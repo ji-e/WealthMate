@@ -28,3 +28,22 @@ object ColorGray {
         Pair("White_80", White_80),
     )
 }
+
+object ColorPrimary {
+    val Primary_700 = Color(0xFF7C3AED)
+    val Primary_600 = Color(0xFF8B5CF6)
+    val Primary_500 = Color(0xFFA78BFA)
+    val Primary_400 = Color(0xFFC4B5DF)
+    val Primary_300 = Color(0xFFF3E8FF)
+    val Primary_200 = Color(0xFFFAF5FF)
+
+
+    fun getColorList() = listOf(
+        Pair("Primary_700", Primary_700),
+        Pair("Primary_600", Primary_600),
+        Pair("Primary_500", Primary_500),
+        Pair("Primary_400", Primary_400),
+        Pair("Primary_300", Primary_300),
+        Pair("Primary_200", Primary_200),
+    )
+}
