@@ -18,8 +18,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import cafe.adriel.voyager.navigator.Navigator
+import cafe.adriel.voyager.transitions.SlideTransition
 import com.jie.wealthmate.component.bottomNav.BottomNavItem
 import com.jie.wealthmate.component.bottomNav.BottomNavigation
+import com.jie.wealthmate.feature.asset.AssetScreen
+import com.jie.wealthmate.feature.calendar.CalendarScreen
+import com.jie.wealthmate.feature.home.HomeScreen
+import com.jie.wealthmate.feature.menu.MenuScreen
 import com.jie.wealthmate.theme.ColorGray
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -66,31 +72,27 @@ fun App() {
 
                 when (selectedItem) {
                     BottomNavItem.Home.route -> {
-                        Text(
-                            text = "선택된 화면: 홈",
-                            style = MaterialTheme.typography.headlineLarge
-                        )
+                        Navigator(HomeScreen()) { navigator ->
+                            SlideTransition(navigator)
+                        }
                     }
 
                     BottomNavItem.Calendar.route -> {
-                        Text(
-                            text = "선택된 화면: 캘린더",
-                            style = MaterialTheme.typography.headlineLarge
-                        )
+                        Navigator(CalendarScreen()) { navigator ->
+                            SlideTransition(navigator)
+                        }
                     }
 
                     BottomNavItem.Asset.route -> {
-                        Text(
-                            text = "선택된 화면: 자산",
-                            style = MaterialTheme.typography.headlineLarge
-                        )
+                        Navigator(AssetScreen()) { navigator ->
+                            SlideTransition(navigator)
+                        }
                     }
 
                     BottomNavItem.Menu.route -> {
-                        Text(
-                            text = "선택된 화면: 메뉴",
-                            style = MaterialTheme.typography.headlineLarge
-                        )
+                        Navigator(MenuScreen()) { navigator ->
+                            SlideTransition(navigator)
+                        }
                     }
                 }
             }
