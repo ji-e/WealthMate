@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Button
+import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -14,7 +15,6 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.jie.wealthmate.component.WMText
-import com.jie.wealthmate.theme.TypoDetail
 
 class HomeScreen : Screen {
     @Composable
@@ -29,9 +29,9 @@ class HomeScreen : Screen {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            WMText(text = "Home Screen Counter: $counter", style = TypoDetail.detail_02)
+            WMText(text = "Home Screen Counter: $counter", style = Typography().bodyLarge)
             Button(onClick = { screenModel.increment() }) {
-                WMText(text = "Increment", style = TypoDetail.detail_02)
+                WMText(text = "Increment", style = Typography().bodyLarge)
             }
         }
     }
