@@ -11,6 +11,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
 import com.jie.wealthmate.theme.ColorGray
+import com.jie.wealthmate.theme.wantedSansFontFamily
 
 @Composable
 fun WMText(
@@ -66,6 +67,7 @@ fun WMText(
         textAlign = textAlign,
         textDecoration = textDecoration,
         fontSize = style.fontSize,
+        fontFamily = wantedSansFontFamily(),
         lineHeight = lineHeight
     )
 }
