@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,6 +26,7 @@ import com.jie.wealthmate.feature.calendar.CalendarScreen
 import com.jie.wealthmate.feature.home.HomeScreen
 import com.jie.wealthmate.feature.menu.MenuScreen
 import com.jie.wealthmate.theme.ColorGray
+import com.jie.wealthmate.theme.WMTheme
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import wealthmate.composeapp.generated.resources.Res
@@ -35,7 +35,7 @@ import wealthmate.composeapp.generated.resources.compose_multiplatform
 @Composable
 @Preview
 fun App() {
-    MaterialTheme {
+    WMTheme() {
         var selectedItem by remember { mutableStateOf(BottomNavItem.Home.route) }
 
         Scaffold(
