@@ -10,20 +10,19 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
+import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.jie.wealthmate.component.WMText
 import com.jie.wealthmate.theme.ColorGray
 import com.jie.wealthmate.theme.ColorPrimary
-import com.jie.wealthmate.theme.NoRippleInteractionSource
-import com.jie.wealthmate.theme.TypoBody
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
-@Preview
 fun BottomNavigation(
     selectedItem: String,
     onItemSelected: (String) -> Unit = { },
@@ -61,7 +60,7 @@ fun BottomNavigation(
                     label = {
                         WMText(
                             text = item.label,
-                            style = TypoBody.body_02_bold,
+                            style = Typography().bodyMedium.copy(fontWeight = FontWeight.SemiBold),
                             color = if (isSelected) ColorGray.Gray_700 else ColorGray.Gray_300,
                         )
                     },
@@ -74,11 +73,16 @@ fun BottomNavigation(
                         unselectedTextColor = ColorGray.Gray_300,
                     ),
                     onClick = { onItemSelected(item.route) },
-                    interactionSource = NoRippleInteractionSource()
                 )
             }
         }
     }
+}
+
+@Composable
+@Preview(showBackground = true)
+private fun BottomNavigationPreview() {
+    BottomNavigation(selectedItem = BottomNavItem.Home.route)
 }
 
 
