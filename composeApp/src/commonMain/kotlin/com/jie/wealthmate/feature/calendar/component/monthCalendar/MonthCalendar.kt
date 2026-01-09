@@ -44,6 +44,7 @@ fun MonthCalendar(
     selectedDate: String,
     onClickToday: () -> Unit = {},
     onClickSelectedMonth: () -> Unit = {},
+    onClickDay: (Int) -> Unit = {},
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
         MonthCalendarHeader(
@@ -51,6 +52,12 @@ fun MonthCalendar(
             selectedMonth = selectedMonth,
             onClickToday = onClickToday,
             onClickSelectedMonth = onClickSelectedMonth,
+        )
+
+        MonthCalendarContent(
+            today = today,
+            selectedMonth = selectedMonth,
+            onClickDay = onClickDay
         )
     }
 }
@@ -65,7 +72,7 @@ private fun MonthCalendarHeader(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 20.dp),
+            .padding(start = 12.dp, end = 4.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         TextButton(
@@ -116,6 +123,15 @@ private fun MonthCalendarHeader(
             onClick = {}
         )
     }
+}
+
+@Composable
+private fun MonthCalendarContent(
+    today: String,
+    selectedMonth: String,
+    onClickDay: (Int) -> Unit,
+) {
+    Week()
 }
 
 @Composable
