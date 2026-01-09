@@ -17,7 +17,6 @@ import androidx.compose.ui.unit.dp
 import com.jie.wealthmate.component.WMText
 import com.jie.wealthmate.theme.ColorGray
 import com.jie.wealthmate.theme.ColorPrimary
-import com.jie.wealthmate.theme.NoRippleInteractionSource
 import com.jie.wealthmate.theme.TypoBody
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -74,7 +73,6 @@ fun BottomNavigation(
                         unselectedTextColor = ColorGray.Gray_300,
                     ),
                     onClick = { onItemSelected(item.route) },
-                    interactionSource = NoRippleInteractionSource()
                 )
             }
         }
