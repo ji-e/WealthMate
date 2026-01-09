@@ -1,8 +1,11 @@
 package com.jie.wealthmate.utils
 
+import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.minus
 import kotlinx.datetime.number
+import kotlinx.datetime.plus
 import kotlinx.datetime.toLocalDateTime
 import kotlinx.datetime.todayIn
 import kotlin.time.Clock
@@ -77,4 +80,20 @@ fun LocalDate?.convertLocalDateToString(
         formatDateKor -> "${this.year}년 ${this.month.number}월 ${this.day}일"
         else -> defaultValue
     }
+}
+
+/**
+ * 월의 마지막 날짜
+ */
+fun LocalDate.lastDayOfMonth(): LocalDate {
+    val nextMonth = this.plus(1, DateTimeUnit.MONTH)
+    val firstDayOfNextMonth = LocalDate(nextMonth.year, nextMonth.month, 1)
+    return firstDayOfNextMonth.minus(1, DateTimeUnit.DAY)
+}
+
+/**
+ * 월의 첫번째 날짜
+ */
+fun LocalDate.firstDayOfMonth(): LocalDate {
+    return LocalDate(this.year, this.month, 1)
 }
