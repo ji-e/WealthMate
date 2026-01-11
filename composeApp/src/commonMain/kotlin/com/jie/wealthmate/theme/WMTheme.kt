@@ -1,10 +1,13 @@
 package com.jie.wealthmate.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material3.LocalRippleConfiguration
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RippleConfiguration
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 
 @Composable
 fun WMTheme(
@@ -40,6 +43,10 @@ fun WMTheme(
     MaterialTheme(
         colorScheme = colorScheme,
     ) {
-        content()
+        CompositionLocalProvider(
+            LocalRippleConfiguration provides RippleConfiguration(color = ColorPrimary.Primary_500)
+        ) {
+            content()
+        }
     }
 }

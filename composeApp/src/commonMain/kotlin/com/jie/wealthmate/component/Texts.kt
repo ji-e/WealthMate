@@ -1,6 +1,7 @@
 package com.jie.wealthmate.component
 
 import androidx.compose.material3.Text
+import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -45,7 +46,7 @@ fun WMText(
 @Composable
 fun WMText(
     text: String,
-    style: TextStyle,
+    style: TextStyle = Typography().bodyMedium,
     modifier: Modifier = Modifier,
     color: Color = ColorGray.Gray_700,
     maxLines: Int = Int.MAX_VALUE,

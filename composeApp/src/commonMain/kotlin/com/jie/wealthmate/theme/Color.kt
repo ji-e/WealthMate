@@ -47,3 +47,30 @@ object ColorPrimary {
         Pair("Primary_200", Primary_200),
     )
 }
+
+object ColorRed {
+    val Red_300 = Color(0xFFF03E3E)
+    val Red_200 = Color(0xFFFF9595)
+    val Red_100 = Color(0xFFFFD5D5)
+    val Red_50 = Color(0xFFFFF2F2)
+    fun getColorList() = listOf(
+        Pair("Red_300", Red_300),
+        Pair("Red_200", Red_200),
+        Pair("Red_100", Red_100),
+        Pair("Red_50", Red_50)
+    )
+}
+
+object ColorBlue {
+    val Blue_300 = Color(0xFF227EFF)
+    val Blue_200 = Color(0xFF87B9FF)
+    val Blue_100 = Color(0xFFBDD8FF)
+    val Blue_50 = Color(0xFFEFF5FF)
+    fun getColorList() = listOf(
+        Pair("Blue_300", Blue_300),
+        Pair("Blue_200", Blue_200),
+        Pair("Blue_100", Blue_100),
+        Pair("Blue_50", Blue_50)
+    )
+}
+
