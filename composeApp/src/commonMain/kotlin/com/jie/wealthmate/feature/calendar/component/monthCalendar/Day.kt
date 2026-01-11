@@ -51,7 +51,7 @@ fun DayGrid(
         mutableListOf<LocalDate?>().apply {
             val firstDay = selectedMonth.firstDayOfMonth()
 
-            repeat(firstDay.dayOfWeek.isoDayNumber - 1) {
+            repeat(firstDay.dayOfWeek.isoDayNumber) {
                 add(null)
             }
 
