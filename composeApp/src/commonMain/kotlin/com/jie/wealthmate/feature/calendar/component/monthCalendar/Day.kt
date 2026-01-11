@@ -70,6 +70,7 @@ private fun Day(
     day?.let {
         WMText(
             text = it.day.toString(),
+            color = WeekEnum.creator(day.dayOfWeek.isoDayNumber).color,
             textAlign = TextAlign.Center
         )
     }

@@ -20,9 +20,10 @@ import androidx.compose.ui.unit.dp
 import com.jie.wealthmate.component.WMIconButton
 import com.jie.wealthmate.component.WMText
 import com.jie.wealthmate.theme.ColorGray
-import com.jie.wealthmate.utils.convertDate
-import com.jie.wealthmate.utils.convertDateToLocalDate
+import com.jie.wealthmate.utils.convertLocalDateToString
 import com.jie.wealthmate.utils.formatDateKorYM
+import com.jie.wealthmate.utils.today
+import kotlinx.datetime.LocalDate
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import wealthmate.composeapp.generated.resources.Res
@@ -33,20 +34,19 @@ import wealthmate.composeapp.generated.resources.ic_more_vert
 
 /**
  * MonthCalendar Composable to display a month view calendar.
- * @param today 오늘 날짜 (예: "2024-06-15")
  * @param selectedMonth 선택된 월 (예: "2024-06")
  * @param selectedDate 선택된 날짜 (예: "2024-06-10")
  */
 @Composable
 fun MonthCalendar(
-    today: String,
-    selectedMonth: String,
-    selectedDate: String,
+    selectedMonth: LocalDate,
+    selectedDate: LocalDate,
     onClickToday: () -> Unit = {},
     onClickSelectedMonth: () -> Unit = {},
-    onClickDay: (Int) -> Unit = {},
+    onClickDate: (LocalDate) -> Unit = {},
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
+
         MonthCalendarHeader(
             today = today,
             selectedMonth = selectedMonth,
@@ -56,16 +56,17 @@ fun MonthCalendar(
 
         MonthCalendarContent(
             today = today,
+            selectedDate = selectedDate,
             selectedMonth = selectedMonth,
-            onClickDay = onClickDay
+            onClickDate = onClickDate
         )
     }
 }
 
 @Composable
 private fun MonthCalendarHeader(
-    today: String,
-    selectedMonth: String,
+    today: LocalDate,
+    selectedMonth: LocalDate,
     onClickToday: () -> Unit,
     onClickSelectedMonth: () -> Unit,
 ) {
@@ -83,7 +84,7 @@ private fun MonthCalendarHeader(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 WMText(
-                    text = selectedMonth.convertDate(formatDateKorYM),
+                    text = selectedMonth.convertLocalDateToString(formatDateKorYM),
                     style = Typography().titleMedium.copy(fontWeight = FontWeight.SemiBold)
                 )
                 Icon(
@@ -110,7 +111,7 @@ private fun MonthCalendarHeader(
                 )
 
                 WMText(
-                    text = today.convertDateToLocalDate()?.day.toString(),
+                    text = today.day.toString(),
                     style = Typography().labelSmall.copy(fontWeight = FontWeight.SemiBold),
                     modifier = Modifier.padding(top = 2.dp)
                 )
@@ -127,19 +128,25 @@ private fun MonthCalendarHeader(
 
 @Composable
 private fun MonthCalendarContent(
-    today: String,
-    selectedMonth: String,
-    onClickDay: (Int) -> Unit,
+    today: LocalDate,
+    selectedDate: LocalDate,
+    selectedMonth: LocalDate,
+    onClickDate: (LocalDate) -> Unit,
 ) {
     Week()
+    GridDay(
+        today = today,
+        selectedDate = selectedDate,
+        selectedMonth = selectedMonth,
+        onClickDate = onClickDate
+    )
 }
 
 @Composable
 @Preview(showBackground = true)
 private fun MonthCalendarPreview() {
     MonthCalendar(
-        today = "2024-06-15",
-        selectedMonth = "2024-06",
-        selectedDate = "2024-06-10",
+        selectedMonth = today,
+        selectedDate = today,
     )
 }
