@@ -13,7 +13,7 @@ import androidx.compose.ui.unit.dp
 import com.jie.wealthmate.component.WMText
 
 @Composable
-fun Week() {
+fun WeekHeader() {
     Row(
         modifier = Modifier
             .fillMaxWidth()
