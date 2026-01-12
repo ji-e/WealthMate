@@ -10,7 +10,10 @@ import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.jie.wealthmate.base.collectSideEffect
+import com.jie.wealthmate.feature.menu.categorySetting.incomCategorySetting.IncomeCategorySettingScreen
 import com.jie.wealthmate.feature.menu.component.MenuContentItem
+import com.jie.wealthmate.feature.menu.component.MenuEnum
 import com.jie.wealthmate.feature.menu.component.MenuTitleItem
 import com.jie.wealthmate.theme.WMTheme
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -21,6 +24,17 @@ class MenuScreen() : Screen {
         val navigator = LocalNavigator.currentOrThrow
         val screenModel = rememberScreenModel { MenuScreenModel() }
         val uiState = screenModel.container.uiState.collectAsState().value
+
+        screenModel.collectSideEffect { effect ->
+            when (effect) {
+                is MenuUiSideEffect.OnCLickMenu -> {
+                    when (effect.menu) {
+                        MenuEnum.INCOME_CATEGORY -> navigator.push(IncomeCategorySettingScreen())
+                        else -> navigator.push(IncomeCategorySettingScreen()) // todo temp
+                    }
+                }
+            }
+        }
 
         LazyColumn(modifier = Modifier.fillMaxSize()) {
             items(uiState.menuEnums.size) { index ->
@@ -33,7 +47,7 @@ class MenuScreen() : Screen {
                         MenuContentItem(
                             menu = menuContent,
                             onClickMenu = {
-                               // todo 클릭 이벤트
+                                screenModel.onMenuClick(menuContent)
                             }
                         )
                     }
