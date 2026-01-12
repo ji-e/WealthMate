@@ -26,7 +26,9 @@ import com.jie.wealthmate.utils.lastDayOfMonth
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.isoDayNumber
+import kotlinx.datetime.minus
 import kotlinx.datetime.plus
+import kotlin.math.ceil
 
 
 @Composable
@@ -41,28 +43,55 @@ fun DayGrid(
     onClickDate: (LocalDate) -> Unit,
 ) {
     val items = remember(selectedMonth) {
-        mutableListOf<LocalDate?>().apply {
+        mutableListOf<Pair<LocalDate, MonthPeriodEnum>>().apply {
             val firstDay = selectedMonth.firstDayOfMonth()
-            val startPadding = (firstDay.dayOfWeek.isoDayNumber - 1) % 7
+            val startPadding = firstDay.dayOfWeek.isoDayNumber % 7
+
+            // 이전 달
             repeat(startPadding) {
-                add(null)
+                add(
+                    firstDay.minus(
+                        startPadding - it,
+                        DateTimeUnit.DAY
+                    ) to MonthPeriodEnum.LAST_MONTH
+                )
             }
 
-            add(firstDay)
+            // 이번 달
+            repeat(selectedMonth.lastDayOfMonth().day) {
+                add(firstDay.plus(it, DateTimeUnit.DAY) to MonthPeriodEnum.THIS_MONTH)
+            }
 
-            repeat(selectedMonth.lastDayOfMonth().day - 1) {
-                add(firstDay.plus(it + 1, DateTimeUnit.DAY))
+            // 다음 달
+            val itemsSize = this.size
+            if (itemsSize < 35) {
+                repeat(35 - this.size) {
+                    add(
+                        firstDay.lastDayOfMonth()
+                            .plus(it + 1, DateTimeUnit.DAY) to MonthPeriodEnum.NEXT_MONTH
+                    )
+                }
+            } else if (itemsSize > 35) {
+                repeat(42 - this.size) {
+                    add(
+                        firstDay.lastDayOfMonth()
+                            .plus(it + 1, DateTimeUnit.DAY) to MonthPeriodEnum.NEXT_MONTH
+                    )
+                }
             }
         }
     }
 
+    val numRowsForCurrentMonth = ceil(items.size / 7f)
+
     // 선택된 날짜가 몇 번째 주에 속하는지 계산
     val selectedItemIndex = remember(items, selectedDate) {
-        items.indexOf(selectedDate)
+        items.indexOfFirst { it.first == selectedDate }
     }
     val selectedRowIndex = remember(selectedItemIndex) {
         if (selectedItemIndex < 0) 0 else selectedItemIndex / 7
     }
+
 
     if (items.isEmpty().not()) {
         LazyVerticalGrid(
@@ -77,15 +106,14 @@ fun DayGrid(
                 DayItem(
                     day = day,
                     today = today,
-                    isSelected = day == selectedDate,
+                    isSelected = day.first == selectedDate,
                     isInSelectedWeek = rowIndex == selectedRowIndex,
-                    dayNormalHeight = dayNormalHeight,
-                    dayMaxHeight = dayMaxHeight,
+                    dayNormalHeight = dayNormalHeight / numRowsForCurrentMonth,
+                    dayMaxHeight = dayMaxHeight / numRowsForCurrentMonth,
                     expansionProgress = expansionProgress,
                     collapseProgress = collapseProgress,
-                    onClickDate = {
-                        day?.let { onClickDate(it) }
-                    }
+                    onClickDate = onClickDate
+
                 )
             }
         }
@@ -95,7 +123,7 @@ fun DayGrid(
 @Composable
 internal fun DayItem(
     modifier: Modifier = Modifier,
-    day: LocalDate?,
+    day: Pair<LocalDate, MonthPeriodEnum>,
     today: LocalDate,
     isSelected: Boolean,
     isInSelectedWeek: Boolean,
@@ -109,7 +137,7 @@ internal fun DayItem(
     val height = when {
         // 1. 축소 중 (Normal -> Minimized)
         collapseProgress > 0f -> {
-            val minHeight = if (isInSelectedWeek) 60.dp else 0.dp
+            val minHeight = if (isInSelectedWeek) 72.dp else 0.dp
             lerp(start = dayNormalHeight, stop = minHeight, fraction = collapseProgress)
         }
         // 2. 확장 중 (Normal -> Maximized)
@@ -135,16 +163,16 @@ internal fun DayItem(
             .fillMaxWidth()
             .height(height)
             .background(if (isSelected) ColorBlue.Blue_50 else ColorGray.White)
-            .clickable { day?.let { onClickDate(it) } },
+            .clickable { onClickDate(day.first) },
         contentAlignment = Alignment.Center
     ) {
-        if (day != null) {
-            WMText(
-                modifier = Modifier.alpha(alpha),
-                text = day.day.toString(),
-                color = WeekEnum.creator(day.dayOfWeek.isoDayNumber).color,
-                textAlign = TextAlign.Center
-            )
-        }
+
+        WMText(
+            modifier = Modifier.alpha(alpha),
+            text = day.first.day.toString(),
+            color = WeekEnum.creator(day.first.dayOfWeek.isoDayNumber).color,
+            textAlign = TextAlign.Center
+        )
+
     }
 }

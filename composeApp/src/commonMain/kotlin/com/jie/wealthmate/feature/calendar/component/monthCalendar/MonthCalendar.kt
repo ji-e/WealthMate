@@ -43,14 +43,11 @@ import com.jie.wealthmate.component.WMIconButton
 import com.jie.wealthmate.component.WMText
 import com.jie.wealthmate.theme.ColorGray
 import com.jie.wealthmate.utils.convertLocalDateToString
-import com.jie.wealthmate.utils.firstDayOfMonth
 import com.jie.wealthmate.utils.formatDateKorYM
-import com.jie.wealthmate.utils.lastDayOfMonth
 import com.jie.wealthmate.utils.today
 import kotlinx.coroutines.launch
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
-import kotlinx.datetime.isoDayNumber
 import kotlinx.datetime.monthsUntil
 import kotlinx.datetime.plus
 import org.jetbrains.compose.resources.painterResource
@@ -59,7 +56,6 @@ import wealthmate.composeapp.generated.resources.Res
 import wealthmate.composeapp.generated.resources.ic_arrow_drop_down
 import wealthmate.composeapp.generated.resources.ic_calendar_today
 import wealthmate.composeapp.generated.resources.ic_more_vert
-import kotlin.math.ceil
 
 private val startDate = LocalDate(2025, 1, 1)
 
@@ -83,15 +79,16 @@ fun MonthCalendar(
     onClickSelectedMonth: () -> Unit = {},
     onClickDate: (LocalDate) -> Unit = {},
 ) {
+    var displaySelectedMonth by remember { mutableStateOf(today.convertLocalDateToString(formatDateKorYM)) }
     val coroutineScope = rememberCoroutineScope()
 
     val anchoredState = remember {
         AnchoredDraggableState(
-            initialValue = CalendarState.Normal,
+            initialValue = CalendarStateEnum.Normal,
             anchors = DraggableAnchors {
-                CalendarState.Maximized at 0f
-                CalendarState.Normal at -1f
-                CalendarState.Minimized at -2f
+                CalendarStateEnum.Maximized at 0f
+                CalendarStateEnum.Normal at -1f
+                CalendarStateEnum.Minimized at -2f
             },
         )
     }
@@ -105,6 +102,12 @@ fun MonthCalendar(
         snapshotFlow { pagerState.targetPage }.collect { page ->
             val newMonth = startDate.plus(value = page, unit = DateTimeUnit.MONTH)
             onMonthChanged(newMonth)
+        }
+    }
+    LaunchedEffect(pagerState) {
+        snapshotFlow { pagerState.settledPage }.collect { page ->
+            val newMonth = startDate.plus(value = page, unit = DateTimeUnit.MONTH)
+            displaySelectedMonth = newMonth.convertLocalDateToString(formatDateKorYM)
         }
     }
 
@@ -125,6 +128,7 @@ fun MonthCalendar(
         MonthCalendarHeader(
             today = today,
             selectedMonth = selectedMonth,
+            displaySelectedMonth = displaySelectedMonth,
             onClickToday = onClickToday,
             onClickSelectedMonth = onClickSelectedMonth,
         )
@@ -137,7 +141,7 @@ fun MonthCalendar(
             val dragBarHeight = 32.dp
             val dragBarHeightPx = with(density) { dragBarHeight.toPx() }
 
-            val dayHeight = 60.dp
+            val dayHeight = 72.dp
             val dayHeightPx = with(density) { dayHeight.toPx() }
 
             val maximizedHeightPx = with(density) { maxHeight.toPx() }
@@ -149,20 +153,20 @@ fun MonthCalendar(
 
                 anchoredState.updateAnchors(
                     newAnchors = DraggableAnchors {
-                        CalendarState.Maximized at 0f
-                        CalendarState.Normal at -(maximizedHeightPx - normalCalendarHeightPx)
-                        CalendarState.Minimized at -(maximizedHeightPx - minimizedHeightPx)
+                        CalendarStateEnum.Maximized at 0f
+                        CalendarStateEnum.Normal at -(maximizedHeightPx - normalCalendarHeightPx)
+                        CalendarStateEnum.Minimized at -(maximizedHeightPx - minimizedHeightPx)
                     }
                 )
 
                 if (isInitialSetup) {
-                    anchoredState.snapTo(CalendarState.Normal)
+                    anchoredState.snapTo(CalendarStateEnum.Normal)
                     isInitialSetup = false
                 }
             }
 
             val currentOffset = anchoredState.requireOffset()
-            val normalHeightPx = anchoredState.anchors.positionOf(CalendarState.Normal)
+            val normalHeightPx = anchoredState.anchors.positionOf(CalendarStateEnum.Normal)
                 .takeIf { it.isFinite() }
                 ?.let { maximizedHeightPx + it }
                 ?: with(density) { normalCalendarHeight.toPx() }
@@ -183,26 +187,8 @@ fun MonthCalendar(
                         .coerceIn(0f, 1f)
                 }
 
-
-            val itemsForCurrentMonth = remember(selectedMonth) {
-                mutableListOf<LocalDate?>().apply {
-                    val firstDay = selectedMonth.firstDayOfMonth()
-                    val startPadding = (firstDay.dayOfWeek.isoDayNumber - 1) % 7
-                    repeat(startPadding) { add(null) }
-                    add(firstDay)
-                    repeat(selectedMonth.lastDayOfMonth().day - 1) {
-                        add(
-                            firstDay.plus(
-                                it + 1,
-                                DateTimeUnit.DAY
-                            )
-                        )
-                    }
-                }
-            }
-            val numRowsForCurrentMonth = ceil(itemsForCurrentMonth.size / 7f)
-            val dayNormalHeight = (normalCalendarHeight - dragBarHeight) / numRowsForCurrentMonth
-            val dayMaxHeight = (maxHeight - dragBarHeight) / numRowsForCurrentMonth
+            val dayNormalHeight = (normalCalendarHeight - dragBarHeight)
+            val dayMaxHeight = (maxHeight - dragBarHeight)
 
             Column(
                 modifier = Modifier.height(with(density) { (maximizedHeightPx + currentOffset).toDp() })
@@ -245,6 +231,7 @@ fun MonthCalendar(
 private fun MonthCalendarHeader(
     today: LocalDate,
     selectedMonth: LocalDate,
+    displaySelectedMonth: String,
     onClickToday: () -> Unit,
     onClickSelectedMonth: () -> Unit,
 ) {
@@ -262,7 +249,7 @@ private fun MonthCalendarHeader(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 WMText(
-                    text = selectedMonth.convertLocalDateToString(formatDateKorYM),
+                    text = displaySelectedMonth,
                     style = Typography().titleMedium.copy(fontWeight = FontWeight.SemiBold)
                 )
                 Icon(
