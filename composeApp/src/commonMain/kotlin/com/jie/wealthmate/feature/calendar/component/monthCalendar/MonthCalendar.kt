@@ -95,7 +95,6 @@ fun MonthCalendar(
                 value = page,
                 unit = DateTimeUnit.MONTH
             )
-            println(newMonth)
             onMonthChanged(newMonth)
         }
     }
