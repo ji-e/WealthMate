@@ -18,8 +18,8 @@ class CalendarScreen() : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
-        val screenModel = rememberScreenModel { CalendarScreenModel()}
-        val uiState  = screenModel.container.uiState.collectAsState().value
+        val screenModel = rememberScreenModel { CalendarScreenModel() }
+        val uiState = screenModel.container.uiState.collectAsState().value
 
 
         Column(
@@ -28,8 +28,9 @@ class CalendarScreen() : Screen {
             MonthCalendar(
                 selectedMonth = uiState.selectedMonth,
                 selectedDate = uiState.selectedDate,
-                onMonthChanged = screenModel:: updateSelectedMonth,
-                onClickToday = screenModel::updateSelectedMonth
+                onMonthChanged = screenModel::updateSelectedMonth,
+                onClickToday = screenModel::updateSelectedMonth,
+                onClickDate = screenModel::updateSelectedDate
             )
         }
     }
