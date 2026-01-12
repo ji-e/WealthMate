@@ -88,9 +88,6 @@ fun MonthCalendar(
     val anchoredState = remember {
         AnchoredDraggableState(
             initialValue = CalendarState.Normal,
-//            positionalThreshold = { distance: Float -> distance * 0.5f },
-//            velocityThreshold = { 100f },
-//            animationSpec = androidx.compose.animation.core.spring(),
             anchors = DraggableAnchors {
                 CalendarState.Maximized at 0f
                 CalendarState.Normal at -1f
@@ -140,29 +137,20 @@ fun MonthCalendar(
             val dragBarHeight = 32.dp
             val dragBarHeightPx = with(density) { dragBarHeight.toPx() }
 
-            val dayHeight = 44.dp
+            val dayHeight = 60.dp
             val dayHeightPx = with(density) { dayHeight.toPx() }
 
             val maximizedHeightPx = with(density) { maxHeight.toPx() }
             val minimizedHeightPx = dayHeightPx + dragBarHeightPx
+            val normalCalendarHeight = 360.dp
 
             LaunchedEffect(selectedMonth, maximizedHeightPx) {
-                val items = mutableListOf<LocalDate?>().apply {
-                    val firstDay = selectedMonth.firstDayOfMonth()
-                    val startPadding = (firstDay.dayOfWeek.isoDayNumber - 1) % 7
-                    repeat(startPadding) { add(null) }
-                    add(firstDay)
-                    repeat(selectedMonth.lastDayOfMonth().day - 1) {
-                        add(firstDay.plus(it + 1, DateTimeUnit.DAY))
-                    }
-                }
-                val numRows = ceil(items.size / 7f)
-                val normalHeightPx = (dayHeightPx * numRows)
+                val normalCalendarHeightPx = with(density) { normalCalendarHeight.toPx() }
 
                 anchoredState.updateAnchors(
                     newAnchors = DraggableAnchors {
                         CalendarState.Maximized at 0f
-                        CalendarState.Normal at -(maximizedHeightPx - normalHeightPx - dragBarHeightPx)
+                        CalendarState.Normal at -(maximizedHeightPx - normalCalendarHeightPx)
                         CalendarState.Minimized at -(maximizedHeightPx - minimizedHeightPx)
                     }
                 )
@@ -177,21 +165,23 @@ fun MonthCalendar(
             val normalHeightPx = anchoredState.anchors.positionOf(CalendarState.Normal)
                 .takeIf { it.isFinite() }
                 ?.let { maximizedHeightPx + it }
-                ?: maximizedHeightPx
+                ?: with(density) { normalCalendarHeight.toPx() }
 
             val expansionProgress =
-                if (normalHeightPx == maximizedHeightPx) 0f
-                else ((currentOffset + maximizedHeightPx - normalHeightPx) / (maximizedHeightPx - normalHeightPx)).coerceIn(
-                    0f,
-                    1f
-                )
+                if (normalHeightPx == maximizedHeightPx) {
+                    0f
+                } else {
+                    ((currentOffset + maximizedHeightPx - normalHeightPx) / (maximizedHeightPx - normalHeightPx))
+                        .coerceIn(0f, 1f)
+                }
 
             val collapseProgress =
-                if (normalHeightPx == minimizedHeightPx) 0f
-                else ((currentOffset + maximizedHeightPx - normalHeightPx) / (minimizedHeightPx - normalHeightPx)).coerceIn(
-                    0f,
-                    1f
-                )
+                if (normalHeightPx == minimizedHeightPx) {
+                    0f
+                } else {
+                    ((currentOffset + maximizedHeightPx - normalHeightPx) / (minimizedHeightPx - normalHeightPx))
+                        .coerceIn(0f, 1f)
+                }
 
 
             val itemsForCurrentMonth = remember(selectedMonth) {
@@ -211,7 +201,8 @@ fun MonthCalendar(
                 }
             }
             val numRowsForCurrentMonth = ceil(itemsForCurrentMonth.size / 7f)
-            val dayMaxHeight = (maxHeight-dragBarHeight) / numRowsForCurrentMonth
+            val dayNormalHeight = (normalCalendarHeight - dragBarHeight) / numRowsForCurrentMonth
+            val dayMaxHeight = (maxHeight - dragBarHeight) / numRowsForCurrentMonth
 
             Column(
                 modifier = Modifier.height(with(density) { (maximizedHeightPx + currentOffset).toDp() })
@@ -226,6 +217,7 @@ fun MonthCalendar(
                         today = today,
                         selectedDate = selectedDate,
                         selectedMonth = month,
+                        dayNormalHeight = dayNormalHeight,
                         dayMaxHeight = dayMaxHeight,
                         expansionProgress = expansionProgress,
                         collapseProgress = collapseProgress,
@@ -317,6 +309,7 @@ private fun MonthCalendarContent(
     today: LocalDate,
     selectedDate: LocalDate,
     selectedMonth: LocalDate,
+    dayNormalHeight: Dp,
     dayMaxHeight: Dp,
     expansionProgress: Float,
     collapseProgress: Float,
@@ -327,6 +320,7 @@ private fun MonthCalendarContent(
             today = today,
             selectedDate = selectedDate,
             selectedMonth = selectedMonth,
+            dayNormalHeight = dayNormalHeight,
             dayMaxHeight = dayMaxHeight,
             expansionProgress = expansionProgress,
             collapseProgress = collapseProgress,

@@ -34,6 +34,7 @@ fun DayGrid(
     today: LocalDate,
     selectedDate: LocalDate,
     selectedMonth: LocalDate,
+    dayNormalHeight: Dp,
     dayMaxHeight: Dp,
     expansionProgress: Float,
     collapseProgress: Float,
@@ -78,6 +79,7 @@ fun DayGrid(
                     today = today,
                     isSelected = day == selectedDate,
                     isInSelectedWeek = rowIndex == selectedRowIndex,
+                    dayNormalHeight = dayNormalHeight,
                     dayMaxHeight = dayMaxHeight,
                     expansionProgress = expansionProgress,
                     collapseProgress = collapseProgress,
@@ -97,6 +99,7 @@ internal fun DayItem(
     today: LocalDate,
     isSelected: Boolean,
     isInSelectedWeek: Boolean,
+    dayNormalHeight: Dp,
     dayMaxHeight: Dp,
     expansionProgress: Float,
     collapseProgress: Float,
@@ -106,15 +109,15 @@ internal fun DayItem(
     val height = when {
         // 1. 축소 중 (Normal -> Minimized)
         collapseProgress > 0f -> {
-            val minHeight = if (isInSelectedWeek) 44.dp else 0.dp
-            lerp(start = 44.dp, stop = minHeight, fraction = collapseProgress)
+            val minHeight = if (isInSelectedWeek) 60.dp else 0.dp
+            lerp(start = dayNormalHeight, stop = minHeight, fraction = collapseProgress)
         }
         // 2. 확장 중 (Normal -> Maximized)
         expansionProgress > 0f -> {
-            lerp(start = 44.dp, stop = dayMaxHeight, fraction = expansionProgress)
+            lerp(start = dayNormalHeight, stop = dayMaxHeight, fraction = expansionProgress)
         }
         // 3. 기본 상태 (Normal)
-        else -> 44.dp
+        else -> dayNormalHeight
     }
 
     val alpha = when {
