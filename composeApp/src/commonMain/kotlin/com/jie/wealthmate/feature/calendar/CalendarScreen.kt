@@ -28,6 +28,8 @@ class CalendarScreen() : Screen {
             MonthCalendar(
                 selectedMonth = uiState.selectedMonth,
                 selectedDate = uiState.selectedDate,
+                onMonthChanged = screenModel:: updateSelectedMonth,
+                onClickToday = screenModel::updateSelectedMonth
             )
         }
     }
