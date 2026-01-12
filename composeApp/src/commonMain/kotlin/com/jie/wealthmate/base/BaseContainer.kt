@@ -5,39 +5,81 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.remember
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
-import androidx.lifecycle.compose.LocalLifecycleOwner
-import androidx.lifecycle.flowWithLifecycle
-import androidx.lifecycle.repeatOnLifecycle
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 
+/**
+ * MVI 컨테이너의 핵심 인터페이스입니다.
+ * UI 상태(StateFlow)와 일회성 이벤트(SharedFlow)를 외부에 노출합니다.
+ *
+ * @param S UI 상태의 타입
+ */
 interface Container<S> {
+    /**
+     * 화면의 UI 상태를 나타내는 StateFlow입니다.
+     * Compose에서는 collectAsState()와 함께 사용하여 상태 변화에 따라 UI를 자동으로 업데이트할 수 있습니다.
+     */
     val uiState: StateFlow<S>
+
+    /**
+     * Toast 메시지 표시, 화면 이동 등 일회성 이벤트를 전달하는 SharedFlow입니다.
+     * SideEffect는 상태와 달리 소비되면 사라져야 하는 이벤트를 처리하는 데 사용됩니다.
+     */
     val uiSideEffect: SharedFlow<UiSideEffect>
 
+    /**
+     * 사용자 입력이나 시스템 이벤트(Intent)를 처리하는 함수입니다.
+     * 이 함수를 통해 UI 상태를 변경하거나 SideEffect를 발생시킬 수 있습니다.
+     * @param intent 이벤트를 처리할 로직을 담은 람다 함수
+     */
     fun event(intent: ContainerContext<S>.() -> Unit)
+
+    /**
+     * SharedFlow의 Replay Cache를 비워, 이전 SideEffect가 새로운 구독자에게 전달되는 것을 방지합니다.
+     * 화면이 사라질 때 호출하여 메모리 누수를 방지하고 원치 않는 동작을 막을 수 있습니다.
+     */
     fun clearSideEffects()
 }
 
+/**
+ * Container를 소유하는 호스트(ViewModel, ScreenModel 등)가 구현하는 인터페이스입니다.
+ * @param S UI 상태의 타입
+ */
 interface ContainerHost<S> {
     val container: Container<S>
 
+    /**
+     * SideEffect를 초기 상태(보통 Idle)로 리셋합니다.
+     */
     fun resetSideEffect()
 }
 
+/**
+ * 이벤트 처리의 컨텍스트를 제공하는 클래스입니다.
+ * 이벤트 핸들러 내에서 현재 상태에 접근하고, 상태를 변경하며, SideEffect를 발생시킬 수 있습니다.
+ *
+ * @param S UI 상태의 타입
+ * @property initState 현재 UI 상태를 가져오는 함수
+ * @property postSideEffect SideEffect를 발생시키는 suspend 함수
+ * @property reduceState UI 상태를 변경하는 함수
+ */
 class ContainerContext<S>(
     val initState: () -> S,
     val postSideEffect: suspend (UiSideEffect) -> Unit,
     val reduceState: ((S) -> S) -> Unit,
 ) {
+    /**
+     * 현재 UI 상태(state)에 직접 접근할 수 있는 프로퍼티입니다.
+     */
     val state: S
         get() = initState()
 
 }
 
+/**
+ * ContainerHost의 확장 함수로, 이벤트 처리를 간결하게 작성할 수 있도록 돕습니다.
+ * @param transformer 이벤트 처리 로직
+ */
 fun <S> ContainerHost<S>.event(
     transformer: ContainerContext<S>.() -> Unit,
 ) {
@@ -46,78 +88,70 @@ fun <S> ContainerHost<S>.event(
     }
 }
 
+/**
+ * KMP 환경에 맞게 수정된 Composable 함수입니다.
+ * 화면(Screen)의 생명주기에 맞춰 SideEffect를 수집하고 처리합니다.
+ * Android의 Lifecycle 종속성을 제거하고 Compose의 Composition 생명주기를 사용합니다.
+ *
+ * @param STATE UI 상태의 타입
+ * @param sideEffect 수신된 SideEffect를 처리할 suspend 람다 함수
+ */
 @Composable
 fun <STATE : UiState> ContainerHost<STATE>.collectSideEffect(
-    lifecycleState: Lifecycle.State = Lifecycle.State.STARTED,
-    clearResource: () -> Unit = {},
-    sideEffect: suspend (UiSideEffect) -> Unit,
-) {
-    collectSideEffectInternal(
-        isReady = true,
-        lifecycleState = lifecycleState,
-        clearResource = clearResource,
-        sideEffect = sideEffect
-    )
-}
-
-
-@Composable
-private fun <STATE : UiState> ContainerHost<STATE>.collectSideEffectInternal(
-    isReady: Boolean = false,
-    lifecycleState: Lifecycle.State = Lifecycle.State.STARTED,
-    clearResource: () -> Unit = {},
     sideEffect: suspend (UiSideEffect) -> Unit,
 ) {
     val sideEffectFlow = container.uiSideEffect
-    val lifecycleOwner = LocalLifecycleOwner.current
 
-    LaunchedEffect(isReady, sideEffectFlow, lifecycleOwner) {
-        lifecycleOwner.lifecycle.repeatOnLifecycle(lifecycleState) {
-            sideEffectFlow.collect {
-                if (isReady) {
-                    sideEffect(it)
-                }
-            }
+    // LaunchedEffect는 Composable이 Composition에 추가될 때 코루틴을 실행하고,
+    // Composable이 제거될 때 코루틴을 취소하여 KMP 환경에서 생명주기를 안전하게 관리합니다.
+    // key로 sideEffectFlow를 사용하여 flow가 변경될 경우 기존 코루틴을 취소하고 새로 시작합니다.
+    LaunchedEffect(sideEffectFlow) {
+        sideEffectFlow.collect {
+            sideEffect(it)
         }
     }
 
-    DisposableEffect(lifecycleOwner) {
-        val observer = LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_STOP || event == Lifecycle.Event.ON_DESTROY) {
-                clearResource()
-                try {
-                    container.clearSideEffects() // replay 버퍼 초기화
-                } catch (e: Exception) {
-                    Unit
-                }
-                resetSideEffect()
-            }
-        }
-
-        lifecycleOwner.lifecycle.addObserver(observer)
-
+    // DisposableEffect는 Composable이 Composition에서 제거될 때(화면 전환 등) 정리 로직을 수행합니다.
+    // onDispose 블록은 화면이 사라질 때 호출되어 SideEffect 관련 리소스를 정리합니다.
+    DisposableEffect(Unit) {
         onDispose {
-            clearResource()
-            lifecycleOwner.lifecycle.removeObserver(observer)
+            // replay 버퍼를 초기화하여 이전 이펙트가 다시 발생하는 것을 방지
+            container.clearSideEffects()
+            // SideEffect 상태를 초기값으로 리셋
+            resetSideEffect()
         }
     }
 }
 
+
+/**
+ * Container의 uiState를 Compose의 State로 변환합니다.
+ * KMP 환경을 위해 Android Lifecycle 종속성을 제거하고, Compose의 `collectAsState`를 직접 사용합니다.
+ * 이 Composable 함수가 활성화된 동안만 StateFlow를 구독합니다.
+ *
+ * @param STATE UI 상태의 타입
+ * @return Compose에서 관찰 가능한 State 객체
+ */
 @Composable
-fun <STATE : UiState> ContainerHost<STATE>.collectAsState(
-    lifecycleState: Lifecycle.State = Lifecycle.State.STARTED,
-): State<STATE> {
-    val stateFlow = container.uiState
-    val lifecycleOwner = LocalLifecycleOwner.current
-
-    val stateFlowLifecycleAware = remember(stateFlow, lifecycleOwner) {
-        stateFlow.flowWithLifecycle(lifecycleOwner.lifecycle, lifecycleState)
-    }
-
-    val initialValue = stateFlow.value
-    return stateFlowLifecycleAware.collectAsState(initialValue)
+fun <STATE : UiState> ContainerHost<STATE>.collectAsState(): State<STATE> {
+    // uiState(StateFlow)를 Compose가 인식할 수 있는 State<T>로 변환합니다.
+    // 별도의 생명주기 처리 없이, Composable의 생명주기에 자동으로 맞춰 구독 및 해제가 이루어집니다.
+    return container.uiState.collectAsState()
 }
 
+/**
+ * UI 상태가 '로딩' 상태일 때 주어진 Composable 블록을 실행합니다.
+ *
+ * 예시:
+ * ```
+ * uiState.onLoading {
+ *     CircularProgressIndicator()
+ * }
+ * ```
+ * @param T BaseUiState를 상속하는 상태 타입
+ * @param block 로딩 상태일 때 표시할 Composable 컨텐츠
+ * @return 원본 State 객체 (체이닝을 위해)
+ */
 @Composable
 fun <T : BaseUiState> State<T>.onLoading(
     block: @Composable () -> Unit,
@@ -128,6 +162,21 @@ fun <T : BaseUiState> State<T>.onLoading(
     return this
 }
 
+/**
+ * UI 상태가 특정 '성공' 상태일 때 주어진 Composable 블록을 실행합니다.
+ * reified 제네릭을 사용하여 캐스팅을 간소화합니다.
+ *
+ * 예시:
+ * ```
+ * uiState.onSuccess<MyUiState.Success> { successData ->
+ *     Text("Success: ${successData.data}")
+ * }
+ * ```
+ * @param S UiState를 상속하는 상태 타입
+ * @param SS BaseUiState.Success를 상속하는 특정 성공 상태 타입
+ * @param block 성공 상태일 때 데이터를 받아 표시할 Composable 컨텐츠
+ * @return 원본 State 객체 (체이닝을 위해)
+ */
 @Composable
 inline fun <S : UiState, reified SS : BaseUiState.Success<SS>> State<S>.onSuccess(
     block: @Composable (data: SS) -> Unit,
@@ -140,6 +189,19 @@ inline fun <S : UiState, reified SS : BaseUiState.Success<SS>> State<S>.onSucces
     return this
 }
 
+/**
+ * UI 상태가 '에러' 상태일 때 주어진 Composable 블록을 실행합니다.
+ *
+ * 예시:
+ * ```
+ * uiState.onError { errorMessage ->
+ *     Text("Error: $errorMessage", color = Color.Red)
+ * }
+ * ```
+ * @param T BaseUiState를 상속하는 상태 타입
+ * @param block 에러 상태일 때 메시지를 받아 표시할 Composable 컨텐츠
+ * @return 원본 State 객체 (체이닝을 위해)
+ */
 @Composable
 fun <T : BaseUiState> State<T>.onError(
     block: @Composable (message: String) -> Unit,
@@ -147,4 +209,3 @@ fun <T : BaseUiState> State<T>.onError(
     (value as? BaseUiState.Error)?.let { block(it.message) }
     return this
 }
-
