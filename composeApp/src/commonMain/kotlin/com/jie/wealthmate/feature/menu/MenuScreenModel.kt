@@ -1,18 +1,9 @@
 package com.jie.wealthmate.feature.menu
 
-import cafe.adriel.voyager.core.model.ScreenModel
-import cafe.adriel.voyager.core.model.screenModelScope
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
+import com.jie.wealthmate.base.BaseScreenModel
 
-class MenuScreenModel : ScreenModel {
-    private val _counter = MutableStateFlow(0)
-    val counter = _counter.asStateFlow()
+class MenuScreenModel : BaseScreenModel<MenuUiState>() {
 
-    fun increment() {
-        screenModelScope.launch {
-            _counter.value++
-        }
-    }
+    override val initialState: MenuUiState
+        get() = MenuUiState()
 }
