@@ -21,6 +21,7 @@ import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -32,6 +33,7 @@ import com.jie.wealthmate.theme.ColorGray
 import com.jie.wealthmate.utils.convertLocalDateToString
 import com.jie.wealthmate.utils.formatDateKorYM
 import com.jie.wealthmate.utils.today
+import kotlinx.coroutines.launch
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.monthsUntil
@@ -43,7 +45,7 @@ import wealthmate.composeapp.generated.resources.ic_arrow_drop_down
 import wealthmate.composeapp.generated.resources.ic_calendar_today
 import wealthmate.composeapp.generated.resources.ic_more_vert
 
-private val startDate = LocalDate(1900, 1, 1)
+private val startDate = LocalDate(2025, 1, 1)
 
 /**
  * MonthCalendar Composable to display a month view calendar.
@@ -65,6 +67,8 @@ fun MonthCalendar(
     onClickSelectedMonth: () -> Unit = {},
     onClickDate: (LocalDate) -> Unit = {},
 ) {
+    val coroutineScope = rememberCoroutineScope()
+
     val anchoredState = remember {
         AnchoredDraggableState(
             initialValue = CalendarState.Normal,
@@ -76,17 +80,22 @@ fun MonthCalendar(
         )
     }
 
-    // "무한" 페이저를 위해 시작 날짜(1900-01-01)와 현재 선택된 월 사이의 개월 수를 계산
+    // 페이저를 위해 시작 날짜(2025-01-01)와 현재 선택된 월 사이의 개월 수를 계산
     val initialPage = startDate.monthsUntil(selectedMonth)
     val pagerState = rememberPagerState(
         initialPage = initialPage,
-        pageCount = { Int.MAX_VALUE }
+        pageCount = { (today.year - startDate.year) * 12 + 12 }
     )
 
     // 사용자가 캘린더를 스와이프했을 때(페이지 변경 감지) -> onMonthChanged 콜백 호출
     LaunchedEffect(pagerState) {
-        snapshotFlow { pagerState.currentPage }.collect { page ->
-            val newMonth = startDate.plus(page, DateTimeUnit.MONTH)
+        // 스크롤이 완료된 페이지를 감지하도록 변경
+        snapshotFlow { pagerState.settledPage }.collect { page ->
+            val newMonth = startDate.plus(
+                value = page,
+                unit = DateTimeUnit.MONTH
+            )
+            println(newMonth)
             onMonthChanged(newMonth)
         }
     }
@@ -95,7 +104,9 @@ fun MonthCalendar(
     LaunchedEffect(selectedMonth) {
         val page = startDate.monthsUntil(selectedMonth)
         if (page != pagerState.currentPage) {
-            pagerState.scrollToPage(page)
+            coroutineScope.launch {
+                pagerState.animateScrollToPage(page)
+            }
         }
     }
 

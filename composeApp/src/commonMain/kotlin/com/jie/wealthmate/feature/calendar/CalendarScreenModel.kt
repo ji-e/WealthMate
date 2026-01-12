@@ -1,18 +1,18 @@
 package com.jie.wealthmate.feature.calendar
 
-import cafe.adriel.voyager.core.model.ScreenModel
-import cafe.adriel.voyager.core.model.screenModelScope
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
+import com.jie.wealthmate.base.BaseScreenModel
+import com.jie.wealthmate.utils.today
+import kotlinx.datetime.LocalDate
 
-class CalendarScreenModel : ScreenModel {
-    private val _counter = MutableStateFlow(0)
-    val counter = _counter.asStateFlow()
 
-    fun increment() {
-        screenModelScope.launch {
-            _counter.value++
+class CalendarScreenModel : BaseScreenModel<CalendarUiState>() {
+    override val initialState: CalendarUiState
+        get() = CalendarUiState()
+
+    fun updateSelectedMonth(month: LocalDate = today) {
+        reduceState { state ->
+            state.copy(selectedMonth = month)
         }
     }
+
 }

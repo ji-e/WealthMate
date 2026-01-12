@@ -1,41 +1,18 @@
 package com.jie.wealthmate.base
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import cafe.adriel.voyager.core.lifecycle.rememberScreenLifecycleOwner
-import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.core.model.ScreenModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 
 /**
  * MVI 패턴을 적용한 화면의 기본 클래스입니다.
- * Voyager의 Screen을 상속받아 화면 전환을 관리하고, ContainerHost를 구현하여 UI 상태와 이벤트를 처리합니다.
+ * Voyager의 ScreenModel을 상속받아 화면 전환을 관리하고, ContainerHost를 구현하여 UI 상태와 이벤트를 처리합니다.
  *
  * @param S 이 화면에서 사용할 UI 상태(UiState)의 타입
  */
-abstract class BaseScreen<S : UiState> : Screen, ContainerHost<S> {
-
-    @Composable
-    override fun Content() {
-        rememberScreenLifecycleOwner(this)
-        // DisposableEffect를 사용하여 화면이 Composition에서 제거될 때
-        // 리소스를 해제합니다.
-        DisposableEffect(Unit) {
-            onDispose {
-                runCatching {
-                    screenScope.cancel()
-                    if (container is RealContainer<*>) {
-                        (container as RealContainer<S>).close()
-                    }
-                }.onFailure { e ->
-                    println("Error during onDispose: $e")
-                }
-            }
-        }
-    }
+abstract class BaseScreenModel<S : UiState> : ScreenModel, ContainerHost<S> {
 
     /**
      * KMP 환경에 맞는 CoroutineScope를 생성합니다.
@@ -63,7 +40,7 @@ abstract class BaseScreen<S : UiState> : Screen, ContainerHost<S> {
      * @param uiState 현재 상태를 받아 새로운 상태를 반환하는 람다 함수
      */
     fun reduceState(
-        uiState: (uiState: S) -> S
+        uiState: (uiState: S) -> S,
     ) = event {
         reduceState { currentState -> uiState(currentState) }
     }
@@ -73,7 +50,7 @@ abstract class BaseScreen<S : UiState> : Screen, ContainerHost<S> {
      * @param postFunc 현재 상태를 기반으로 SideEffect를 생성하거나 Unit을 반환하는 suspend 람다 함수
      */
     protected fun <SEU> postSideEffect(
-        postFunc: suspend (state: S) -> SEU
+        postFunc: suspend (state: S) -> SEU,
     ) = event {
         screenScope.launch {
             val sideEffectOrUnit = postFunc(state)
@@ -88,7 +65,7 @@ abstract class BaseScreen<S : UiState> : Screen, ContainerHost<S> {
      * @param message 표시할 메시지 문자열
      */
     fun showToast(
-        message: String
+        message: String,
     ) {
         postSideEffect {
             BaseUiSideEffect.ShowToast(message = message)
@@ -104,7 +81,7 @@ abstract class BaseScreen<S : UiState> : Screen, ContainerHost<S> {
     fun showToastWithAction(
         message: String,
         actionText: String,
-        action: () -> Unit
+        action: () -> Unit,
     ) = postSideEffect {
         BaseUiSideEffect.ShowToastWithAction(
             message = message,
@@ -125,5 +102,17 @@ abstract class BaseScreen<S : UiState> : Screen, ContainerHost<S> {
      */
     override fun resetSideEffect() = postSideEffect {
         BaseUiSideEffect.Idle
+    }
+
+    override fun onDispose() {
+        // RealContainer 리소스 정리
+        try {
+            when (container) {
+                is RealContainer -> (container as RealContainer<S>).close()
+                else -> println("Container doesn't support close operation: ${container::class.simpleName}")
+            }
+        } catch (e: Exception) {
+            println("Error closing container: $e")
+        }
     }
 }
