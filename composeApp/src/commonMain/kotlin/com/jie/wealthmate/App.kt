@@ -1,11 +1,14 @@
 package com.jie.wealthmate
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -27,47 +30,82 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @Composable
 @Preview
 fun App() {
+    var isBottomNaviVisible by remember { mutableStateOf(true) }
+
     WMTheme() {
         var selectedItem by remember { mutableStateOf(BottomNavItem.Home.route) }
 
         Scaffold(
             bottomBar = {
-                BottomNavigation(
-                    selectedItem = selectedItem,
-                    onItemSelected = { selectedItem = it }
-                )
+                AnimatedVisibility(
+                    visible = isBottomNaviVisible,
+                    enter = slideInVertically { height -> height },
+                    exit = slideOutVertically { height -> height }
+                ) {
+                    BottomNavigation(
+                        selectedItem = selectedItem,
+                        onItemSelected = { selectedItem = it }
+                    )
+                }
             },
             containerColor = ColorGray.White,
         ) { innerPadding ->
             Column(
                 modifier = Modifier
                     .statusBarsPadding()
-                    .fillMaxSize()
-                    .padding(bottom = innerPadding.calculateBottomPadding()),
+                    .fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 when (selectedItem) {
                     BottomNavItem.Home.route -> {
-                        Navigator(HomeScreen()) { navigator ->
+                        Navigator(
+                            HomeScreen(
+                                innerPadding.calculateBottomPadding()
+                            )
+                        ) { navigator ->
                             SlideTransition(navigator)
+                            LaunchedEffect(navigator.lastItem) {
+                                isBottomNaviVisible = (navigator.lastItem is HomeScreen)
+                            }
                         }
                     }
 
                     BottomNavItem.Calendar.route -> {
-                        Navigator(CalendarScreen()) { navigator ->
+                        Navigator(
+                            CalendarScreen(
+                                innerPadding.calculateBottomPadding()
+                            )
+                        ) { navigator ->
                             SlideTransition(navigator)
+                            LaunchedEffect(navigator.lastItem) {
+                                isBottomNaviVisible = (navigator.lastItem is CalendarScreen)
+                            }
                         }
                     }
 
                     BottomNavItem.Asset.route -> {
-                        Navigator(AssetScreen()) { navigator ->
+                        Navigator(
+                            AssetScreen(
+                                innerPadding.calculateBottomPadding()
+                            )
+                        ) { navigator ->
                             SlideTransition(navigator)
+                            LaunchedEffect(navigator.lastItem) {
+                                isBottomNaviVisible = (navigator.lastItem is AssetScreen)
+                            }
                         }
                     }
 
                     BottomNavItem.Menu.route -> {
-                        Navigator(MenuScreen()) { navigator ->
+                        Navigator(
+                            MenuScreen(
+                                innerPadding.calculateBottomPadding()
+                            )
+                        ) { navigator ->
                             SlideTransition(navigator)
+                            LaunchedEffect(navigator.lastItem) {
+                                isBottomNaviVisible = (navigator.lastItem is MenuScreen)
+                            }
                         }
                     }
                 }
