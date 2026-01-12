@@ -2,10 +2,13 @@ package com.jie.wealthmate.feature.menu
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
@@ -18,7 +21,7 @@ import com.jie.wealthmate.feature.menu.component.MenuTitleItem
 import com.jie.wealthmate.theme.WMTheme
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
-class MenuScreen() : Screen {
+class MenuScreen(private val calculateBottomPadding: Dp = 0.dp) : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
@@ -36,7 +39,11 @@ class MenuScreen() : Screen {
             }
         }
 
-        LazyColumn(modifier = Modifier.fillMaxSize()) {
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(bottom = calculateBottomPadding)
+        ) {
             items(uiState.menuEnums.size) { index ->
                 val menu = uiState.menuEnums[index]
                 MenuTitleItem(menu.label)
