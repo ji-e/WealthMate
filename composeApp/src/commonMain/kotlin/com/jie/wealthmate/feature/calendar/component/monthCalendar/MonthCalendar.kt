@@ -1,15 +1,21 @@
 package com.jie.wealthmate.feature.calendar.component.monthCalendar
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.AnchoredDraggableState
 import androidx.compose.foundation.gestures.DraggableAnchors
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.anchoredDraggable
+import androidx.compose.foundation.gestures.snapTo
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
@@ -20,12 +26,18 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.jie.wealthmate.component.WMIconButton
 import com.jie.wealthmate.component.WMText
@@ -67,39 +79,38 @@ fun MonthCalendar(
     onClickSelectedMonth: () -> Unit = {},
     onClickDate: (LocalDate) -> Unit = {},
 ) {
+    var displaySelectedMonth by remember { mutableStateOf(today.convertLocalDateToString(formatDateKorYM)) }
     val coroutineScope = rememberCoroutineScope()
 
     val anchoredState = remember {
         AnchoredDraggableState(
-            initialValue = CalendarState.Normal,
+            initialValue = CalendarStateEnum.Normal,
             anchors = DraggableAnchors {
-                CalendarState.Maximized at 0f
-                CalendarState.Normal at -1f
-                CalendarState.Minimized at -2f
+                CalendarStateEnum.Maximized at 0f
+                CalendarStateEnum.Normal at -1f
+                CalendarStateEnum.Minimized at -2f
             },
         )
     }
 
-    // 페이저를 위해 시작 날짜(2025-01-01)와 현재 선택된 월 사이의 개월 수를 계산
-    val initialPage = startDate.monthsUntil(selectedMonth)
     val pagerState = rememberPagerState(
-        initialPage = initialPage,
+        initialPage = startDate.monthsUntil(selectedMonth),
         pageCount = { (today.year - startDate.year) * 12 + 12 }
     )
 
-    // 사용자가 캘린더를 스와이프했을 때(페이지 변경 감지) -> onMonthChanged 콜백 호출
     LaunchedEffect(pagerState) {
-        // 스크롤이 완료된 페이지를 감지하도록 변경
-        snapshotFlow { pagerState.settledPage }.collect { page ->
-            val newMonth = startDate.plus(
-                value = page,
-                unit = DateTimeUnit.MONTH
-            )
+        snapshotFlow { pagerState.targetPage }.collect { page ->
+            val newMonth = startDate.plus(value = page, unit = DateTimeUnit.MONTH)
             onMonthChanged(newMonth)
         }
     }
+    LaunchedEffect(pagerState) {
+        snapshotFlow { pagerState.settledPage }.collect { page ->
+            val newMonth = startDate.plus(value = page, unit = DateTimeUnit.MONTH)
+            displaySelectedMonth = newMonth.convertLocalDateToString(formatDateKorYM)
+        }
+    }
 
-    // 외부 요인으로 selectedMonth가 변경되었을 때(예: '오늘' 버튼 클릭) 페이저를 해당 월로 스크롤
     LaunchedEffect(selectedMonth) {
         val page = startDate.monthsUntil(selectedMonth)
         if (page != pagerState.currentPage) {
@@ -109,29 +120,109 @@ fun MonthCalendar(
         }
     }
 
+    var isInitialSetup by remember { mutableStateOf(true) }
+
     Column(
-        modifier = modifier.fillMaxWidth()
+        modifier = modifier.fillMaxSize()
     ) {
         MonthCalendarHeader(
             today = today,
             selectedMonth = selectedMonth,
+            displaySelectedMonth = displaySelectedMonth,
             onClickToday = onClickToday,
             onClickSelectedMonth = onClickSelectedMonth,
         )
         WeekHeader()
-        HorizontalPager(
-            state = pagerState,
-            modifier = Modifier.weight(1f)
-        ) { page ->
-            // 페이지 번호를 기반으로 해당 월을 계산
-            val month = startDate.plus(page, DateTimeUnit.MONTH)
-            MonthCalendarContent(
-                anchoredState = anchoredState,
-                today = today,
-                selectedDate = selectedDate,
-                selectedMonth = month,
-                onClickDate = onClickDate
-            )
+
+        BoxWithConstraints(
+            modifier = Modifier.weight(1f).clipToBounds()
+        ) {
+            val density = LocalDensity.current
+            val dragBarHeight = 32.dp
+            val dragBarHeightPx = with(density) { dragBarHeight.toPx() }
+
+            val dayHeight = 72.dp
+            val dayHeightPx = with(density) { dayHeight.toPx() }
+
+            val maximizedHeightPx = with(density) { maxHeight.toPx() }
+            val minimizedHeightPx = dayHeightPx + dragBarHeightPx
+            val normalCalendarHeight = 360.dp
+
+            LaunchedEffect(selectedMonth, maximizedHeightPx) {
+                val normalCalendarHeightPx = with(density) { normalCalendarHeight.toPx() }
+
+                anchoredState.updateAnchors(
+                    newAnchors = DraggableAnchors {
+                        CalendarStateEnum.Maximized at 0f
+                        CalendarStateEnum.Normal at -(maximizedHeightPx - normalCalendarHeightPx)
+                        CalendarStateEnum.Minimized at -(maximizedHeightPx - minimizedHeightPx)
+                    }
+                )
+
+                if (isInitialSetup) {
+                    anchoredState.snapTo(CalendarStateEnum.Normal)
+                    isInitialSetup = false
+                }
+            }
+
+            val currentOffset = anchoredState.requireOffset()
+            val normalHeightPx = anchoredState.anchors.positionOf(CalendarStateEnum.Normal)
+                .takeIf { it.isFinite() }
+                ?.let { maximizedHeightPx + it }
+                ?: with(density) { normalCalendarHeight.toPx() }
+
+            val expansionProgress =
+                if (normalHeightPx == maximizedHeightPx) {
+                    0f
+                } else {
+                    ((currentOffset + maximizedHeightPx - normalHeightPx) / (maximizedHeightPx - normalHeightPx))
+                        .coerceIn(0f, 1f)
+                }
+
+            val collapseProgress =
+                if (normalHeightPx == minimizedHeightPx) {
+                    0f
+                } else {
+                    ((currentOffset + maximizedHeightPx - normalHeightPx) / (minimizedHeightPx - normalHeightPx))
+                        .coerceIn(0f, 1f)
+                }
+
+            val dayNormalHeight = (normalCalendarHeight - dragBarHeight)
+            val dayMaxHeight = (maxHeight - dragBarHeight)
+
+            Column(
+                modifier = Modifier.height(with(density) { (maximizedHeightPx + currentOffset).toDp() })
+            ) {
+
+                HorizontalPager(
+                    modifier = Modifier.weight(1f),
+                    state = pagerState,
+                ) { page ->
+                    val month = startDate.plus(page, DateTimeUnit.MONTH)
+                    MonthCalendarContent(
+                        today = today,
+                        selectedDate = selectedDate,
+                        selectedMonth = month,
+                        dayNormalHeight = dayNormalHeight,
+                        dayMaxHeight = dayMaxHeight,
+                        expansionProgress = expansionProgress,
+                        collapseProgress = collapseProgress,
+                        onClickDate = onClickDate
+                    )
+                }
+
+                // dragBar
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(dragBarHeight)
+                        .background(ColorGray.Gray_300)
+                        .anchoredDraggable(
+                            state = anchoredState,
+                            orientation = Orientation.Vertical
+                        )
+                )
+            }
         }
     }
 }
@@ -140,6 +231,7 @@ fun MonthCalendar(
 private fun MonthCalendarHeader(
     today: LocalDate,
     selectedMonth: LocalDate,
+    displaySelectedMonth: String,
     onClickToday: () -> Unit,
     onClickSelectedMonth: () -> Unit,
 ) {
@@ -157,7 +249,7 @@ private fun MonthCalendarHeader(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 WMText(
-                    text = selectedMonth.convertLocalDateToString(formatDateKorYM),
+                    text = displaySelectedMonth,
                     style = Typography().titleMedium.copy(fontWeight = FontWeight.SemiBold)
                 )
                 Icon(
@@ -198,14 +290,16 @@ private fun MonthCalendarHeader(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun MonthCalendarContent(
     modifier: Modifier = Modifier,
-    anchoredState: AnchoredDraggableState<CalendarState>,
     today: LocalDate,
     selectedDate: LocalDate,
     selectedMonth: LocalDate,
+    dayNormalHeight: Dp,
+    dayMaxHeight: Dp,
+    expansionProgress: Float,
+    collapseProgress: Float,
     onClickDate: (LocalDate) -> Unit,
 ) {
     Column(modifier = modifier) {
@@ -213,7 +307,10 @@ private fun MonthCalendarContent(
             today = today,
             selectedDate = selectedDate,
             selectedMonth = selectedMonth,
-            anchoredState = anchoredState,
+            dayNormalHeight = dayNormalHeight,
+            dayMaxHeight = dayMaxHeight,
+            expansionProgress = expansionProgress,
+            collapseProgress = collapseProgress,
             onClickDate = onClickDate
         )
     }
@@ -223,7 +320,6 @@ private fun MonthCalendarContent(
 @Preview(showBackground = true)
 private fun MonthCalendarPreview() {
     MonthCalendar(
-        modifier = Modifier.fillMaxHeight(),
         selectedMonth = today,
         selectedDate = today,
         onMonthChanged = {}

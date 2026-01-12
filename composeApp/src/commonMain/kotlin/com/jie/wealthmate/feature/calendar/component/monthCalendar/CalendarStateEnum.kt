@@ -1,6 +1,6 @@
 package com.jie.wealthmate.feature.calendar.component.monthCalendar
 
-enum class CalendarState {
+enum class CalendarStateEnum {
     Maximized,
     Normal,
     Minimized,

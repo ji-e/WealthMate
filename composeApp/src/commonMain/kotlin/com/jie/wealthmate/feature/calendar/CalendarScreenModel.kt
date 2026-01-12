@@ -1,7 +1,7 @@
 package com.jie.wealthmate.feature.calendar
 
 import com.jie.wealthmate.base.BaseScreenModel
-import com.jie.wealthmate.utils.firstDayOfMonth
+import com.jie.wealthmate.utils.lastDayOfMonth
 import com.jie.wealthmate.utils.today
 import kotlinx.datetime.LocalDate
 
@@ -12,13 +12,15 @@ class CalendarScreenModel : BaseScreenModel<CalendarUiState>() {
 
     fun updateSelectedMonth(month: LocalDate = today) {
         reduceState { state ->
-            state.copy(selectedMonth = month)
-        }
+            val currentDayOfMonth = state.selectedDate.day
+            val lastDayOfNewMonth = month.lastDayOfMonth()
+            val newDay = currentDayOfMonth.coerceAtMost(lastDayOfNewMonth.day)
+            val newSelectedDate = LocalDate(month.year, month.month, newDay)
 
-        if (month.month == today.month) {
-            updateSelectedDate(today)
-        } else {
-            updateSelectedDate(month.firstDayOfMonth())
+            state.copy(
+                selectedMonth = month,
+                selectedDate = newSelectedDate
+            )
         }
     }
 

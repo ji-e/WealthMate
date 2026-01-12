@@ -6,7 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeContentPadding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -49,7 +49,7 @@ fun App() {
         ) { innerPadding ->
             Column(
                 modifier = Modifier
-                    .safeContentPadding()
+                    .statusBarsPadding()
                     .fillMaxSize()
                     .padding(bottom = innerPadding.calculateBottomPadding()),
                 horizontalAlignment = Alignment.CenterHorizontally,
