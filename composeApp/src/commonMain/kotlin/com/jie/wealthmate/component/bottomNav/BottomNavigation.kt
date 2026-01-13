@@ -60,8 +60,10 @@ fun BottomNavigation(
                     label = {
                         WMText(
                             text = item.label,
-                            style = Typography().bodyMedium.copy(fontWeight = FontWeight.SemiBold),
-                            color = if (isSelected) ColorGray.Gray_700 else ColorGray.Gray_300,
+                            style = Typography().bodyMedium.copy(
+                                fontWeight = FontWeight.SemiBold,
+                                color = if (isSelected) ColorGray.Gray_700 else ColorGray.Gray_300
+                            )
                         )
                     },
                     selected = isSelected,

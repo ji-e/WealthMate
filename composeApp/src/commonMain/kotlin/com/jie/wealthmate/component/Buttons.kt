@@ -36,6 +36,10 @@ fun WMButton(
     enabled: Boolean = true,
     onClick: () -> Unit,
 ) {
+
+    val defaultColor = ColorGray.Gray_700
+    val disabledColor = ColorGray.Gray_300
+
     when (buttonStyle) {
         ButtonStyle.ELEVATED -> {
             ElevatedButton(
@@ -46,8 +50,7 @@ fun WMButton(
             ) {
                 WMText(
                     text = text,
-                    style = buttonSize.textStyle,
-                    color = if (enabled) ColorGray.Gray_700 else ColorGray.Gray_300
+                    style = buttonSize.textStyle.copy(color = if (enabled) defaultColor else disabledColor),
                 )
             }
         }
@@ -61,8 +64,7 @@ fun WMButton(
             ) {
                 WMText(
                     text = text,
-                    style = buttonSize.textStyle,
-                    color = if (enabled) ColorGray.White else ColorGray.Gray_300
+                    style = buttonSize.textStyle.copy(color = if (enabled) ColorGray.White else disabledColor),
                 )
             }
         }
@@ -76,8 +78,7 @@ fun WMButton(
             ) {
                 WMText(
                     text = text,
-                    style = buttonSize.textStyle,
-                    color = if (enabled) ColorGray.Gray_700 else ColorGray.Gray_300
+                    style = buttonSize.textStyle.copy(color = if (enabled) defaultColor else disabledColor),
                 )
             }
         }
@@ -92,8 +93,7 @@ fun WMButton(
                 ) {
                 WMText(
                     text = text,
-                    style = buttonSize.textStyle,
-                    color = if (enabled) ColorGray.Gray_700 else ColorGray.Gray_300
+                    style = buttonSize.textStyle.copy(color = if (enabled) defaultColor else disabledColor),
                 )
             }
         }
@@ -107,8 +107,7 @@ fun WMButton(
             ) {
                 WMText(
                     text = text,
-                    style = buttonSize.textStyle,
-                    color = if (enabled) ColorGray.Gray_700 else ColorGray.Gray_300
+                    style = buttonSize.textStyle.copy(color = if (enabled) defaultColor else disabledColor),
                 )
             }
         }
