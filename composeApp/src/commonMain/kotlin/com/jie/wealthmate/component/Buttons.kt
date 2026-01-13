@@ -136,6 +136,7 @@ fun WMButton(
 
 @Composable
 fun WMIconButton(
+    modifier: Modifier = Modifier,
     iconRes: DrawableResource,
     contentDescription: String? = null,
     enabled: Boolean = true,
@@ -149,7 +150,7 @@ fun WMIconButton(
     ) {
         Icon(
             painter = painterResource(iconRes),
-            modifier = Modifier.size(24.dp),
+            modifier = modifier.size(24.dp),
             contentDescription = contentDescription,
             tint = tint
         )
