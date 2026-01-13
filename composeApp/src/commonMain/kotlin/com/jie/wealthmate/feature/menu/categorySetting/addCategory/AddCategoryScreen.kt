@@ -61,6 +61,7 @@ class AddCategoryScreen(
                 CategoryIcon(
                     modifier = Modifier.padding(top = 24.dp),
                     largeCategory = largeCategory,
+                    selectedCategoryIcon = uiState.categoryIcon,
                     onClickChange = {}
                 )
             }

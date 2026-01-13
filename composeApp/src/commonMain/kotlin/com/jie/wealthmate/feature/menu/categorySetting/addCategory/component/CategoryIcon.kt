@@ -10,20 +10,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.jie.wealthmate.component.CategoryIconEnum
 import com.jie.wealthmate.component.WMIconButton
 import com.jie.wealthmate.feature.menu.categorySetting.component.LargeCategoryEnum
 import com.jie.wealthmate.theme.ColorGray
-import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import wealthmate.composeapp.generated.resources.Res
-import wealthmate.composeapp.generated.resources.emoji_u1f4b0
 import wealthmate.composeapp.generated.resources.ic_exchange
 
 @Composable
 fun CategoryIcon(
     modifier: Modifier = Modifier,
     largeCategory: LargeCategoryEnum,
-    selectedCategoryIcon: DrawableResource = Res.drawable.emoji_u1f4b0,
+    selectedCategoryIcon: CategoryIconEnum = CategoryIconEnum.defaultCategoryIcon,
     onClickChange: () -> Unit,
 ) {
     Box(modifier = modifier) {
@@ -37,7 +36,7 @@ fun CategoryIcon(
             contentAlignment = Alignment.Center
         ) {
             Image(
-                painter = painterResource(selectedCategoryIcon),
+                painter = painterResource(selectedCategoryIcon.resource),
                 contentDescription = "카테고리 아이콘",
                 modifier = Modifier.size(80.dp)
             )
