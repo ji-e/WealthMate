@@ -13,9 +13,9 @@ data class CategoryItemData(
 )
 
 
-enum class LargeCategoryEnum {
-    INCOME,
-    EXPENSES,
-    SAVING,
+enum class LargeCategoryEnum(val label: String) {
+    INCOME("수입"),
+    EXPENSES("지출"),
+    SAVING("저축"),
     ;
 }
