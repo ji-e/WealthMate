@@ -23,11 +23,13 @@ fun WeekHeader() {
         WeekEnum.entries.forEach { day ->
             WMText(
                 text = day.korDisplayName,
-                style = Typography().bodyMedium.copy(fontWeight = FontWeight.SemiBold),
+                style = Typography().bodyMedium.copy(
+                    fontWeight = FontWeight.SemiBold,
+                    color = day.color
+                ),
                 modifier = Modifier
                     .weight(1f)
                     .padding(vertical = 12.dp),
-                color = day.color,
                 textAlign = TextAlign.Center
             )
         }

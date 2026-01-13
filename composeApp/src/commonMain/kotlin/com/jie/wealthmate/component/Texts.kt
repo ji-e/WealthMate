@@ -4,22 +4,19 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
-import com.jie.wealthmate.theme.ColorGray
 import com.jie.wealthmate.theme.wantedSansFontFamily
 
 @Composable
 fun WMText(
     text: AnnotatedString,
-    style: TextStyle,
+    style: TextStyle = Typography().bodyMedium,
     modifier: Modifier = Modifier,
-    color: Color = ColorGray.Gray_700,
     maxLines: Int = Int.MAX_VALUE,
     overflow: TextOverflow = TextOverflow.Ellipsis,
     textAlign: TextAlign? = null,
@@ -32,14 +29,11 @@ fun WMText(
     Text(
         text = text,
         modifier = modifier,
-        style = style,
-        color = color,
+        style = style.copy(lineHeight = lineHeight),
         maxLines = maxLines,
         overflow = overflow,
         textAlign = textAlign,
         textDecoration = textDecoration,
-        fontSize = style.fontSize,
-        lineHeight = lineHeight
     )
 }
 
@@ -48,7 +42,6 @@ fun WMText(
     text: String,
     style: TextStyle = Typography().bodyMedium,
     modifier: Modifier = Modifier,
-    color: Color = ColorGray.Gray_700,
     maxLines: Int = Int.MAX_VALUE,
     overflow: TextOverflow = TextOverflow.Ellipsis,
     textAlign: TextAlign? = null,
@@ -61,14 +54,11 @@ fun WMText(
     Text(
         text = text,
         modifier = modifier,
-        style = style,
-        color = color,
+        style = style.copy(lineHeight = lineHeight),
         maxLines = maxLines,
         overflow = overflow,
         textAlign = textAlign,
         textDecoration = textDecoration,
-        fontSize = style.fontSize,
         fontFamily = wantedSansFontFamily(),
-        lineHeight = lineHeight
     )
 }

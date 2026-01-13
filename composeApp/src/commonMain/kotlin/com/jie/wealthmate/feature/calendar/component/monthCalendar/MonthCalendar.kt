@@ -79,7 +79,13 @@ fun MonthCalendar(
     onClickSelectedMonth: () -> Unit = {},
     onClickDate: (LocalDate) -> Unit = {},
 ) {
-    var displaySelectedMonth by remember { mutableStateOf(today.convertLocalDateToString(formatDateKorYM)) }
+    var displaySelectedMonth by remember {
+        mutableStateOf(
+            today.convertLocalDateToString(
+                formatDateKorYM
+            )
+        )
+    }
     val coroutineScope = rememberCoroutineScope()
 
     val anchoredState = remember {
@@ -250,11 +256,15 @@ private fun MonthCalendarHeader(
             ) {
                 WMText(
                     text = displaySelectedMonth,
-                    style = Typography().titleMedium.copy(fontWeight = FontWeight.SemiBold)
+                    style = Typography().titleMedium.copy(
+                        fontWeight = FontWeight.SemiBold,
+                        color = ColorGray.Gray_700
+                    )
                 )
                 Icon(
                     painter = painterResource(Res.drawable.ic_arrow_drop_down),
                     contentDescription = "년 월 선택",
+                    modifier = Modifier.size(24.dp),
                     tint = ColorGray.Gray_700
                 )
             }
