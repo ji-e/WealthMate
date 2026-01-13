@@ -11,11 +11,13 @@ import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
@@ -118,6 +120,7 @@ fun WMIconButton(
     iconRes: DrawableResource,
     contentDescription: String? = null,
     enabled: Boolean = true,
+    tint: Color = LocalContentColor.current,
     onClick: () -> Unit,
 ) {
 
@@ -128,7 +131,8 @@ fun WMIconButton(
         Icon(
             painter = painterResource(iconRes),
             modifier = Modifier.size(24.dp),
-            contentDescription = contentDescription
+            contentDescription = contentDescription,
+            tint = tint
         )
     }
 
