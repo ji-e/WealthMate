@@ -20,8 +20,10 @@ fun MenuTitleItem(
 ) {
     WMText(
         text = label,
-        style = Typography().bodySmall.copy(fontWeight = FontWeight.Bold),
-        color = ColorPrimary.Primary_700,
+        style = Typography().bodySmall.copy(
+            fontWeight = FontWeight.Bold,
+            color = ColorPrimary.Primary_700,
+        ),
         modifier = Modifier
             .padding(top = 40.dp, bottom = 4.dp)
             .padding(horizontal = 20.dp)

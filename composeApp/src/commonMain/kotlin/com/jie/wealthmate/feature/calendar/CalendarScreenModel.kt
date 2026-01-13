@@ -19,7 +19,7 @@ class CalendarScreenModel : BaseScreenModel<CalendarUiState>() {
 
             state.copy(
                 selectedMonth = month,
-                selectedDate = newSelectedDate
+                selectedDate = if (month == today) today else newSelectedDate
             )
         }
     }
