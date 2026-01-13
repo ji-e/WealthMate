@@ -18,7 +18,9 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import cafe.adriel.voyager.navigator.internal.BackHandler
 import com.jie.wealthmate.component.topbar.TopBarItem
 import com.jie.wealthmate.component.topbar.WMTobBar
+import com.jie.wealthmate.feature.menu.categorySetting.addCategory.AddCategoryScreen
 import com.jie.wealthmate.feature.menu.categorySetting.component.CategoryItem
+import com.jie.wealthmate.feature.menu.categorySetting.component.LargeCategoryEnum
 import com.jie.wealthmate.feature.menu.component.MenuEnum
 import com.jie.wealthmate.theme.WMTheme
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -49,7 +51,7 @@ class IncomeCategorySettingScreen(
                     trailingItem = listOf(
                         TopBarItem.TrailingItem(
                             iconRes = Res.drawable.ic_add,
-                            action = {} // todo
+                            action = { navigator.push(AddCategoryScreen(LargeCategoryEnum.INCOME)) }
                         )
                     )
                 )
