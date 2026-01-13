@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -170,7 +171,7 @@ internal fun DayItem(
         WMText(
             modifier = Modifier.alpha(alpha),
             text = day.first.day.toString(),
-            color = WeekEnum.creator(day.first.dayOfWeek.isoDayNumber).color,
+            style = Typography().bodyMedium.copy(color = WeekEnum.creator(day.first.dayOfWeek.isoDayNumber).color),
             textAlign = TextAlign.Center
         )
 

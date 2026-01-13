@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
@@ -36,18 +37,25 @@ fun WMButton(
     enabled: Boolean = true,
     onClick: () -> Unit,
 ) {
+
+    val defaultColor = ColorGray.Gray_700
+    val disabledColor = ColorGray.Gray_300
+
     when (buttonStyle) {
         ButtonStyle.ELEVATED -> {
             ElevatedButton(
                 onClick = onClick,
                 enabled = enabled,
                 contentPadding = PaddingValues(horizontal = 12.dp),
-                modifier = Modifier.height(buttonSize.buttonHeight)
+                modifier = Modifier.height(buttonSize.buttonHeight),
+                colors = ButtonDefaults.elevatedButtonColors().copy(
+                    contentColor = defaultColor,
+                    disabledContentColor = disabledColor
+                )
             ) {
                 WMText(
                     text = text,
                     style = buttonSize.textStyle,
-                    color = if (enabled) ColorGray.Gray_700 else ColorGray.Gray_300
                 )
             }
         }
@@ -57,12 +65,15 @@ fun WMButton(
                 onClick = onClick,
                 enabled = enabled,
                 contentPadding = PaddingValues(horizontal = 12.dp),
-                modifier = Modifier.height(buttonSize.buttonHeight)
+                modifier = Modifier.height(buttonSize.buttonHeight),
+                colors = ButtonDefaults.buttonColors().copy(
+                    contentColor = ColorGray.White,
+                    disabledContentColor = disabledColor
+                )
             ) {
                 WMText(
                     text = text,
                     style = buttonSize.textStyle,
-                    color = if (enabled) ColorGray.White else ColorGray.Gray_300
                 )
             }
         }
@@ -72,12 +83,15 @@ fun WMButton(
                 onClick = onClick,
                 enabled = enabled,
                 contentPadding = PaddingValues(horizontal = 12.dp),
-                modifier = Modifier.height(buttonSize.buttonHeight)
+                modifier = Modifier.height(buttonSize.buttonHeight),
+                colors = ButtonDefaults.filledTonalButtonColors().copy(
+                    contentColor = defaultColor,
+                    disabledContentColor = disabledColor
+                )
             ) {
                 WMText(
                     text = text,
                     style = buttonSize.textStyle,
-                    color = if (enabled) ColorGray.Gray_700 else ColorGray.Gray_300
                 )
             }
         }
@@ -88,12 +102,14 @@ fun WMButton(
                 enabled = enabled,
                 contentPadding = PaddingValues(horizontal = 12.dp),
                 modifier = Modifier.height(buttonSize.buttonHeight),
-
-                ) {
+                colors = ButtonDefaults.outlinedButtonColors().copy(
+                    contentColor = defaultColor,
+                    disabledContentColor = disabledColor
+                )
+            ) {
                 WMText(
                     text = text,
                     style = buttonSize.textStyle,
-                    color = if (enabled) ColorGray.Gray_700 else ColorGray.Gray_300
                 )
             }
         }
@@ -103,12 +119,15 @@ fun WMButton(
                 onClick = onClick,
                 enabled = enabled,
                 contentPadding = PaddingValues(horizontal = 12.dp),
-                modifier = Modifier.height(buttonSize.buttonHeight)
+                modifier = Modifier.height(buttonSize.buttonHeight),
+                colors = ButtonDefaults.textButtonColors().copy(
+                    contentColor = defaultColor,
+                    disabledContentColor = disabledColor
+                )
             ) {
                 WMText(
                     text = text,
                     style = buttonSize.textStyle,
-                    color = if (enabled) ColorGray.Gray_700 else ColorGray.Gray_300
                 )
             }
         }
