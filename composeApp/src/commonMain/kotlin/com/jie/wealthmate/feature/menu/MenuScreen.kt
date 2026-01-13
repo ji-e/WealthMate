@@ -32,8 +32,8 @@ class MenuScreen(private val calculateBottomPadding: Dp = 0.dp) : Screen {
             when (effect) {
                 is MenuUiSideEffect.OnCLickMenu -> {
                     when (effect.menu) {
-                        MenuEnum.INCOME_CATEGORY -> navigator.push(IncomeCategorySettingScreen())
-                        else -> navigator.push(IncomeCategorySettingScreen()) // todo temp
+                        MenuEnum.INCOME_CATEGORY -> navigator.push(IncomeCategorySettingScreen(effect.menu))
+                        else -> navigator.push(IncomeCategorySettingScreen(effect.menu)) // todo temp
                     }
                 }
             }

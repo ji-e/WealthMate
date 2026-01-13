@@ -8,7 +8,7 @@ sealed class MenuItem(
     val items: List<MenuEnum>,
 ) {
     object CategoryMenu : MenuItem(
-        label = "카테고리 설정",
+        label = "카테고리 관리",
         items = MenuEnum.categoryMenu
     )
 
