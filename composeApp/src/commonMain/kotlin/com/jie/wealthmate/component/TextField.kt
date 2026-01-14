@@ -180,6 +180,7 @@ fun WMTextField(
                 disabledContainerColor = ColorGray.White,
                 unfocusedContainerColor = ColorGray.White,
                 errorContainerColor = ColorGray.White,
+                cursorColor = ColorPrimary.Primary_700,
                 errorCursorColor = errorColor,
                 textSelectionColors = TextSelectionColors(
                     handleColor = if (isError) errorColor else ColorPrimary.Primary_700,
