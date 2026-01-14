@@ -18,6 +18,7 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import cafe.adriel.voyager.navigator.internal.BackHandler
+import com.jie.wealthmate.component.WMTextField
 import com.jie.wealthmate.component.topbar.TopBarItem
 import com.jie.wealthmate.component.topbar.WMTobBar
 import com.jie.wealthmate.feature.menu.categorySetting.addCategory.component.CategoryIcon
@@ -58,11 +59,27 @@ class AddCategoryScreen(
                     ),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+
+                // 카테고리 아이콘
                 CategoryIcon(
                     modifier = Modifier.padding(top = 24.dp),
                     largeCategory = largeCategory,
                     selectedCategoryIcon = uiState.categoryIcon,
                     onClickChange = {}
+                )
+
+                // 카테고리 라벨
+                WMTextField(
+                    value = uiState.label,
+                    onValueChange = screenModel::updateCategoryLabel,
+                    modifier = Modifier
+                        .padding(top = 20.dp)
+                        .padding(horizontal = 4.dp),
+                    maxLength = 15,
+                    label = "카테고리 이름",
+                    placeholder = largeCategory.tempMiddleCategoryLabel,
+                    supportingText = "15자 이내로 입력해 주세요.",
+                    isCount = true,
                 )
             }
         }
