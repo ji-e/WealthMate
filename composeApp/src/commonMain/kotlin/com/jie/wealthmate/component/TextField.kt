@@ -237,7 +237,7 @@ fun WMTextField(
                         enabled.not() -> disabledColor
                         isError -> errorColor
                         isFocused -> ColorPrimary.Primary_700
-                        value.text.isNotEmpty() -> defaultColor
+                        value.text.isNotEmpty() -> ColorGray.Gray_500
                         else -> placeholderColor
                     }
                 )
