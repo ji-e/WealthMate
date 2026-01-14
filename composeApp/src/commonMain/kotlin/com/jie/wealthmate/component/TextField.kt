@@ -147,7 +147,7 @@ fun WMTextField(
                         Text(
                             text = it,
                             modifier = Modifier.padding(bottom = if (value.text.isNotEmpty() || isFocused) 12.dp else 0.dp),
-                            color = if (value.text.isNotEmpty() || isFocused) defaultColor else placeholderColor,
+                            color = if (value.text.isNotEmpty() || isFocused) defaultColor else ColorGray.Gray_500,
                             fontSize = if (value.text.isNotEmpty() || isFocused) Typography().titleSmall.fontSize else Typography().bodyLarge.fontSize,
                             fontWeight = FontWeight.SemiBold,
                             fontFamily = wantedSansFontFamily()
