@@ -1,6 +1,5 @@
 package com.jie.wealthmate.feature.menu.categorySetting.component
 
-import CategoryIncomePack
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -19,8 +18,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.jie.wealthmate.component.CategoryIconEnum
 import com.jie.wealthmate.component.WMText
-import com.jie.wealthmate.component.category.categoryIncome.EmojiU1f3e2
 import com.jie.wealthmate.theme.ColorBlue
 import com.jie.wealthmate.theme.ColorGray
 import com.jie.wealthmate.theme.WMTheme
@@ -52,7 +51,7 @@ fun CategoryItem(
         ) {
 
             Image(
-                imageVector = data.icon,
+                painter = painterResource(data.icon),
                 contentDescription = data.label,
                 modifier = Modifier.size(28.dp)
             )
@@ -82,7 +81,7 @@ private fun CategoryItemPreview() {
         CategoryItem(
             CategoryItemData(
                 id = 0,
-                icon = CategoryIncomePack.EmojiU1f3e2,
+                icon = CategoryIconEnum.CATEGORY_EMOJI_U1F303.resource,
                 label = "급여",
                 backgroundColor = ColorBlue.Blue_100,
                 sort = 1,
