@@ -4,7 +4,9 @@ package com.jie.wealthmate.feature.menu.categorySetting.addCategory
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -18,6 +20,8 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import cafe.adriel.voyager.navigator.internal.BackHandler
+import com.jie.wealthmate.component.ButtonSize
+import com.jie.wealthmate.component.WMButton
 import com.jie.wealthmate.component.WMTextField
 import com.jie.wealthmate.component.topbar.TopBarItem
 import com.jie.wealthmate.component.topbar.WMTobBar
@@ -92,6 +96,18 @@ class AddCategoryScreen(
                     tagLabelItems = listOf("상여금", "식대"),
                     onValueChange = {},
                     onClickChip = {}
+                )
+
+                Spacer(modifier = Modifier.weight(1f))
+
+                // 저장 버튼
+                WMButton(
+                    text = "저장",
+                    buttonSize = ButtonSize.LARGE,
+                    modifier = Modifier
+                        .padding(20.dp)
+                        .fillMaxWidth(),
+                    onClick = {}
                 )
             }
         }
