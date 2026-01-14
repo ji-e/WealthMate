@@ -42,7 +42,7 @@ fun CategoryTag(
     tagLabelItems: List<CategoryTagVo> = emptyList(),
     onValueChange: (TextFieldValue) -> Unit,
     onChipAdd: (TextFieldValue?) -> Unit = {},
-    onChipClick: (CategoryTagVo) -> Unit = {},
+    onChipRemove: (CategoryTagVo) -> Unit = {},
 ) {
     Column(
         modifier = modifier,
@@ -74,7 +74,7 @@ fun CategoryTag(
                 .padding(top = 12.dp)
                 .padding(horizontal = 20.dp),
             chipItems = tagLabelItems,
-            onChipClick = onChipClick
+            onChipRemove = onChipRemove
         )
     }
 }
@@ -83,7 +83,7 @@ fun CategoryTag(
 fun CategoryTagItem(
     modifier: Modifier = Modifier,
     chipItems: List<CategoryTagVo>,
-    onChipClick: (CategoryTagVo) -> Unit,
+    onChipRemove: (CategoryTagVo) -> Unit,
 ) {
     FlowRow(
         modifier = modifier.fillMaxWidth(),
@@ -95,7 +95,7 @@ fun CategoryTagItem(
                 modifier = Modifier
                     .clip(CircleShape)
                     .background(color = ColorGray.Gray_100)
-                    .clickable { onChipClick(item) }
+                    .clickable { onChipRemove(item) }
                     .padding(horizontal = 8.dp, vertical = 4.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(4.dp)
@@ -105,6 +105,7 @@ fun CategoryTagItem(
                     style = Typography().labelMedium
                 )
 
+                // 삭제 아이콘
                 Icon(
                     painter = painterResource(Res.drawable.ic_close_circle),
                     contentDescription = item.label,

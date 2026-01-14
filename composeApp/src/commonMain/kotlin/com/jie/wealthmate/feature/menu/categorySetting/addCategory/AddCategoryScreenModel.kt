@@ -25,10 +25,10 @@ class AddCategoryScreenModel : BaseScreenModel<AddCategoryUiState>() {
         }
     }
 
-    fun addCategoryTabLabel(tagLabel: TextFieldValue?) {
+    fun addCategoryTagLabel(tagLabel: TextFieldValue?) {
         reduceState { state ->
             if (tagLabel == null) {
-                return@reduceState state.copy(tagLabel = TextFieldValue(""),)
+                return@reduceState state.copy(tagLabel = TextFieldValue(""))
             }
 
             if (tagLabel.text.isEmpty()) {
@@ -48,6 +48,14 @@ class AddCategoryScreenModel : BaseScreenModel<AddCategoryUiState>() {
                     tagLabelItems = state.tagLabelItems.toMutableList().apply { add(categoryTag) }
                 )
             }
+        }
+    }
+
+    fun removeCategoryTagLabel(tag: CategoryTagVo) {
+        reduceState { state ->
+            state.copy(
+                tagLabelItems = state.tagLabelItems.toMutableList().apply { remove(tag) }
+            )
         }
     }
 }

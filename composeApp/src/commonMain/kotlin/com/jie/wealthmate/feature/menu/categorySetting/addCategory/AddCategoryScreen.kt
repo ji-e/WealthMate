@@ -110,8 +110,8 @@ class AddCategoryScreen(
                     tagLabel = uiState.tagLabel,
                     tagLabelItems = uiState.tagLabelItems,
                     onValueChange = screenModel::updateCategoryTagLabel,
-                    onChipAdd = screenModel::addCategoryTabLabel,
-                    onChipClick = {}
+                    onChipAdd = screenModel::addCategoryTagLabel,
+                    onChipRemove = screenModel::removeCategoryTagLabel,
                 )
 
                 Spacer(modifier = Modifier.weight(1f))
