@@ -26,7 +26,10 @@ fun WMTobBar(
         title = {
             WMText(
                 text = title.title,
-                style = Typography().titleMedium.copy(fontWeight = FontWeight.SemiBold)
+                style = Typography().titleMedium.copy(
+                    fontWeight = FontWeight.SemiBold,
+                    color = ColorGray.Gray_700
+                )
             )
         },
         navigationIcon = {

@@ -1,6 +1,8 @@
 package com.jie.wealthmate.theme
 
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.LocalRippleConfiguration
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RippleConfiguration
@@ -8,6 +10,9 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalFocusManager
 
 @Composable
 fun WMTheme(
@@ -39,6 +44,7 @@ fun WMTheme(
             background = ColorGray.White
         )
     }
+    val focusManager = LocalFocusManager.current
 
     MaterialTheme(
         colorScheme = colorScheme,
@@ -46,7 +52,15 @@ fun WMTheme(
         CompositionLocalProvider(
             LocalRippleConfiguration provides RippleConfiguration(color = ColorPrimary.Primary_500)
         ) {
-            content()
+            Column(
+                modifier = Modifier.pointerInput(Unit) {
+                    detectTapGestures(onTap = {
+                        focusManager.clearFocus()
+                    })
+                }
+            ) {
+                content()
+            }
         }
     }
 }
