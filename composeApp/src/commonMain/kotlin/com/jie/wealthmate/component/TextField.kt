@@ -2,7 +2,9 @@ package com.jie.wealthmate.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -48,6 +50,7 @@ fun WMTextField(
     placeholder: String? = null,
     supportingText: String? = null,
     isError: Boolean = false,
+    isCount: Boolean = false,
     visualTransformation: VisualTransformation = VisualTransformation.None,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
@@ -76,6 +79,7 @@ fun WMTextField(
         placeholder = placeholder,
         supportingText = supportingText,
         isError = isError,
+        isCount = isCount,
         visualTransformation = visualTransformation,
         keyboardOptions = keyboardOptions,
         keyboardActions = keyboardActions,
@@ -95,6 +99,7 @@ fun WMTextField(
     placeholder: String? = null,
     supportingText: String? = null,
     isError: Boolean = false,
+    isCount: Boolean = false,
     visualTransformation: VisualTransformation = VisualTransformation.None,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
@@ -105,7 +110,9 @@ fun WMTextField(
 
     val defaultColor = ColorGray.Gray_700
     val errorColor = ColorRed.Red_300
-    val disabledColor = ColorGray.Gray_300
+    val disabledColor = ColorGray.Gray_200
+    val placeholderColor = ColorGray.Gray_400
+
 
     Box(
         modifier = modifier,
@@ -133,6 +140,7 @@ fun WMTextField(
                     Text(
                         text = it,
                         modifier = Modifier.padding(bottom = if (value.text.isNotEmpty() || isFocused) 4.dp else 0.dp),
+                        color = if (value.text.isNotEmpty() || isFocused) defaultColor else placeholderColor,
                         fontSize = if (value.text.isNotEmpty() || isFocused) Typography().titleSmall.fontSize else Typography().bodyLarge.fontSize,
                         fontWeight = FontWeight.SemiBold,
                         fontFamily = wantedSansFontFamily()
@@ -146,7 +154,16 @@ fun WMTextField(
             },
             supportingText = supportingText?.let {
                 {
-                    WMText(text = it)
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        WMText(text = it, modifier = Modifier.weight(1f))
+
+                        if (isCount) {
+                            WMText(text = "${value.text.length}/$maxLength")
+                        }
+                    }
                 }
             },
             singleLine = true,
@@ -176,13 +193,13 @@ fun WMTextField(
                 unfocusedLabelColor = defaultColor,
                 disabledLabelColor = disabledColor,
                 errorLabelColor = defaultColor,
-                focusedPlaceholderColor = disabledColor,
-                unfocusedPlaceholderColor = disabledColor,
-                disabledPlaceholderColor = disabledColor,
-                errorPlaceholderColor = disabledColor,
-                focusedSupportingTextColor = defaultColor,
-                unfocusedSupportingTextColor = defaultColor,
-                disabledSupportingTextColor = disabledColor,
+                focusedPlaceholderColor = placeholderColor,
+                unfocusedPlaceholderColor = placeholderColor,
+                disabledPlaceholderColor = placeholderColor,
+                errorPlaceholderColor = placeholderColor,
+                focusedSupportingTextColor = placeholderColor,
+                unfocusedSupportingTextColor = placeholderColor,
+                disabledSupportingTextColor = placeholderColor,
                 errorSupportingTextColor = errorColor,
             )
         )
@@ -197,7 +214,8 @@ fun WMTextField(
                         enabled.not() -> disabledColor
                         isError -> errorColor
                         isFocused -> ColorPrimary.Primary_700
-                        else -> ColorGray.Gray_500
+                        value.text.isNotEmpty() -> defaultColor
+                        else -> placeholderColor
                     }
                 )
         )
