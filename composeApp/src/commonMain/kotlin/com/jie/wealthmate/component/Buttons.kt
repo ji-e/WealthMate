@@ -4,8 +4,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ElevatedButton
@@ -31,10 +33,12 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
 fun WMButton(
+    modifier: Modifier = Modifier.fillMaxWidth(),
     text: String,
     buttonStyle: ButtonStyle = ButtonStyle.FILLED,
     buttonSize: ButtonSize = ButtonSize.MEDIUM,
     enabled: Boolean = true,
+    isRounded: Boolean = false,
     onClick: () -> Unit,
 ) {
 
@@ -47,7 +51,8 @@ fun WMButton(
                 onClick = onClick,
                 enabled = enabled,
                 contentPadding = PaddingValues(horizontal = 12.dp),
-                modifier = Modifier.height(buttonSize.buttonHeight),
+                modifier = modifier.height(buttonSize.buttonHeight),
+                shape = if (isRounded) ButtonDefaults.elevatedShape else RoundedCornerShape(8.dp),
                 colors = ButtonDefaults.elevatedButtonColors().copy(
                     contentColor = defaultColor,
                     disabledContentColor = disabledColor
@@ -65,7 +70,8 @@ fun WMButton(
                 onClick = onClick,
                 enabled = enabled,
                 contentPadding = PaddingValues(horizontal = 12.dp),
-                modifier = Modifier.height(buttonSize.buttonHeight),
+                modifier = modifier.height(buttonSize.buttonHeight),
+                shape = if (isRounded) ButtonDefaults.shape else RoundedCornerShape(8.dp),
                 colors = ButtonDefaults.buttonColors().copy(
                     contentColor = ColorGray.White,
                     disabledContentColor = disabledColor
@@ -83,7 +89,8 @@ fun WMButton(
                 onClick = onClick,
                 enabled = enabled,
                 contentPadding = PaddingValues(horizontal = 12.dp),
-                modifier = Modifier.height(buttonSize.buttonHeight),
+                modifier = modifier.height(buttonSize.buttonHeight),
+                shape = if (isRounded) ButtonDefaults.filledTonalShape else RoundedCornerShape(8.dp),
                 colors = ButtonDefaults.filledTonalButtonColors().copy(
                     contentColor = defaultColor,
                     disabledContentColor = disabledColor
@@ -101,7 +108,8 @@ fun WMButton(
                 onClick = onClick,
                 enabled = enabled,
                 contentPadding = PaddingValues(horizontal = 12.dp),
-                modifier = Modifier.height(buttonSize.buttonHeight),
+                modifier = modifier.height(buttonSize.buttonHeight),
+                shape = if (isRounded) ButtonDefaults.outlinedShape else RoundedCornerShape(8.dp),
                 colors = ButtonDefaults.outlinedButtonColors().copy(
                     contentColor = defaultColor,
                     disabledContentColor = disabledColor
@@ -119,7 +127,7 @@ fun WMButton(
                 onClick = onClick,
                 enabled = enabled,
                 contentPadding = PaddingValues(horizontal = 12.dp),
-                modifier = Modifier.height(buttonSize.buttonHeight),
+                modifier = modifier.height(buttonSize.buttonHeight),
                 colors = ButtonDefaults.textButtonColors().copy(
                     contentColor = defaultColor,
                     disabledContentColor = disabledColor
@@ -163,7 +171,10 @@ fun WMIconButton(
 fun WMButtonPreview() {
     WMTheme() {
         Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
                 WMButton(
                     text = "ELEVATED",
                     buttonStyle = ButtonStyle.ELEVATED,
@@ -200,12 +211,16 @@ fun WMButtonPreview() {
                     onClick = {}
                 )
             }
-            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
                 WMButton(
                     text = "ELEVATED",
                     buttonStyle = ButtonStyle.ELEVATED,
                     buttonSize = ButtonSize.X_SMALL,
                     enabled = false,
+                    isRounded = true,
                     onClick = {}
                 )
                 WMButton(
@@ -213,6 +228,7 @@ fun WMButtonPreview() {
                     buttonStyle = ButtonStyle.FILLED,
                     buttonSize = ButtonSize.SMALL,
                     enabled = false,
+                    isRounded = true,
                     onClick = {}
                 )
                 WMButton(
@@ -220,6 +236,7 @@ fun WMButtonPreview() {
                     buttonStyle = ButtonStyle.TONAL,
                     buttonSize = ButtonSize.MEDIUM,
                     enabled = false,
+                    isRounded = true,
                     onClick = {}
                 )
                 WMButton(
@@ -227,6 +244,7 @@ fun WMButtonPreview() {
                     buttonStyle = ButtonStyle.OUTLINED,
                     buttonSize = ButtonSize.LARGE,
                     enabled = false,
+                    isRounded = true,
                     onClick = {}
                 )
                 WMButton(
@@ -234,12 +252,14 @@ fun WMButtonPreview() {
                     buttonStyle = ButtonStyle.FILLED,
                     buttonSize = ButtonSize.X_LARGE,
                     enabled = false,
+                    isRounded = true,
                     onClick = {}
                 )
                 WMButton(
                     text = "TEXT",
                     buttonStyle = ButtonStyle.TEXT,
                     enabled = false,
+                    isRounded = true,
                     onClick = {}
                 )
             }
