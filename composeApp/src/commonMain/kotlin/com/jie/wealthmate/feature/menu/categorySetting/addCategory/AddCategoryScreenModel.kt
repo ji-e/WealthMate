@@ -25,15 +25,23 @@ class AddCategoryScreenModel : BaseScreenModel<AddCategoryUiState>() {
         }
     }
 
-    fun addCategoryTabLabel() {
+    fun addCategoryTabLabel(tagLabel: TextFieldValue?) {
         reduceState { state ->
-            val categoryTag = CategoryTagVo(label = state.tagLabel.text)
-            val isExisted = state.tagLabelItems.any { it.label == categoryTag.label }
+            if (tagLabel == null) {
+                state.copy(
+                    tagLabel = TextFieldValue(""),
+                )
+                return@reduceState state
+            }
 
-            if (categoryTag.label.isEmpty()) {
+            if (tagLabel.text.isEmpty()) {
                 showSnackbar("상세 태그 이름을 입력해 주세요.")
                 return@reduceState state
             }
+
+            val categoryTag = CategoryTagVo(label = tagLabel.text)
+            val isExisted = state.tagLabelItems.any { it.label == categoryTag.label }
+
             if (isExisted) {
                 showSnackbar("이미 존재하는 태그 입니다.")
                 state

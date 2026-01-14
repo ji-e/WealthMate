@@ -14,9 +14,13 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.jie.wealthmate.component.WMText
@@ -37,7 +41,7 @@ fun CategoryTag(
     tagLabel: TextFieldValue,
     tagLabelItems: List<CategoryTagVo> = emptyList(),
     onValueChange: (TextFieldValue) -> Unit,
-    onChipAdd: () -> Unit = {},
+    onChipAdd: (TextFieldValue?) -> Unit = {},
     onChipClick: (CategoryTagVo) -> Unit = {},
 ) {
     Column(
@@ -46,7 +50,14 @@ fun CategoryTag(
         WMTextField(
             value = tagLabel,
             onValueChange = onValueChange,
-            modifier = Modifier.padding(horizontal = 4.dp),
+            modifier = Modifier
+                .padding(horizontal = 4.dp)
+                .focusRequester(remember { FocusRequester() })
+                .onFocusChanged { focusState ->
+                    if (focusState.isFocused.not()) {
+                        onChipAdd(null)
+                    }
+                },
             maxLength = 15,
             label = "상세 태그 이름",
             placeholder = largeCategory.tempTagLabel,
@@ -54,7 +65,7 @@ fun CategoryTag(
             enabled = tagLabelItems.size <= 10,
             isCount = true,
             keyboardActions = KeyboardActions(
-                onDone = { onChipAdd() }
+                onDone = { onChipAdd(tagLabel) }
             )
         )
 
@@ -97,7 +108,7 @@ fun CategoryTagItem(
                 Icon(
                     painter = painterResource(Res.drawable.ic_close_circle),
                     contentDescription = item.label,
-                    tint = ColorGray.Gray_400,
+                    tint = ColorGray.Gray_300,
                     modifier = Modifier.size(16.dp)
                 )
             }
