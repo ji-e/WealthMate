@@ -93,9 +93,10 @@ class AddCategoryScreen(
                     modifier = Modifier.padding(top = 20.dp),
                     largeCategory = largeCategory,
                     tagLabel = uiState.tagLabel,
-                    tagLabelItems = listOf("상여금", "식대"),
-                    onValueChange = {},
-                    onClickChip = {}
+                    tagLabelItems = uiState.tagLabelItems,
+                    onValueChange = screenModel::updateCategoryTagLabel,
+                    onChipAdd = {},
+                    onChipClick = {}
                 )
 
                 Spacer(modifier = Modifier.weight(1f))

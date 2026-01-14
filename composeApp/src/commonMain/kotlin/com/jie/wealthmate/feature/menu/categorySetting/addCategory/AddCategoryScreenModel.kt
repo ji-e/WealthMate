@@ -15,4 +15,12 @@ class AddCategoryScreenModel : BaseScreenModel<AddCategoryUiState>() {
             )
         }
     }
+
+    fun updateCategoryTagLabel(textFieldValue: TextFieldValue){
+        reduceState { state ->
+            state.copy(
+                tagLabel = textFieldValue
+            )
+        }
+    }
 }
