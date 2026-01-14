@@ -28,10 +28,7 @@ class AddCategoryScreenModel : BaseScreenModel<AddCategoryUiState>() {
     fun addCategoryTabLabel(tagLabel: TextFieldValue?) {
         reduceState { state ->
             if (tagLabel == null) {
-                state.copy(
-                    tagLabel = TextFieldValue(""),
-                )
-                return@reduceState state
+                return@reduceState state.copy(tagLabel = TextFieldValue(""),)
             }
 
             if (tagLabel.text.isEmpty()) {
