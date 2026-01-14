@@ -7,4 +7,5 @@ import com.jie.wealthmate.component.CategoryIconEnum
 data class AddCategoryUiState(
     val categoryIcon: CategoryIconEnum = CategoryIconEnum.defaultCategoryIcon,
     val label: TextFieldValue = TextFieldValue(""),
+    val tagLabel: TextFieldValue = TextFieldValue(""),
 ) : BaseUiState

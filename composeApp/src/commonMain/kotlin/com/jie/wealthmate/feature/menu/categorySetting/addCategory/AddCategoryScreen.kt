@@ -22,6 +22,7 @@ import com.jie.wealthmate.component.WMTextField
 import com.jie.wealthmate.component.topbar.TopBarItem
 import com.jie.wealthmate.component.topbar.WMTobBar
 import com.jie.wealthmate.feature.menu.categorySetting.addCategory.component.CategoryIcon
+import com.jie.wealthmate.feature.menu.categorySetting.addCategory.component.CategoryTagTextField
 import com.jie.wealthmate.feature.menu.categorySetting.component.LargeCategoryEnum
 import com.jie.wealthmate.theme.WMTheme
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -80,6 +81,15 @@ class AddCategoryScreen(
                     placeholder = largeCategory.tempMiddleCategoryLabel,
                     supportingText = "15자 이내로 입력해 주세요.",
                     isCount = true,
+                    isRequire = true,
+                )
+
+                // 카테고리 태그
+                CategoryTagTextField(
+                    modifier = Modifier.padding(top = 20.dp),
+                    largeCategory = largeCategory,
+                    tagLabel = uiState.tagLabel,
+                    onValueChange = {}
                 )
             }
         }
