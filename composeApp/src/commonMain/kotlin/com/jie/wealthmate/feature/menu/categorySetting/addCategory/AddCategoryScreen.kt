@@ -22,7 +22,7 @@ import com.jie.wealthmate.component.WMTextField
 import com.jie.wealthmate.component.topbar.TopBarItem
 import com.jie.wealthmate.component.topbar.WMTobBar
 import com.jie.wealthmate.feature.menu.categorySetting.addCategory.component.CategoryIcon
-import com.jie.wealthmate.feature.menu.categorySetting.addCategory.component.CategoryTagTextField
+import com.jie.wealthmate.feature.menu.categorySetting.addCategory.component.CategoryTag
 import com.jie.wealthmate.feature.menu.categorySetting.component.LargeCategoryEnum
 import com.jie.wealthmate.theme.WMTheme
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -85,11 +85,13 @@ class AddCategoryScreen(
                 )
 
                 // 카테고리 태그
-                CategoryTagTextField(
+                CategoryTag(
                     modifier = Modifier.padding(top = 20.dp),
                     largeCategory = largeCategory,
                     tagLabel = uiState.tagLabel,
-                    onValueChange = {}
+                    tagLabelItems = listOf("상여금", "식대"),
+                    onValueChange = {},
+                    onClickChip = {}
                 )
             }
         }
