@@ -16,11 +16,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.annotation.InternalVoyagerApi
 import cafe.adriel.voyager.core.model.rememberScreenModel
-import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import cafe.adriel.voyager.navigator.internal.BackHandler
+import com.jie.wealthmate.base.BaseScreen
+import com.jie.wealthmate.base.BaseUiSideEffect
+import com.jie.wealthmate.base.collectSideEffect
 import com.jie.wealthmate.component.ButtonSize
+import com.jie.wealthmate.component.SnackbarController
 import com.jie.wealthmate.component.WMButton
 import com.jie.wealthmate.component.WMTextField
 import com.jie.wealthmate.component.topbar.TopBarItem
@@ -33,16 +36,27 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 
 class AddCategoryScreen(
     val largeCategory: LargeCategoryEnum,
-) : Screen {
+) : BaseScreen() {
 
     @Composable
-    override fun Content() {
+    override fun ScreenContent(
+        snackbarController: SnackbarController,
+        snackbarHost: @Composable () -> Unit,
+    ) {
         val navigator = LocalNavigator.currentOrThrow
         val screenModel = rememberScreenModel { AddCategoryScreenModel() }
         val uiState = screenModel.container.uiState.collectAsState().value
 
         BackHandler(true) {
             navigator.pop()
+        }
+
+        screenModel.collectSideEffect { sideEffect ->
+            when (sideEffect) {
+                is BaseUiSideEffect.ShowSnackbar -> {
+                    snackbarController.showMessage(sideEffect.message)
+                }
+            }
         }
 
         Scaffold(
@@ -53,7 +67,8 @@ class AddCategoryScreen(
                         action = { navigator.pop() }
                     ),
                 )
-            }
+            },
+            snackbarHost = snackbarHost,
         ) { innerPadding: PaddingValues ->
             Column(
                 modifier = Modifier
@@ -93,9 +108,10 @@ class AddCategoryScreen(
                     modifier = Modifier.padding(top = 20.dp),
                     largeCategory = largeCategory,
                     tagLabel = uiState.tagLabel,
-                    tagLabelItems = listOf("상여금", "식대"),
-                    onValueChange = {},
-                    onClickChip = {}
+                    tagLabelItems = uiState.tagLabelItems,
+                    onValueChange = screenModel::updateCategoryTagLabel,
+                    onChipAdd = screenModel::addCategoryTagLabel,
+                    onChipRemove = screenModel::removeCategoryTagLabel,
                 )
 
                 Spacer(modifier = Modifier.weight(1f))

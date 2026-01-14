@@ -147,7 +147,10 @@ fun WMTextField(
                         Text(
                             text = it,
                             modifier = Modifier.padding(bottom = if (value.text.isNotEmpty() || isFocused) 12.dp else 0.dp),
-                            color = if (value.text.isNotEmpty() || isFocused) defaultColor else ColorGray.Gray_500,
+                            color =
+                                if (enabled.not()) disabledColor
+                                else if (value.text.isNotEmpty() || isFocused) defaultColor
+                                else ColorGray.Gray_500,
                             fontSize = if (value.text.isNotEmpty() || isFocused) Typography().titleSmall.fontSize else Typography().bodyLarge.fontSize,
                             fontWeight = FontWeight.SemiBold,
                             fontFamily = wantedSansFontFamily()
@@ -157,7 +160,7 @@ fun WMTextField(
                             Text(
                                 text = "*",
                                 modifier = Modifier.padding(bottom = if (value.text.isNotEmpty() || isFocused) 12.dp else 0.dp),
-                                color = errorColor,
+                                color = if (enabled.not()) disabledColor else errorColor,
                                 fontSize = if (value.text.isNotEmpty() || isFocused) Typography().titleSmall.fontSize else Typography().bodyLarge.fontSize,
                                 fontWeight = FontWeight.SemiBold,
                                 fontFamily = wantedSansFontFamily()
@@ -219,7 +222,7 @@ fun WMTextField(
                 errorPlaceholderColor = placeholderColor,
                 focusedSupportingTextColor = placeholderColor,
                 unfocusedSupportingTextColor = placeholderColor,
-                disabledSupportingTextColor = placeholderColor,
+                disabledSupportingTextColor = disabledColor,
                 errorSupportingTextColor = errorColor,
             )
         )
@@ -234,7 +237,7 @@ fun WMTextField(
                         enabled.not() -> disabledColor
                         isError -> errorColor
                         isFocused -> ColorPrimary.Primary_700
-                        value.text.isNotEmpty() -> defaultColor
+                        value.text.isNotEmpty() -> ColorGray.Gray_500
                         else -> placeholderColor
                     }
                 )

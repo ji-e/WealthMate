@@ -47,13 +47,13 @@ sealed class BaseUiSideEffect : UiSideEffect {
     data class ShowLoading(val isShowLoading: Boolean) : UiSideEffect
 
     @Immutable
-    data class ShowToast(
+    data class ShowSnackbar(
         val message: String,
         val triggerBack: Boolean = false,
     ) : UiSideEffect
 
     @Immutable
-    data class ShowToastWithAction(
+    data class ShowSnackbarWithAction(
         val message: String,
         val actionText: String,
         val action: () -> Unit,
