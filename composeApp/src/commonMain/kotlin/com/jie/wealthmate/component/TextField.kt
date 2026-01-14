@@ -51,6 +51,7 @@ fun WMTextField(
     supportingText: String? = null,
     isError: Boolean = false,
     isCount: Boolean = false,
+    isRequire: Boolean = false,
     visualTransformation: VisualTransformation = VisualTransformation.None,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
@@ -80,6 +81,7 @@ fun WMTextField(
         supportingText = supportingText,
         isError = isError,
         isCount = isCount,
+        isRequire = isRequire,
         visualTransformation = visualTransformation,
         keyboardOptions = keyboardOptions,
         keyboardActions = keyboardActions,
@@ -100,6 +102,7 @@ fun WMTextField(
     supportingText: String? = null,
     isError: Boolean = false,
     isCount: Boolean = false,
+    isRequire: Boolean = false,
     visualTransformation: VisualTransformation = VisualTransformation.None,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
@@ -110,8 +113,8 @@ fun WMTextField(
 
     val defaultColor = ColorGray.Gray_700
     val errorColor = ColorRed.Red_300
-    val disabledColor = ColorGray.Gray_200
-    val placeholderColor = ColorGray.Gray_400
+    val disabledColor = ColorGray.Gray_100
+    val placeholderColor = ColorGray.Gray_300
 
 
     Box(
@@ -121,7 +124,7 @@ fun WMTextField(
         TextField(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(88.dp)
+                .height(92.dp)
                 .focusRequester(focusRequester)
                 .onFocusChanged { focusState ->
                     isFocused = focusState.isFocused
@@ -137,14 +140,30 @@ fun WMTextField(
             isError = isError,
             label = label?.let {
                 {
-                    Text(
-                        text = it,
-                        modifier = Modifier.padding(bottom = if (value.text.isNotEmpty() || isFocused) 4.dp else 0.dp),
-                        color = if (value.text.isNotEmpty() || isFocused) defaultColor else placeholderColor,
-                        fontSize = if (value.text.isNotEmpty() || isFocused) Typography().titleSmall.fontSize else Typography().bodyLarge.fontSize,
-                        fontWeight = FontWeight.SemiBold,
-                        fontFamily = wantedSansFontFamily()
-                    )
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        Text(
+                            text = it,
+                            modifier = Modifier.padding(bottom = if (value.text.isNotEmpty() || isFocused) 12.dp else 0.dp),
+                            color = if (value.text.isNotEmpty() || isFocused) defaultColor else placeholderColor,
+                            fontSize = if (value.text.isNotEmpty() || isFocused) Typography().titleSmall.fontSize else Typography().bodyLarge.fontSize,
+                            fontWeight = FontWeight.SemiBold,
+                            fontFamily = wantedSansFontFamily()
+                        )
+
+                        if (isRequire) {
+                            Text(
+                                text = "*",
+                                modifier = Modifier.padding(bottom = if (value.text.isNotEmpty() || isFocused) 12.dp else 0.dp),
+                                color = errorColor,
+                                fontSize = if (value.text.isNotEmpty() || isFocused) Typography().titleSmall.fontSize else Typography().bodyLarge.fontSize,
+                                fontWeight = FontWeight.SemiBold,
+                                fontFamily = wantedSansFontFamily()
+                            )
+                        }
+                    }
                 }
             },
             placeholder = placeholder?.let {
