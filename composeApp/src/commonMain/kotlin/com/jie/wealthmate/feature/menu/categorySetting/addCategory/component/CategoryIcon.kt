@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
@@ -45,8 +46,9 @@ fun CategoryIcon(
         }
         Box(
             modifier = Modifier
+                .padding(2.dp)
                 .clip(CircleShape)
-                .background(color = ColorGray.White,)
+                .background(color = ColorGray.White)
                 .border(
                     width = 2.dp,
                     color = ColorGray.White_80,
