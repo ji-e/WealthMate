@@ -7,13 +7,14 @@ plugins {
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.composeHotReload)
     alias(libs.plugins.kotlinx.atomicfu)
+    alias(libs.plugins.sqldelight)
 }
 
 kotlin {
     androidTarget {
-        compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_11)
-        }
+//        compilerOptions {
+//            jvmTarget.set(JvmTarget.JVM_11)
+//        }
     }
     
     listOf(
@@ -30,9 +31,10 @@ kotlin {
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
+            implementation(libs.sqldelight.android.driver)
         }
         iosMain.dependencies {
-
+            implementation(libs.sqldelight.native.driver)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -51,6 +53,8 @@ kotlin {
             implementation(libs.voyager.navigator)
             implementation(libs.voyager.screenmodel)
             implementation(libs.voyager.transitions)
+
+            implementation(libs.sqldelight.coroutines.extensions)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
@@ -87,4 +91,12 @@ android {
 
 dependencies {
     debugImplementation(compose.uiTooling)
+}
+
+sqldelight {
+    databases {
+        create("WMDatabase") { // 생성될 데이터베이스 클래스의 이름
+            packageName.set("com.jie.wealthmate.database") // 생성될 파일들의 패키지 경로
+        }
+    }
 }
