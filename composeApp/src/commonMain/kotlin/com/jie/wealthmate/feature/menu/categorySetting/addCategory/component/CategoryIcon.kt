@@ -135,7 +135,9 @@ fun CategoryIconGrid(
             )
         }
     }
-    HorizontalPager(pagerState) {
+    HorizontalPager(pagerState) { page ->
+        val selectedIconItems = iconItems[page].second
+
         LazyVerticalGrid(
             columns = GridCells.Fixed(5),
             modifier = modifier
@@ -145,7 +147,6 @@ fun CategoryIconGrid(
             horizontalArrangement = Arrangement.spacedBy(4.dp),
             contentPadding = PaddingValues(20.dp),
         ) {
-            val selectedIconItems = iconItems[pagerState.currentPage].second
             items(
                 count = selectedIconItems.size
             ) { index ->
