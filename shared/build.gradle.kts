@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.sqldelight)
+//    id("org.jetbrains.kotlin.native.cocoapods") version "1.9.22" // CocoaPods 플러그인 추가
 }
 
 kotlin {
@@ -12,15 +13,19 @@ kotlin {
 //            jvmTarget.set(JvmTarget.JVM_11)
 //        }
     }
-    
-    iosArm64()
-    iosSimulatorArm64()
+
+    // iOS 타겟 설정
+    listOf(
+        iosArm64(),
+        iosSimulatorArm64()
+    )
     
     jvm()
 
     sourceSets {
         androidMain.dependencies {
             implementation(libs.sqldelight.android.driver)
+            implementation(libs.koin.android)
         }
         iosMain.dependencies {
             implementation(libs.sqldelight.native.driver)
@@ -28,6 +33,8 @@ kotlin {
         commonMain.dependencies {
             implementation(libs.kotlinx.datetime)
             implementation(libs.sqldelight.coroutines.extensions)
+            implementation(libs.koin.core)
+            implementation(libs.koin.compose)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
