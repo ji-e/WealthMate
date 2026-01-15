@@ -1,6 +1,5 @@
 package com.jie.wealthmate.feature.menu.categorySetting.component
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -49,11 +48,9 @@ fun CategoryItem(
                 .size(40.dp),
             contentAlignment = Alignment.Center
         ) {
-
-            Image(
-                painter = painterResource(data.icon),
-                contentDescription = data.label,
-                modifier = Modifier.size(28.dp)
+            WMText(
+                text = data.icon,
+                style = Typography().bodyLarge.copy(fontSize = 28.sp)
             )
         }
 
@@ -81,7 +78,7 @@ private fun CategoryItemPreview() {
         CategoryItem(
             CategoryItemData(
                 id = 0,
-                icon = CategoryIconEnum.CATEGORY_EMOJI_U1F303.resource,
+                icon = CategoryIconEnum.CATEGORY_U1F9D0.text,
                 label = "급여",
                 backgroundColor = ColorBlue.Blue_100,
                 sort = 1,

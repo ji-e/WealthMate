@@ -2,12 +2,21 @@ package com.jie.wealthmate.feature.menu.categorySetting.addCategory
 
 import androidx.compose.ui.text.input.TextFieldValue
 import com.jie.wealthmate.base.BaseScreenModel
+import com.jie.wealthmate.component.CategoryIconEnum
 import com.jie.wealthmate.vo.CategoryTagVo
 
 class AddCategoryScreenModel : BaseScreenModel<AddCategoryUiState>() {
 
     override val initialState: AddCategoryUiState
         get() = AddCategoryUiState()
+
+    fun updateCategoryIcon(icon: CategoryIconEnum) {
+        reduceState { state ->
+            state.copy(
+                categoryIcon = icon
+            )
+        }
+    }
 
     fun updateCategoryLabel(textFieldValue: TextFieldValue) {
         reduceState { state ->

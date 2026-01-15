@@ -4,11 +4,10 @@ import androidx.compose.ui.graphics.Color
 import com.jie.wealthmate.theme.ColorBlue
 import com.jie.wealthmate.theme.ColorPrimary
 import com.jie.wealthmate.theme.ColorRed
-import org.jetbrains.compose.resources.DrawableResource
 
 data class CategoryItemData(
     val id: Int,
-    val icon: DrawableResource,
+    val icon: String,
     val label: String,
     val backgroundColor: Color,
     val sort: Int,
