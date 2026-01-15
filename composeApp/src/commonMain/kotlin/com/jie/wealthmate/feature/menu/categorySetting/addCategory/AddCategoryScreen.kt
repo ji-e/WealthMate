@@ -19,7 +19,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.annotation.InternalVoyagerApi
-import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import cafe.adriel.voyager.navigator.internal.BackHandler
@@ -39,6 +38,7 @@ import com.jie.wealthmate.feature.menu.categorySetting.addCategory.component.Cat
 import com.jie.wealthmate.feature.menu.categorySetting.component.LargeCategoryEnum
 import com.jie.wealthmate.theme.WMTheme
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import org.koin.compose.koinInject
 
 class AddCategoryScreen(
     val largeCategory: LargeCategoryEnum,
@@ -50,7 +50,7 @@ class AddCategoryScreen(
         snackbarHost: @Composable () -> Unit,
     ) {
         val navigator = LocalNavigator.currentOrThrow
-        val screenModel = rememberScreenModel { AddCategoryScreenModel() }
+        val screenModel: AddCategoryScreenModel = koinInject()
         val uiState = screenModel.container.uiState.collectAsState().value
 
         BackHandler(true) {

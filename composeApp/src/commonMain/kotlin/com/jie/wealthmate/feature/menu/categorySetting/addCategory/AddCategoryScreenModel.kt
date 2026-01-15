@@ -3,9 +3,12 @@ package com.jie.wealthmate.feature.menu.categorySetting.addCategory
 import androidx.compose.ui.text.input.TextFieldValue
 import com.jie.wealthmate.base.BaseScreenModel
 import com.jie.wealthmate.component.CategoryIconEnum
+import com.jie.wealthmate.repository.CategoryRepository
 import com.jie.wealthmate.vo.CategoryTagVo
 
-class AddCategoryScreenModel : BaseScreenModel<AddCategoryUiState>() {
+class AddCategoryScreenModel(
+    val categoryRepository: CategoryRepository,
+) : BaseScreenModel<AddCategoryUiState>() {
 
     override val initialState: AddCategoryUiState
         get() = AddCategoryUiState()
@@ -67,4 +70,5 @@ class AddCategoryScreenModel : BaseScreenModel<AddCategoryUiState>() {
             )
         }
     }
+
 }
