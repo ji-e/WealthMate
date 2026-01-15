@@ -139,7 +139,8 @@ class AddCategoryScreen(
                         onDismissRequest = { isShowCategoryIconModalBottomSheet = false },
                     ) {
                         CategoryIconGrid(
-                            selectedCategoryIcon = uiState.categoryIcon
+                            selectedCategoryIcon = uiState.categoryIcon,
+                            onIconChange = screenModel::updateCategoryIcon
                         )
                     }
                 }

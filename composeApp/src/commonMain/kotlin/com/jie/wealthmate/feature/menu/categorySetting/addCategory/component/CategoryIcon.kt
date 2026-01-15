@@ -60,7 +60,7 @@ fun CategoryIcon(
 
             WMText(
                 text = selectedCategoryIcon.text,
-                style = Typography().bodyLarge.copy(fontSize = 76.sp)
+                style = Typography().bodyLarge.copy(fontSize = 60.sp)
             )
         }
         Box(
@@ -98,6 +98,7 @@ fun CategoryIcon(
 fun CategoryIconGrid(
     modifier: Modifier = Modifier,
     selectedCategoryIcon: CategoryIconEnum,
+    onIconChange: (CategoryIconEnum) -> Unit = {},
 ) {
     val iconItems = CategoryIconEnum.categoryIcons
     val pagerState = rememberPagerState(pageCount = { iconItems.size })
@@ -149,7 +150,10 @@ fun CategoryIconGrid(
                 count = selectedIconItems.size
             ) { index ->
                 val icon = selectedIconItems[index]
-                Box(contentAlignment = Alignment.Center) {
+                Box(
+                    modifier = Modifier.clickable { onIconChange(icon) },
+                    contentAlignment = Alignment.Center
+                ) {
                     WMText(
                         text = icon.text,
                         style = Typography().bodyLarge.copy(fontSize = 44.sp)
