@@ -1,6 +1,5 @@
 package com.jie.wealthmate.feature.menu.categorySetting.addCategory.component
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -21,6 +20,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.PrimaryScrollableTabRow
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRowDefaults
+import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -28,8 +28,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.jie.wealthmate.component.CategoryIconEnum
 import com.jie.wealthmate.component.WMIconButton
+import com.jie.wealthmate.component.WMText
 import com.jie.wealthmate.feature.menu.categorySetting.component.LargeCategoryEnum
 import com.jie.wealthmate.theme.ColorGray
 import com.jie.wealthmate.theme.ColorPrimary
@@ -55,10 +57,10 @@ fun CategoryIcon(
                 .clickable { onClickChange() },
             contentAlignment = Alignment.Center
         ) {
-            Image(
-                painter = painterResource(selectedCategoryIcon.resource),
-                contentDescription = "카테고리 아이콘",
-                modifier = Modifier.size(80.dp)
+
+            WMText(
+                text = selectedCategoryIcon.text,
+                style = Typography().bodyLarge.copy(fontSize = 76.sp)
             )
         }
         Box(
@@ -117,14 +119,11 @@ fun CategoryIconGrid(
     ) {
         iconItems.forEachIndexed { index, icon ->
             Tab(
-                icon = {
-
-                    Image(
-                        painter = painterResource(icon.first.resource),
-                        modifier = Modifier.size(36.dp),
-                        contentDescription = null
+                text = {
+                    WMText(
+                        text = icon.first.text,
+                        style = Typography().bodyLarge.copy(fontSize = 36.sp)
                     )
-
                 },
                 selected = pagerState.currentPage == index,
                 onClick = {
@@ -151,13 +150,12 @@ fun CategoryIconGrid(
             ) { index ->
                 val icon = selectedIconItems[index]
                 Box(contentAlignment = Alignment.Center) {
-                    Image(
-                        painter = painterResource(icon.resource),
-                        contentDescription = "카테고리 아이콘",
-                        modifier = Modifier.size(48.dp)
+                    WMText(
+                        text = icon.text,
+                        style = Typography().bodyLarge.copy(fontSize = 44.sp)
                     )
 
-                    if (selectedCategoryIcon.resource == icon.resource) {
+                    if (selectedCategoryIcon.text == icon.text) {
                         Spacer(
                             modifier = modifier
                                 .clip(CircleShape)

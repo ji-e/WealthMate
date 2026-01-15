@@ -27,7 +27,7 @@ class IncomeCategorySettingScreenModel : BaseScreenModel<IncomeCategorySettingUi
                     add(
                         CategoryItemData(
                             id = it,
-                            icon = CategoryIconEnum.CATEGORY_U1F9D0.resource,
+                            icon = CategoryIconEnum.CATEGORY_U1F9D0.text,
                             label = "급여",
                             backgroundColor = ColorBlue.Blue_100,
                             sort = it + 1,
