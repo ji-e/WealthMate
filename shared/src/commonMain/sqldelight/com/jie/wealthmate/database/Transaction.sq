@@ -1,0 +1,24 @@
+-- Transaction.sq
+
+CREATE TABLE `Transaction` (
+    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    title TEXT NOT NULL,
+    amount REAL NOT NULL,
+    createdAt INTEGER NOT NULL
+);
+
+-- 모든 트랜잭션을 조회하는 쿼리
+selectAll:
+SELECT * FROM `Transaction` ORDER BY createdAt DESC;
+
+-- ID로 특정 트랜잭션을 조회하는 쿼리
+selectById:
+SELECT * FROM `Transaction` WHERE id = ?;
+
+-- 새로운 트랜잭션을 추가하는 쿼리
+insert:
+INSERT INTO `Transaction`(title, amount, createdAt) VALUES (?, ?, ?);
+
+-- ID로 트랜잭션을 삭제하는 쿼리
+deleteById:
+DELETE FROM `Transaction` WHERE id = ?;
