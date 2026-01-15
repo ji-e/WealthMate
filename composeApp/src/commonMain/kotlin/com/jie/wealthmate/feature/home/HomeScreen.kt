@@ -35,10 +35,8 @@ class HomeScreen(private val calculateBottomPadding: Dp = 0.dp) : Screen {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-//            WMText(text = "Home Screen Counter: ${screenModel.transactions.value}", style = Typography().bodyLarge)
             Button(onClick = { screenModel.increment() }) {
                 WMText(text = "Increment $counter", style = Typography().bodyLarge)
-                screenModel.addTransaction("F", counter.toDouble())
             }
         }
     }
