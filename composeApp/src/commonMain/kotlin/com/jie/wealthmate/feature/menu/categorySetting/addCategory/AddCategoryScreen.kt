@@ -11,6 +11,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -26,9 +30,11 @@ import com.jie.wealthmate.component.ButtonSize
 import com.jie.wealthmate.component.SnackbarController
 import com.jie.wealthmate.component.WMButton
 import com.jie.wealthmate.component.WMTextField
+import com.jie.wealthmate.component.WMTextModalBottomSheet
 import com.jie.wealthmate.component.topbar.TopBarItem
 import com.jie.wealthmate.component.topbar.WMTobBar
 import com.jie.wealthmate.feature.menu.categorySetting.addCategory.component.CategoryIcon
+import com.jie.wealthmate.feature.menu.categorySetting.addCategory.component.CategoryIconGrid
 import com.jie.wealthmate.feature.menu.categorySetting.addCategory.component.CategoryTag
 import com.jie.wealthmate.feature.menu.categorySetting.component.LargeCategoryEnum
 import com.jie.wealthmate.theme.WMTheme
@@ -79,13 +85,14 @@ class AddCategoryScreen(
                     ),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                var isShowCategoryIconModalBottomSheet by remember { mutableStateOf(false) }
 
                 // 카테고리 아이콘
                 CategoryIcon(
                     modifier = Modifier.padding(top = 24.dp),
                     largeCategory = largeCategory,
                     selectedCategoryIcon = uiState.categoryIcon,
-                    onClickChange = {}
+                    onClickChange = { isShowCategoryIconModalBottomSheet = true }
                 )
 
                 // 카테고리 라벨
@@ -125,6 +132,17 @@ class AddCategoryScreen(
                         .fillMaxWidth(),
                     onClick = {}
                 )
+
+                // 아이콘 변경 ModalBottomSheet
+                if (isShowCategoryIconModalBottomSheet) {
+                    WMTextModalBottomSheet(
+                        onDismissRequest = { isShowCategoryIconModalBottomSheet = false },
+                    ) {
+                        CategoryIconGrid(
+                            selectedCategoryIcon = uiState.categoryIcon
+                        )
+                    }
+                }
             }
         }
     }

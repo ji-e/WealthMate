@@ -81,7 +81,7 @@ private fun CategoryItemPreview() {
         CategoryItem(
             CategoryItemData(
                 id = 0,
-                icon = CategoryIconEnum.CATEGORY_EMOJI_U1F303.resource,
+                icon = CategoryIconEnum.CATEGORY_U1F9D0.resource,
                 label = "급여",
                 backgroundColor = ColorBlue.Blue_100,
                 sort = 1,
