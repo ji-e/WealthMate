@@ -1,10 +1,13 @@
 package com.jie.wealthmate.feature.menu.categorySetting.addCategory
 
 import androidx.compose.ui.text.input.TextFieldValue
+import cafe.adriel.voyager.core.model.screenModelScope
 import com.jie.wealthmate.base.BaseScreenModel
 import com.jie.wealthmate.component.CategoryIconEnum
+import com.jie.wealthmate.feature.menu.categorySetting.component.LargeCategoryEnum
 import com.jie.wealthmate.repository.CategoryRepository
 import com.jie.wealthmate.vo.CategoryTagVo
+import kotlinx.coroutines.launch
 
 class AddCategoryScreenModel(
     val categoryRepository: CategoryRepository,
@@ -12,6 +15,14 @@ class AddCategoryScreenModel(
 
     override val initialState: AddCategoryUiState
         get() = AddCategoryUiState()
+
+    fun updateLargeCategory(largeCategoryEnum: LargeCategoryEnum) {
+        reduceState { state ->
+            state.copy(
+                largeCategory = largeCategoryEnum
+            )
+        }
+    }
 
     fun updateCategoryIcon(icon: CategoryIconEnum) {
         reduceState { state ->
@@ -71,4 +82,32 @@ class AddCategoryScreenModel(
         }
     }
 
+    fun saveCategory() {
+        val uiState = container.uiState.value
+        screenModelScope.launch {
+            try {
+                categoryRepository.addCategory(
+                    icon = uiState.categoryIcon.text,
+                    largeCategory = uiState.largeCategory.name,
+                    middleLabel = uiState.label.text,
+                    tagIds = createTags()
+                )
+
+                postSideEffect { AddCategoryUiSideEffect.OnSuccessSave }
+            } catch (e: Exception) {
+                showSnackbar("카테고리 저장에 실패했습니다.")
+            }
+        }
+    }
+
+    private suspend fun createTags(): List<Long> {
+        val uiState = container.uiState.value
+        return uiState.tagLabelItems.map {
+            categoryRepository.addTag(
+                largeCategory = uiState.largeCategory.name,
+                middleLabel = uiState.label.text,
+                tagLabel = it.label
+            )
+        }
+    }
 }

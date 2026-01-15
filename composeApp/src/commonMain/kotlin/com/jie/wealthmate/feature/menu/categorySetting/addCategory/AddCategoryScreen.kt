@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -62,7 +63,15 @@ class AddCategoryScreen(
                 is BaseUiSideEffect.ShowSnackbar -> {
                     snackbarController.showMessage(sideEffect.message)
                 }
+
+                is AddCategoryUiSideEffect.OnSuccessSave -> {
+                    navigator.pop()
+                }
             }
+        }
+
+        LaunchedEffect(Unit) {
+            screenModel.updateLargeCategory(largeCategory)
         }
 
         Scaffold(
@@ -130,7 +139,8 @@ class AddCategoryScreen(
                     modifier = Modifier
                         .padding(20.dp)
                         .fillMaxWidth(),
-                    onClick = {}
+                    enabled = uiState.label.text.isNotEmpty(),
+                    onClick = { screenModel.saveCategory() }
                 )
 
                 // 아이콘 변경 ModalBottomSheet
