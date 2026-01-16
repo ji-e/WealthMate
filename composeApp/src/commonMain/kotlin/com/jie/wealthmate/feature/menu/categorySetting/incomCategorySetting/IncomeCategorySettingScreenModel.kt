@@ -1,6 +1,7 @@
 package com.jie.wealthmate.feature.menu.categorySetting.incomCategorySetting
 
 import cafe.adriel.voyager.core.model.screenModelScope
+import com.jie.wealthmate.MainScreenModel
 import com.jie.wealthmate.base.BaseScreenModel
 import com.jie.wealthmate.component.CategoryIconEnum
 import com.jie.wealthmate.feature.menu.categorySetting.component.CategoryItemData
@@ -10,7 +11,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class IncomeCategorySettingScreenModel : BaseScreenModel<IncomeCategorySettingUiState>() {
+class IncomeCategorySettingScreenModel(
+    val mainScreenModel: MainScreenModel
+) : BaseScreenModel<IncomeCategorySettingUiState>() {
     private val _counter = MutableStateFlow(0)
     val counter = _counter.asStateFlow()
 

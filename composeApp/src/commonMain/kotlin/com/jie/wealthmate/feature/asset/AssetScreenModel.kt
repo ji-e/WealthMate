@@ -2,11 +2,14 @@ package com.jie.wealthmate.feature.asset
 
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
+import com.jie.wealthmate.MainScreenModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class AssetScreenModel : ScreenModel {
+class AssetScreenModel(
+    val mainScreenModel: MainScreenModel
+) : ScreenModel {
     private val _counter = MutableStateFlow(0)
     val counter = _counter.asStateFlow()
 

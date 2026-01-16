@@ -1,12 +1,15 @@
 package com.jie.wealthmate.feature.calendar
 
+import com.jie.wealthmate.MainScreenModel
 import com.jie.wealthmate.base.BaseScreenModel
 import com.jie.wealthmate.utils.lastDayOfMonth
 import com.jie.wealthmate.utils.today
 import kotlinx.datetime.LocalDate
 
 
-class CalendarScreenModel : BaseScreenModel<CalendarUiState>() {
+class CalendarScreenModel(
+    val mainScreenModel: MainScreenModel
+) : BaseScreenModel<CalendarUiState>() {
     override val initialState: CalendarUiState
         get() = CalendarUiState()
 
