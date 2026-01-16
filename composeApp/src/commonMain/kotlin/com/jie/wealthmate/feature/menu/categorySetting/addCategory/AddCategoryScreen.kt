@@ -61,10 +61,7 @@ class AddCategoryScreen(
             }
         }
 
-        BackHandler(true) {
-            onBack()
-        }
-
+        BackHandler(true) { onBack() }
 
         screenModel.collectSideEffect { sideEffect ->
             when (sideEffect) {

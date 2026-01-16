@@ -18,7 +18,6 @@ class AddCategoryScreenModel(
 
     private var categoryItems: List<CategoryItemData> = emptyList()
 
-
     override val initialState: AddCategoryUiState
         get() = AddCategoryUiState()
 
@@ -104,8 +103,7 @@ class AddCategoryScreenModel(
 
     fun saveCategory() {
         val uiState = container.uiState.value
-        println(categoryItems)
-        println(categoryItems.any{ it.label == uiState.label.text })
+
         if (categoryItems.any { it.label == uiState.label.text }) {
             mainScreenModel.showSnackbar("존재하는 카테고리입니다.")
 
