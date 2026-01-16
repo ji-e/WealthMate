@@ -10,6 +10,8 @@ interface CategoryRepository {
         largeCategory: String,
         middleLabel: String,
         tagIds: List<Long> = emptyList(),
+        sort: Long,
+        isFixed: Boolean,
     ): Long
 
     suspend fun deleteCategory(categoryId: Long)

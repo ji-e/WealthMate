@@ -19,7 +19,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.jie.wealthmate.component.CategoryIconEnum
 import com.jie.wealthmate.component.WMText
-import com.jie.wealthmate.theme.ColorBlue
 import com.jie.wealthmate.theme.ColorGray
 import com.jie.wealthmate.theme.WMTheme
 import org.jetbrains.compose.resources.painterResource
@@ -44,7 +43,7 @@ fun CategoryItem(
         Box(
             modifier = Modifier
                 .clip(CircleShape)
-                .background(data.backgroundColor)
+                .background(data.largeCategory.backgroundColor)
                 .size(40.dp),
             contentAlignment = Alignment.Center
         ) {
@@ -80,7 +79,6 @@ private fun CategoryItemPreview() {
                 id = 0,
                 icon = CategoryIconEnum.CATEGORY_U1F9D0.text,
                 label = "급여",
-                backgroundColor = ColorBlue.Blue_100,
                 sort = 1,
                 largeCategory = LargeCategoryEnum.EXPENSES
             )

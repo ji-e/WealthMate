@@ -5,6 +5,8 @@ import com.jie.wealthmate.database.DatabaseDriverFactory
 import com.jie.wealthmate.database.WMDatabase
 import com.jie.wealthmate.entity.CategoryEntity
 import com.jie.wealthmate.entity.CategoryTagEntity
+import com.jie.wealthmate.utils.transformBoolean
+import com.jie.wealthmate.utils.trasnformLong
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.withContext
@@ -22,10 +24,12 @@ class CategoryRepositoryImpl(databaseDriverFactory: DatabaseDriverFactory) : Cat
         largeCategory: String,
         middleLabel: String,
         tagIds: List<Long>,
+        sort: Long,
+        isFixed: Boolean,
     ): Long = withContext(Dispatchers.IO) {
         database.transactionWithResult {
             // 1. 카테고리 추가
-            dbQuery.insertCategory(icon, largeCategory, middleLabel)
+            dbQuery.insertCategory(icon, largeCategory, middleLabel, sort, isFixed.trasnformLong())
 
             // 2. 추가된 카테고리 ID 가져오기
             val categoryId = dbQuery.lastInsertRowId().executeAsOne()
@@ -69,6 +73,8 @@ class CategoryRepositoryImpl(databaseDriverFactory: DatabaseDriverFactory) : Cat
                 icon = first.icon,
                 largeCategory = first.largeCategory,
                 middleLabel = first.middleLabel,
+                sort = first.sort,
+                fixed = first.isFixed.transformBoolean(),
                 tags = results.mapNotNull { row ->
                     row.tag_id?.let {
                         CategoryTagEntity(it, row.tagLabel ?: "")
@@ -92,6 +98,8 @@ class CategoryRepositoryImpl(databaseDriverFactory: DatabaseDriverFactory) : Cat
                         icon = first.icon,
                         largeCategory = first.largeCategory,
                         middleLabel = first.middleLabel,
+                        sort = first.sort,
+                        fixed = first.isFixed.transformBoolean(),
                         tags = rows.mapNotNull { row ->
                             row.tag_id?.let {
                                 CategoryTagEntity(it, row.tagLabel ?: "")
