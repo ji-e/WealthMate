@@ -5,6 +5,7 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import com.jie.wealthmate.MainScreenModel
 import com.jie.wealthmate.base.BaseScreenModel
 import com.jie.wealthmate.component.CategoryIconEnum
+import com.jie.wealthmate.feature.menu.categorySetting.component.CategoryItemData
 import com.jie.wealthmate.feature.menu.categorySetting.component.LargeCategoryEnum
 import com.jie.wealthmate.repository.CategoryRepository
 import com.jie.wealthmate.vo.CategoryTagVo
@@ -15,13 +16,22 @@ class AddCategoryScreenModel(
     private val categoryRepository: CategoryRepository,
 ) : BaseScreenModel<AddCategoryUiState>() {
 
+    private var categoryItems: List<CategoryItemData> = emptyList()
+
+
     override val initialState: AddCategoryUiState
         get() = AddCategoryUiState()
 
-    fun updateLargeCategory(largeCategoryEnum: LargeCategoryEnum) {
+    fun updateInit(
+        categoryItems: List<CategoryItemData>,
+        largeCategoryEnum: LargeCategoryEnum,
+    ) {
+        this.categoryItems = categoryItems
+
+        println(largeCategoryEnum)
         reduceState { state ->
             state.copy(
-                largeCategory = largeCategoryEnum
+                largeCategory = largeCategoryEnum,
             )
         }
     }
@@ -56,7 +66,7 @@ class AddCategoryScreenModel(
                 return@reduceState state.copy(tagLabel = TextFieldValue(""))
             }
 
-            if (tagLabel.text.isEmpty()) {
+            if (tagLabel.text.isBlank()) {
                 mainScreenModel.showSnackbar("상세 태그 이름을 입력해 주세요.")
                 return@reduceState state
             }
@@ -94,13 +104,21 @@ class AddCategoryScreenModel(
 
     fun saveCategory() {
         val uiState = container.uiState.value
+        println(categoryItems)
+        println(categoryItems.any{ it.label == uiState.label.text })
+        if (categoryItems.any { it.label == uiState.label.text }) {
+            mainScreenModel.showSnackbar("존재하는 카테고리입니다.")
+
+            return
+        }
+
         screenModelScope.launch {
             try {
                 categoryRepository.addCategory(
                     icon = uiState.categoryIcon.text,
                     largeCategory = uiState.largeCategory.name,
                     middleLabel = uiState.label.text,
-                    sort = 0, // todo temp
+                    sort = categoryItems.size.toLong(),
                     isFixed = uiState.isFixed,
                     tagIds = createTags()
                 )

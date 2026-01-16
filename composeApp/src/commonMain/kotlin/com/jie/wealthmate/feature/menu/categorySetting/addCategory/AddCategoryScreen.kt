@@ -36,6 +36,7 @@ import com.jie.wealthmate.component.topbar.TopBarItem
 import com.jie.wealthmate.feature.menu.categorySetting.addCategory.component.CategoryIcon
 import com.jie.wealthmate.feature.menu.categorySetting.addCategory.component.CategoryIconGrid
 import com.jie.wealthmate.feature.menu.categorySetting.addCategory.component.CategoryTag
+import com.jie.wealthmate.feature.menu.categorySetting.component.CategoryItemData
 import com.jie.wealthmate.feature.menu.categorySetting.component.LargeCategoryEnum
 import com.jie.wealthmate.theme.WMTheme
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -43,6 +44,7 @@ import org.koin.compose.koinInject
 
 class AddCategoryScreen(
     val largeCategory: LargeCategoryEnum,
+    val categoryItems: List<CategoryItemData> = emptyList(),
 ) : Screen {
 
     @Composable
@@ -71,7 +73,12 @@ class AddCategoryScreen(
                         action = { navigator.pop() }
                     ),
                 )
-                screenModel.updateLargeCategory(largeCategory)
+
+                println(categoryItems)
+                screenModel.updateInit(
+                    categoryItems = categoryItems,
+                    largeCategoryEnum = largeCategory
+                )
             }
         }
 
@@ -85,6 +92,7 @@ class AddCategoryScreen(
             Column(
                 modifier = Modifier
                     .weight(1f)
+                    .padding(bottom = 40.dp)
                     .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -147,7 +155,7 @@ class AddCategoryScreen(
                     .padding(horizontal = 20.dp)
                     .padding(bottom = 20.dp)
                     .fillMaxWidth(),
-                enabled = uiState.label.text.isNotEmpty(),
+                enabled = uiState.label.text.isNotBlank(),
                 onClick = { screenModel.saveCategory() }
             )
 
@@ -169,7 +177,7 @@ class AddCategoryScreen(
     @Preview(showBackground = true)
     private fun AddCategoryScreenPreview() {
         WMTheme {
-            AddCategoryScreen(LargeCategoryEnum.INCOME)
+            AddCategoryScreen(largeCategory = LargeCategoryEnum.INCOME)
         }
     }
 }
