@@ -20,14 +20,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.annotation.InternalVoyagerApi
+import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import cafe.adriel.voyager.navigator.internal.BackHandler
-import com.jie.wealthmate.base.BaseScreen
-import com.jie.wealthmate.base.BaseUiSideEffect
 import com.jie.wealthmate.base.collectSideEffect
 import com.jie.wealthmate.component.ButtonSize
-import com.jie.wealthmate.component.SnackbarController
 import com.jie.wealthmate.component.WMButton
 import com.jie.wealthmate.component.WMTextField
 import com.jie.wealthmate.component.WMTextModalBottomSheet
@@ -43,13 +41,10 @@ import org.koin.compose.koinInject
 
 class AddCategoryScreen(
     val largeCategory: LargeCategoryEnum,
-) : BaseScreen() {
+) : Screen {
 
     @Composable
-    override fun ScreenContent(
-        snackbarController: SnackbarController,
-        snackbarHost: @Composable () -> Unit,
-    ) {
+    override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val screenModel: AddCategoryScreenModel = koinInject()
         val uiState = screenModel.container.uiState.collectAsState().value
@@ -60,10 +55,6 @@ class AddCategoryScreen(
 
         screenModel.collectSideEffect { sideEffect ->
             when (sideEffect) {
-                is BaseUiSideEffect.ShowSnackbar -> {
-                    snackbarController.showMessage(sideEffect.message)
-                }
-
                 is AddCategoryUiSideEffect.OnSuccessSave -> {
                     navigator.pop()
                 }
@@ -83,7 +74,6 @@ class AddCategoryScreen(
                     ),
                 )
             },
-            snackbarHost = snackbarHost,
         ) { innerPadding: PaddingValues ->
             Column(
                 modifier = Modifier
