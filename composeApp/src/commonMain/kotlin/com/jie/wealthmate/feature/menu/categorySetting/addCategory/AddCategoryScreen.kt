@@ -21,10 +21,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.annotation.InternalVoyagerApi
-import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import cafe.adriel.voyager.navigator.internal.BackHandler
+import com.jie.wealthmate.base.BaseScreen
 import com.jie.wealthmate.base.collectSideEffect
 import com.jie.wealthmate.component.ButtonSize
 import com.jie.wealthmate.component.WMButton
@@ -45,17 +45,26 @@ import org.koin.compose.koinInject
 class AddCategoryScreen(
     val largeCategory: LargeCategoryEnum,
     val categoryItems: List<CategoryItemData> = emptyList(),
-) : Screen {
+) : BaseScreen() {
 
     @Composable
     override fun Content() {
+        super.Content()
+
         val navigator = LocalNavigator.currentOrThrow
         val screenModel: AddCategoryScreenModel = koinInject()
         val uiState = screenModel.container.uiState.collectAsState().value
 
-        BackHandler(true) {
-            navigator.pop()
+        fun onBack() {
+            showSaveBackDialog(uiState.label.text.isNotEmpty()) {
+                navigator.pop()
+            }
         }
+
+        BackHandler(true) {
+            onBack()
+        }
+
 
         screenModel.collectSideEffect { sideEffect ->
             when (sideEffect) {
@@ -65,12 +74,12 @@ class AddCategoryScreen(
             }
         }
 
-        LaunchedEffect(navigator.lastItem) {
+        LaunchedEffect(navigator.lastItem, uiState.label.text) {
             if (navigator.lastItem is AddCategoryScreen) {
                 screenModel.mainScreenModel.updateTopBar(
                     title = TopBarItem.Title("${largeCategory.label} 카테고리 추가"),
                     readingItem = TopBarItem.ReadingItem().copy(
-                        action = { navigator.pop() }
+                        action = { onBack() }
                     ),
                 )
 
