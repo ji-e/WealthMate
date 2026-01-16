@@ -2,11 +2,27 @@ package com.jie.wealthmate
 
 import com.jie.wealthmate.base.BaseScreenModel
 import com.jie.wealthmate.base.BaseUiSideEffect
+import com.jie.wealthmate.component.topbar.TopBarItem
 
 open class MainScreenModel() : BaseScreenModel<MainUiState>() {
 
     override val initialState: MainUiState
         get() = MainUiState()
+
+    fun updateTopBar(
+        title: TopBarItem.Title? = null,
+        readingItem: TopBarItem.ReadingItem? = null,
+        trailingItem: List<TopBarItem.TrailingItem>? = null,
+    ) {
+        println(title)
+        reduceState { state ->
+            state.copy(
+                title = title,
+                readingItem = readingItem,
+                trailingItem = trailingItem
+            )
+        }
+    }
 
     /**
      * Snackbar 메시지를 표시하는 SideEffect를 발생시킵니다.

@@ -25,7 +25,7 @@ fun MenuTitleItem(
             color = ColorPrimary.Primary_700,
         ),
         modifier = Modifier
-            .padding(top = 40.dp, bottom = 4.dp)
+            .padding(top = 12.dp, bottom = 4.dp)
             .padding(horizontal = 20.dp)
     )
 }

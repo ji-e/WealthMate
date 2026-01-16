@@ -12,12 +12,14 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.transitions.SlideTransition
@@ -26,6 +28,8 @@ import com.jie.wealthmate.base.collectSideEffect
 import com.jie.wealthmate.component.bottomNav.BottomNavItem
 import com.jie.wealthmate.component.bottomNav.BottomNavigation
 import com.jie.wealthmate.component.calculateAdjustedToastPadding
+import com.jie.wealthmate.component.topbar.TopBarItem
+import com.jie.wealthmate.component.topbar.WMTobBar
 import com.jie.wealthmate.feature.asset.AssetScreen
 import com.jie.wealthmate.feature.calendar.CalendarScreen
 import com.jie.wealthmate.feature.home.HomeScreen
@@ -38,6 +42,8 @@ open class MainScreen : Screen {
     @Composable
     override fun Content() {
         val mainScreenModel: MainScreenModel = koinInject()
+        val uiState = mainScreenModel.container.uiState.collectAsState().value
+
         var isBottomNaviVisible by remember { mutableStateOf(true) }
         var selectedItem by remember { mutableStateOf(BottomNavItem.Home.route) }
         val snackbarHostState = remember { SnackbarHostState() }
@@ -51,6 +57,13 @@ open class MainScreen : Screen {
         }
 
         Scaffold(
+            topBar = {
+                WMTobBar(
+                    title = uiState.title ?: TopBarItem.Title(""),
+                    readingItem = uiState.readingItem,
+                    trailingItem = uiState.trailingItem
+                )
+            },
             bottomBar = {
                 AnimatedVisibility(
                     visible = isBottomNaviVisible,
@@ -74,16 +87,16 @@ open class MainScreen : Screen {
             Column(
                 modifier = Modifier
                     .statusBarsPadding()
-                    .fillMaxSize(),
+                    .fillMaxSize()
+                    .padding(
+                        top = 64.dp,
+                        bottom = innerPadding.calculateBottomPadding()
+                    ),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 when (selectedItem) {
                     BottomNavItem.Home.route -> {
-                        Navigator(
-                            HomeScreen(
-                                innerPadding.calculateBottomPadding()
-                            )
-                        ) { navigator ->
+                        Navigator(HomeScreen()) { navigator ->
                             SlideTransition(navigator)
                             LaunchedEffect(navigator.lastItem) {
                                 isBottomNaviVisible = (navigator.lastItem is HomeScreen)
@@ -92,11 +105,7 @@ open class MainScreen : Screen {
                     }
 
                     BottomNavItem.Calendar.route -> {
-                        Navigator(
-                            CalendarScreen(
-                                innerPadding.calculateBottomPadding()
-                            )
-                        ) { navigator ->
+                        Navigator(CalendarScreen()) { navigator ->
                             SlideTransition(navigator)
                             LaunchedEffect(navigator.lastItem) {
                                 isBottomNaviVisible = (navigator.lastItem is CalendarScreen)
@@ -105,11 +114,7 @@ open class MainScreen : Screen {
                     }
 
                     BottomNavItem.Asset.route -> {
-                        Navigator(
-                            AssetScreen(
-                                innerPadding.calculateBottomPadding()
-                            )
-                        ) { navigator ->
+                        Navigator(AssetScreen()) { navigator ->
                             SlideTransition(navigator)
                             LaunchedEffect(navigator.lastItem) {
                                 isBottomNaviVisible = (navigator.lastItem is AssetScreen)
@@ -118,11 +123,7 @@ open class MainScreen : Screen {
                     }
 
                     BottomNavItem.Menu.route -> {
-                        Navigator(
-                            MenuScreen(
-                                innerPadding.calculateBottomPadding()
-                            )
-                        ) { navigator ->
+                        Navigator(MenuScreen()) { navigator ->
                             SlideTransition(navigator)
                             LaunchedEffect(navigator.lastItem) {
                                 isBottomNaviVisible = (navigator.lastItem is MenuScreen)

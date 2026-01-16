@@ -3,12 +3,10 @@
 package com.jie.wealthmate.feature.menu.categorySetting.addCategory
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -30,7 +28,6 @@ import com.jie.wealthmate.component.WMButton
 import com.jie.wealthmate.component.WMTextField
 import com.jie.wealthmate.component.WMTextModalBottomSheet
 import com.jie.wealthmate.component.topbar.TopBarItem
-import com.jie.wealthmate.component.topbar.WMTobBar
 import com.jie.wealthmate.feature.menu.categorySetting.addCategory.component.CategoryIcon
 import com.jie.wealthmate.feature.menu.categorySetting.addCategory.component.CategoryIconGrid
 import com.jie.wealthmate.feature.menu.categorySetting.addCategory.component.CategoryTag
@@ -61,88 +58,80 @@ class AddCategoryScreen(
             }
         }
 
-        LaunchedEffect(Unit) {
-            screenModel.updateLargeCategory(largeCategory)
-        }
-
-        Scaffold(
-            topBar = {
-                WMTobBar(
+        LaunchedEffect(navigator.lastItem) {
+            if (navigator.lastItem is AddCategoryScreen) {
+                screenModel.mainScreenModel.updateTopBar(
                     title = TopBarItem.Title("${largeCategory.label} 카테고리 추가"),
                     readingItem = TopBarItem.ReadingItem().copy(
                         action = { navigator.pop() }
                     ),
                 )
-            },
-        ) { innerPadding: PaddingValues ->
-            Column(
+                screenModel.updateLargeCategory(largeCategory)
+            }
+        }
+
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            var isShowCategoryIconModalBottomSheet by remember { mutableStateOf(false) }
+
+            // 카테고리 아이콘
+            CategoryIcon(
+                modifier = Modifier.padding(top = 24.dp),
+                largeCategory = largeCategory,
+                selectedCategoryIcon = uiState.categoryIcon,
+                onClickChange = { isShowCategoryIconModalBottomSheet = true }
+            )
+
+            // 카테고리 라벨
+            WMTextField(
+                value = uiState.label,
+                onValueChange = screenModel::updateCategoryLabel,
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(
-                        top = innerPadding.calculateTopPadding(),
-                        bottom = innerPadding.calculateBottomPadding()
-                    ),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                var isShowCategoryIconModalBottomSheet by remember { mutableStateOf(false) }
+                    .padding(top = 20.dp)
+                    .padding(horizontal = 4.dp),
+                maxLength = 15,
+                label = "카테고리 이름",
+                placeholder = largeCategory.tempMiddleCategoryLabel,
+                supportingText = "15자 이내로 입력해 주세요.",
+                isCount = true,
+                isRequire = true,
+            )
 
-                // 카테고리 아이콘
-                CategoryIcon(
-                    modifier = Modifier.padding(top = 24.dp),
-                    largeCategory = largeCategory,
-                    selectedCategoryIcon = uiState.categoryIcon,
-                    onClickChange = { isShowCategoryIconModalBottomSheet = true }
-                )
+            // 카테고리 태그
+            CategoryTag(
+                modifier = Modifier.padding(top = 20.dp),
+                largeCategory = largeCategory,
+                tagLabel = uiState.tagLabel,
+                tagLabelItems = uiState.tagLabelItems,
+                onValueChange = screenModel::updateCategoryTagLabel,
+                onChipAdd = screenModel::addCategoryTagLabel,
+                onChipRemove = screenModel::removeCategoryTagLabel,
+            )
 
-                // 카테고리 라벨
-                WMTextField(
-                    value = uiState.label,
-                    onValueChange = screenModel::updateCategoryLabel,
-                    modifier = Modifier
-                        .padding(top = 20.dp)
-                        .padding(horizontal = 4.dp),
-                    maxLength = 15,
-                    label = "카테고리 이름",
-                    placeholder = largeCategory.tempMiddleCategoryLabel,
-                    supportingText = "15자 이내로 입력해 주세요.",
-                    isCount = true,
-                    isRequire = true,
-                )
+            Spacer(modifier = Modifier.weight(1f))
 
-                // 카테고리 태그
-                CategoryTag(
-                    modifier = Modifier.padding(top = 20.dp),
-                    largeCategory = largeCategory,
-                    tagLabel = uiState.tagLabel,
-                    tagLabelItems = uiState.tagLabelItems,
-                    onValueChange = screenModel::updateCategoryTagLabel,
-                    onChipAdd = screenModel::addCategoryTagLabel,
-                    onChipRemove = screenModel::removeCategoryTagLabel,
-                )
+            // 저장 버튼
+            WMButton(
+                text = "저장",
+                buttonSize = ButtonSize.LARGE,
+                modifier = Modifier
+                    .padding(20.dp)
+                    .fillMaxWidth(),
+                enabled = uiState.label.text.isNotEmpty(),
+                onClick = { screenModel.saveCategory() }
+            )
 
-                Spacer(modifier = Modifier.weight(1f))
-
-                // 저장 버튼
-                WMButton(
-                    text = "저장",
-                    buttonSize = ButtonSize.LARGE,
-                    modifier = Modifier
-                        .padding(20.dp)
-                        .fillMaxWidth(),
-                    enabled = uiState.label.text.isNotEmpty(),
-                    onClick = { screenModel.saveCategory() }
-                )
-
-                // 아이콘 변경 ModalBottomSheet
-                if (isShowCategoryIconModalBottomSheet) {
-                    WMTextModalBottomSheet(
-                        onDismissRequest = { isShowCategoryIconModalBottomSheet = false },
-                    ) {
-                        CategoryIconGrid(
-                            selectedCategoryIcon = uiState.categoryIcon,
-                            onIconChange = screenModel::updateCategoryIcon
-                        )
-                    }
+            // 아이콘 변경 ModalBottomSheet
+            if (isShowCategoryIconModalBottomSheet) {
+                WMTextModalBottomSheet(
+                    onDismissRequest = { isShowCategoryIconModalBottomSheet = false },
+                ) {
+                    CategoryIconGrid(
+                        selectedCategoryIcon = uiState.categoryIcon,
+                        onIconChange = screenModel::updateCategoryIcon
+                    )
                 }
             }
         }

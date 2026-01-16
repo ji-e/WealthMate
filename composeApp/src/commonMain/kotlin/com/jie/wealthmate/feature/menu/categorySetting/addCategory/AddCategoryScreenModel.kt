@@ -11,7 +11,7 @@ import com.jie.wealthmate.vo.CategoryTagVo
 import kotlinx.coroutines.launch
 
 class AddCategoryScreenModel(
-    private val mainScreenModel: MainScreenModel,
+    val mainScreenModel: MainScreenModel,
     private val categoryRepository: CategoryRepository,
 ) : BaseScreenModel<AddCategoryUiState>() {
 
