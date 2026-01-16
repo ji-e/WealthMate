@@ -6,11 +6,11 @@ import com.jie.wealthmate.theme.ColorPrimary
 import com.jie.wealthmate.theme.ColorRed
 
 data class CategoryItemData(
-    val id: Int,
+    val id: Long,
     val icon: String,
     val label: String,
-    val backgroundColor: Color,
-    val sort: Int,
+    val sort: Long,
+    val isFixed: Boolean = false,
     val largeCategory: LargeCategoryEnum,
 )
 
@@ -40,4 +40,10 @@ enum class LargeCategoryEnum(
         tempTagLabel = "주책 청약"
     ),
     ;
+
+    companion object {
+        fun creator(name: String): LargeCategoryEnum {
+           return LargeCategoryEnum.entries.find { it.name == name } ?: INCOME
+        }
+    }
 }

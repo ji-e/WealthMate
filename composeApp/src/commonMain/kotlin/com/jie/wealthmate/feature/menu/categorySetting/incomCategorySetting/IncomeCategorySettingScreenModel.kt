@@ -3,41 +3,41 @@ package com.jie.wealthmate.feature.menu.categorySetting.incomCategorySetting
 import cafe.adriel.voyager.core.model.screenModelScope
 import com.jie.wealthmate.MainScreenModel
 import com.jie.wealthmate.base.BaseScreenModel
-import com.jie.wealthmate.component.CategoryIconEnum
 import com.jie.wealthmate.feature.menu.categorySetting.component.CategoryItemData
 import com.jie.wealthmate.feature.menu.categorySetting.component.LargeCategoryEnum
-import com.jie.wealthmate.theme.ColorBlue
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import com.jie.wealthmate.repository.CategoryRepository
 import kotlinx.coroutines.launch
 
 class IncomeCategorySettingScreenModel(
-    val mainScreenModel: MainScreenModel
+    val mainScreenModel: MainScreenModel,
+    private val categoryRepository: CategoryRepository,
 ) : BaseScreenModel<IncomeCategorySettingUiState>() {
-    private val _counter = MutableStateFlow(0)
-    val counter = _counter.asStateFlow()
-
-    fun increment() {
-        screenModelScope.launch {
-            _counter.value++
-        }
-    }
 
     override val initialState: IncomeCategorySettingUiState
-        get() = IncomeCategorySettingUiState(
-            incomeCategoryItems = mutableListOf<CategoryItemData>().apply {
-                repeat(5) {
-                    add(
+        get() = IncomeCategorySettingUiState()
+
+    init {
+        getAllCategories()
+    }
+
+    fun getAllCategories() {
+        screenModelScope.launch {
+            val categories = categoryRepository.getAllCategoriesWithTags()
+
+            reduceState { state ->
+                state.copy(
+                    incomeCategoryItems = categories.map {
                         CategoryItemData(
-                            id = it,
-                            icon = CategoryIconEnum.CATEGORY_U1F9D0.text,
-                            label = "급여",
-                            backgroundColor = ColorBlue.Blue_100,
-                            sort = it + 1,
-                            largeCategory = LargeCategoryEnum.INCOME
+                            id = it.id,
+                            icon = it.icon,
+                            label = it.middleLabel,
+                            sort = it.sort,
+                            isFixed = it.fixed,
+                            largeCategory = LargeCategoryEnum.creator(it.largeCategory)
                         )
-                    )
-                }
+                    }
+                )
             }
-        )
+        }
+    }
 }
