@@ -38,7 +38,7 @@ class IncomeCategorySettingScreen(
             navigator.pop()
         }
 
-        LaunchedEffect(navigator.lastItem) {
+        LaunchedEffect(navigator.lastItem, uiState.incomeCategoryItems) {
             if (navigator.lastItem is IncomeCategorySettingScreen) {
                 screenModel.mainScreenModel.updateTopBar(
                     title = TopBarItem.Title(menuEnum.title),
@@ -48,7 +48,14 @@ class IncomeCategorySettingScreen(
                     trailingItem = listOf(
                         TopBarItem.TrailingItem(
                             iconRes = Res.drawable.ic_add,
-                            action = { navigator.push(AddCategoryScreen(LargeCategoryEnum.INCOME)) }
+                            action = {
+                                navigator.push(
+                                    AddCategoryScreen(
+                                        largeCategory = LargeCategoryEnum.INCOME,
+                                        categoryItems = uiState.incomeCategoryItems
+                                    )
+                                )
+                            }
                         )
                     )
                 )

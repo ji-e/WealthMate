@@ -6,7 +6,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -18,19 +21,22 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.annotation.InternalVoyagerApi
-import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import cafe.adriel.voyager.navigator.internal.BackHandler
+import com.jie.wealthmate.base.BaseScreen
 import com.jie.wealthmate.base.collectSideEffect
 import com.jie.wealthmate.component.ButtonSize
 import com.jie.wealthmate.component.WMButton
+import com.jie.wealthmate.component.WMCheckBox
+import com.jie.wealthmate.component.WMShadowDivider
 import com.jie.wealthmate.component.WMTextField
 import com.jie.wealthmate.component.WMTextModalBottomSheet
 import com.jie.wealthmate.component.topbar.TopBarItem
 import com.jie.wealthmate.feature.menu.categorySetting.addCategory.component.CategoryIcon
 import com.jie.wealthmate.feature.menu.categorySetting.addCategory.component.CategoryIconGrid
 import com.jie.wealthmate.feature.menu.categorySetting.addCategory.component.CategoryTag
+import com.jie.wealthmate.feature.menu.categorySetting.component.CategoryItemData
 import com.jie.wealthmate.feature.menu.categorySetting.component.LargeCategoryEnum
 import com.jie.wealthmate.theme.WMTheme
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -38,17 +44,27 @@ import org.koin.compose.koinInject
 
 class AddCategoryScreen(
     val largeCategory: LargeCategoryEnum,
-) : Screen {
+    val categoryItems: List<CategoryItemData> = emptyList(),
+) : BaseScreen() {
 
     @Composable
     override fun Content() {
+        super.Content()
+
         val navigator = LocalNavigator.currentOrThrow
         val screenModel: AddCategoryScreenModel = koinInject()
         val uiState = screenModel.container.uiState.collectAsState().value
 
-        BackHandler(true) {
-            navigator.pop()
+        fun onBack() {
+            showSaveBackDialog(uiState.label.text.isNotEmpty()) {
+                navigator.pop()
+            }
         }
+
+        BackHandler(true) {
+            onBack()
+        }
+
 
         screenModel.collectSideEffect { sideEffect ->
             when (sideEffect) {
@@ -58,68 +74,97 @@ class AddCategoryScreen(
             }
         }
 
-        LaunchedEffect(navigator.lastItem) {
+        LaunchedEffect(navigator.lastItem, uiState.label.text) {
             if (navigator.lastItem is AddCategoryScreen) {
                 screenModel.mainScreenModel.updateTopBar(
                     title = TopBarItem.Title("${largeCategory.label} 카테고리 추가"),
                     readingItem = TopBarItem.ReadingItem().copy(
-                        action = { navigator.pop() }
+                        action = { onBack() }
                     ),
                 )
-                screenModel.updateLargeCategory(largeCategory)
+
+                println(categoryItems)
+                screenModel.updateInit(
+                    categoryItems = categoryItems,
+                    largeCategoryEnum = largeCategory
+                )
             }
         }
 
         Column(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally
+            modifier = Modifier
+                .fillMaxSize()
+                .imePadding()
         ) {
             var isShowCategoryIconModalBottomSheet by remember { mutableStateOf(false) }
 
-            // 카테고리 아이콘
-            CategoryIcon(
-                modifier = Modifier.padding(top = 24.dp),
-                largeCategory = largeCategory,
-                selectedCategoryIcon = uiState.categoryIcon,
-                onClickChange = { isShowCategoryIconModalBottomSheet = true }
-            )
-
-            // 카테고리 라벨
-            WMTextField(
-                value = uiState.label,
-                onValueChange = screenModel::updateCategoryLabel,
+            Column(
                 modifier = Modifier
-                    .padding(top = 20.dp)
-                    .padding(horizontal = 4.dp),
-                maxLength = 15,
-                label = "카테고리 이름",
-                placeholder = largeCategory.tempMiddleCategoryLabel,
-                supportingText = "15자 이내로 입력해 주세요.",
-                isCount = true,
-                isRequire = true,
-            )
+                    .weight(1f)
+                    .padding(bottom = 40.dp)
+                    .verticalScroll(rememberScrollState()),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
 
-            // 카테고리 태그
-            CategoryTag(
-                modifier = Modifier.padding(top = 20.dp),
-                largeCategory = largeCategory,
-                tagLabel = uiState.tagLabel,
-                tagLabelItems = uiState.tagLabelItems,
-                onValueChange = screenModel::updateCategoryTagLabel,
-                onChipAdd = screenModel::addCategoryTagLabel,
-                onChipRemove = screenModel::removeCategoryTagLabel,
-            )
+                // 카테고리 아이콘
+                CategoryIcon(
+                    modifier = Modifier.padding(top = 24.dp),
+                    largeCategory = largeCategory,
+                    selectedCategoryIcon = uiState.categoryIcon,
+                    onClickChange = { isShowCategoryIconModalBottomSheet = true }
+                )
 
-            Spacer(modifier = Modifier.weight(1f))
+                // 카테고리 라벨
+                WMTextField(
+                    value = uiState.label,
+                    onValueChange = screenModel::updateCategoryLabel,
+                    modifier = Modifier
+                        .padding(top = 20.dp)
+                        .padding(horizontal = 4.dp),
+                    maxLength = 15,
+                    label = "카테고리 이름",
+                    placeholder = largeCategory.tempMiddleCategoryLabel,
+                    supportingText = "15자 이내로 입력해 주세요.",
+                    isCount = true,
+                    isRequire = true,
+                )
+
+                // 카테고리 태그
+                CategoryTag(
+                    modifier = Modifier.padding(top = 20.dp),
+                    largeCategory = largeCategory,
+                    tagLabel = uiState.tagLabel,
+                    tagLabelItems = uiState.tagLabelItems,
+                    onValueChange = screenModel::updateCategoryTagLabel,
+                    onChipAdd = screenModel::addCategoryTagLabel,
+                    onChipRemove = screenModel::removeCategoryTagLabel,
+                )
+
+                Spacer(modifier = Modifier.weight(1f))
+            }
+
+            WMShadowDivider()
+
+            // 고정 카테고리
+            WMCheckBox(
+                label = "고정 카테고리",
+                checked = uiState.isFixed,
+                modifier = Modifier
+                    .padding(start = 6.dp)
+                    .padding(vertical = 8.dp)
+                    .align(Alignment.Start),
+                onCheckedChange = screenModel::updateIsFixed,
+            )
 
             // 저장 버튼
             WMButton(
                 text = "저장",
                 buttonSize = ButtonSize.LARGE,
                 modifier = Modifier
-                    .padding(20.dp)
+                    .padding(horizontal = 20.dp)
+                    .padding(bottom = 20.dp)
                     .fillMaxWidth(),
-                enabled = uiState.label.text.isNotEmpty(),
+                enabled = uiState.label.text.isNotBlank(),
                 onClick = { screenModel.saveCategory() }
             )
 
@@ -141,7 +186,7 @@ class AddCategoryScreen(
     @Preview(showBackground = true)
     private fun AddCategoryScreenPreview() {
         WMTheme {
-            AddCategoryScreen(LargeCategoryEnum.INCOME)
+            AddCategoryScreen(largeCategory = LargeCategoryEnum.INCOME)
         }
     }
 }

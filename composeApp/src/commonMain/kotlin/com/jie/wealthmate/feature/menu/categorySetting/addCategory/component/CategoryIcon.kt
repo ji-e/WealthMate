@@ -172,7 +172,7 @@ fun CategoryIconGrid(
                         Icon(
                             painter = painterResource(Res.drawable.ic_check_circle),
                             contentDescription = null,
-                            tint = ColorPrimary.Primary_700,
+                            tint = ColorPrimary.Primary_500,
                             modifier = Modifier
                                 .size(24.dp)
                                 .align(Alignment.BottomEnd)

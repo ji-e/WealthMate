@@ -27,6 +27,8 @@ class CategoryRepositoryImpl(databaseDriverFactory: DatabaseDriverFactory) : Cat
         sort: Long,
         isFixed: Boolean,
     ): Long = withContext(Dispatchers.IO) {
+        println("addCategory called\n icon: $icon, largeCategory: $largeCategory, middleLabel: $middleLabel, tagIds: $tagIds, sort: $sort, isFixed: $isFixed")
+
         database.transactionWithResult {
             // 1. 카테고리 추가
             dbQuery.insertCategory(icon, largeCategory, middleLabel, sort, isFixed.trasnformLong())

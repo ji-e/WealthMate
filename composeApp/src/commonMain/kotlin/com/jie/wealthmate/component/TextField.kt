@@ -202,10 +202,10 @@ fun WMTextField(
                 disabledContainerColor = ColorGray.White,
                 unfocusedContainerColor = ColorGray.White,
                 errorContainerColor = ColorGray.White,
-                cursorColor = ColorPrimary.Primary_700,
+                cursorColor = ColorPrimary.Primary_500,
                 errorCursorColor = errorColor,
                 textSelectionColors = TextSelectionColors(
-                    handleColor = if (isError) errorColor else ColorPrimary.Primary_700,
+                    handleColor = if (isError) errorColor else ColorPrimary.Primary_500,
                     backgroundColor = ColorPrimary.Primary_200
                 ),
                 focusedIndicatorColor = Color.Transparent,
@@ -236,7 +236,7 @@ fun WMTextField(
                     when {
                         enabled.not() -> disabledColor
                         isError -> errorColor
-                        isFocused -> ColorPrimary.Primary_700
+                        isFocused -> ColorPrimary.Primary_500
                         value.text.isNotEmpty() -> ColorGray.Gray_500
                         else -> placeholderColor
                     }
