@@ -84,6 +84,14 @@ class AddCategoryScreenModel(
         }
     }
 
+    fun updateIsFixed(isFixed: Boolean) {
+        reduceState { state ->
+            state.copy(
+                isFixed = isFixed
+            )
+        }
+    }
+
     fun saveCategory() {
         val uiState = container.uiState.value
         screenModelScope.launch {
@@ -93,7 +101,7 @@ class AddCategoryScreenModel(
                     largeCategory = uiState.largeCategory.name,
                     middleLabel = uiState.label.text,
                     sort = 0, // todo temp
-                    isFixed = false, // todo temp
+                    isFixed = uiState.isFixed,
                     tagIds = createTags()
                 )
                 mainScreenModel.showSnackbar("카테고리가 저장되었습니다.")
