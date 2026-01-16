@@ -1,8 +1,12 @@
+import kotlinx.serialization.descriptors.PrimitiveKind.BOOLEAN;
+
 CREATE TABLE Category (
     id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     icon TEXT NOT NULL,
     largeCategory TEXT NOT NULL,
-    middleLabel TEXT NOT NULL
+    middleLabel TEXT NOT NULL,
+    sort INTEGER NOT NULL,
+    isFixed INTEGER NOT NULL
 );
 
 CREATE TABLE CategoryTag (
@@ -25,8 +29,8 @@ CREATE TABLE CategoryTagRelation (
 
 -- 카테고리 추가
 insertCategory:
-INSERT INTO Category(icon, largeCategory, middleLabel)
-VALUES (?, ?, ?);
+INSERT INTO Category(icon, largeCategory, middleLabel, sort, isFixed)
+VALUES (?, ?, ?,?,?);
 
 -- 마지막으로 추가된 카테고리 ID 가져오기
 lastInsertRowId:
@@ -47,6 +51,8 @@ SELECT
     Category.icon,
     Category.largeCategory,
     Category.middleLabel,
+    Category.sort,
+    Category.isFixed,
     CategoryTag.id AS tag_id,
     CategoryTag.tagLabel
 FROM Category
@@ -61,6 +67,8 @@ SELECT
     Category.icon,
     Category.largeCategory,
     Category.middleLabel,
+    Category.sort,
+    Category.isFixed,
     CategoryTag.id AS tag_id,
     CategoryTag.tagLabel
 FROM Category

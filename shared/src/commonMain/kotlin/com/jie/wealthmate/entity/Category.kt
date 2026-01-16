@@ -10,5 +10,7 @@ data class CategoryEntity(
     val icon: String,
     val largeCategory: String,
     val middleLabel: String,
+    val sort: Long,
+    val fixed: Boolean,
     val tags: List<CategoryTagEntity>
 )

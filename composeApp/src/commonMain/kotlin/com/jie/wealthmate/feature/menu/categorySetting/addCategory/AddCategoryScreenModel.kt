@@ -92,6 +92,8 @@ class AddCategoryScreenModel(
                     icon = uiState.categoryIcon.text,
                     largeCategory = uiState.largeCategory.name,
                     middleLabel = uiState.label.text,
+                    sort = 0, // todo temp
+                    isFixed = false, // todo temp
                     tagIds = createTags()
                 )
                 mainScreenModel.showSnackbar("카테고리가 저장되었습니다.")

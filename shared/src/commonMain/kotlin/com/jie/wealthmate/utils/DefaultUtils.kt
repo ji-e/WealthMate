@@ -8,3 +8,6 @@ fun Boolean?.default() = this ?: false
 fun Float?.default() = this ?: 0f
 fun Double?.default() = this ?: 0.0
 fun Long?.default() = this ?: 0L
+
+fun Long?.transformBoolean() = this != 0L
+fun Boolean?.trasnformLong() = if (this == true) 1L else 0L
