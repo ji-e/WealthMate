@@ -2,22 +2,39 @@
 
 package com.jie.wealthmate.feature.menu.categorySetting.incomCategorySetting
 
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.dropShadow
+import androidx.compose.ui.graphics.shadow.Shadow
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.unit.DpOffset
+import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.annotation.InternalVoyagerApi
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import cafe.adriel.voyager.navigator.internal.BackHandler
+import com.jie.wealthmate.component.reorderable.ReorderableItem
+import com.jie.wealthmate.component.reorderable.detectReorderAfterLongPress
+import com.jie.wealthmate.component.reorderable.rememberReorderableLazyListState
+import com.jie.wealthmate.component.reorderable.reorderable
 import com.jie.wealthmate.component.topbar.TopBarItem
 import com.jie.wealthmate.feature.menu.categorySetting.addCategory.AddCategoryScreen
 import com.jie.wealthmate.feature.menu.categorySetting.component.CategoryItem
 import com.jie.wealthmate.feature.menu.categorySetting.component.LargeCategoryEnum
 import com.jie.wealthmate.feature.menu.component.MenuEnum
+import com.jie.wealthmate.theme.ColorPrimary
 import com.jie.wealthmate.theme.WMTheme
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.koinInject
@@ -33,6 +50,12 @@ class IncomeCategorySettingScreen(
         val navigator = LocalNavigator.currentOrThrow
         val screenModel: IncomeCategorySettingScreenModel = koinInject()
         val uiState = screenModel.container.uiState.collectAsState().value
+
+        val hapticFeedback = LocalHapticFeedback.current
+        val listState = rememberReorderableLazyListState(
+            onMove = { from, to -> screenModel.handleReorderImageItems(from.index, to.index) }
+        )
+
 
         BackHandler(true) {
             navigator.pop()
@@ -62,11 +85,54 @@ class IncomeCategorySettingScreen(
             }
         }
 
-        LazyColumn(modifier = Modifier.fillMaxSize()) {
-            items(uiState.incomeCategoryItems.size) { index ->
+        LazyColumn(
+            state = listState.listState,
+            modifier = Modifier
+                .fillMaxSize()
+                .reorderable(listState),
+        ) {
+            items(
+                count = uiState.incomeCategoryItems.size,
+                key = { index -> uiState.incomeCategoryItems[index].id }
+            ) { index ->
                 val category = uiState.incomeCategoryItems[index]
+                ReorderableItem(
+                    state = listState,
+                    key = category.id,
+                ) { isDragging ->
+                    if (isDragging) {
+                        hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+                    }
 
-                CategoryItem(category)
+                    CategoryItem(
+                        data = category,
+                        modifier = Modifier.then(
+                            if (isDragging) {
+                                Modifier
+                                    .padding(horizontal = 12.dp)
+                                    .dropShadow(
+                                        shape = RoundedCornerShape(4.dp),
+                                        shadow = Shadow(
+                                            radius = 10.dp,
+                                            spread = 10.dp,
+                                            color = ColorPrimary.Primary_200,
+                                            offset = DpOffset(x = 4.dp, 4.dp)
+                                        )
+                                    )
+                                    .clip(RoundedCornerShape(4.dp))
+                                    .clickable(
+                                        onClick = { },
+                                        indication = null,
+                                        interactionSource = remember { MutableInteractionSource() }
+                                    )
+
+                            } else {
+                                Modifier.clickable { }
+                            }
+                        ),
+                        onDragHandle = Modifier.detectReorderAfterLongPress(listState),
+                    )
+                }
             }
         }
     }

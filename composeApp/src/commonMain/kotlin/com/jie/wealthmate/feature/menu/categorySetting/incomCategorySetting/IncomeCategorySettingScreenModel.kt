@@ -40,4 +40,11 @@ class IncomeCategorySettingScreenModel(
             }
         }
     }
+
+    fun handleReorderImageItems(from: Int, to: Int) = reduceState { state ->
+        val imageItems = state.incomeCategoryItems.toMutableList()
+        state.copy(
+            incomeCategoryItems = imageItems.apply { add(to, removeAt(from)) },
+        )
+    }
 }
