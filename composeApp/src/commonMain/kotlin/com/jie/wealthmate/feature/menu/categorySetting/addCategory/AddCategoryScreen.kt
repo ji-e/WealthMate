@@ -73,7 +73,7 @@ class AddCategoryScreen(
 
         LaunchedEffect(navigator.lastItem, uiState.label.text) {
             if (navigator.lastItem is AddCategoryScreen) {
-                screenModel.mainScreenModel.updateTopBar(
+                screenModel.updateTopBar(
                     title = TopBarItem.Title("${largeCategory.label} 카테고리 추가"),
                     readingItem = TopBarItem.ReadingItem().copy(
                         action = { onBack() }

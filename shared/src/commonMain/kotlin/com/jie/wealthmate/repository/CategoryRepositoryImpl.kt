@@ -97,8 +97,8 @@ class CategoryRepositoryImpl(databaseDriverFactory: DatabaseDriverFactory) : Cat
     /**
      * 모든 카테고리와 태그 조회
      */
-    override suspend fun getAllCategoriesWithTags(): List<CategoryEntity> =
-        withContext(Dispatchers.IO) {
+    override suspend fun getAllCategoriesWithTags(): List<CategoryEntity> {
+        val response = withContext(Dispatchers.IO) {
             dbQuery.selectAllCategoriesWithTags()
                 .executeAsList()
                 .groupBy { it.category_id }
@@ -119,6 +119,10 @@ class CategoryRepositoryImpl(databaseDriverFactory: DatabaseDriverFactory) : Cat
                     )
                 }
         }
+        println("getAllCategoriesWithTags called\n $response")
+
+        return response
+    }
 
     /**
      * 태그 추가

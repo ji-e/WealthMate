@@ -69,6 +69,7 @@ class IncomeCategorySettingScreen(
             if (isDragging) {
                 showSaveBackDialog(isDragging) {
                     isDragging = false
+                    screenModel.getIncomeCategories()
                 }
             } else {
                 navigator.pop()
@@ -80,9 +81,9 @@ class IncomeCategorySettingScreen(
             onBack()
         }
 
-        LaunchedEffect(navigator.lastItem, uiState.initialized, isDragging) {
-            if (navigator.lastItem is IncomeCategorySettingScreen && uiState.initialized && isDragging.not()) {
-                screenModel.mainScreenModel.updateTopBar(
+        LaunchedEffect(navigator.lastItem, uiState.isInitialized, isDragging) {
+            if (navigator.lastItem is IncomeCategorySettingScreen && uiState.isInitialized && isDragging.not()) {
+                screenModel.updateTopBar(
                     title = TopBarItem.Title(menuEnum.title),
                     readingItem = TopBarItem.ReadingItem().copy(
                         action = { navigator.pop() }
@@ -104,13 +105,15 @@ class IncomeCategorySettingScreen(
             }
         }
 
-        if (isDragging) {
-            screenModel.mainScreenModel.updateTopBar(
-                title = TopBarItem.Title(menuEnum.label + " 순서 변경"),
-                readingItem = TopBarItem.ReadingItem().copy(
-                    action = { onBack() }
+        LaunchedEffect(isDragging) {
+            if (isDragging) {
+                screenModel.updateTopBar(
+                    title = TopBarItem.Title(menuEnum.label + " 순서 변경"),
+                    readingItem = TopBarItem.ReadingItem().copy(
+                        action = { onBack() }
+                    )
                 )
-            )
+            }
         }
 
         Column {
