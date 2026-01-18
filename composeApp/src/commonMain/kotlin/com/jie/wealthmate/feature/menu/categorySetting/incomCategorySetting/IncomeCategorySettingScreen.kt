@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.annotation.InternalVoyagerApi
 import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import cafe.adriel.voyager.navigator.internal.BackHandler
 import com.jie.wealthmate.base.BaseScreen
@@ -39,6 +40,7 @@ import com.jie.wealthmate.component.topbar.TopBarItem
 import com.jie.wealthmate.feature.menu.categorySetting.addCategory.AddCategoryScreen
 import com.jie.wealthmate.feature.menu.categorySetting.component.CategoryItem
 import com.jie.wealthmate.feature.menu.categorySetting.component.LargeCategoryEnum
+import com.jie.wealthmate.feature.menu.categorySetting.modifyCategory.ModifyCategoryScreen
 import com.jie.wealthmate.feature.menu.component.MenuEnum
 import com.jie.wealthmate.theme.ColorGray
 import com.jie.wealthmate.theme.ColorPrimary
@@ -51,6 +53,7 @@ import wealthmate.composeapp.generated.resources.ic_add
 class IncomeCategorySettingScreen(
     val menuEnum: MenuEnum,
 ) : BaseScreen() {
+
 
     @Composable
     override fun Content() {
@@ -161,13 +164,23 @@ class IncomeCategorySettingScreen(
                                         )
                                         .clip(RoundedCornerShape(4.dp))
                                         .clickable(
-                                            onClick = { },
+                                            onClick = {
+                                                goToModifyCategory(
+                                                    navigator = navigator,
+                                                    categoryId = category.id
+                                                )
+                                            },
                                             indication = null,
                                             interactionSource = remember { MutableInteractionSource() }
                                         )
 
                                 } else {
-                                    Modifier.clickable { }
+                                    Modifier.clickable {
+                                        goToModifyCategory(
+                                            navigator = navigator,
+                                            categoryId = category.id
+                                        )
+                                    }
                                 }
                             ),
                             onDragHandle = Modifier.detectReorderAfterLongPress(listState),
@@ -192,6 +205,15 @@ class IncomeCategorySettingScreen(
                 )
             }
         }
+    }
+
+    fun goToModifyCategory(navigator: Navigator, categoryId: Long) {
+        navigator.push(
+            ModifyCategoryScreen(
+                largeCategory = LargeCategoryEnum.INCOME,
+                categoryId = categoryId
+            )
+        )
     }
 
     @Composable
