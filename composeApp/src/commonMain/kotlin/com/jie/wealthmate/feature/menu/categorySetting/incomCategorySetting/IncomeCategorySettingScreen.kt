@@ -62,7 +62,7 @@ class IncomeCategorySettingScreen(
         var isDragging by remember { mutableStateOf(false) }
         val hapticFeedback = LocalHapticFeedback.current
         val listState = rememberReorderableLazyListState(
-            onMove = { from, to -> screenModel.handleReorderImageItems(from.index, to.index) }
+            onMove = { from, to -> screenModel.handleReorderCategoryItems(from.index, to.index) }
         )
 
         fun onBack() {
@@ -80,8 +80,8 @@ class IncomeCategorySettingScreen(
             onBack()
         }
 
-        LaunchedEffect(navigator.lastItem, uiState.incomeCategoryItems, isDragging) {
-            if (navigator.lastItem is IncomeCategorySettingScreen && isDragging.not()) {
+        LaunchedEffect(navigator.lastItem, uiState.initialized, isDragging) {
+            if (navigator.lastItem is IncomeCategorySettingScreen && uiState.initialized && isDragging.not()) {
                 screenModel.mainScreenModel.updateTopBar(
                     title = TopBarItem.Title(menuEnum.title),
                     readingItem = TopBarItem.ReadingItem().copy(
@@ -179,6 +179,7 @@ class IncomeCategorySettingScreen(
                         .padding(bottom = 20.dp)
                         .fillMaxWidth(),
                     onClick = {
+                        screenModel.saveCategorySort()
                         isDragging = false
                     }
                 )

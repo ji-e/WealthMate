@@ -23,10 +23,11 @@ class IncomeCategorySettingScreenModel(
 
     fun getIncomeCategories() {
         screenModelScope.launch {
-            val categories = categoryRepository.getAllCategoriesWithTags()
+            val categories = categoryRepository.getAllCategoriesWithTags().sortedBy { it.sort }
 
             reduceState { state ->
                 state.copy(
+                    initialized = true,
                     incomeCategoryItems = categories.fastFilteredMap(
                         { it.largeCategory == LargeCategoryEnum.INCOME.name },
                     ) {
@@ -44,10 +45,20 @@ class IncomeCategorySettingScreenModel(
         }
     }
 
-    fun handleReorderImageItems(from: Int, to: Int) = reduceState { state ->
-        val imageItems = state.incomeCategoryItems.toMutableList()
+    fun saveCategorySort() {
+        screenModelScope.launch {
+            val categoryItems = container.uiState.value.incomeCategoryItems
+            categoryRepository.updateCategorySorts(
+                categoryItems.mapIndexed { index, item -> item.id to index.toLong() }
+            )
+            mainScreenModel.showSnackbar("저장되었습니다.")
+        }
+    }
+
+    fun handleReorderCategoryItems(from: Int, to: Int) = reduceState { state ->
+        val categoryItems = state.incomeCategoryItems.toMutableList()
         state.copy(
-            incomeCategoryItems = imageItems.apply { add(to, removeAt(from)) },
+            incomeCategoryItems = categoryItems.apply { add(to, removeAt(from)) },
         )
     }
 }
