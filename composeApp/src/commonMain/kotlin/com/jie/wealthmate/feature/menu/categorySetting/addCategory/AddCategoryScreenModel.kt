@@ -106,20 +106,20 @@ class AddCategoryScreenModel(
         }
 
         launchSafe(
+            block = {
+                categoryRepository.addCategory(
+                    icon = uiState.categoryIcon.text,
+                    largeCategory = uiState.largeCategory.name,
+                    middleLabel = uiState.label.text,
+                    sort = categoryItems.size.toLong(),
+                    isFixed = uiState.isFixed,
+                    tagIds = createTags()
+                )
+            },
             errorMsg = "카테고리 저장에 실패했습니다.",
-            onSuccess = {
-                showSnackbar("카테고리가 저장되었습니다.")
-                postSideEffect { AddCategoryUiSideEffect.OnSuccessSave }
-            }
         ) {
-            categoryRepository.addCategory(
-                icon = uiState.categoryIcon.text,
-                largeCategory = uiState.largeCategory.name,
-                middleLabel = uiState.label.text,
-                sort = categoryItems.size.toLong(),
-                isFixed = uiState.isFixed,
-                tagIds = createTags()
-            )
+            showSnackbar("카테고리가 저장되었습니다.")
+            postSideEffect { AddCategoryUiSideEffect.OnSuccessSave }
         }
     }
 

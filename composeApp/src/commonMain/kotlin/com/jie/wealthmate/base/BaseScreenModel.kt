@@ -136,38 +136,43 @@ abstract class BaseScreenModel<S : UiState> : ScreenModel, ContainerHost<S> {
     /**
      * 예외 처리와 로딩 상태 관리를 포함하는 공통 코루틴 실행 함수입니다.
      *
+     * @param T 실행할 비즈니스 로직의 반환 타입
      * @param showLoading 로딩 인디케이터 표시 여부
      * @param errorMsg 에러 발생 시 표시할 기본 메시지
      * @param onError 에러 발생 시 추가로 실행할 작업
-     * @param onSuccess 성공 시 실행할 작업
+     * @param onSuccess 성공 시 실행할 작업 (block의 결과값을 인자로 받음)
      * @param block 실행할 메인 비즈니스 로직
      */
-    protected fun launchSafe(
+    protected fun <T> launchSafe(
+        block: suspend () -> T,
         showLoading: Boolean = true,
         errorMsg: String? = null,
         onError: (suspend (Throwable) -> Unit)? = null,
-        onSuccess: (suspend () -> Unit)? = null,
-        block: suspend () -> Unit,
+        onSuccess: (suspend (T) -> Unit)? = null,
     ) = event {
         screenScope.launch {
             hideKeyboard()
-            delay(100)
+            delay(timeMillis = 100)
 
             if (showLoading) {
-                postSideEffect { BaseUiSideEffect.ShowLoading(true) }
+                postSideEffect { 
+                    BaseUiSideEffect.ShowLoading(true)
+                }
             }
             try {
-                block()
-                onSuccess?.invoke()
+                val result = block()
+                onSuccess?.invoke(result)
             } catch (e: Exception) {
                 if (e is CancellationException) throw e
 
                 val finalMessage = errorMsg ?: e.message ?: "오류가 발생했습니다."
-                showSnackbar(finalMessage)
+                showSnackbar(message = finalMessage)
                 onError?.invoke(e)
             } finally {
                 if (showLoading) {
-                    postSideEffect { BaseUiSideEffect.ShowLoading(false) }
+                    postSideEffect {
+                        BaseUiSideEffect.ShowLoading(false)
+                    }
                 }
             }
         }
