@@ -144,4 +144,20 @@ abstract class BaseScreen : Screen {
             }
         }
     }
+
+    @Composable
+    fun EmptyListView(
+        modifier: Modifier = Modifier,
+        contentText: String,
+    ) {
+        Box(
+            modifier = modifier,
+            contentAlignment = Alignment.Center
+        ) {
+            WMText(
+                text = contentText,
+                style = Typography().bodyLarge.copy(color = ColorGray.Gray_400)
+            )
+        }
+    }
 }
