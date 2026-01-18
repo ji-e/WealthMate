@@ -14,6 +14,8 @@ interface CategoryRepository {
         isFixed: Boolean,
     ): Long
 
+    suspend fun updateCategorySorts(updates: List<Pair<Long, Long>>)
+
     suspend fun deleteCategory(categoryId: Long)
 
     suspend fun getCategoryById(categoryId: Long): Category?

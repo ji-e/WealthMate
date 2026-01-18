@@ -36,6 +36,12 @@ VALUES (?, ?, ?,?,?);
 lastInsertRowId:
 SELECT last_insert_rowid();
 
+-- 카테고리 순서 업데이트
+updateCategorySort:
+UPDATE Category
+SET sort = :sort
+WHERE id = :id;
+
 -- 카테고리 삭제 (CASCADE로 관계도 자동 삭제됨)
 deleteCategory:
 DELETE FROM Category WHERE id = ?;

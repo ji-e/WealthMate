@@ -45,6 +45,15 @@ class CategoryRepositoryImpl(databaseDriverFactory: DatabaseDriverFactory) : Cat
         }
     }
 
+    override suspend fun updateCategorySorts(updates: List<Pair<Long, Long>>) {
+        println("updateCategorySorts called\n updates: $updates")
+        database.transaction {
+            updates.forEach { (id, sort) ->
+                dbQuery.updateCategorySort(sort = sort, id = id)
+            }
+        }
+    }
+
     /**
      * 카테고리 삭제 (관련 태그 관계도 CASCADE로 자동 삭제)
      */
