@@ -5,6 +5,7 @@ import com.jie.wealthmate.base.BaseScreenModel
 import com.jie.wealthmate.component.CategoryIconEnum
 import com.jie.wealthmate.feature.menu.categorySetting.component.LargeCategoryEnum
 import com.jie.wealthmate.repository.CategoryRepository
+import com.jie.wealthmate.utils.default
 import com.jie.wealthmate.vo.CategoryTagVo
 
 class ModifyCategoryScreenModel(
@@ -23,12 +24,15 @@ class ModifyCategoryScreenModel(
                 largeCategory = largeCategoryEnum,
             )
         }
+
+        getCategoryDetail()
     }
 
     fun updateCategoryIcon(icon: CategoryIconEnum) {
         reduceState { state ->
             state.copy(
-                categoryIcon = icon
+                categoryIcon = icon,
+                isChangedData = true
             )
         }
     }
@@ -36,7 +40,8 @@ class ModifyCategoryScreenModel(
     fun updateCategoryLabel(textFieldValue: TextFieldValue) {
         reduceState { state ->
             state.copy(
-                label = textFieldValue
+                label = textFieldValue,
+                isChangedData = true
             )
         }
     }
@@ -44,7 +49,8 @@ class ModifyCategoryScreenModel(
     fun updateCategoryTagLabel(textFieldValue: TextFieldValue) {
         reduceState { state ->
             state.copy(
-                tagLabel = textFieldValue
+                tagLabel = textFieldValue,
+                isChangedData = true
             )
         }
     }
@@ -69,7 +75,8 @@ class ModifyCategoryScreenModel(
             } else {
                 state.copy(
                     tagLabel = TextFieldValue(""),
-                    tagLabelItems = state.tagLabelItems.toMutableList().apply { add(categoryTag) }
+                    tagLabelItems = state.tagLabelItems.toMutableList().apply { add(categoryTag) },
+                    isChangedData = true
                 )
             }
         }
@@ -78,7 +85,8 @@ class ModifyCategoryScreenModel(
     fun removeCategoryTagLabel(tag: CategoryTagVo) {
         reduceState { state ->
             state.copy(
-                tagLabelItems = state.tagLabelItems.toMutableList().apply { remove(tag) }
+                tagLabelItems = state.tagLabelItems.toMutableList().apply { remove(tag) },
+                isChangedData = true
             )
         }
     }
@@ -86,8 +94,28 @@ class ModifyCategoryScreenModel(
     fun updateIsFixed(isFixed: Boolean) {
         reduceState { state ->
             state.copy(
-                isFixed = isFixed
+                isFixed = isFixed,
+                isChangedData = true
             )
+        }
+    }
+
+    fun getCategoryDetail() {
+        launchSafe(
+            block = {
+                categoryRepository.getCategoryWithTags(categoryId)
+            }
+        ) { response ->
+            reduceState { state ->
+                state.copy(
+                    categoryIcon = CategoryIconEnum.creatorFromText(response?.icon),
+                    label = TextFieldValue(response?.middleLabel.default()),
+                    tagLabelItems = response?.tags.default()
+                        .map { CategoryTagVo(it.id, it.tagLabel) },
+                    isFixed = response?.fixed.default()
+                )
+            }
+
         }
     }
 }

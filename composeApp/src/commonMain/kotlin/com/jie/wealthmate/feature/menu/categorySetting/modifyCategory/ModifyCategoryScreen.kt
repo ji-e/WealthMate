@@ -160,7 +160,7 @@ class ModifyCategoryScreen(
                     .padding(horizontal = 20.dp)
                     .padding(bottom = 20.dp)
                     .fillMaxWidth(),
-                enabled = uiState.label.text.isNotBlank(),
+                enabled = uiState.isChangedData,
                 onClick = { }
             )
 

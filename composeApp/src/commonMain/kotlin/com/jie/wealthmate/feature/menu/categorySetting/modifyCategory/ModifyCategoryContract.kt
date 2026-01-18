@@ -14,6 +14,7 @@ data class ModifyCategoryUiState(
     val tagLabel: TextFieldValue = TextFieldValue(""),
     val tagLabelItems: List<CategoryTagVo> = emptyList(),
     val isFixed: Boolean = false,
+    val isChangedData: Boolean = false,
 ) : BaseUiState
 
 sealed class ModifyCategoryUiSideEffect : UiSideEffect {
