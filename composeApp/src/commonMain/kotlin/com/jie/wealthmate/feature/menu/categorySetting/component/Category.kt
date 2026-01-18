@@ -29,10 +29,13 @@ import wealthmate.composeapp.generated.resources.ic_drag_handle
 @Composable
 fun CategoryItem(
     data: CategoryItemData,
+    modifier: Modifier = Modifier,
+    onDragHandle: Modifier = Modifier,
 ) {
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
+            .background(ColorGray.White)
             .padding(
                 vertical = 10.dp,
                 horizontal = 20.dp
@@ -64,7 +67,7 @@ fun CategoryItem(
             painter = painterResource(Res.drawable.ic_drag_handle),
             contentDescription = "이동",
             tint = ColorGray.Gray_300,
-            modifier = Modifier.size(28.dp)
+            modifier = onDragHandle.size(28.dp)
         )
     }
 

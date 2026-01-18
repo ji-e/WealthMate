@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
@@ -164,6 +165,33 @@ fun WMIconButton(
         )
     }
 
+}
+
+@Composable
+fun WMFloatingButton(
+    modifier: Modifier = Modifier.fillMaxWidth(),
+    text: String,
+    buttonStyle: ButtonStyle = ButtonStyle.FILLED,
+    buttonSize: ButtonSize = ButtonSize.MEDIUM,
+    enabled: Boolean = true,
+    isRounded: Boolean = false,
+    onClick: () -> Unit,
+) {
+    Column() {
+        WMShadowDivider()
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        WMButton(
+            modifier = modifier,
+            text = text,
+            buttonStyle = buttonStyle,
+            buttonSize = buttonSize,
+            enabled = enabled,
+            isRounded = isRounded,
+            onClick = onClick,
+        )
+    }
 }
 
 @Composable
