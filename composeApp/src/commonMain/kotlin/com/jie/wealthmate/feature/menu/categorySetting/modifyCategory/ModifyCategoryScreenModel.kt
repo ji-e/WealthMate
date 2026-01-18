@@ -157,7 +157,15 @@ class ModifyCategoryScreenModel(
         }
     }
 
-    fun removeCategory(){
+    fun removeCategory() {
+        launchSafe(
+            block = {
+                categoryRepository.deleteCategory(categoryId)
+            },
+        ) {
+            showSnackbar("카테고리가 삭제되었습니다.")
+            postSideEffect { ModifyCategoryUiSideEffect.OnSuccess }
+        }
 
     }
 }

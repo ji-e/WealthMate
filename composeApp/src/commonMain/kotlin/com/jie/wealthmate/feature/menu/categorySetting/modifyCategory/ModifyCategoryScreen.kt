@@ -36,7 +36,6 @@ import com.jie.wealthmate.component.WMCheckBox
 import com.jie.wealthmate.component.WMModalBottomSheet
 import com.jie.wealthmate.component.WMTextField
 import com.jie.wealthmate.component.topbar.TopBarItem
-import com.jie.wealthmate.feature.menu.categorySetting.addCategory.AddCategoryUiSideEffect
 import com.jie.wealthmate.feature.menu.categorySetting.addCategory.component.CategoryIcon
 import com.jie.wealthmate.feature.menu.categorySetting.addCategory.component.CategoryIconGrid
 import com.jie.wealthmate.feature.menu.categorySetting.addCategory.component.CategoryTag
@@ -73,7 +72,7 @@ class ModifyCategoryScreen(
 
         screenModel.collectSideEffect { sideEffect ->
             when (sideEffect) {
-                is AddCategoryUiSideEffect.OnSuccessSave -> {
+                is ModifyCategoryUiSideEffect.OnSuccess -> {
                     navigator.pop()
                 }
             }
