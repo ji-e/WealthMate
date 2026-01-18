@@ -104,3 +104,34 @@ WHERE categoryId = ? AND tagId = ?;
 -- 특정 카테고리의 모든 태그 관계 삭제
 deleteAllTagsFromCategory:
 DELETE FROM CategoryTagRelation WHERE categoryId = ?;
+
+-- Category 기본 정보 업데이트
+updateCategory:
+UPDATE Category
+SET icon = ?, middleLabel = ?, isFixed = ?
+WHERE id = ?;
+
+-- 특정 Category의 현재 태그 관계 조회
+getTagRelationsByCategoryId:
+SELECT ct.id, ct.tagLabel
+FROM CategoryTagRelation ctr
+JOIN CategoryTag ct ON ctr.tagId = ct.id
+WHERE ctr.categoryId = ?;
+
+-- 태그가 존재하는지 확인
+findTagByLabels:
+SELECT id FROM CategoryTag
+WHERE largeCategory = ? AND middleLabel = ? AND tagLabel = ?;
+
+-- 태그 라벨 업데이트
+updateTag:
+UPDATE CategoryTag
+SET tagLabel = ?
+WHERE id = ?;
+
+-- 사용되지 않는 태그 삭제 (어떤 Category에도 연결되지 않은 태그)
+deleteUnusedTag:
+DELETE FROM CategoryTag
+WHERE id = ? AND NOT EXISTS (
+    SELECT 1 FROM CategoryTagRelation WHERE tagId = id
+);
