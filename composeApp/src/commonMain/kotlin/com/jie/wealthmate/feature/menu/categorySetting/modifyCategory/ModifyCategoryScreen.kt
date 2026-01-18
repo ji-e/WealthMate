@@ -2,13 +2,16 @@
 
 package com.jie.wealthmate.feature.menu.categorySetting.modifyCategory
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -26,17 +29,21 @@ import cafe.adriel.voyager.navigator.internal.BackHandler
 import com.jie.wealthmate.base.BaseScreen
 import com.jie.wealthmate.base.collectSideEffect
 import com.jie.wealthmate.component.ButtonSize
+import com.jie.wealthmate.component.ButtonStyle
+import com.jie.wealthmate.component.CategoryIconEnum
 import com.jie.wealthmate.component.WMButton
 import com.jie.wealthmate.component.WMCheckBox
-import com.jie.wealthmate.component.WMTextField
 import com.jie.wealthmate.component.WMModalBottomSheet
+import com.jie.wealthmate.component.WMTextField
 import com.jie.wealthmate.component.topbar.TopBarItem
 import com.jie.wealthmate.feature.menu.categorySetting.addCategory.AddCategoryUiSideEffect
 import com.jie.wealthmate.feature.menu.categorySetting.addCategory.component.CategoryIcon
 import com.jie.wealthmate.feature.menu.categorySetting.addCategory.component.CategoryIconGrid
 import com.jie.wealthmate.feature.menu.categorySetting.addCategory.component.CategoryTag
 import com.jie.wealthmate.feature.menu.categorySetting.component.LargeCategoryEnum
+import com.jie.wealthmate.theme.ColorRed
 import com.jie.wealthmate.theme.WMTheme
+import com.jie.wealthmate.utils.default
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.koinInject
 import wealthmate.composeapp.generated.resources.Res
@@ -89,6 +96,7 @@ class ModifyCategoryScreen(
 
         Column(modifier = Modifier.fillMaxSize()) {
             var isShowCategoryIconModalBottomSheet by remember { mutableStateOf(false) }
+            var isShowCategoryTagLabelModalBottomSheet by remember { mutableStateOf(false) }
 
             Column(
                 modifier = Modifier
@@ -129,7 +137,10 @@ class ModifyCategoryScreen(
                     tagLabelItems = uiState.tagLabelItems,
                     onValueChange = screenModel::updateCategoryTagLabel,
                     onChipAdd = screenModel::addCategoryTagLabel,
-                    onChipClick = screenModel::removeCategoryTagLabel,
+                    onChipClick = {
+                        screenModel.selectedCategoryTagLabel(it)
+                        isShowCategoryTagLabelModalBottomSheet = true
+                    }
                 )
                 Spacer(modifier = Modifier.weight(1f))
             }
@@ -157,17 +168,108 @@ class ModifyCategoryScreen(
                 onClick = { }
             )
 
-            // 아이콘 변경 ModalBottomSheet
+            if (isShowCategoryTagLabelModalBottomSheet) {
+                ShowCategoryTagLabelModalBottomSheet(
+                    tagLabel = uiState.modifyTagLabel?.label.default(),
+                    onTagLabelChange = screenModel::updateModifyCategoryTagLabel,
+                    onRemoveClick = screenModel::removeCategoryTagLabel,
+                    onModifyClick = screenModel::modifyCategoryTagLabel,
+                    onDismissRequest = { isShowCategoryTagLabelModalBottomSheet = false }
+                )
+            }
+
             if (isShowCategoryIconModalBottomSheet) {
-                WMModalBottomSheet(
-                    onDismissRequest = { isShowCategoryIconModalBottomSheet = false },
+                ShowCategoryIconModalBottomSheet(
+                    selectedCategoryIcon = uiState.categoryIcon,
+                    onIconChange = screenModel::updateCategoryIcon,
+                    onDismissRequest = { isShowCategoryIconModalBottomSheet = false }
+                )
+            }
+        }
+    }
+
+    /**
+     * 카테고리 상세 태그 수정 ModalBottomSheet
+     */
+    @Composable
+    private fun ShowCategoryTagLabelModalBottomSheet(
+        tagLabel: String,
+        onTagLabelChange: (String) -> Unit,
+        onRemoveClick: () -> Unit = {},
+        onModifyClick: () -> Unit = {},
+        onDismissRequest: () -> Unit = {},
+    ) {
+        WMModalBottomSheet(
+            title = "상세 태그 수정",
+            onDismissRequest = onDismissRequest,
+        ) {
+            Column(
+                modifier = Modifier.padding(horizontal = 16.dp).padding(bottom = 20.dp)
+            ) {
+                WMTextField(
+                    value = tagLabel,
+                    onValueChange = onTagLabelChange,
+                    maxLength = 15,
+                    label = "상세 태그 이름",
+                    placeholder = largeCategory.tempTagLabel,
+                    supportingText = "15자 이내로 입력해 주세요.",
+                    isCount = true,
+                )
+
+                Row(
+                    modifier = Modifier
+                        .padding(top = 20.dp)
+                        .padding(horizontal = 4.dp)
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
-                    CategoryIconGrid(
-                        selectedCategoryIcon = uiState.categoryIcon,
-                        onIconChange = screenModel::updateCategoryIcon
+                    WMButton(
+                        text = "삭제",
+                        buttonStyle = ButtonStyle.TONAL,
+                        buttonSize = ButtonSize.LARGE,
+                        colors = ButtonDefaults.filledTonalButtonColors(
+                            containerColor = ColorRed.Red_50,
+                            contentColor = ColorRed.Red_300
+                        ),
+                        modifier = Modifier.weight(1f),
+                        onClick = {
+                            onRemoveClick()
+                            onDismissRequest()
+                        },
+                    )
+
+                    WMButton(
+                        text = "수정",
+                        buttonStyle = ButtonStyle.FILLED,
+                        buttonSize = ButtonSize.LARGE,
+                        modifier = Modifier.weight(4f),
+                        onClick = {
+                            onModifyClick()
+                            onDismissRequest()
+                        }
                     )
                 }
             }
+        }
+    }
+
+    /**
+     * 아이콘 변경 ModalBottomSheet
+     */
+
+    @Composable
+    private fun ShowCategoryIconModalBottomSheet(
+        selectedCategoryIcon: CategoryIconEnum,
+        onIconChange: (CategoryIconEnum) -> Unit = {},
+        onDismissRequest: () -> Unit = {},
+    ) {
+        WMModalBottomSheet(
+            onDismissRequest = { onDismissRequest() },
+        ) {
+            CategoryIconGrid(
+                selectedCategoryIcon = selectedCategoryIcon,
+                onIconChange = onIconChange,
+            )
         }
     }
 

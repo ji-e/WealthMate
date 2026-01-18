@@ -55,6 +55,43 @@ class ModifyCategoryScreenModel(
         }
     }
 
+    fun selectedCategoryTagLabel(categoryTagVo: CategoryTagVo) {
+        hideKeyboard()
+        reduceState { state ->
+            state.copy(
+                modifyTagLabel = categoryTagVo,
+                isChangedData = true
+            )
+        }
+    }
+
+    fun updateModifyCategoryTagLabel(text: String) {
+        reduceState { state ->
+            state.copy(
+                modifyTagLabel = state.modifyTagLabel?.copy(label = text),
+                isChangedData = true
+            )
+        }
+    }
+
+    fun modifyCategoryTagLabel() {
+        reduceState { state ->
+            state.copy(
+                modifyTagLabel = null,
+                tagLabelItems = state.tagLabelItems.toMutableList()
+                    .apply {
+                        val modifyTagLabel = state.modifyTagLabel
+                        if (modifyTagLabel != null) {
+                            val index = indexOf(find { it.id == modifyTagLabel.id })
+                            set(index, modifyTagLabel)
+                        }
+                    },
+                isChangedData = true
+            )
+        }
+
+    }
+
     fun addCategoryTagLabel(tagLabel: TextFieldValue?) {
         reduceState { state ->
             if (tagLabel == null) {
@@ -82,10 +119,12 @@ class ModifyCategoryScreenModel(
         }
     }
 
-    fun removeCategoryTagLabel(tag: CategoryTagVo) {
+    fun removeCategoryTagLabel() {
         reduceState { state ->
             state.copy(
-                tagLabelItems = state.tagLabelItems.toMutableList().apply { remove(tag) },
+                modifyTagLabel = null,
+                tagLabelItems = state.tagLabelItems.toMutableList()
+                    .apply { remove(state.modifyTagLabel) },
                 isChangedData = true
             )
         }

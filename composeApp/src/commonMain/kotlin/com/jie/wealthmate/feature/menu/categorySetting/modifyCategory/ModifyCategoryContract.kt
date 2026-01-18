@@ -13,6 +13,7 @@ data class ModifyCategoryUiState(
     val label: TextFieldValue = TextFieldValue(""),
     val tagLabel: TextFieldValue = TextFieldValue(""),
     val tagLabelItems: List<CategoryTagVo> = emptyList(),
+    val modifyTagLabel: CategoryTagVo? = null,
     val isFixed: Boolean = false,
     val isChangedData: Boolean = false,
 ) : BaseUiState
