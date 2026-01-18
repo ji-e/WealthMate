@@ -47,7 +47,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.koinInject
 import wealthmate.composeapp.generated.resources.Res
 import wealthmate.composeapp.generated.resources.ic_delete
-import wealthmate.composeapp.generated.resources.ic_keyboard_arrow_right
+import wealthmate.composeapp.generated.resources.ic_expand_circle_right
 
 class ModifyCategoryScreen(
     val largeCategory: LargeCategoryEnum,
@@ -146,7 +146,7 @@ class ModifyCategoryScreen(
                     modifier = Modifier.padding(top = 20.dp),
                     largeCategory = largeCategory,
                     tagLabel = uiState.tagLabel,
-                    trailingIcon = Res.drawable.ic_keyboard_arrow_right,
+                    trailingIcon = Res.drawable.ic_expand_circle_right,
                     tagLabelItems = uiState.tagLabelItems,
                     onValueChange = screenModel::updateCategoryTagLabel,
                     onChipAdd = screenModel::addCategoryTagLabel,

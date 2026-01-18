@@ -27,20 +27,21 @@ import com.jie.wealthmate.component.WMText
 import com.jie.wealthmate.component.WMTextField
 import com.jie.wealthmate.feature.menu.categorySetting.component.LargeCategoryEnum
 import com.jie.wealthmate.theme.ColorGray
+import com.jie.wealthmate.theme.ColorPrimary
 import com.jie.wealthmate.theme.WMTheme
 import com.jie.wealthmate.vo.CategoryTagVo
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import wealthmate.composeapp.generated.resources.Res
-import wealthmate.composeapp.generated.resources.ic_close_circle
+import wealthmate.composeapp.generated.resources.ic_close_circle2
 
 @Composable
 fun CategoryTag(
     modifier: Modifier = Modifier,
     largeCategory: LargeCategoryEnum,
     tagLabel: TextFieldValue,
-    trailingIcon: DrawableResource = Res.drawable.ic_close_circle,
+    trailingIcon: DrawableResource = Res.drawable.ic_close_circle2,
     tagLabelItems: List<CategoryTagVo> = emptyList(),
     onValueChange: (TextFieldValue) -> Unit,
     onChipAdd: (TextFieldValue?) -> Unit = {},
@@ -98,7 +99,7 @@ fun CategoryTagItem(
             Row(
                 modifier = Modifier
                     .clip(CircleShape)
-                    .background(color = ColorGray.Gray_100)
+                    .background(color = ColorPrimary.Primary_300)
                     .clickable { onChipClick(item) }
                     .padding(horizontal = 8.dp, vertical = 4.dp),
                 verticalAlignment = Alignment.CenterVertically,
@@ -113,7 +114,7 @@ fun CategoryTagItem(
                 Icon(
                     painter = painterResource(trailingIcon),
                     contentDescription = item.label,
-                    tint = ColorGray.Gray_300,
+                    tint = ColorGray.Gray_500,
                     modifier = Modifier.size(16.dp)
                 )
             }
