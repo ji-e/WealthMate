@@ -1,5 +1,6 @@
 package com.jie.wealthmate.feature.menu.categorySetting.incomCategorySetting
 
+import androidx.compose.ui.util.fastFilteredMap
 import cafe.adriel.voyager.core.model.screenModelScope
 import com.jie.wealthmate.MainScreenModel
 import com.jie.wealthmate.base.BaseScreenModel
@@ -17,16 +18,18 @@ class IncomeCategorySettingScreenModel(
         get() = IncomeCategorySettingUiState()
 
     init {
-        getAllCategories()
+        getIncomeCategories()
     }
 
-    fun getAllCategories() {
+    fun getIncomeCategories() {
         screenModelScope.launch {
             val categories = categoryRepository.getAllCategoriesWithTags()
 
             reduceState { state ->
                 state.copy(
-                    incomeCategoryItems = categories.map {
+                    incomeCategoryItems = categories.fastFilteredMap(
+                        { it.largeCategory == LargeCategoryEnum.INCOME.name },
+                    ) {
                         CategoryItemData(
                             id = it.id,
                             icon = it.icon,
