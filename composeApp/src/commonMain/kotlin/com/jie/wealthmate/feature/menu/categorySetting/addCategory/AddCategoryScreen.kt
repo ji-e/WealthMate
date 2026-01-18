@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -29,7 +28,6 @@ import com.jie.wealthmate.base.collectSideEffect
 import com.jie.wealthmate.component.ButtonSize
 import com.jie.wealthmate.component.WMButton
 import com.jie.wealthmate.component.WMCheckBox
-import com.jie.wealthmate.component.WMShadowDivider
 import com.jie.wealthmate.component.WMTextField
 import com.jie.wealthmate.component.WMTextModalBottomSheet
 import com.jie.wealthmate.component.topbar.TopBarItem
@@ -89,16 +87,13 @@ class AddCategoryScreen(
         }
 
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .imePadding()
+            modifier = Modifier.fillMaxSize()
         ) {
             var isShowCategoryIconModalBottomSheet by remember { mutableStateOf(false) }
 
             Column(
                 modifier = Modifier
                     .weight(1f)
-                    .padding(bottom = 40.dp)
                     .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -134,13 +129,11 @@ class AddCategoryScreen(
                     tagLabelItems = uiState.tagLabelItems,
                     onValueChange = screenModel::updateCategoryTagLabel,
                     onChipAdd = screenModel::addCategoryTagLabel,
-                    onChipRemove = screenModel::removeCategoryTagLabel,
+                    onChipClick = screenModel::removeCategoryTagLabel,
                 )
 
                 Spacer(modifier = Modifier.weight(1f))
             }
-
-            WMShadowDivider()
 
             // 고정 카테고리
             WMCheckBox(
