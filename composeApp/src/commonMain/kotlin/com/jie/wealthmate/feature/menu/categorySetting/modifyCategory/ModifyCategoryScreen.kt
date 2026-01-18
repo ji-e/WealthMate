@@ -47,6 +47,7 @@ import com.jie.wealthmate.utils.default
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.koinInject
 import wealthmate.composeapp.generated.resources.Res
+import wealthmate.composeapp.generated.resources.ic_delete
 import wealthmate.composeapp.generated.resources.ic_keyboard_arrow_right
 
 class ModifyCategoryScreen(
@@ -78,19 +79,32 @@ class ModifyCategoryScreen(
             }
         }
 
-        LaunchedEffect(navigator.lastItem, uiState.label.text) {
+        LaunchedEffect(navigator.lastItem, uiState.isChangedData) {
             if (navigator.lastItem is ModifyCategoryScreen) {
                 screenModel.updateTopBar(
                     title = TopBarItem.Title("${largeCategory.label} 카테고리 수정"),
                     readingItem = TopBarItem.ReadingItem().copy(
                         action = { onBack() }
                     ),
+                    trailingItem = listOf(
+                        TopBarItem.TrailingItem(
+                            iconRes = Res.drawable.ic_delete,
+                            tint = ColorRed.Red_300,
+                            action = {
+                                showRemoveDialog() {
+                                    screenModel.removeCategory()
+                                }
+                            }
+                        )
+                    )
                 )
 
-                screenModel.updateInit(
-                    largeCategoryEnum = largeCategory,
-                    categoryId = categoryId
-                )
+                if (uiState.isChangedData.not()) {
+                    screenModel.updateInit(
+                        largeCategoryEnum = largeCategory,
+                        categoryId = categoryId
+                    )
+                }
             }
         }
 

@@ -154,7 +154,10 @@ class ModifyCategoryScreenModel(
                     isFixed = response?.fixed.default()
                 )
             }
-
         }
+    }
+
+    fun removeCategory(){
+
     }
 }
