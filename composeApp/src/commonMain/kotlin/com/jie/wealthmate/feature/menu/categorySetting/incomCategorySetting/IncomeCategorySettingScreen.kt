@@ -40,6 +40,7 @@ import com.jie.wealthmate.feature.menu.categorySetting.addCategory.AddCategorySc
 import com.jie.wealthmate.feature.menu.categorySetting.component.CategoryItem
 import com.jie.wealthmate.feature.menu.categorySetting.component.LargeCategoryEnum
 import com.jie.wealthmate.feature.menu.component.MenuEnum
+import com.jie.wealthmate.theme.ColorGray
 import com.jie.wealthmate.theme.ColorPrimary
 import com.jie.wealthmate.theme.WMTheme
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -83,6 +84,7 @@ class IncomeCategorySettingScreen(
 
         LaunchedEffect(navigator.lastItem, uiState.isInitialized, isDragging) {
             if (navigator.lastItem is IncomeCategorySettingScreen && uiState.isInitialized && isDragging.not()) {
+                val isAddItemEnabled = uiState.incomeCategoryItems.size < 10
                 screenModel.updateTopBar(
                     title = TopBarItem.Title(menuEnum.title),
                     readingItem = TopBarItem.ReadingItem().copy(
@@ -91,7 +93,9 @@ class IncomeCategorySettingScreen(
                     trailingItem = listOf(
                         TopBarItem.TrailingItem(
                             iconRes = Res.drawable.ic_add,
+                            tint = if (isAddItemEnabled) ColorGray.Gray_700 else ColorGray.Gray_100,
                             action = {
+                                if (isAddItemEnabled.not()) return@TrailingItem
                                 navigator.push(
                                     AddCategoryScreen(
                                         largeCategory = LargeCategoryEnum.INCOME,
