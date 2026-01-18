@@ -1,13 +1,18 @@
 package com.jie.wealthmate.component
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.jie.wealthmate.theme.ColorGray
 import org.jetbrains.compose.resources.painterResource
@@ -18,6 +23,7 @@ import wealthmate.composeapp.generated.resources.ic_horizontal_rule
 @Composable
 fun WMModalBottomSheet(
     modifier: Modifier = Modifier,
+    title: String? = null,
     onDismissRequest: () -> Unit,
     content: @Composable ColumnScope.() -> Unit,
 ) {
@@ -35,6 +41,17 @@ fun WMModalBottomSheet(
             )
         }
     ) {
-        content()
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            title?.run {
+                WMText(
+                    text = this,
+                    style = Typography().titleMedium.copy(fontWeight = FontWeight.SemiBold),
+                    modifier = Modifier
+                        .padding(horizontal = 20.dp)
+                        .padding(top = 4.dp, bottom = 12.dp)
+                )
+            }
+            content()
+        }
     }
 }
