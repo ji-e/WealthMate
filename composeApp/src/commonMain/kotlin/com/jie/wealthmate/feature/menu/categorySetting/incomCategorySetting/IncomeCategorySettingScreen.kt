@@ -4,6 +4,7 @@ package com.jie.wealthmate.feature.menu.categorySetting.incomCategorySetting
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -123,14 +124,26 @@ class IncomeCategorySettingScreen(
         }
 
         Column {
+            val itemSize = uiState.incomeCategoryItems.size
+
+            if (itemSize == 0) {
+                EmptyListView(
+                    modifier = Modifier.fillMaxSize().padding(20.dp),
+                    contentText = "카테고리를 추가해주세요.",
+                )
+                return@Column
+            }
+
             LazyColumn(
                 state = listState.listState,
                 modifier = Modifier
                     .weight(1f)
                     .reorderable(listState),
             ) {
+
+
                 items(
-                    count = uiState.incomeCategoryItems.size,
+                    count = itemSize,
                     key = { index -> uiState.incomeCategoryItems[index].id }
                 ) { index ->
                     val category = uiState.incomeCategoryItems[index]
