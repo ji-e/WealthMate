@@ -1,16 +1,12 @@
 package com.jie.wealthmate.feature.menu.categorySetting.incomCategorySetting
 
 import androidx.compose.ui.util.fastFilteredMap
-import cafe.adriel.voyager.core.model.screenModelScope
-import com.jie.wealthmate.MainScreenModel
 import com.jie.wealthmate.base.BaseScreenModel
 import com.jie.wealthmate.feature.menu.categorySetting.component.CategoryItemData
 import com.jie.wealthmate.feature.menu.categorySetting.component.LargeCategoryEnum
 import com.jie.wealthmate.repository.CategoryRepository
-import kotlinx.coroutines.launch
 
 class IncomeCategorySettingScreenModel(
-    val mainScreenModel: MainScreenModel,
     private val categoryRepository: CategoryRepository,
 ) : BaseScreenModel<IncomeCategorySettingUiState>() {
 
@@ -22,12 +18,17 @@ class IncomeCategorySettingScreenModel(
     }
 
     fun getIncomeCategories() {
-        screenModelScope.launch {
-            val categories = categoryRepository.getAllCategoriesWithTags().sortedBy { it.sort }
+        launchSafe(
+            block = {
+                categoryRepository.getAllCategoriesWithTags()
+            },
+            errorMsg = "카테고리 저장에 실패했습니다.",
+        ) { response ->
+            val categories = response.sortedBy { it.sort }
 
             reduceState { state ->
                 state.copy(
-                    initialized = true,
+                    isInitialized = true,
                     incomeCategoryItems = categories.fastFilteredMap(
                         { it.largeCategory == LargeCategoryEnum.INCOME.name },
                     ) {
@@ -46,12 +47,16 @@ class IncomeCategorySettingScreenModel(
     }
 
     fun saveCategorySort() {
-        screenModelScope.launch {
-            val categoryItems = container.uiState.value.incomeCategoryItems
-            categoryRepository.updateCategorySorts(
-                categoryItems.mapIndexed { index, item -> item.id to index.toLong() }
-            )
-            mainScreenModel.showSnackbar("저장되었습니다.")
+        launchSafe(
+            block = {
+                val categoryItems = container.uiState.value.incomeCategoryItems
+                categoryRepository.updateCategorySorts(
+                    categoryItems.mapIndexed { index, item -> item.id to index.toLong() }
+                )
+            },
+            errorMsg = "카테고리 저장에 실패했습니다.",
+        ) {
+            showSnackbar("저장되었습니다.")
         }
     }
 
