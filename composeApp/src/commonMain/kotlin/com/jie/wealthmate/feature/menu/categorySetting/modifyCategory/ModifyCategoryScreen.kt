@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -29,7 +28,6 @@ import com.jie.wealthmate.base.collectSideEffect
 import com.jie.wealthmate.component.ButtonSize
 import com.jie.wealthmate.component.WMButton
 import com.jie.wealthmate.component.WMCheckBox
-import com.jie.wealthmate.component.WMShadowDivider
 import com.jie.wealthmate.component.WMTextField
 import com.jie.wealthmate.component.WMTextModalBottomSheet
 import com.jie.wealthmate.component.topbar.TopBarItem
@@ -41,6 +39,8 @@ import com.jie.wealthmate.feature.menu.categorySetting.component.LargeCategoryEn
 import com.jie.wealthmate.theme.WMTheme
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.koinInject
+import wealthmate.composeapp.generated.resources.Res
+import wealthmate.composeapp.generated.resources.ic_keyboard_arrow_right
 
 class ModifyCategoryScreen(
     val largeCategory: LargeCategoryEnum,
@@ -56,7 +56,7 @@ class ModifyCategoryScreen(
         val uiState = screenModel.container.uiState.collectAsState().value
 
         fun onBack() {
-            showSaveBackDialog(uiState.label.text.isNotEmpty()) {
+            showSaveBackDialog(uiState.isChangedData) {
                 navigator.pop()
             }
         }
@@ -87,17 +87,12 @@ class ModifyCategoryScreen(
             }
         }
 
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .imePadding()
-        ) {
+        Column(modifier = Modifier.fillMaxSize()) {
             var isShowCategoryIconModalBottomSheet by remember { mutableStateOf(false) }
 
             Column(
                 modifier = Modifier
                     .weight(1f)
-                    .padding(bottom = 40.dp)
                     .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -130,16 +125,14 @@ class ModifyCategoryScreen(
                     modifier = Modifier.padding(top = 20.dp),
                     largeCategory = largeCategory,
                     tagLabel = uiState.tagLabel,
+                    trailingIcon = Res.drawable.ic_keyboard_arrow_right,
                     tagLabelItems = uiState.tagLabelItems,
                     onValueChange = screenModel::updateCategoryTagLabel,
                     onChipAdd = screenModel::addCategoryTagLabel,
-                    onChipRemove = screenModel::removeCategoryTagLabel,
+                    onChipClick = screenModel::removeCategoryTagLabel,
                 )
-
                 Spacer(modifier = Modifier.weight(1f))
             }
-
-            WMShadowDivider()
 
             // 고정 카테고리
             WMCheckBox(
