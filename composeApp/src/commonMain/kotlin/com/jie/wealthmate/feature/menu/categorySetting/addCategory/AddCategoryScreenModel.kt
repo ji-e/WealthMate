@@ -116,7 +116,6 @@ class AddCategoryScreenModel(
                     tagIds = createTags()
                 )
             },
-            errorMsg = "카테고리 저장에 실패했습니다.",
         ) {
             showSnackbar("카테고리가 저장되었습니다.")
             postSideEffect { AddCategoryUiSideEffect.OnSuccessSave }

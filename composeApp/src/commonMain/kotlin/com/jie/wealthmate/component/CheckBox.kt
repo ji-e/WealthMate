@@ -29,12 +29,12 @@ fun WMCheckBox(
             enabled = enabled,
             onCheckedChange = onCheckedChange,
             colors = CheckboxDefaults.colors().copy(
+                checkedCheckmarkColor = ColorGray.White,
                 disabledCheckedBoxColor = ColorGray.Gray_100,
                 disabledBorderColor = ColorGray.Gray_100,
                 disabledUncheckedBorderColor = ColorGray.Gray_100,
                 uncheckedBorderColor = ColorGray.Gray_300,
-
-                )
+            )
         )
 
         label?.let {

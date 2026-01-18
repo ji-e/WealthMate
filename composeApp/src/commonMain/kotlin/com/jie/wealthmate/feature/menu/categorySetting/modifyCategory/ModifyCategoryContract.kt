@@ -19,5 +19,5 @@ data class ModifyCategoryUiState(
 ) : BaseUiState
 
 sealed class ModifyCategoryUiSideEffect : UiSideEffect {
-    data object OnSuccessSave : ModifyCategoryUiSideEffect()
+    data object OnSuccess : ModifyCategoryUiSideEffect()
 }

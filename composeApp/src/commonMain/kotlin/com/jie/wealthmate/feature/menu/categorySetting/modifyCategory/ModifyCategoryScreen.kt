@@ -36,7 +36,6 @@ import com.jie.wealthmate.component.WMCheckBox
 import com.jie.wealthmate.component.WMModalBottomSheet
 import com.jie.wealthmate.component.WMTextField
 import com.jie.wealthmate.component.topbar.TopBarItem
-import com.jie.wealthmate.feature.menu.categorySetting.addCategory.AddCategoryUiSideEffect
 import com.jie.wealthmate.feature.menu.categorySetting.addCategory.component.CategoryIcon
 import com.jie.wealthmate.feature.menu.categorySetting.addCategory.component.CategoryIconGrid
 import com.jie.wealthmate.feature.menu.categorySetting.addCategory.component.CategoryTag
@@ -47,6 +46,7 @@ import com.jie.wealthmate.utils.default
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.koinInject
 import wealthmate.composeapp.generated.resources.Res
+import wealthmate.composeapp.generated.resources.ic_delete
 import wealthmate.composeapp.generated.resources.ic_keyboard_arrow_right
 
 class ModifyCategoryScreen(
@@ -72,25 +72,38 @@ class ModifyCategoryScreen(
 
         screenModel.collectSideEffect { sideEffect ->
             when (sideEffect) {
-                is AddCategoryUiSideEffect.OnSuccessSave -> {
+                is ModifyCategoryUiSideEffect.OnSuccess -> {
                     navigator.pop()
                 }
             }
         }
 
-        LaunchedEffect(navigator.lastItem, uiState.label.text) {
+        LaunchedEffect(navigator.lastItem, uiState.isChangedData) {
             if (navigator.lastItem is ModifyCategoryScreen) {
                 screenModel.updateTopBar(
                     title = TopBarItem.Title("${largeCategory.label} 카테고리 수정"),
                     readingItem = TopBarItem.ReadingItem().copy(
                         action = { onBack() }
                     ),
+                    trailingItem = listOf(
+                        TopBarItem.TrailingItem(
+                            iconRes = Res.drawable.ic_delete,
+                            tint = ColorRed.Red_300,
+                            action = {
+                                showRemoveDialog() {
+                                    screenModel.removeCategory()
+                                }
+                            }
+                        )
+                    )
                 )
 
-                screenModel.updateInit(
-                    largeCategoryEnum = largeCategory,
-                    categoryId = categoryId
-                )
+                if (uiState.isChangedData.not()) {
+                    screenModel.updateInit(
+                        largeCategoryEnum = largeCategory,
+                        categoryId = categoryId
+                    )
+                }
             }
         }
 

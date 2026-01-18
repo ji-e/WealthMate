@@ -49,7 +49,7 @@ object ColorPrimary {
 }
 
 object ColorRed {
-    val Red_300 = Color(0xFFF03E3E)
+    val Red_300 = Color(0xFFF87171)
     val Red_200 = Color(0xFFFF9595)
     val Red_100 = Color(0xFFFFD5D5)
     val Red_50 = Color(0xFFFFF2F2)

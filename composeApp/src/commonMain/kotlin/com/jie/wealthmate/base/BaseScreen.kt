@@ -16,6 +16,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -24,9 +25,11 @@ import cafe.adriel.voyager.core.screen.Screen
 import com.jie.wealthmate.component.WMText
 import com.jie.wealthmate.theme.ColorGray
 import com.jie.wealthmate.theme.ColorPrimary
+import com.jie.wealthmate.theme.ColorRed
 
 abstract class BaseScreen : Screen {
     var isShowSaveBackDialog = mutableStateOf(false)
+    var isShowRemoveDialog = mutableStateOf(false)
     var confirmCallback = mutableStateOf({})
 
     fun showSaveBackDialog(
@@ -42,21 +45,45 @@ abstract class BaseScreen : Screen {
         confirmCallback.value = callback
     }
 
+    fun showRemoveDialog(
+        callback: () -> Unit,
+    ) {
+
+        isShowRemoveDialog.value = true
+        confirmCallback.value = callback
+    }
+
 
     @Composable
     override fun Content() {
 
         if (isShowSaveBackDialog.value) {
-            SaveBackDialog()
+            BaseDialog(
+                contentText = "저장되지 않았습니다.\n이전 화면으로 돌아갈까요?",
+                onDismissRequest = { isShowSaveBackDialog.value = false }
+            )
+        }
+
+        if (isShowRemoveDialog.value) {
+            BaseDialog(
+                contentText = "정말 삭제하시겠습니까?\n삭제된 정보는 복구할 수 없습니다.",
+                confirmLabel = "삭제",
+                confirmColor = ColorRed.Red_300,
+                onDismissRequest = { isShowRemoveDialog.value = false }
+            )
         }
     }
 
     @Composable
-    private fun SaveBackDialog() {
+    private fun BaseDialog(
+        contentText: String,
+        confirmLabel: String = "확인",
+        cancelLabel: String = "취소",
+        confirmColor: Color = ColorPrimary.Primary_500,
+        onDismissRequest: () -> Unit,
+    ) {
         Dialog(
-            onDismissRequest = {
-                isShowSaveBackDialog.value = false
-            }
+            onDismissRequest = onDismissRequest
         ) {
             Column(
                 modifier = Modifier
@@ -73,7 +100,7 @@ abstract class BaseScreen : Screen {
                     contentAlignment = Alignment.Center
                 ) {
                     WMText(
-                        text = "저장되지 않았습니다.\n이전 화면으로 돌아갈까요?",
+                        text = contentText,
                         textAlign = TextAlign.Center,
                         style = Typography().bodyLarge,
                     )
@@ -85,13 +112,12 @@ abstract class BaseScreen : Screen {
                             .weight(1f)
                             .background(ColorGray.Gray_50)
                             .clickable {
-                                isShowSaveBackDialog.value = false
-                                confirmCallback.value.invoke()
+                                onDismissRequest()
                             },
                         contentAlignment = Alignment.Center
                     ) {
                         WMText(
-                            text = "예",
+                            text = cancelLabel,
                             style = Typography().titleMedium.copy(fontWeight = FontWeight.Medium),
                         )
                     }
@@ -99,15 +125,19 @@ abstract class BaseScreen : Screen {
                         modifier = Modifier
                             .height(60.dp)
                             .weight(1f)
-                            .background(ColorPrimary.Primary_200)
+                            .background(confirmColor)
                             .clickable {
-                                isShowSaveBackDialog.value = false
+                                onDismissRequest()
+                                confirmCallback.value.invoke()
                             },
                         contentAlignment = Alignment.Center
                     ) {
                         WMText(
-                            text = "아니오",
-                            style = Typography().titleMedium.copy(fontWeight = FontWeight.Medium),
+                            text = confirmLabel,
+                            style = Typography().titleMedium.copy(
+                                color = ColorGray.White,
+                                fontWeight = FontWeight.Medium
+                            ),
                         )
                     }
                 }
