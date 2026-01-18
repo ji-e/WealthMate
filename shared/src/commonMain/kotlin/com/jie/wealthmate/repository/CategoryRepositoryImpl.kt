@@ -96,7 +96,7 @@ class CategoryRepositoryImpl(databaseDriverFactory: DatabaseDriverFactory) : Cat
                 largeCategory = first.largeCategory,
                 middleLabel = first.middleLabel,
                 sort = first.sort,
-                fixed = first.isFixed.transformBoolean(),
+                isFixed = first.isFixed.transformBoolean(),
                 tags = results.mapNotNull { row ->
                     row.tag_id?.let {
                         CategoryTagEntity(it, row.tagLabel ?: "")
@@ -126,7 +126,7 @@ class CategoryRepositoryImpl(databaseDriverFactory: DatabaseDriverFactory) : Cat
                         largeCategory = first.largeCategory,
                         middleLabel = first.middleLabel,
                         sort = first.sort,
-                        fixed = first.isFixed.transformBoolean(),
+                        isFixed = first.isFixed.transformBoolean(),
                         tags = rows.mapNotNull { row ->
                             row.tag_id?.let {
                                 CategoryTagEntity(it, row.tagLabel ?: "")
@@ -184,19 +184,82 @@ class CategoryRepositoryImpl(databaseDriverFactory: DatabaseDriverFactory) : Cat
             dbQuery.deleteAllTagsFromCategory(categoryId)
         }
 
-    /**
-     * 카테고리의 태그 업데이트 (기존 태그 모두 삭제 후 새로 추가)
-     */
-    override suspend fun updateCategoryTags(categoryId: Long, tagIds: List<Long>): Unit =
-        withContext(Dispatchers.IO) {
-            database.transaction {
-                // 기존 태그 관계 모두 삭제
-                dbQuery.deleteAllTagsFromCategory(categoryId)
+    override suspend fun updateCategoryWithTags(categoryEntity: CategoryEntity) {
+        println("updateCategoryWithTags called\n $categoryEntity")
 
-                // 새 태그 관계 추가
-                tagIds.forEach { tagId ->
-                    dbQuery.insertCategoryTagRelation(categoryId, tagId)
+        withContext(Dispatchers.IO) {
+            // 1. Category 기본 정보 업데이트
+            dbQuery.updateCategory(
+                icon = categoryEntity.icon,
+                middleLabel = categoryEntity.middleLabel,
+                isFixed = categoryEntity.isFixed.trasnformLong(),
+                id = categoryEntity.id
+            )
+
+            // 2. 기존 태그 관계 조회
+            val existingTags = dbQuery.getTagRelationsByCategoryId(categoryEntity.id)
+                .executeAsList()
+                .associateBy { it.id }
+
+            // 3. 새로운 태그 ID 목록
+            val newTagIds = mutableSetOf<Long>()
+            categoryEntity.tags.forEach { tagUpdate ->
+                when {
+                    // 기존 태그 수정
+                    tagUpdate.id != null && existingTags.containsKey(tagUpdate.id) -> {
+                        if (existingTags[tagUpdate.id]?.tagLabel != tagUpdate.tagLabel) {
+                            dbQuery.updateTag(
+                                tagLabel = tagUpdate.tagLabel,
+                                id = tagUpdate.id
+                            )
+                        }
+                        newTagIds.add(tagUpdate.id)
+                    }
+                    // 새 태그 추가
+                    tagUpdate.id == null -> {
+                        // 같은 라벨의 태그가 이미 존재하는지 확인
+                        val existingTag = dbQuery.findTagByLabels(
+                            largeCategory = categoryEntity.largeCategory,
+                            middleLabel = categoryEntity.middleLabel,
+                            tagLabel = tagUpdate.tagLabel
+                        ).executeAsOneOrNull()
+
+                        val tagId =
+                            if (existingTag != null) {
+                                existingTag
+                            } else {
+                                // 새 태그 생성
+                                dbQuery.insertTag(
+                                    largeCategory = categoryEntity.largeCategory,
+                                    middleLabel = categoryEntity.middleLabel,
+                                    tagLabel = tagUpdate.tagLabel
+                                )
+                                dbQuery.lastInsertRowId().executeAsOne()
+                            }
+
+                        // 관계가 없으면 추가
+                        dbQuery.insertCategoryTagRelation(
+                            categoryId = categoryEntity.id,
+                            tagId = tagId
+                        )
+                        newTagIds.add(tagId)
+                    }
+                }
+            }
+
+            // 4. 삭제된 태그 처리
+            existingTags.keys.forEach { existingTagId ->
+                if (newTagIds.contains(existingTagId).not()) {
+                    // 관계 삭제
+                    dbQuery.deleteCategoryTagRelation(
+                        categoryId = categoryEntity.id,
+                        tagId = existingTagId
+                    )
+
+                    // 사용되지 않는 태그 삭제
+                    dbQuery.deleteUnusedTag(existingTagId)
                 }
             }
         }
+    }
 }

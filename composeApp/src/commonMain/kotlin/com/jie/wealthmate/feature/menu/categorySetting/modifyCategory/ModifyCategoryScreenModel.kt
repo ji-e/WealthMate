@@ -3,6 +3,8 @@ package com.jie.wealthmate.feature.menu.categorySetting.modifyCategory
 import androidx.compose.ui.text.input.TextFieldValue
 import com.jie.wealthmate.base.BaseScreenModel
 import com.jie.wealthmate.component.CategoryIconEnum
+import com.jie.wealthmate.entity.CategoryEntity
+import com.jie.wealthmate.entity.CategoryTagEntity
 import com.jie.wealthmate.feature.menu.categorySetting.component.LargeCategoryEnum
 import com.jie.wealthmate.repository.CategoryRepository
 import com.jie.wealthmate.utils.default
@@ -151,7 +153,7 @@ class ModifyCategoryScreenModel(
                     label = TextFieldValue(response?.middleLabel.default()),
                     tagLabelItems = response?.tags.default()
                         .map { CategoryTagVo(it.id, it.tagLabel) },
-                    isFixed = response?.fixed.default()
+                    isFixed = response?.isFixed.default()
                 )
             }
         }
@@ -166,6 +168,27 @@ class ModifyCategoryScreenModel(
             showSnackbar("카테고리가 삭제되었습니다.")
             postSideEffect { ModifyCategoryUiSideEffect.OnSuccess }
         }
+    }
 
+    fun saveCategory() {
+        launchSafe(
+            block = {
+                val uiState = container.uiState.value
+                categoryRepository.updateCategoryWithTags(
+                    CategoryEntity(
+                        id = categoryId,
+                        icon = uiState.categoryIcon.text,
+                        largeCategory = uiState.largeCategory.name,
+                        middleLabel = uiState.label.text,
+                        sort = 0, // 의미 없음, 업데이트 시 사용 안함
+                        isFixed = uiState.isFixed,
+                        tags = uiState.tagLabelItems.map { CategoryTagEntity(it.id, it.label) },
+                    )
+                )
+            },
+        ) {
+            showSnackbar("카테고리가 수정되었습니다.")
+            postSideEffect { ModifyCategoryUiSideEffect.OnSuccess }
+        }
     }
 }

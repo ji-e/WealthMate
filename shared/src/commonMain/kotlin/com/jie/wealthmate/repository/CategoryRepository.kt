@@ -42,8 +42,6 @@ interface CategoryRepository {
     )
 
     suspend fun removeAllTagsFromCategory(categoryId: Long)
-    suspend fun updateCategoryTags(
-        categoryId: Long,
-        tagIds: List<Long>,
-    )
+
+    suspend fun updateCategoryWithTags(categoryEntity: CategoryEntity)
 }

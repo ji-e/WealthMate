@@ -47,7 +47,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.koinInject
 import wealthmate.composeapp.generated.resources.Res
 import wealthmate.composeapp.generated.resources.ic_delete
-import wealthmate.composeapp.generated.resources.ic_keyboard_arrow_right
+import wealthmate.composeapp.generated.resources.ic_expand_circle_right
 
 class ModifyCategoryScreen(
     val largeCategory: LargeCategoryEnum,
@@ -146,7 +146,7 @@ class ModifyCategoryScreen(
                     modifier = Modifier.padding(top = 20.dp),
                     largeCategory = largeCategory,
                     tagLabel = uiState.tagLabel,
-                    trailingIcon = Res.drawable.ic_keyboard_arrow_right,
+                    trailingIcon = Res.drawable.ic_expand_circle_right,
                     tagLabelItems = uiState.tagLabelItems,
                     onValueChange = screenModel::updateCategoryTagLabel,
                     onChipAdd = screenModel::addCategoryTagLabel,
@@ -169,16 +169,16 @@ class ModifyCategoryScreen(
                 onCheckedChange = screenModel::updateIsFixed,
             )
 
-            // 저장 버튼
+            // 수정 버튼
             WMButton(
-                text = "저장",
+                text = "수정",
                 buttonSize = ButtonSize.LARGE,
                 modifier = Modifier
                     .padding(horizontal = 20.dp)
                     .padding(bottom = 20.dp)
                     .fillMaxWidth(),
                 enabled = uiState.isChangedData,
-                onClick = { }
+                onClick = screenModel::saveCategory
             )
 
             if (isShowCategoryTagLabelModalBottomSheet) {

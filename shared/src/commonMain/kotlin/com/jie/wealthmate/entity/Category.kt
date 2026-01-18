@@ -1,7 +1,7 @@
 package com.jie.wealthmate.entity
 
 data class CategoryTagEntity(
-    val id: Long,
+    val id: Long?,
     val tagLabel: String
 )
 
@@ -11,6 +11,6 @@ data class CategoryEntity(
     val largeCategory: String,
     val middleLabel: String,
     val sort: Long,
-    val fixed: Boolean,
+    val isFixed: Boolean,
     val tags: List<CategoryTagEntity>
 )
