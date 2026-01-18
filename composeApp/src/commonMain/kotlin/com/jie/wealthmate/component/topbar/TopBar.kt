@@ -36,6 +36,7 @@ fun WMTobBar(
             readingItem?.let {
                 WMIconButton(
                     iconRes = it.iconRes,
+                    tint = it.tint,
                     onClick = { it.action() }
                 )
             }
@@ -44,6 +45,7 @@ fun WMTobBar(
             trailingItem?.forEach {
                 WMIconButton(
                     iconRes = it.iconRes,
+                    tint = it.tint,
                     onClick = { it.action() }
                 )
             }
