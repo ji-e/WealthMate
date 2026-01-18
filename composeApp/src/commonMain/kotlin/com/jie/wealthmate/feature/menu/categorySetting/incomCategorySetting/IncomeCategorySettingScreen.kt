@@ -3,7 +3,6 @@
 package com.jie.wealthmate.feature.menu.categorySetting.incomCategorySetting
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -26,6 +25,7 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.annotation.InternalVoyagerApi
 import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import cafe.adriel.voyager.navigator.internal.BackHandler
 import com.jie.wealthmate.base.BaseScreen
@@ -39,7 +39,9 @@ import com.jie.wealthmate.component.topbar.TopBarItem
 import com.jie.wealthmate.feature.menu.categorySetting.addCategory.AddCategoryScreen
 import com.jie.wealthmate.feature.menu.categorySetting.component.CategoryItem
 import com.jie.wealthmate.feature.menu.categorySetting.component.LargeCategoryEnum
+import com.jie.wealthmate.feature.menu.categorySetting.modifyCategory.ModifyCategoryScreen
 import com.jie.wealthmate.feature.menu.component.MenuEnum
+import com.jie.wealthmate.theme.ColorGray
 import com.jie.wealthmate.theme.ColorPrimary
 import com.jie.wealthmate.theme.WMTheme
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -50,6 +52,7 @@ import wealthmate.composeapp.generated.resources.ic_add
 class IncomeCategorySettingScreen(
     val menuEnum: MenuEnum,
 ) : BaseScreen() {
+
 
     @Composable
     override fun Content() {
@@ -83,6 +86,7 @@ class IncomeCategorySettingScreen(
 
         LaunchedEffect(navigator.lastItem, uiState.isInitialized, isDragging) {
             if (navigator.lastItem is IncomeCategorySettingScreen && uiState.isInitialized && isDragging.not()) {
+                val isAddItemEnabled = uiState.incomeCategoryItems.size < 10
                 screenModel.updateTopBar(
                     title = TopBarItem.Title(menuEnum.title),
                     readingItem = TopBarItem.ReadingItem().copy(
@@ -91,7 +95,9 @@ class IncomeCategorySettingScreen(
                     trailingItem = listOf(
                         TopBarItem.TrailingItem(
                             iconRes = Res.drawable.ic_add,
+                            tint = if (isAddItemEnabled) ColorGray.Gray_700 else ColorGray.Gray_100,
                             action = {
+                                if (isAddItemEnabled.not()) return@TrailingItem
                                 navigator.push(
                                     AddCategoryScreen(
                                         largeCategory = LargeCategoryEnum.INCOME,
@@ -156,14 +162,13 @@ class IncomeCategorySettingScreen(
                                             )
                                         )
                                         .clip(RoundedCornerShape(4.dp))
-                                        .clickable(
-                                            onClick = { },
-                                            indication = null,
-                                            interactionSource = remember { MutableInteractionSource() }
-                                        )
-
                                 } else {
-                                    Modifier.clickable { }
+                                    Modifier.clickable(isDragging.not()) {
+                                        goToModifyCategory(
+                                            navigator = navigator,
+                                            categoryId = category.id
+                                        )
+                                    }
                                 }
                             ),
                             onDragHandle = Modifier.detectReorderAfterLongPress(listState),
@@ -188,6 +193,15 @@ class IncomeCategorySettingScreen(
                 )
             }
         }
+    }
+
+    fun goToModifyCategory(navigator: Navigator, categoryId: Long) {
+        navigator.push(
+            ModifyCategoryScreen(
+                largeCategory = LargeCategoryEnum.INCOME,
+                categoryId = categoryId
+            )
+        )
     }
 
     @Composable

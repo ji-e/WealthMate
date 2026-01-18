@@ -465,8 +465,11 @@ enum class CategoryIconEnum(val text: String) {
     companion object {
         val defaultCategoryIcon = CATEGORY_U1F4B0
 
-        fun creator(name: String): CategoryIconEnum =
+        fun creator(name: String?): CategoryIconEnum =
             CategoryIconEnum.entries.find { it.name == name } ?: defaultCategoryIcon
+
+        fun creatorFromText(text: String?): CategoryIconEnum =
+            CategoryIconEnum.entries.find { it.text == text } ?: defaultCategoryIcon
 
 
         val categoryIcons: List<Pair<CategoryIconEnum, List<CategoryIconEnum>>>

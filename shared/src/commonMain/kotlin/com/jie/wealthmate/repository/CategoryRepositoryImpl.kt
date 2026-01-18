@@ -64,16 +64,21 @@ class CategoryRepositoryImpl(databaseDriverFactory: DatabaseDriverFactory) : Cat
     /**
      * 카테고리 조회
      */
-    override suspend fun getCategoryById(categoryId: Long): Category? =
-        withContext(Dispatchers.IO) {
+    override suspend fun getCategoryById(categoryId: Long): Category? {
+        val response = withContext(Dispatchers.IO) {
             dbQuery.selectCategoryById(categoryId).executeAsOneOrNull()
         }
+
+        println("getCategoryById called\n $response")
+
+        return response
+    }
 
     /**
      * 카테고리와 태그 함께 조회
      */
-    override suspend fun getCategoryWithTags(categoryId: Long): CategoryEntity? =
-        withContext(Dispatchers.IO) {
+    override suspend fun getCategoryWithTags(categoryId: Long): CategoryEntity? {
+        val response = withContext(Dispatchers.IO) {
             val results = dbQuery.selectCategoryWithTags(categoryId).executeAsList()
 
             if (results.isEmpty()) return@withContext null
@@ -93,6 +98,11 @@ class CategoryRepositoryImpl(databaseDriverFactory: DatabaseDriverFactory) : Cat
                 }
             )
         }
+
+        println("getCategoryWithTags called\n $response")
+
+        return response
+    }
 
     /**
      * 모든 카테고리와 태그 조회

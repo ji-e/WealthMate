@@ -6,6 +6,7 @@ import com.jie.wealthmate.feature.home.HomeScreenModel
 import com.jie.wealthmate.feature.menu.MenuScreenModel
 import com.jie.wealthmate.feature.menu.categorySetting.addCategory.AddCategoryScreenModel
 import com.jie.wealthmate.feature.menu.categorySetting.incomCategorySetting.IncomeCategorySettingScreenModel
+import com.jie.wealthmate.feature.menu.categorySetting.modifyCategory.ModifyCategoryScreenModel
 import com.jie.wealthmate.repository.CategoryRepository
 import com.jie.wealthmate.repository.CategoryRepositoryImpl
 import org.koin.dsl.module
@@ -22,5 +23,6 @@ val commonModule = module {
     factory { AssetScreenModel() }
     factory { MenuScreenModel() }
     factory { AddCategoryScreenModel(get()) }
+    factory { ModifyCategoryScreenModel(get()) }
     factory { IncomeCategorySettingScreenModel(get()) }
 }

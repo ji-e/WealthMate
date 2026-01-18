@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.FilledTonalButton
@@ -34,12 +35,13 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
 fun WMButton(
-    modifier: Modifier = Modifier.fillMaxWidth(),
+    modifier: Modifier = Modifier,
     text: String,
     buttonStyle: ButtonStyle = ButtonStyle.FILLED,
     buttonSize: ButtonSize = ButtonSize.MEDIUM,
     enabled: Boolean = true,
     isRounded: Boolean = false,
+    colors: ButtonColors? = null,
     onClick: () -> Unit,
 ) {
 
@@ -54,7 +56,7 @@ fun WMButton(
                 contentPadding = PaddingValues(horizontal = 12.dp),
                 modifier = modifier.height(buttonSize.buttonHeight),
                 shape = if (isRounded) ButtonDefaults.elevatedShape else RoundedCornerShape(8.dp),
-                colors = ButtonDefaults.elevatedButtonColors().copy(
+                colors = colors ?: ButtonDefaults.elevatedButtonColors().copy(
                     contentColor = defaultColor,
                     disabledContentColor = disabledColor
                 )
@@ -73,7 +75,7 @@ fun WMButton(
                 contentPadding = PaddingValues(horizontal = 12.dp),
                 modifier = modifier.height(buttonSize.buttonHeight),
                 shape = if (isRounded) ButtonDefaults.shape else RoundedCornerShape(8.dp),
-                colors = ButtonDefaults.buttonColors().copy(
+                colors = colors ?: ButtonDefaults.buttonColors().copy(
                     contentColor = ColorGray.White,
                     disabledContentColor = disabledColor
                 )
@@ -92,7 +94,7 @@ fun WMButton(
                 contentPadding = PaddingValues(horizontal = 12.dp),
                 modifier = modifier.height(buttonSize.buttonHeight),
                 shape = if (isRounded) ButtonDefaults.filledTonalShape else RoundedCornerShape(8.dp),
-                colors = ButtonDefaults.filledTonalButtonColors().copy(
+                colors = colors ?: ButtonDefaults.filledTonalButtonColors().copy(
                     contentColor = defaultColor,
                     disabledContentColor = disabledColor
                 )
@@ -111,7 +113,7 @@ fun WMButton(
                 contentPadding = PaddingValues(horizontal = 12.dp),
                 modifier = modifier.height(buttonSize.buttonHeight),
                 shape = if (isRounded) ButtonDefaults.outlinedShape else RoundedCornerShape(8.dp),
-                colors = ButtonDefaults.outlinedButtonColors().copy(
+                colors = colors ?: ButtonDefaults.outlinedButtonColors().copy(
                     contentColor = defaultColor,
                     disabledContentColor = disabledColor
                 )
@@ -129,7 +131,7 @@ fun WMButton(
                 enabled = enabled,
                 contentPadding = PaddingValues(horizontal = 12.dp),
                 modifier = modifier.height(buttonSize.buttonHeight),
-                colors = ButtonDefaults.textButtonColors().copy(
+                colors = colors ?: ButtonDefaults.textButtonColors().copy(
                     contentColor = defaultColor,
                     disabledContentColor = disabledColor
                 )

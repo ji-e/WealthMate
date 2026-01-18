@@ -29,6 +29,7 @@ import com.jie.wealthmate.feature.menu.categorySetting.component.LargeCategoryEn
 import com.jie.wealthmate.theme.ColorGray
 import com.jie.wealthmate.theme.WMTheme
 import com.jie.wealthmate.vo.CategoryTagVo
+import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import wealthmate.composeapp.generated.resources.Res
@@ -39,10 +40,11 @@ fun CategoryTag(
     modifier: Modifier = Modifier,
     largeCategory: LargeCategoryEnum,
     tagLabel: TextFieldValue,
+    trailingIcon: DrawableResource = Res.drawable.ic_close_circle,
     tagLabelItems: List<CategoryTagVo> = emptyList(),
     onValueChange: (TextFieldValue) -> Unit,
     onChipAdd: (TextFieldValue?) -> Unit = {},
-    onChipRemove: (CategoryTagVo) -> Unit = {},
+    onChipClick: (CategoryTagVo) -> Unit = {},
 ) {
     Column(
         modifier = modifier,
@@ -73,8 +75,9 @@ fun CategoryTag(
             modifier = Modifier
                 .padding(top = 12.dp)
                 .padding(horizontal = 20.dp),
+            trailingIcon = trailingIcon,
             chipItems = tagLabelItems,
-            onChipRemove = onChipRemove
+            onChipClick = onChipClick
         )
     }
 }
@@ -82,8 +85,9 @@ fun CategoryTag(
 @Composable
 fun CategoryTagItem(
     modifier: Modifier = Modifier,
+    trailingIcon: DrawableResource,
     chipItems: List<CategoryTagVo>,
-    onChipRemove: (CategoryTagVo) -> Unit,
+    onChipClick: (CategoryTagVo) -> Unit,
 ) {
     FlowRow(
         modifier = modifier.fillMaxWidth(),
@@ -95,7 +99,7 @@ fun CategoryTagItem(
                 modifier = Modifier
                     .clip(CircleShape)
                     .background(color = ColorGray.Gray_100)
-                    .clickable { onChipRemove(item) }
+                    .clickable { onChipClick(item) }
                     .padding(horizontal = 8.dp, vertical = 4.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(4.dp)
@@ -107,7 +111,7 @@ fun CategoryTagItem(
 
                 // 삭제 아이콘
                 Icon(
-                    painter = painterResource(Res.drawable.ic_close_circle),
+                    painter = painterResource(trailingIcon),
                     contentDescription = item.label,
                     tint = ColorGray.Gray_300,
                     modifier = Modifier.size(16.dp)
