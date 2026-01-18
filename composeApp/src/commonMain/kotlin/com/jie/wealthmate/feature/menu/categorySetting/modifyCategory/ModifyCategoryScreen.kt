@@ -169,16 +169,16 @@ class ModifyCategoryScreen(
                 onCheckedChange = screenModel::updateIsFixed,
             )
 
-            // 저장 버튼
+            // 수정 버튼
             WMButton(
-                text = "저장",
+                text = "수정",
                 buttonSize = ButtonSize.LARGE,
                 modifier = Modifier
                     .padding(horizontal = 20.dp)
                     .padding(bottom = 20.dp)
                     .fillMaxWidth(),
                 enabled = uiState.isChangedData,
-                onClick = { }
+                onClick = screenModel::saveCategory
             )
 
             if (isShowCategoryTagLabelModalBottomSheet) {

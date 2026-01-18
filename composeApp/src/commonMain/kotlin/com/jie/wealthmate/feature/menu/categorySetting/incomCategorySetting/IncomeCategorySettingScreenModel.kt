@@ -37,7 +37,7 @@ class IncomeCategorySettingScreenModel(
                             icon = it.icon,
                             label = it.middleLabel,
                             sort = it.sort,
-                            isFixed = it.fixed,
+                            isFixed = it.isFixed,
                             largeCategory = LargeCategoryEnum.creator(it.largeCategory)
                         )
                     }
