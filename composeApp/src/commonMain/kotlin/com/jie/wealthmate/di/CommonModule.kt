@@ -24,6 +24,6 @@ val commonModule = module {
     factory { CalendarScreenModel(get()) }
     factory { AssetScreenModel(get()) }
     factory { MenuScreenModel(get()) }
-    factory { AddCategoryScreenModel(get(), get()) }
+    factory { AddCategoryScreenModel(get()) }
     factory { IncomeCategorySettingScreenModel(get(), get()) }
 }
