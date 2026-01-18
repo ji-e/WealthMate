@@ -26,7 +26,7 @@ class HomeScreen() : Screen {
 
         LaunchedEffect(navigator.lastItem) {
             if (navigator.lastItem is HomeScreen) {
-                screenModel.mainScreenModel.updateTopBar()
+                screenModel.updateTopBar()
             }
         }
 

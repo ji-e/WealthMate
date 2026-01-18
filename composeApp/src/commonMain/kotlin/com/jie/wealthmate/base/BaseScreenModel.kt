@@ -7,7 +7,6 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 /**
@@ -137,11 +136,11 @@ abstract class BaseScreenModel<S : UiState> : ScreenModel, ContainerHost<S> {
      * 예외 처리와 로딩 상태 관리를 포함하는 공통 코루틴 실행 함수입니다.
      *
      * @param T 실행할 비즈니스 로직의 반환 타입
+     * @param block 실행할 메인 비즈니스 로직
      * @param showLoading 로딩 인디케이터 표시 여부
      * @param errorMsg 에러 발생 시 표시할 기본 메시지
      * @param onError 에러 발생 시 추가로 실행할 작업
      * @param onSuccess 성공 시 실행할 작업 (block의 결과값을 인자로 받음)
-     * @param block 실행할 메인 비즈니스 로직
      */
     protected fun <T> launchSafe(
         block: suspend () -> T,
@@ -152,7 +151,6 @@ abstract class BaseScreenModel<S : UiState> : ScreenModel, ContainerHost<S> {
     ) = event {
         screenScope.launch {
             hideKeyboard()
-            delay(timeMillis = 100)
 
             if (showLoading) {
                 postSideEffect { 

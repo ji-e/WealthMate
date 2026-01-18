@@ -25,7 +25,7 @@ class CalendarScreen() : Screen {
 
         LaunchedEffect(navigator.lastItem) {
             if (navigator.lastItem is CalendarScreen) {
-                screenModel.mainScreenModel.updateTopBar(
+                screenModel.updateTopBar(
                     title = TopBarItem.Title("캘린더")
                 )
             }

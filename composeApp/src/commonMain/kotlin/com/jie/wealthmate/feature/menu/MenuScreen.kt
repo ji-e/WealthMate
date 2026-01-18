@@ -45,7 +45,7 @@ class MenuScreen() : Screen {
 
         LaunchedEffect(navigator.lastItem) {
             if (navigator.lastItem is MenuScreen) {
-                screenModel.mainScreenModel.updateTopBar(
+                screenModel.updateTopBar(
                     title = TopBarItem.Title("전체 메뉴")
                 )
             }

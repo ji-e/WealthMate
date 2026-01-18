@@ -28,7 +28,7 @@ class AssetScreen() : Screen {
 
         LaunchedEffect(navigator.lastItem) {
             if (navigator.lastItem is AssetScreen) {
-                screenModel.mainScreenModel.updateTopBar(
+                screenModel.updateTopBar(
                     title = TopBarItem.Title("자산")
                 )
             }

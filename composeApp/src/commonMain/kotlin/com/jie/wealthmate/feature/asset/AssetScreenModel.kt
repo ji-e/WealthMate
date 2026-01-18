@@ -1,15 +1,13 @@
 package com.jie.wealthmate.feature.asset
 
-import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
-import com.jie.wealthmate.MainScreenModel
+import com.jie.wealthmate.base.BaseScreenModel
+import com.jie.wealthmate.base.BaseUiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class AssetScreenModel(
-    val mainScreenModel: MainScreenModel
-) : ScreenModel {
+class AssetScreenModel() : BaseScreenModel<BaseUiState>() {
     private val _counter = MutableStateFlow(0)
     val counter = _counter.asStateFlow()
 
@@ -18,4 +16,7 @@ class AssetScreenModel(
             _counter.value++
         }
     }
+
+    override val initialState: BaseUiState
+        get() = TODO("Not yet implemented")
 }
