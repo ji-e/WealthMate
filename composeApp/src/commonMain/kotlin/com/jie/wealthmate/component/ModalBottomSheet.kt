@@ -16,7 +16,7 @@ import wealthmate.composeapp.generated.resources.ic_horizontal_rule
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun WMTextModalBottomSheet(
+fun WMModalBottomSheet(
     modifier: Modifier = Modifier,
     onDismissRequest: () -> Unit,
     content: @Composable ColumnScope.() -> Unit,

@@ -29,7 +29,7 @@ import com.jie.wealthmate.component.ButtonSize
 import com.jie.wealthmate.component.WMButton
 import com.jie.wealthmate.component.WMCheckBox
 import com.jie.wealthmate.component.WMTextField
-import com.jie.wealthmate.component.WMTextModalBottomSheet
+import com.jie.wealthmate.component.WMModalBottomSheet
 import com.jie.wealthmate.component.topbar.TopBarItem
 import com.jie.wealthmate.feature.menu.categorySetting.addCategory.component.CategoryIcon
 import com.jie.wealthmate.feature.menu.categorySetting.addCategory.component.CategoryIconGrid
@@ -160,7 +160,7 @@ class AddCategoryScreen(
 
             // 아이콘 변경 ModalBottomSheet
             if (isShowCategoryIconModalBottomSheet) {
-                WMTextModalBottomSheet(
+                WMModalBottomSheet(
                     onDismissRequest = { isShowCategoryIconModalBottomSheet = false },
                 ) {
                     CategoryIconGrid(
