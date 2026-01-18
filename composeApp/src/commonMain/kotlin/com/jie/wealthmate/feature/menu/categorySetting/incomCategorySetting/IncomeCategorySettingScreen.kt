@@ -65,13 +65,23 @@ class IncomeCategorySettingScreen(
             onMove = { from, to -> screenModel.handleReorderImageItems(from.index, to.index) }
         )
 
-
-        BackHandler(true) {
-            navigator.pop()
+        fun onBack() {
+            if (isDragging) {
+                showSaveBackDialog(isDragging) {
+                    isDragging = false
+                }
+            } else {
+                navigator.pop()
+            }
         }
 
-        LaunchedEffect(navigator.lastItem, uiState.incomeCategoryItems) {
-            if (navigator.lastItem is IncomeCategorySettingScreen) {
+
+        BackHandler(true) {
+            onBack()
+        }
+
+        LaunchedEffect(navigator.lastItem, uiState.incomeCategoryItems, isDragging) {
+            if (navigator.lastItem is IncomeCategorySettingScreen && isDragging.not()) {
                 screenModel.mainScreenModel.updateTopBar(
                     title = TopBarItem.Title(menuEnum.title),
                     readingItem = TopBarItem.ReadingItem().copy(
@@ -92,6 +102,15 @@ class IncomeCategorySettingScreen(
                     )
                 )
             }
+        }
+
+        if (isDragging) {
+            screenModel.mainScreenModel.updateTopBar(
+                title = TopBarItem.Title(menuEnum.label + " 순서 변경"),
+                readingItem = TopBarItem.ReadingItem().copy(
+                    action = { onBack() }
+                )
+            )
         }
 
         Column {
