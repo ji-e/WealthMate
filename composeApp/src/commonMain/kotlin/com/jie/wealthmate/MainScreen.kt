@@ -20,12 +20,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.transitions.SlideTransition
 import com.jie.wealthmate.base.BaseUiSideEffect
-import com.jie.wealthmate.base.collectSideEffect
 import com.jie.wealthmate.component.bottomNav.BottomNavItem
 import com.jie.wealthmate.component.bottomNav.BottomNavigation
 import com.jie.wealthmate.component.calculateAdjustedToastPadding
@@ -36,26 +36,31 @@ import com.jie.wealthmate.feature.calendar.CalendarScreen
 import com.jie.wealthmate.feature.home.HomeScreen
 import com.jie.wealthmate.feature.menu.MenuScreen
 import com.jie.wealthmate.theme.ColorGray
-import org.koin.compose.koinInject
 
 open class MainScreen : Screen {
 
     @Composable
     override fun Content() {
-        val mainScreenModel: MainScreenModel = koinInject()
-        val uiState = mainScreenModel.container.uiState.collectAsState().value
+        val uiState by MainUiManager.uiState.collectAsState()
 
         var isBottomNaviVisible by remember { mutableStateOf(true) }
         var selectedItem by remember { mutableStateOf(BottomNavItem.Home.route) }
         val snackbarHostState = remember { SnackbarHostState() }
+        val focusManager = LocalFocusManager.current
 
-        mainScreenModel.collectSideEffect { sideEffect ->
-            when (sideEffect) {
-                is BaseUiSideEffect.ShowSnackbar -> {
-                    snackbarHostState.showSnackbar(sideEffect.message)
+        LaunchedEffect(Unit) {
+            MainUiManager.sideEffect.collect { sideEffect ->
+                when (sideEffect) {
+                    is BaseUiSideEffect.ShowSnackbar -> {
+                        snackbarHostState.showSnackbar(sideEffect.message)
+                    }
+                    is BaseUiSideEffect.HideKeyboard -> {
+                        focusManager.clearFocus(true)
+                    }
                 }
             }
         }
+
 
         Scaffold(
             topBar = {
