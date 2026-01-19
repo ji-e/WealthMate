@@ -95,6 +95,7 @@ fun WMTextField(
     onValueChange: (TextFieldValue) -> Unit,
     modifier: Modifier = Modifier,
     maxLength: Int = Int.MAX_VALUE,
+    maxLines: Int = 1,
     readOnly: Boolean = false,
     enabled: Boolean = true,
     label: String? = null,
@@ -138,6 +139,7 @@ fun WMTextField(
             enabled = enabled,
             readOnly = readOnly,
             isError = isError,
+            maxLines = maxLines,
             label = label?.let {
                 {
                     Row(
