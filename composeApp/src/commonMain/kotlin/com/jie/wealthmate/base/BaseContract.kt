@@ -1,5 +1,6 @@
 package com.jie.wealthmate.base
 
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 
@@ -55,13 +56,22 @@ sealed class BaseUiSideEffect : UiSideEffect {
     @Immutable
     data class ShowSnackbarWithAction(
         val message: String,
-        val actionText: String,
-        val action: () -> Unit,
+        val actionLabel: String,
+        val onAction: () -> Unit,
     ) : UiSideEffect
 
     @Immutable
     data object HideKeyboard : UiSideEffect
 
+    @Immutable
+    data class ShowBottomSheet(
+        val title: String? = null,
+        val onDismissRequest: () -> Unit,
+        val content: @Composable () -> Unit
+    ): UiSideEffect
+
+    @Immutable
+    data object HideBottomSheet : UiSideEffect
 }
 
 /**
