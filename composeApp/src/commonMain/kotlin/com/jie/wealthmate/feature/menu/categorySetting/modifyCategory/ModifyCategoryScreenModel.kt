@@ -78,20 +78,38 @@ class ModifyCategoryScreenModel(
 
     fun modifyCategoryTagLabel() {
         reduceState { state ->
-            state.copy(
-                modifyTagLabel = null,
-                tagLabelItems = state.tagLabelItems.toMutableList()
-                    .apply {
-                        val modifyTagLabel = state.modifyTagLabel
-                        if (modifyTagLabel != null) {
-                            val index = indexOf(find { it.id == modifyTagLabel.id })
-                            set(index, modifyTagLabel)
-                        }
-                    },
-                isChangedData = true
-            )
-        }
+            val modifyTagLabelText = state.modifyTagLabel?.label.default()
 
+            if (modifyTagLabelText.isBlank()) {
+                showSnackbar("상세 태그 이름을 입력해 주세요.")
+                return@reduceState state
+            }
+
+            val categoryTag = CategoryTagVo(label = modifyTagLabelText)
+            val isExisted = state.tagLabelItems.any { it.label == categoryTag.label }
+
+            if (isExisted) {
+                showSnackbar("이미 존재하는 태그 입니다.")
+                state
+            } else {
+                postSideEffect {
+                    ModifyCategoryUiSideEffect.OnSuccessModifyTagLabel
+                }
+
+                state.copy(
+                    modifyTagLabel = null,
+                    tagLabelItems = state.tagLabelItems.toMutableList()
+                        .apply {
+                            val modifyTagLabel = state.modifyTagLabel
+                            if (modifyTagLabel != null) {
+                                val index = indexOf(find { it.id == modifyTagLabel.id })
+                                set(index, modifyTagLabel)
+                            }
+                        },
+                    isChangedData = true
+                )
+            }
+        }
     }
 
     fun addCategoryTagLabel(tagLabel: TextFieldValue?) {

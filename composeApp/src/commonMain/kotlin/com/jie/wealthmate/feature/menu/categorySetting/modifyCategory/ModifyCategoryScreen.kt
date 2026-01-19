@@ -62,6 +62,9 @@ class ModifyCategoryScreen(
         val screenModel: ModifyCategoryScreenModel = koinInject()
         val uiState = screenModel.container.uiState.collectAsState().value
 
+        var isShowCategoryIconModalBottomSheet by remember { mutableStateOf(false) }
+        var isShowCategoryTagLabelModalBottomSheet by remember { mutableStateOf(false) }
+
         fun onBack() {
             showSaveBackDialog(uiState.isChangedData) {
                 navigator.pop()
@@ -74,6 +77,10 @@ class ModifyCategoryScreen(
             when (sideEffect) {
                 is ModifyCategoryUiSideEffect.OnSuccess -> {
                     navigator.pop()
+                }
+
+                is ModifyCategoryUiSideEffect.OnSuccessModifyTagLabel -> {
+                    isShowCategoryTagLabelModalBottomSheet = false
                 }
             }
         }
@@ -108,9 +115,6 @@ class ModifyCategoryScreen(
         }
 
         Column(modifier = Modifier.fillMaxSize()) {
-            var isShowCategoryIconModalBottomSheet by remember { mutableStateOf(false) }
-            var isShowCategoryTagLabelModalBottomSheet by remember { mutableStateOf(false) }
-
             Column(
                 modifier = Modifier
                     .weight(1f)
@@ -256,10 +260,7 @@ class ModifyCategoryScreen(
                         buttonStyle = ButtonStyle.FILLED,
                         buttonSize = ButtonSize.LARGE,
                         modifier = Modifier.weight(4f),
-                        onClick = {
-                            onModifyClick()
-                            onDismissRequest()
-                        }
+                        onClick = { onModifyClick() }
                     )
                 }
             }
