@@ -39,7 +39,7 @@ import com.jie.wealthmate.component.CategoryIconEnum
 import com.jie.wealthmate.component.WMButton
 import com.jie.wealthmate.component.WMCheckBox
 import com.jie.wealthmate.component.WMModalBottomSheet
-import com.jie.wealthmate.component.WMTextField
+import com.jie.wealthmate.component.textField.WMTextField
 import com.jie.wealthmate.component.topbar.TopBarItem
 import com.jie.wealthmate.feature.menu.categorySetting.addCategory.component.CategoryIcon
 import com.jie.wealthmate.feature.menu.categorySetting.addCategory.component.CategoryIconGrid

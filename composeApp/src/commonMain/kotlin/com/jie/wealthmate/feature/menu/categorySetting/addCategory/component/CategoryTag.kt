@@ -24,7 +24,7 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.jie.wealthmate.component.WMText
-import com.jie.wealthmate.component.WMTextField
+import com.jie.wealthmate.component.textField.WMTextField
 import com.jie.wealthmate.feature.menu.categorySetting.component.LargeCategoryEnum
 import com.jie.wealthmate.theme.ColorGray
 import com.jie.wealthmate.theme.ColorPrimary

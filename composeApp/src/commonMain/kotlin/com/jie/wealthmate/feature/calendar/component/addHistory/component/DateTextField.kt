@@ -9,12 +9,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.jie.wealthmate.component.ButtonSize
 import com.jie.wealthmate.component.ButtonStyle
 import com.jie.wealthmate.component.WMButton
-import com.jie.wealthmate.component.WMTextField
+import com.jie.wealthmate.component.textField.WMTextField
 import com.jie.wealthmate.feature.calendar.component.addHistory.component.RepeatCycleEnum.Companion.formattedDescription
 import com.jie.wealthmate.feature.menu.categorySetting.component.LargeCategoryEnum
 import com.jie.wealthmate.theme.WMTheme
@@ -50,26 +51,8 @@ fun DateTextField(
                 installmentCount != null -> "할부 $installmentCount 개월"
                 else -> ""
             },
-            supportingContent = {
-                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                    WMButton(
-                        text = "반복",
-                        onClick = onRepeatClick,
-                        buttonSize = ButtonSize.X_SMALL,
-                        buttonStyle = if (repeatCycle != null) ButtonStyle.FILLED else ButtonStyle.OUTLINED,
-                    )
-
-                    if (isSelectedLargeCategoryEnum == LargeCategoryEnum.EXPENSES) {
-                        WMButton(
-                            text = "할부",
-                            onClick = onInstallmentClick,
-                            buttonSize = ButtonSize.X_SMALL,
-                            buttonStyle = if (installmentCount != null) ButtonStyle.FILLED else ButtonStyle.OUTLINED,
-                        )
-                    }
-                }
-            }
         )
+
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -77,7 +60,31 @@ fun DateTextField(
                 .padding(horizontal = 20.dp)
                 .padding(top = 48.dp)
                 .clickable { onDateClick() }
-        )
+        ) {
+            Row(
+                modifier = Modifier
+                    .padding(top = 6.dp)
+                    .align(Alignment.CenterEnd),
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                WMButton(
+                    text = "반복",
+                    onClick = onRepeatClick,
+                    buttonSize = ButtonSize.X_SMALL,
+                    buttonStyle = if (repeatCycle != null) ButtonStyle.FILLED else ButtonStyle.OUTLINED,
+                )
+
+                if (isSelectedLargeCategoryEnum == LargeCategoryEnum.EXPENSES) {
+                    WMButton(
+                        text = "할부",
+                        onClick = onInstallmentClick,
+                        buttonSize = ButtonSize.X_SMALL,
+                        buttonStyle = if (installmentCount != null) ButtonStyle.FILLED else ButtonStyle.OUTLINED,
+                    )
+                }
+            }
+        }
     }
 }
 
