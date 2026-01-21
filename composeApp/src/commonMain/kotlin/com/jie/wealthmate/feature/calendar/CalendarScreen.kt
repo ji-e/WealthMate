@@ -39,6 +39,7 @@ import com.jie.wealthmate.component.WMModalBottomSheet
 import com.jie.wealthmate.component.WMText
 import com.jie.wealthmate.component.calculateAdjustedToastPadding
 import com.jie.wealthmate.component.topbar.TopBarItem
+import com.jie.wealthmate.feature.calendar.component.addHistory.AddHistoryScreen
 import com.jie.wealthmate.feature.calendar.component.monthCalendar.MonthCalendar
 import com.jie.wealthmate.theme.ColorGray
 import com.jie.wealthmate.theme.ColorPrimary
@@ -129,7 +130,7 @@ class CalendarScreen() : Screen {
                     .background(ColorPrimary.Primary_500)
                     .align(Alignment.BottomEnd),
                 tint = ColorGray.White,
-                onClick = {}
+                onClick = { navigator.push(AddHistoryScreen()) }
             )
 
             if (isShowSelectedCalendarModalBottomSheet) {
