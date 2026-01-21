@@ -11,6 +11,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -85,41 +86,39 @@ class CategorySettingScreen(
             onBack()
         }
 
-        LaunchedEffect(navigator.lastItem, uiState.isInitialized, isDragging) {
-            if (navigator.lastItem is CategorySettingScreen && uiState.isInitialized && isDragging.not()) {
-                val isAddItemEnabled = uiState.incomeCategoryItems.size < 10
-                screenModel.updateTopBar(
-                    title = TopBarItem.Title(menuEnum.title),
-                    readingItem = TopBarItem.ReadingItem().copy(
-                        action = { navigator.pop() }
-                    ),
-                    trailingItem = listOf(
-                        TopBarItem.TrailingItem(
-                            iconRes = Res.drawable.ic_add,
-                            tint = if (isAddItemEnabled) ColorGray.Gray_700 else ColorGray.Gray_100,
-                            action = {
-                                if (isAddItemEnabled.not()) return@TrailingItem
-                                navigator.push(
-                                    AddCategoryScreen(
-                                        largeCategory = largeCategoryEnum,
-                                        categoryItems = uiState.incomeCategoryItems
-                                    )
-                                )
-                            }
+        if (navigator.lastItem is CategorySettingScreen) {
+            SideEffect {
+                if (isDragging) {
+                    screenModel.updateTopBar(
+                        title = TopBarItem.Title("${menuEnum.label} 순서 변경"),
+                        readingItem = TopBarItem.ReadingItem().copy(
+                            action = { onBack() }
                         )
                     )
-                )
-            }
-        }
-
-        LaunchedEffect(isDragging) {
-            if (isDragging) {
-                screenModel.updateTopBar(
-                    title = TopBarItem.Title(menuEnum.label + " 순서 변경"),
-                    readingItem = TopBarItem.ReadingItem().copy(
-                        action = { onBack() }
+                } else if (uiState.isInitialized) {
+                    val isAddItemEnabled = uiState.incomeCategoryItems.size < 10
+                    screenModel.updateTopBar(
+                        title = TopBarItem.Title(menuEnum.title),
+                        readingItem = TopBarItem.ReadingItem().copy(
+                            action = { navigator.pop() }
+                        ),
+                        trailingItem = listOf(
+                            TopBarItem.TrailingItem(
+                                iconRes = Res.drawable.ic_add,
+                                tint = if (isAddItemEnabled) ColorGray.Gray_700 else ColorGray.Gray_100,
+                                action = {
+                                    if (isAddItemEnabled.not()) return@TrailingItem
+                                    navigator.push(
+                                        AddCategoryScreen(
+                                            largeCategory = largeCategoryEnum,
+                                            categoryItems = uiState.incomeCategoryItems
+                                        )
+                                    )
+                                }
+                            )
+                        )
                     )
-                )
+                }
             }
         }
 

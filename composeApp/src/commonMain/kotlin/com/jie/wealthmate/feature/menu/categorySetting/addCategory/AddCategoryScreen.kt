@@ -11,6 +11,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -28,8 +29,8 @@ import com.jie.wealthmate.base.collectSideEffect
 import com.jie.wealthmate.component.ButtonSize
 import com.jie.wealthmate.component.WMButton
 import com.jie.wealthmate.component.WMCheckBox
-import com.jie.wealthmate.component.WMTextField
 import com.jie.wealthmate.component.WMModalBottomSheet
+import com.jie.wealthmate.component.WMTextField
 import com.jie.wealthmate.component.topbar.TopBarItem
 import com.jie.wealthmate.feature.menu.categorySetting.addCategory.component.CategoryIcon
 import com.jie.wealthmate.feature.menu.categorySetting.addCategory.component.CategoryIconGrid
@@ -61,28 +62,30 @@ class AddCategoryScreen(
 
         BackHandler(true) { onBack() }
 
-        screenModel.collectSideEffect { sideEffect ->
-            when (sideEffect) {
-                is AddCategoryUiSideEffect.OnSuccessSave -> {
-                    navigator.pop()
-                }
-            }
-        }
-
-        LaunchedEffect(navigator.lastItem, uiState.label.text) {
-            if (navigator.lastItem is AddCategoryScreen) {
+        if (navigator.lastItem is AddCategoryScreen) {
+            SideEffect {
                 screenModel.updateTopBar(
                     title = TopBarItem.Title("${largeCategory.label} 카테고리 추가"),
                     readingItem = TopBarItem.ReadingItem().copy(
                         action = { onBack() }
                     ),
                 )
-
                 println(categoryItems)
-                screenModel.updateInit(
-                    categoryItems = categoryItems,
-                    largeCategoryEnum = largeCategory
-                )
+            }
+        }
+
+        LaunchedEffect(Unit) {
+            screenModel.updateInit(
+                categoryItems = categoryItems,
+                largeCategoryEnum = largeCategory
+            )
+        }
+
+        screenModel.collectSideEffect { sideEffect ->
+            when (sideEffect) {
+                is AddCategoryUiSideEffect.OnSuccessSave -> {
+                    navigator.pop()
+                }
             }
         }
 

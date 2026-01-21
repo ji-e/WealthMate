@@ -110,13 +110,13 @@ open class MainScreen : Screen {
                         .fillMaxSize()
                         .padding(
                             top = 64.dp,
-                            bottom = if (isBottomNaviVisible) innerPadding.calculateBottomPadding() else 4.dp
+//                            bottom = if (isBottomNaviVisible) innerPadding.calculateBottomPadding() else 4.dp
                         ),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     when (selectedItem) {
                         BottomNavItem.Home.route -> {
-                            Navigator(HomeScreen()) { navigator ->
+                            Navigator(HomeScreen(innerPadding.calculateBottomPadding())) { navigator ->
                                 SlideTransition(navigator)
                                 LaunchedEffect(navigator.lastItem) {
                                     isBottomNaviVisible = (navigator.lastItem is HomeScreen)
@@ -125,7 +125,7 @@ open class MainScreen : Screen {
                         }
 
                         BottomNavItem.Calendar.route -> {
-                            Navigator(CalendarScreen()) { navigator ->
+                            Navigator(CalendarScreen(innerPadding.calculateBottomPadding())) { navigator ->
                                 SlideTransition(navigator)
                                 LaunchedEffect(navigator.lastItem) {
                                     isBottomNaviVisible = (navigator.lastItem is CalendarScreen)
@@ -134,7 +134,7 @@ open class MainScreen : Screen {
                         }
 
                         BottomNavItem.Asset.route -> {
-                            Navigator(AssetScreen()) { navigator ->
+                            Navigator(AssetScreen(innerPadding.calculateBottomPadding())) { navigator ->
                                 SlideTransition(navigator)
                                 LaunchedEffect(navigator.lastItem) {
                                     isBottomNaviVisible = (navigator.lastItem is AssetScreen)
@@ -143,7 +143,7 @@ open class MainScreen : Screen {
                         }
 
                         BottomNavItem.Menu.route -> {
-                            Navigator(MenuScreen()) { navigator ->
+                            Navigator(MenuScreen(innerPadding.calculateBottomPadding())) { navigator ->
                                 SlideTransition(navigator)
                                 LaunchedEffect(navigator.lastItem) {
                                     isBottomNaviVisible = (navigator.lastItem is MenuScreen)

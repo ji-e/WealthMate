@@ -14,6 +14,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -80,20 +81,8 @@ class ModifyCategoryScreen(
 
         BackHandler(true) { onBack() }
 
-        screenModel.collectSideEffect { sideEffect ->
-            when (sideEffect) {
-                is ModifyCategoryUiSideEffect.OnSuccess -> {
-                    navigator.pop()
-                }
-
-                is ModifyCategoryUiSideEffect.OnSuccessModifyTagLabel -> {
-                    isShowCategoryTagLabelModalBottomSheet = false
-                }
-            }
-        }
-
-        LaunchedEffect(navigator.lastItem, uiState.isChangedData) {
-            if (navigator.lastItem is ModifyCategoryScreen) {
+        if (navigator.lastItem is ModifyCategoryScreen) {
+            SideEffect {
                 screenModel.updateTopBar(
                     title = TopBarItem.Title("${largeCategory.label} 카테고리 수정"),
                     readingItem = TopBarItem.ReadingItem().copy(
@@ -111,12 +100,24 @@ class ModifyCategoryScreen(
                         )
                     )
                 )
+            }
+        }
 
-                if (uiState.isChangedData.not()) {
-                    screenModel.updateInit(
-                        largeCategoryEnum = largeCategory,
-                        categoryId = categoryId
-                    )
+        LaunchedEffect(Unit) {
+            screenModel.updateInit(
+                largeCategoryEnum = largeCategory,
+                categoryId = categoryId
+            )
+        }
+
+        screenModel.collectSideEffect { sideEffect ->
+            when (sideEffect) {
+                is ModifyCategoryUiSideEffect.OnSuccess -> {
+                    navigator.pop()
+                }
+
+                is ModifyCategoryUiSideEffect.OnSuccessModifyTagLabel -> {
+                    isShowCategoryTagLabelModalBottomSheet = false
                 }
             }
         }
@@ -239,7 +240,7 @@ class ModifyCategoryScreen(
         val focusRequester = remember { FocusRequester() }
 
         LaunchedEffect(Unit) {
-            if(isKeyboardOpen) {
+            if (isKeyboardOpen) {
                 focusRequester.requestFocus()
             }
         }
