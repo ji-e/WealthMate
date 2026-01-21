@@ -38,6 +38,11 @@ import com.jie.wealthmate.theme.ColorRed
 import com.jie.wealthmate.theme.wantedSansFontFamily
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
+/**
+ * WMTextField
+ *
+ * 기본으로 horizontal padding 16.dp
+ */
 @Composable
 fun WMTextField(
     value: String,
@@ -45,6 +50,7 @@ fun WMTextField(
     modifier: Modifier = Modifier,
     textFieldModifier: Modifier = Modifier,
     maxLength: Int = Int.MAX_VALUE,
+    maxLines: Int = 1,
     readOnly: Boolean = false,
     enabled: Boolean = true,
     label: String? = null,
@@ -76,6 +82,7 @@ fun WMTextField(
             onValueChange(it.text)
         },
         maxLength = maxLength,
+        maxLines = maxLines,
         readOnly = readOnly,
         enabled = enabled,
         label = label,
