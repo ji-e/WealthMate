@@ -1,30 +1,51 @@
+@file:OptIn(InternalVoyagerApi::class)
+
 package com.jie.wealthmate.feature.calendar.component.addHistory
 
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
-import cafe.adriel.voyager.core.screen.Screen
+import androidx.compose.ui.Modifier
+import cafe.adriel.voyager.core.annotation.InternalVoyagerApi
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import cafe.adriel.voyager.navigator.internal.BackHandler
+import com.jie.wealthmate.base.BaseScreen
 import com.jie.wealthmate.component.topbar.TopBarItem
 import com.jie.wealthmate.theme.WMTheme
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.koinInject
 
-class AddHistoryScreen() : Screen {
+class AddHistoryScreen() : BaseScreen() {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val screenModel: AddHistoryScreenModel = koinInject()
         val uiState = screenModel.container.uiState.collectAsState().value
 
+
+        fun onBack() {
+            showSaveBackDialog(uiState.isChangedData) {
+                navigator.pop()
+            }
+        }
+
+        BackHandler(true) { onBack() }
+
         if (navigator.lastItem is AddHistoryScreen) {
             SideEffect {
                 screenModel.updateTopBar(
-                    title = TopBarItem.Title("내역 추가")
+                    title = TopBarItem.Title("내역 추가"),
+                    readingItem = TopBarItem.ReadingItem().copy(
+                        action = { onBack() }
+                    ),
                 )
             }
         }
+
+        Column(modifier = Modifier.fillMaxSize()) { }
     }
 }
 

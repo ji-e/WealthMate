@@ -4,7 +4,7 @@ import com.jie.wealthmate.base.BaseUiState
 import com.jie.wealthmate.base.UiSideEffect
 
 data class AddHistoryUiState(
-    val temp: String = "",
+    val isChangedData: Boolean = false
 ) : BaseUiState
 
 sealed class AddHistoryUiSideEffect : UiSideEffect {
