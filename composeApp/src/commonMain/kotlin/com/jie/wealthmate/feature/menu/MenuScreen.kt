@@ -12,7 +12,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.jie.wealthmate.base.collectSideEffect
 import com.jie.wealthmate.component.topbar.TopBarItem
-import com.jie.wealthmate.feature.menu.categorySetting.incomCategorySetting.IncomeCategorySettingScreen
+import com.jie.wealthmate.feature.menu.categorySetting.categorySetting.CategorySettingScreen
 import com.jie.wealthmate.feature.menu.component.MenuContentItem
 import com.jie.wealthmate.feature.menu.component.MenuEnum
 import com.jie.wealthmate.feature.menu.component.MenuTitleItem
@@ -32,12 +32,12 @@ class MenuScreen() : Screen {
                 is MenuUiSideEffect.OnCLickMenu -> {
                     when (effect.menu) {
                         MenuEnum.INCOME_CATEGORY -> navigator.push(
-                            IncomeCategorySettingScreen(
+                            CategorySettingScreen(
                                 effect.menu
                             )
                         )
 
-                        else -> navigator.push(IncomeCategorySettingScreen(effect.menu)) // todo temp
+                        else -> navigator.push(CategorySettingScreen(effect.menu)) // todo temp
                     }
                 }
             }

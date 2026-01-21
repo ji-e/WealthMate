@@ -1,4 +1,4 @@
-package com.jie.wealthmate.feature.menu.categorySetting.incomCategorySetting
+package com.jie.wealthmate.feature.menu.categorySetting.categorySetting
 
 import androidx.compose.ui.util.fastFilteredMap
 import com.jie.wealthmate.base.BaseScreenModel
@@ -6,12 +6,12 @@ import com.jie.wealthmate.feature.menu.categorySetting.component.CategoryItemDat
 import com.jie.wealthmate.feature.menu.categorySetting.component.LargeCategoryEnum
 import com.jie.wealthmate.repository.CategoryRepository
 
-class IncomeCategorySettingScreenModel(
+class CategorySettingScreenModel(
     private val categoryRepository: CategoryRepository,
-) : BaseScreenModel<IncomeCategorySettingUiState>() {
+) : BaseScreenModel<CategorySettingUiState>() {
 
-    override val initialState: IncomeCategorySettingUiState
-        get() = IncomeCategorySettingUiState()
+    override val initialState: CategorySettingUiState
+        get() = CategorySettingUiState()
 
     var largeCategoryEnum: LargeCategoryEnum = LargeCategoryEnum.INCOME
 
