@@ -23,6 +23,7 @@ import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
@@ -44,6 +45,7 @@ fun WMButton(
     colors: ButtonColors? = null,
     onClick: () -> Unit,
 ) {
+    val focusManager = LocalFocusManager.current
 
     val defaultColor = ColorGray.Gray_700
     val disabledColor = ColorGray.Gray_300
@@ -51,7 +53,10 @@ fun WMButton(
     when (buttonStyle) {
         ButtonStyle.ELEVATED -> {
             ElevatedButton(
-                onClick = onClick,
+                onClick = {
+                    focusManager.clearFocus()
+                    onClick()
+                },
                 enabled = enabled,
                 contentPadding = PaddingValues(horizontal = 12.dp),
                 modifier = modifier.height(buttonSize.buttonHeight),
@@ -70,7 +75,10 @@ fun WMButton(
 
         ButtonStyle.FILLED -> {
             Button(
-                onClick = onClick,
+                onClick = {
+                    focusManager.clearFocus()
+                    onClick()
+                },
                 enabled = enabled,
                 contentPadding = PaddingValues(horizontal = 12.dp),
                 modifier = modifier.height(buttonSize.buttonHeight),
@@ -89,7 +97,10 @@ fun WMButton(
 
         ButtonStyle.TONAL -> {
             FilledTonalButton(
-                onClick = onClick,
+                onClick = {
+                    focusManager.clearFocus()
+                    onClick()
+                },
                 enabled = enabled,
                 contentPadding = PaddingValues(horizontal = 12.dp),
                 modifier = modifier.height(buttonSize.buttonHeight),
@@ -108,7 +119,10 @@ fun WMButton(
 
         ButtonStyle.OUTLINED -> {
             OutlinedButton(
-                onClick = onClick,
+                onClick = {
+                    focusManager.clearFocus()
+                    onClick()
+                },
                 enabled = enabled,
                 contentPadding = PaddingValues(horizontal = 12.dp),
                 modifier = modifier.height(buttonSize.buttonHeight),
@@ -127,7 +141,10 @@ fun WMButton(
 
         ButtonStyle.TEXT -> {
             TextButton(
-                onClick = onClick,
+                onClick = {
+                    focusManager.clearFocus()
+                    onClick()
+                },
                 enabled = enabled,
                 contentPadding = PaddingValues(horizontal = 12.dp),
                 modifier = modifier.height(buttonSize.buttonHeight),
@@ -154,9 +171,13 @@ fun WMIconButton(
     tint: Color = LocalContentColor.current,
     onClick: () -> Unit,
 ) {
+    val focusManager = LocalFocusManager.current
 
     IconButton(
-        onClick = onClick,
+        onClick = {
+            focusManager.clearFocus()
+            onClick()
+        },
         enabled = enabled
     ) {
         Icon(
@@ -179,6 +200,8 @@ fun WMFloatingButton(
     isRounded: Boolean = false,
     onClick: () -> Unit,
 ) {
+    val focusManager = LocalFocusManager.current
+
     Column() {
         WMShadowDivider()
 
@@ -191,7 +214,10 @@ fun WMFloatingButton(
             buttonSize = buttonSize,
             enabled = enabled,
             isRounded = isRounded,
-            onClick = onClick,
+            onClick = {
+                focusManager.clearFocus()
+                onClick()
+            }
         )
     }
 }
