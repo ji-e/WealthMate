@@ -45,6 +45,7 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import com.jie.wealthmate.component.WMIconButton
 import com.jie.wealthmate.component.WMText
+import com.jie.wealthmate.feature.calendar.startDate
 import com.jie.wealthmate.theme.ColorGray
 import com.jie.wealthmate.utils.convertLocalDateToString
 import com.jie.wealthmate.utils.formatDateKorYM
@@ -62,16 +63,15 @@ import wealthmate.composeapp.generated.resources.ic_calendar_today
 import wealthmate.composeapp.generated.resources.ic_horizontal_rule
 import wealthmate.composeapp.generated.resources.ic_more_vert
 
-private val startDate = LocalDate(2025, 1, 1)
 
 /**
  * MonthCalendar Composable to display a month view calendar.
  * @param selectedMonth 선택된 월 (예: "2024-06")
  * @param selectedDate 선택된 날짜 (예: "2024-06-10")
  * @param onMonthChanged 월이 변경되었을 때 호출되는 콜백
- * @param onClickToday 오늘 날짜 클릭
- * @param onClickSelectedMonth 월 변경 클릭
- * @param onClickDate 선택하고 싶은 날짜 클릭
+ * @param onTodayClick 오늘 날짜 클릭
+ * @param onSelectedMonthClick 월 변경 클릭
+ * @param onDateClick 선택하고 싶은 날짜 클릭
  */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -80,9 +80,9 @@ fun MonthCalendar(
     selectedMonth: LocalDate,
     selectedDate: LocalDate,
     onMonthChanged: (LocalDate) -> Unit = {},
-    onClickToday: () -> Unit = {},
-    onClickSelectedMonth: () -> Unit = {},
-    onClickDate: (LocalDate) -> Unit = {},
+    onTodayClick: () -> Unit = {},
+    onSelectedMonthClick: () -> Unit = {},
+    onDateClick: (LocalDate) -> Unit = {},
     bottomContent: @Composable () -> Unit = {},
 ) {
     var displaySelectedMonth by remember {
@@ -126,10 +126,9 @@ fun MonthCalendar(
     ) {
         MonthCalendarHeader(
             today = today,
-            selectedMonth = selectedMonth,
             displaySelectedMonth = displaySelectedMonth,
-            onClickToday = onClickToday,
-            onClickSelectedMonth = onClickSelectedMonth,
+            onTodayClick = onTodayClick,
+            onSelectedMonthClick = onSelectedMonthClick,
         )
         WeekHeader()
 
@@ -204,7 +203,7 @@ fun MonthCalendar(
                             dayMaxHeight = dayMaxHeight,
                             expansionProgress = expansionProgress,
                             collapseProgress = collapseProgress,
-                            onClickDate = onClickDate
+                            onClickDate = onDateClick
                         )
                     }
 
@@ -221,7 +220,7 @@ fun MonthCalendar(
                                     color = ColorGray.Gray_100,
                                     offset = DpOffset(
                                         x = 0.dp,
-                                        y = (-6).dp
+                                        y = (-5).dp
                                     )
                                 )
                             )
@@ -259,10 +258,9 @@ fun MonthCalendar(
 @Composable
 private fun MonthCalendarHeader(
     today: LocalDate,
-    selectedMonth: LocalDate,
     displaySelectedMonth: String,
-    onClickToday: () -> Unit,
-    onClickSelectedMonth: () -> Unit,
+    onTodayClick: () -> Unit,
+    onSelectedMonthClick: () -> Unit,
 ) {
     Row(
         modifier = Modifier
@@ -272,7 +270,7 @@ private fun MonthCalendarHeader(
     ) {
         TextButton(
             contentPadding = PaddingValues(horizontal = 12.dp),
-            onClick = onClickSelectedMonth
+            onClick = onSelectedMonthClick
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically
@@ -296,7 +294,7 @@ private fun MonthCalendarHeader(
         Spacer(modifier = Modifier.weight(1f))
 
         IconButton(
-            onClick = onClickToday
+            onClick = onTodayClick
         ) {
             Box(
                 contentAlignment = Alignment.Center
