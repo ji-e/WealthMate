@@ -38,8 +38,7 @@ fun WMModalBottomSheet(
             focusManager.clearFocus()
             onDismissRequest()
         },
-        dragHandle = {
-            ->
+        dragHandle = { ->
             Icon(
                 painter = painterResource(Res.drawable.ic_horizontal_rule),
                 contentDescription = null,
