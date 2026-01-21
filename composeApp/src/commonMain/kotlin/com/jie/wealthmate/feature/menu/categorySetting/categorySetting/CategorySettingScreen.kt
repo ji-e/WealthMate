@@ -1,6 +1,6 @@
 @file:OptIn(InternalVoyagerApi::class)
 
-package com.jie.wealthmate.feature.menu.categorySetting.incomCategorySetting
+package com.jie.wealthmate.feature.menu.categorySetting.categorySetting
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -50,17 +50,17 @@ import org.koin.compose.koinInject
 import wealthmate.composeapp.generated.resources.Res
 import wealthmate.composeapp.generated.resources.ic_add
 
-class IncomeCategorySettingScreen(
+class CategorySettingScreen(
     val menuEnum: MenuEnum,
 ) : BaseScreen() {
-
+    private val largeCategoryEnum = LargeCategoryEnum.creatorFromMenu(menuEnum.label)
 
     @Composable
     override fun Content() {
         super.Content()
 
         val navigator = LocalNavigator.currentOrThrow
-        val screenModel: IncomeCategorySettingScreenModel = koinInject()
+        val screenModel: CategorySettingScreenModel = koinInject()
         val uiState = screenModel.container.uiState.collectAsState().value
 
         var isDragging by remember { mutableStateOf(false) }
@@ -86,7 +86,7 @@ class IncomeCategorySettingScreen(
         }
 
         LaunchedEffect(navigator.lastItem, uiState.isInitialized, isDragging) {
-            if (navigator.lastItem is IncomeCategorySettingScreen && uiState.isInitialized && isDragging.not()) {
+            if (navigator.lastItem is CategorySettingScreen && uiState.isInitialized && isDragging.not()) {
                 val isAddItemEnabled = uiState.incomeCategoryItems.size < 10
                 screenModel.updateTopBar(
                     title = TopBarItem.Title(menuEnum.title),
@@ -101,7 +101,7 @@ class IncomeCategorySettingScreen(
                                 if (isAddItemEnabled.not()) return@TrailingItem
                                 navigator.push(
                                     AddCategoryScreen(
-                                        largeCategory = LargeCategoryEnum.INCOME,
+                                        largeCategory = largeCategoryEnum,
                                         categoryItems = uiState.incomeCategoryItems
                                     )
                                 )
@@ -121,6 +121,10 @@ class IncomeCategorySettingScreen(
                     )
                 )
             }
+        }
+
+        LaunchedEffect(Unit) {
+            screenModel.updateInit(largeCategoryEnum)
         }
 
         Column {
@@ -211,7 +215,7 @@ class IncomeCategorySettingScreen(
     fun goToModifyCategory(navigator: Navigator, categoryId: Long) {
         navigator.push(
             ModifyCategoryScreen(
-                largeCategory = LargeCategoryEnum.INCOME,
+                largeCategory = largeCategoryEnum,
                 categoryId = categoryId
             )
         )
@@ -221,7 +225,7 @@ class IncomeCategorySettingScreen(
     @Preview(showBackground = true)
     private fun IncomeCategorySettingScreenPreview() {
         WMTheme {
-            IncomeCategorySettingScreen(MenuEnum.INCOME_CATEGORY)
+            CategorySettingScreen(MenuEnum.INCOME_CATEGORY)
         }
     }
 }
