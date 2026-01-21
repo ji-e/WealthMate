@@ -56,6 +56,7 @@ fun WMTextField(
     label: String? = null,
     placeholder: String? = null,
     supportingText: String? = null,
+    supportingContent: @Composable (() -> Unit)? = null,
     isError: Boolean = false,
     isCount: Boolean = false,
     isRequire: Boolean = false,
@@ -88,6 +89,7 @@ fun WMTextField(
         label = label,
         placeholder = placeholder,
         supportingText = supportingText,
+        supportingContent = supportingContent,
         isError = isError,
         isCount = isCount,
         isRequire = isRequire,
@@ -111,6 +113,7 @@ fun WMTextField(
     label: String? = null,
     placeholder: String? = null,
     supportingText: String? = null,
+    supportingContent: @Composable (() -> Unit)? = null,
     isError: Boolean = false,
     isCount: Boolean = false,
     isRequire: Boolean = false,
@@ -186,20 +189,22 @@ fun WMTextField(
                     WMText(text = it, style = Typography().bodyLarge)
                 }
             },
-            supportingText = supportingText?.let {
+            supportingText =
                 {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
-                        WMText(text = it, modifier = Modifier.weight(1f))
+                        supportingText?.let {
+                            WMText(text = it, modifier = Modifier.weight(1f))
+                        }
 
                         if (isCount) {
                             WMText(text = "${value.text.length}/$maxLength")
                         }
+                        supportingContent?.invoke()
                     }
-                }
-            },
+                },
             singleLine = true,
             visualTransformation = visualTransformation,
             keyboardOptions = keyboardOptions,
