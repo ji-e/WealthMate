@@ -13,7 +13,11 @@ class IncomeCategorySettingScreenModel(
     override val initialState: IncomeCategorySettingUiState
         get() = IncomeCategorySettingUiState()
 
-    init {
+    var largeCategoryEnum: LargeCategoryEnum = LargeCategoryEnum.INCOME
+
+    fun updateInit(largeCategoryEnum: LargeCategoryEnum) {
+        this.largeCategoryEnum = largeCategoryEnum
+
         getIncomeCategories()
     }
 
@@ -22,7 +26,6 @@ class IncomeCategorySettingScreenModel(
             block = {
                 categoryRepository.getAllCategoriesWithTags()
             },
-            errorMsg = "카테고리 저장에 실패했습니다.",
         ) { response ->
             val categories = response.sortedBy { it.sort }
 
@@ -30,7 +33,7 @@ class IncomeCategorySettingScreenModel(
                 state.copy(
                     isInitialized = true,
                     incomeCategoryItems = categories.fastFilteredMap(
-                        { it.largeCategory == LargeCategoryEnum.INCOME.name },
+                        { it.largeCategory == largeCategoryEnum.name },
                     ) {
                         CategoryItemData(
                             id = it.id,

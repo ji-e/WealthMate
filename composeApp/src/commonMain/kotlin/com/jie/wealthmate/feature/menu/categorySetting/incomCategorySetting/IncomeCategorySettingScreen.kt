@@ -53,7 +53,7 @@ import wealthmate.composeapp.generated.resources.ic_add
 class IncomeCategorySettingScreen(
     val menuEnum: MenuEnum,
 ) : BaseScreen() {
-
+    private val largeCategoryEnum = LargeCategoryEnum.creatorFromMenu(menuEnum.label)
 
     @Composable
     override fun Content() {
@@ -101,7 +101,7 @@ class IncomeCategorySettingScreen(
                                 if (isAddItemEnabled.not()) return@TrailingItem
                                 navigator.push(
                                     AddCategoryScreen(
-                                        largeCategory = LargeCategoryEnum.INCOME,
+                                        largeCategory = largeCategoryEnum,
                                         categoryItems = uiState.incomeCategoryItems
                                     )
                                 )
@@ -121,6 +121,10 @@ class IncomeCategorySettingScreen(
                     )
                 )
             }
+        }
+
+        LaunchedEffect(Unit) {
+            screenModel.updateInit(largeCategoryEnum)
         }
 
         Column {
@@ -211,7 +215,7 @@ class IncomeCategorySettingScreen(
     fun goToModifyCategory(navigator: Navigator, categoryId: Long) {
         navigator.push(
             ModifyCategoryScreen(
-                largeCategory = LargeCategoryEnum.INCOME,
+                largeCategory = largeCategoryEnum,
                 categoryId = categoryId
             )
         )
