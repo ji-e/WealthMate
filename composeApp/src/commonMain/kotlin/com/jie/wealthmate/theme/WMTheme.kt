@@ -50,7 +50,7 @@ fun WMTheme(
         colorScheme = colorScheme,
     ) {
         CompositionLocalProvider(
-            LocalRippleConfiguration provides RippleConfiguration(color = ColorPrimary.Primary_500)
+            LocalRippleConfiguration provides RippleConfiguration(color = ColorPrimary.Primary_400)
         ) {
             Column(
                 modifier = Modifier.pointerInput(Unit) {

@@ -164,6 +164,7 @@ fun WMButton(
 
 @Composable
 fun WMIconButton(
+    iconButtonModifier: Modifier = Modifier,
     modifier: Modifier = Modifier,
     iconRes: DrawableResource,
     contentDescription: String? = null,
@@ -178,6 +179,7 @@ fun WMIconButton(
             focusManager.clearFocus()
             onClick()
         },
+        modifier = iconButtonModifier,
         enabled = enabled
     ) {
         Icon(
