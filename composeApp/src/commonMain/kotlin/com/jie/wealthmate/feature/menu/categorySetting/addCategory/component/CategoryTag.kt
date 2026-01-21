@@ -39,6 +39,7 @@ import wealthmate.composeapp.generated.resources.ic_close_circle2
 @Composable
 fun CategoryTag(
     modifier: Modifier = Modifier,
+    textFieldModifier: Modifier = Modifier,
     largeCategory: LargeCategoryEnum,
     tagLabel: TextFieldValue,
     trailingIcon: DrawableResource = Res.drawable.ic_close_circle2,
@@ -61,6 +62,7 @@ fun CategoryTag(
                         onChipAdd(null)
                     }
                 },
+            textFieldModifier = textFieldModifier,
             maxLength = 15,
             label = "상세 태그 이름",
             placeholder = largeCategory.tempTagLabel,
