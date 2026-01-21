@@ -23,7 +23,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.dropShadow
+import androidx.compose.ui.graphics.shadow.Shadow
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
@@ -31,6 +34,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.jie.wealthmate.component.ButtonSize
 import com.jie.wealthmate.component.WMButton
+import com.jie.wealthmate.component.WMIconButton
 import com.jie.wealthmate.component.WMModalBottomSheet
 import com.jie.wealthmate.component.WMText
 import com.jie.wealthmate.component.calculateAdjustedToastPadding
@@ -49,6 +53,8 @@ import kotlinx.datetime.plus
 import kotlinx.datetime.yearMonth
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.koinInject
+import wealthmate.composeapp.generated.resources.Res
+import wealthmate.composeapp.generated.resources.ic_add
 
 val startDate = LocalDate(2025, 1, 1)
 
@@ -80,26 +86,51 @@ class CalendarScreen() : Screen {
             }
         }
 
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(bottom = calculateAdjustedToastPadding(80)),
+                .padding(bottom = calculateAdjustedToastPadding(80))
         ) {
-            MonthCalendar(
-                selectedMonth = uiState.selectedMonth,
-                selectedDate = uiState.selectedDate,
-                onMonthChanged = screenModel::updateSelectedMonth,
-                onTodayClick = screenModel::updateSelectedMonth,
-                onSelectedMonthClick = { isShowSelectedCalendarModalBottomSheet = true },
-                onDateClick = screenModel::updateSelectedDate
+            Column(
+                modifier = Modifier.fillMaxSize(),
             ) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
+                MonthCalendar(
+                    selectedMonth = uiState.selectedMonth,
+                    selectedDate = uiState.selectedDate,
+                    onMonthChanged = screenModel::updateSelectedMonth,
+                    onTodayClick = screenModel::updateSelectedMonth,
+                    onSelectedMonthClick = { isShowSelectedCalendarModalBottomSheet = true },
+                    onDateClick = screenModel::updateSelectedDate
                 ) {
-                    WMText(text = "리스트뷰 영역 (ListView Area)")
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        WMText(text = "리스트뷰 영역 (ListView Area)")
+                    }
                 }
             }
+
+            WMIconButton(
+                iconRes = Res.drawable.ic_add,
+                contentDescription = "내역 추가",
+                iconButtonModifier = Modifier
+                    .padding(20.dp)
+                    .dropShadow(
+                        shape = CircleShape,
+                        shadow = Shadow(
+                            radius = 4.dp,
+                            spread = 0.dp,
+                            color = ColorGray.Gray_200,
+                            offset = DpOffset(x = 2.dp, 2.dp)
+                        )
+                    )
+                    .clip(CircleShape)
+                    .background(ColorPrimary.Primary_500)
+                    .align(Alignment.BottomEnd),
+                tint = ColorGray.White,
+                onClick = {}
+            )
 
             if (isShowSelectedCalendarModalBottomSheet) {
                 ShowSelectedCalendarModalBottomSheet(
@@ -176,7 +207,6 @@ class CalendarScreen() : Screen {
                     onDismissRequest()
                 }
             )
-
         }
     }
 
