@@ -43,6 +43,7 @@ fun WMTextField(
     value: String,
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier,
+    textFieldModifier: Modifier = Modifier,
     maxLength: Int = Int.MAX_VALUE,
     readOnly: Boolean = false,
     enabled: Boolean = true,
@@ -68,6 +69,7 @@ fun WMTextField(
 
     WMTextField(
         modifier = modifier,
+        textFieldModifier = textFieldModifier,
         value = textFieldValueState,
         onValueChange = {
             textFieldValueState = it
@@ -94,7 +96,9 @@ fun WMTextField(
     value: TextFieldValue,
     onValueChange: (TextFieldValue) -> Unit,
     modifier: Modifier = Modifier,
+    textFieldModifier: Modifier = Modifier,
     maxLength: Int = Int.MAX_VALUE,
+    maxLines: Int = 1,
     readOnly: Boolean = false,
     enabled: Boolean = true,
     label: String? = null,
@@ -122,7 +126,7 @@ fun WMTextField(
         contentAlignment = Alignment.BottomCenter
     ) {
         TextField(
-            modifier = Modifier
+            modifier = textFieldModifier
                 .fillMaxWidth()
                 .height(92.dp)
                 .focusRequester(focusRequester)
@@ -138,6 +142,7 @@ fun WMTextField(
             enabled = enabled,
             readOnly = readOnly,
             isError = isError,
+            maxLines = maxLines,
             label = label?.let {
                 {
                     Row(

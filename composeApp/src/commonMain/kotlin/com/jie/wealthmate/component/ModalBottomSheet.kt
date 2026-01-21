@@ -12,6 +12,7 @@ import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.jie.wealthmate.theme.ColorGray
@@ -27,12 +28,18 @@ fun WMModalBottomSheet(
     onDismissRequest: () -> Unit,
     content: @Composable ColumnScope.() -> Unit,
 ) {
+    val focusManager = LocalFocusManager.current
+
     ModalBottomSheet(
         modifier = modifier,
         containerColor = ColorGray.White,
         shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
-        onDismissRequest = onDismissRequest,
+        onDismissRequest = {
+            focusManager.clearFocus()
+            onDismissRequest()
+        },
         dragHandle = {
+            ->
             Icon(
                 painter = painterResource(Res.drawable.ic_horizontal_rule),
                 contentDescription = null,

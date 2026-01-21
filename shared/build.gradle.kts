@@ -4,7 +4,8 @@ plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.sqldelight)
-//    id("org.jetbrains.kotlin.native.cocoapods") version "1.9.22" // CocoaPods 플러그인 추가
+    alias(libs.plugins.composeMultiplatform)
+    alias(libs.plugins.composeCompiler)
 }
 
 kotlin {
@@ -26,6 +27,10 @@ kotlin {
         androidMain.dependencies {
             implementation(libs.sqldelight.android.driver)
             implementation(libs.koin.android)
+
+            implementation(libs.androidx.compose.ui)
+            implementation(libs.androidx.ui.graphics)
+
         }
         iosMain.dependencies {
             implementation(libs.sqldelight.native.driver)
@@ -35,6 +40,11 @@ kotlin {
             implementation(libs.sqldelight.coroutines.extensions)
             implementation(libs.koin.core)
             implementation(libs.koin.compose)
+
+            implementation(compose.runtime)
+            implementation(compose.foundation)
+            implementation(compose.material3)
+            implementation(compose.ui)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

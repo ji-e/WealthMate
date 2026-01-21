@@ -110,18 +110,20 @@ abstract class BaseScreenModel<S : UiState> : ScreenModel, ContainerHost<S> {
     /**
      * 액션 버튼이 포함된 Snackbar 메시지를 표시하는 SideEffect를 발생시킵니다.
      * @param message 표시할 메시지 문자열
-     * @param actionText 액션 버튼에 표시될 텍스트
-     * @param action 버튼 클릭 시 실행될 람다 함수
+     * @param actionLabel 액션 버튼에 표시될 텍스트
+     * @param onAction 버튼 클릭 시 실행될 람다 함수
      */
     fun showSnackbarWithAction(
         message: String,
-        actionText: String,
-        action: () -> Unit,
-    ) = postSideEffect {
-        BaseUiSideEffect.ShowSnackbarWithAction(
-            message = message,
-            actionText = actionText,
-            action = action
+        actionLabel: String,
+        onAction: () -> Unit,
+    ) = screenScope.launch {
+        MainUiManager.emitSideEffect(
+            BaseUiSideEffect.ShowSnackbarWithAction(
+                message = message,
+                actionLabel = actionLabel,
+                onAction = onAction
+            )
         )
     }
 
@@ -145,15 +147,16 @@ abstract class BaseScreenModel<S : UiState> : ScreenModel, ContainerHost<S> {
     protected fun <T> launchSafe(
         block: suspend () -> T,
         showLoading: Boolean = true,
+        isHideKeyboard: Boolean = true,
         errorMsg: String? = null,
         onError: (suspend (Throwable) -> Unit)? = null,
         onSuccess: (suspend (T) -> Unit)? = null,
     ) = event {
         screenScope.launch {
-            hideKeyboard()
+            if (isHideKeyboard) hideKeyboard()
 
             if (showLoading) {
-                postSideEffect { 
+                postSideEffect {
                     BaseUiSideEffect.ShowLoading(true)
                 }
             }

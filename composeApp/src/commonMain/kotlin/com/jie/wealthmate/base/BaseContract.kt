@@ -55,13 +55,12 @@ sealed class BaseUiSideEffect : UiSideEffect {
     @Immutable
     data class ShowSnackbarWithAction(
         val message: String,
-        val actionText: String,
-        val action: () -> Unit,
+        val actionLabel: String,
+        val onAction: () -> Unit,
     ) : UiSideEffect
 
     @Immutable
     data object HideKeyboard : UiSideEffect
-
 }
 
 /**

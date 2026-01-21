@@ -20,4 +20,5 @@ data class ModifyCategoryUiState(
 
 sealed class ModifyCategoryUiSideEffect : UiSideEffect {
     data object OnSuccess : ModifyCategoryUiSideEffect()
+    data object OnSuccessModifyTagLabel : ModifyCategoryUiSideEffect()
 }

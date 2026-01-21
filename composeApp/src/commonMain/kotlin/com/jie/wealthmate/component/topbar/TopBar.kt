@@ -5,6 +5,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
 import com.jie.wealthmate.component.WMIconButton
 import com.jie.wealthmate.component.WMText
@@ -22,6 +23,8 @@ fun WMTobBar(
     readingItem: TopBarItem.ReadingItem? = TopBarItem.ReadingItem(),
     trailingItem: List<TopBarItem.TrailingItem>? = null,
 ) {
+    val focusManager = LocalFocusManager.current
+
     TopAppBar(
         title = {
             WMText(
@@ -37,7 +40,10 @@ fun WMTobBar(
                 WMIconButton(
                     iconRes = it.iconRes,
                     tint = it.tint,
-                    onClick = { it.action() }
+                    onClick = {
+                        focusManager.clearFocus()
+                        it.action()
+                    }
                 )
             }
         },
@@ -46,7 +52,10 @@ fun WMTobBar(
                 WMIconButton(
                     iconRes = it.iconRes,
                     tint = it.tint,
-                    onClick = { it.action() }
+                    onClick = {
+                        focusManager.clearFocus()
+                        it.action()
+                    }
                 )
             }
         },
