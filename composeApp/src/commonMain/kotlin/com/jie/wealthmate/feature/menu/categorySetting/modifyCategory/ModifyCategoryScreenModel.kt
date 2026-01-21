@@ -58,7 +58,6 @@ class ModifyCategoryScreenModel(
     }
 
     fun selectedCategoryTagLabel(categoryTagVo: CategoryTagVo) {
-        hideKeyboard()
         reduceState { state ->
             state.copy(
                 modifyTagLabel = categoryTagVo,

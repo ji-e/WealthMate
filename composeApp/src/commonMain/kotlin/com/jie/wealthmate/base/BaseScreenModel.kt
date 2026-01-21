@@ -1,6 +1,5 @@
 package com.jie.wealthmate.base
 
-import androidx.compose.runtime.Composable
 import cafe.adriel.voyager.core.model.ScreenModel
 import com.jie.wealthmate.MainUiManager
 import com.jie.wealthmate.component.topbar.TopBarItem
@@ -136,30 +135,6 @@ abstract class BaseScreenModel<S : UiState> : ScreenModel, ContainerHost<S> {
     }
 
     /**
-     * BottomSheet를 표시하는 SideEffect를 발생시킵니다.
-     */
-    fun showBottomSheet(
-        title: String? = null,
-        onDismissRequest: () -> Unit = {},
-        content: @Composable () -> Unit,
-    ) = screenScope.launch {
-        MainUiManager.emitSideEffect(
-            BaseUiSideEffect.ShowBottomSheet(
-                title = title,
-                onDismissRequest = onDismissRequest,
-                content = content
-            )
-        )
-    }
-
-    /**
-     * BottomSheet를 숨기는 SideEffect를 발생시킵니다.
-     */
-    fun hideBottomSheet() = screenScope.launch {
-        MainUiManager.emitSideEffect(BaseUiSideEffect.HideBottomSheet)
-    }
-
-    /**
      * 예외 처리와 로딩 상태 관리를 포함하는 공통 코루틴 실행 함수입니다.
      *
      * @param T 실행할 비즈니스 로직의 반환 타입
@@ -172,12 +147,13 @@ abstract class BaseScreenModel<S : UiState> : ScreenModel, ContainerHost<S> {
     protected fun <T> launchSafe(
         block: suspend () -> T,
         showLoading: Boolean = true,
+        isHideKeyboard: Boolean = true,
         errorMsg: String? = null,
         onError: (suspend (Throwable) -> Unit)? = null,
         onSuccess: (suspend (T) -> Unit)? = null,
     ) = event {
         screenScope.launch {
-            hideKeyboard()
+            if (isHideKeyboard) hideKeyboard()
 
             if (showLoading) {
                 postSideEffect {

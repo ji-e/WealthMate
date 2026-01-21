@@ -27,7 +27,6 @@ import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.transitions.SlideTransition
 import com.jie.wealthmate.base.BaseUiSideEffect
 import com.jie.wealthmate.component.CustomSnackbarHost
-import com.jie.wealthmate.component.WMModalBottomSheet
 import com.jie.wealthmate.component.bottomNav.BottomNavItem
 import com.jie.wealthmate.component.bottomNav.BottomNavigation
 import com.jie.wealthmate.component.calculateAdjustedToastPadding
@@ -52,10 +51,6 @@ open class MainScreen : Screen {
         val snackbarState = rememberSnackbarState()
         val scope = rememberCoroutineScope()
         val focusManager = LocalFocusManager.current
-        var isShowBottomSheetDialg by remember { mutableStateOf(false) }
-
-        var bottomSheetTitle by remember { mutableStateOf<String?>(null) }
-        var bottomSheetContent by remember { mutableStateOf<@Composable () -> Unit>({}) }
 
         LaunchedEffect(Unit) {
             MainUiManager.sideEffect.collect { sideEffect ->
@@ -78,16 +73,6 @@ open class MainScreen : Screen {
 
                     is BaseUiSideEffect.HideKeyboard -> {
                         focusManager.clearFocus(true)
-                    }
-
-                    is BaseUiSideEffect.ShowBottomSheet -> {
-                        isShowBottomSheetDialg = true
-                        bottomSheetTitle = sideEffect.title
-                        bottomSheetContent = sideEffect.content
-                    }
-
-                    is BaseUiSideEffect.HideBottomSheet -> {
-                        isShowBottomSheetDialg = false
                     }
 
                     else -> Unit
@@ -166,16 +151,6 @@ open class MainScreen : Screen {
                             }
                         }
                     }
-                }
-            }
-
-            WMModalBottomSheet(
-                isVisible = isShowBottomSheetDialg,
-                title = bottomSheetTitle,
-                onDismissRequest = { isShowBottomSheetDialg = false },
-            ) {
-                Box {
-                    bottomSheetContent.invoke()
                 }
             }
 

@@ -10,12 +10,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
-import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -128,26 +126,29 @@ fun CustomSnackbarHost(
 ) {
     val currentSnackbar by snackbarState.currentSnackbar
 
-    Box(
-        modifier = modifier.fillMaxSize(),
-        contentAlignment = Alignment.BottomCenter
-    ) {
-        AnimatedVisibility(
-            visible = currentSnackbar != null,
-            enter = slideInVertically(
-                initialOffsetY = { it },
-                animationSpec = tween(durationMillis = 300)
-            ) + fadeIn(animationSpec = tween(durationMillis = 300)),
-            exit = slideOutVertically(
-                targetOffsetY = { it },
-                animationSpec = tween(durationMillis = 300)
-            ) + fadeOut(animationSpec = tween(durationMillis = 300))
+    if (currentSnackbar != null) {
+        TransparentInteractiveDialog(
+            onDismissRequest = { snackbarState.dismiss() },
         ) {
-            currentSnackbar?.let { data ->
-                CustomSnackbar(
-                    snackbarData = data,
-                    onDismiss = { snackbarState.dismiss() }
-                )
+            Box(modifier = modifier) {
+                AnimatedVisibility(
+                    visible = currentSnackbar != null,
+                    enter = slideInVertically(
+                        initialOffsetY = { it },
+                        animationSpec = tween(durationMillis = 300)
+                    ) + fadeIn(animationSpec = tween(durationMillis = 300)),
+                    exit = slideOutVertically(
+                        targetOffsetY = { it },
+                        animationSpec = tween(durationMillis = 300)
+                    ) + fadeOut(animationSpec = tween(durationMillis = 300))
+                ) {
+                    currentSnackbar?.let { data ->
+                        CustomSnackbar(
+                            snackbarData = data,
+                            onDismiss = { snackbarState.dismiss() }
+                        )
+                    }
+                }
             }
         }
     }
@@ -187,10 +188,8 @@ fun calculateAdjustedToastPadding(customPadding: Int = 0): Dp {
     // navigation bar 영역 - scaffold 내부에서 자동으로 적용되기 때문.
     val navigationBottomPx = WindowInsets.navigationBars.getBottom(density)
 
-    val systemBarsPx = WindowInsets.systemBars.getBottom(density)
-
     // navigation 영역 제외한 padding (예: 키보드 올라왔을 때만 값 있음)
-    val adjustedPx = (safeBottomPx - navigationBottomPx + systemBarsPx).coerceAtLeast(0)
+    val adjustedPx = (safeBottomPx - navigationBottomPx).coerceAtLeast(0)
 
     return with(density) { adjustedPx.toDp() }.plus(customPadding.dp)
 }
