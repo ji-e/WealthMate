@@ -3,6 +3,8 @@ package com.jie.wealthmate
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -38,7 +40,12 @@ import com.jie.wealthmate.feature.calendar.CalendarScreen
 import com.jie.wealthmate.feature.home.HomeScreen
 import com.jie.wealthmate.feature.menu.MenuScreen
 import com.jie.wealthmate.theme.ColorGray
+import io.github.alexzhirkevich.compottie.Compottie
+import io.github.alexzhirkevich.compottie.LottieCompositionSpec
+import io.github.alexzhirkevich.compottie.rememberLottieComposition
+import io.github.alexzhirkevich.compottie.rememberLottiePainter
 import kotlinx.coroutines.launch
+import wealthmate.composeapp.generated.resources.Res
 
 open class MainScreen : Screen {
 
@@ -46,6 +53,7 @@ open class MainScreen : Screen {
     override fun Content() {
         val uiState by MainUiManager.uiState.collectAsState()
 
+        var isShowLoading by remember { mutableStateOf(false) }
         var isBottomNaviVisible by remember { mutableStateOf(true) }
         var selectedItem by remember { mutableStateOf(BottomNavItem.Home.route) }
         val snackbarState = rememberSnackbarState()
@@ -55,6 +63,9 @@ open class MainScreen : Screen {
         LaunchedEffect(Unit) {
             MainUiManager.sideEffect.collect { sideEffect ->
                 when (sideEffect) {
+                    is BaseUiSideEffect.ShowLoading ->{
+                        isShowLoading = sideEffect.isShowLoading
+                    }
                     is BaseUiSideEffect.ShowSnackbar -> {
                         scope.launch {
                             snackbarState.showSnackbar(message = sideEffect.message)
@@ -74,8 +85,6 @@ open class MainScreen : Screen {
                     is BaseUiSideEffect.HideKeyboard -> {
                         focusManager.clearFocus(true)
                     }
-
-                    else -> Unit
                 }
             }
         }
@@ -108,7 +117,7 @@ open class MainScreen : Screen {
                         .statusBarsPadding()
                         .navigationBarsPadding()
                         .fillMaxSize()
-                        .padding(top = 64.dp,),
+                        .padding(top = 64.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     when (selectedItem) {
@@ -151,10 +160,37 @@ open class MainScreen : Screen {
                 }
             }
 
+            Loading(isShowLoading)
+
             CustomSnackbarHost(
                 snackbarState = snackbarState,
                 modifier = Modifier.padding(bottom = calculateAdjustedToastPadding(20))
             )
+        }
+    }
+
+    @Composable
+    private fun Loading(isShowLoading: Boolean) {
+        if (isShowLoading) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clickable(false) {},
+                contentAlignment = Alignment.Center
+            ) {
+                val composition by rememberLottieComposition {
+                    val animationBytes = Res.readBytes("files/loading_animation.json")
+                    LottieCompositionSpec.JsonString(animationBytes.decodeToString())
+                }
+
+                Image(
+                    contentDescription = "Lottie animation",
+                    painter = rememberLottiePainter(
+                        composition = composition,
+                        iterations = Compottie.IterateForever
+                    )
+                )
+            }
         }
     }
 }
