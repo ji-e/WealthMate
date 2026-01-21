@@ -38,6 +38,11 @@ import com.jie.wealthmate.theme.ColorRed
 import com.jie.wealthmate.theme.wantedSansFontFamily
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
+/**
+ * WMTextField
+ *
+ * 기본으로 horizontal padding 16.dp
+ */
 @Composable
 fun WMTextField(
     value: String,
@@ -45,11 +50,13 @@ fun WMTextField(
     modifier: Modifier = Modifier,
     textFieldModifier: Modifier = Modifier,
     maxLength: Int = Int.MAX_VALUE,
+    maxLines: Int = 1,
     readOnly: Boolean = false,
     enabled: Boolean = true,
     label: String? = null,
     placeholder: String? = null,
     supportingText: String? = null,
+    supportingContent: @Composable (() -> Unit)? = null,
     isError: Boolean = false,
     isCount: Boolean = false,
     isRequire: Boolean = false,
@@ -76,11 +83,13 @@ fun WMTextField(
             onValueChange(it.text)
         },
         maxLength = maxLength,
+        maxLines = maxLines,
         readOnly = readOnly,
         enabled = enabled,
         label = label,
         placeholder = placeholder,
         supportingText = supportingText,
+        supportingContent = supportingContent,
         isError = isError,
         isCount = isCount,
         isRequire = isRequire,
@@ -104,6 +113,7 @@ fun WMTextField(
     label: String? = null,
     placeholder: String? = null,
     supportingText: String? = null,
+    supportingContent: @Composable (() -> Unit)? = null,
     isError: Boolean = false,
     isCount: Boolean = false,
     isRequire: Boolean = false,
@@ -179,20 +189,22 @@ fun WMTextField(
                     WMText(text = it, style = Typography().bodyLarge)
                 }
             },
-            supportingText = supportingText?.let {
+            supportingText =
                 {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
-                        WMText(text = it, modifier = Modifier.weight(1f))
+                        supportingText?.let {
+                            WMText(text = it, modifier = Modifier.weight(1f))
+                        }
 
                         if (isCount) {
                             WMText(text = "${value.text.length}/$maxLength")
                         }
+                        supportingContent?.invoke()
                     }
-                }
-            },
+                },
             singleLine = true,
             visualTransformation = visualTransformation,
             keyboardOptions = keyboardOptions,

@@ -3,21 +3,27 @@ package com.jie.wealthmate.utils
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.isoDayNumber
 import kotlinx.datetime.minus
 import kotlinx.datetime.number
 import kotlinx.datetime.plus
 import kotlinx.datetime.toLocalDateTime
 import kotlinx.datetime.todayIn
 import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
 
 const val formatDateHyphen: String = "yyyy-MM-dd"
+const val formatDateHyphenYMDE: String = "yyyy-MM-dd (E)"
 
 const val formatDateKor: String = "yyyy년 M월 d일"
 const val formatDateKorYM: String = "yyyy년 M월"
+const val formatDateKorMD: String = "M월 d일"
 
 
+@OptIn(ExperimentalTime::class)
 val today = Clock.System.todayIn(TimeZone.currentSystemDefault())
+@OptIn(ExperimentalTime::class)
 val nowLocalDateTime = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
 
 /**
@@ -76,8 +82,10 @@ fun LocalDate?.convertLocalDateToString(
     this ?: return defaultValue
 
     return when (convertPattern) {
-        formatDateKorYM -> "${this.year}년 ${this.month.number}월"
+        formatDateHyphenYMDE -> this.toString() + " (${WeekEnum.creator(this.dayOfWeek.isoDayNumber).korDisplayName})"
         formatDateKor -> "${this.year}년 ${this.month.number}월 ${this.day}일"
+        formatDateKorYM -> "${this.year}년 ${this.month.number}월"
+        formatDateKorMD -> "${this.month.number}월 ${this.day}일 "
         else -> defaultValue
     }
 }
@@ -96,4 +104,41 @@ fun LocalDate.lastDayOfMonth(): LocalDate {
  */
 fun LocalDate.firstDayOfMonth(): LocalDate {
     return LocalDate(this.year, this.month, 1)
+}
+
+private enum class WeekEnum(val korDisplayName: String, val isoDayNumber: Int) {
+    SUN(
+        korDisplayName = "일",
+        isoDayNumber = 7
+    ),
+    MON(
+        korDisplayName = "월",
+        isoDayNumber = 1
+    ),
+    TUE(
+        korDisplayName = "화",
+        isoDayNumber = 2
+    ),
+    WED(
+        korDisplayName = "수",
+        isoDayNumber = 3
+    ),
+    THU(
+        korDisplayName = "목",
+        isoDayNumber = 4
+    ),
+    FRI(
+        korDisplayName = "금",
+        isoDayNumber = 5
+    ),
+    SAT(
+        korDisplayName = "토",
+        isoDayNumber = 6
+    );
+
+    companion object {
+        fun creator(isoDayNumber: Int): WeekEnum =
+            WeekEnum.entries.find { it.isoDayNumber == isoDayNumber } ?: MON
+    }
+
 }
