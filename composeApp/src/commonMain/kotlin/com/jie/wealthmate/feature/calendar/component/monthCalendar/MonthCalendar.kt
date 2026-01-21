@@ -29,7 +29,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
@@ -50,7 +49,6 @@ import com.jie.wealthmate.theme.ColorGray
 import com.jie.wealthmate.utils.convertLocalDateToString
 import com.jie.wealthmate.utils.formatDateKorYM
 import com.jie.wealthmate.utils.today
-import kotlinx.coroutines.launch
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.monthsUntil
@@ -92,7 +90,6 @@ fun MonthCalendar(
             )
         )
     }
-    val coroutineScope = rememberCoroutineScope()
 
     val pagerState = rememberPagerState(
         initialPage = startDate.monthsUntil(selectedMonth),
@@ -115,9 +112,7 @@ fun MonthCalendar(
     LaunchedEffect(selectedMonth) {
         val page = startDate.monthsUntil(selectedMonth)
         if (page != pagerState.currentPage) {
-            coroutineScope.launch {
-                pagerState.animateScrollToPage(page)
-            }
+            pagerState.requestScrollToPage(page)
         }
     }
 
