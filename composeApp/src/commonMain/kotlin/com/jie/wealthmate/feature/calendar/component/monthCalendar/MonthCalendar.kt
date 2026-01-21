@@ -1,12 +1,10 @@
 package com.jie.wealthmate.feature.calendar.component.monthCalendar
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.AnchoredDraggableState
 import androidx.compose.foundation.gestures.DraggableAnchors
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.anchoredDraggable
-import androidx.compose.foundation.gestures.snapTo
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
@@ -55,6 +53,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 import wealthmate.composeapp.generated.resources.Res
 import wealthmate.composeapp.generated.resources.ic_arrow_drop_down
 import wealthmate.composeapp.generated.resources.ic_calendar_today
+import wealthmate.composeapp.generated.resources.ic_horizontal_rule
 import wealthmate.composeapp.generated.resources.ic_more_vert
 
 private val startDate = LocalDate(2025, 1, 1)
@@ -88,17 +87,6 @@ fun MonthCalendar(
     }
     val coroutineScope = rememberCoroutineScope()
 
-    val anchoredState = remember {
-        AnchoredDraggableState(
-            initialValue = CalendarStateEnum.Normal,
-            anchors = DraggableAnchors {
-                CalendarStateEnum.Maximized at 0f
-                CalendarStateEnum.Normal at -1f
-                CalendarStateEnum.Minimized at -2f
-            },
-        )
-    }
-
     val pagerState = rememberPagerState(
         initialPage = startDate.monthsUntil(selectedMonth),
         pageCount = { (today.year - startDate.year) * 12 + 12 }
@@ -126,8 +114,6 @@ fun MonthCalendar(
         }
     }
 
-    var isInitialSetup by remember { mutableStateOf(true) }
-
     Column(
         modifier = modifier.fillMaxSize()
     ) {
@@ -153,29 +139,24 @@ fun MonthCalendar(
             val maximizedHeightPx = with(density) { maxHeight.toPx() }
             val minimizedHeightPx = dayHeightPx + dragBarHeightPx
             val normalCalendarHeight = 360.dp
+            val normalCalendarHeightPx = with(density) { normalCalendarHeight.toPx() }
 
-            LaunchedEffect(selectedMonth, maximizedHeightPx) {
-                val normalCalendarHeightPx = with(density) { normalCalendarHeight.toPx() }
-
-                anchoredState.updateAnchors(
-                    newAnchors = DraggableAnchors {
+            val anchoredState = remember(maximizedHeightPx) {
+                AnchoredDraggableState(
+                    initialValue = CalendarStateEnum.Normal,
+                    anchors = DraggableAnchors {
                         CalendarStateEnum.Maximized at 0f
                         CalendarStateEnum.Normal at -(maximizedHeightPx - normalCalendarHeightPx)
                         CalendarStateEnum.Minimized at -(maximizedHeightPx - minimizedHeightPx)
-                    }
+                    },
                 )
-
-                if (isInitialSetup) {
-                    anchoredState.snapTo(CalendarStateEnum.Normal)
-                    isInitialSetup = false
-                }
             }
 
             val currentOffset = anchoredState.requireOffset()
             val normalHeightPx = anchoredState.anchors.positionOf(CalendarStateEnum.Normal)
                 .takeIf { it.isFinite() }
                 ?.let { maximizedHeightPx + it }
-                ?: with(density) { normalCalendarHeight.toPx() }
+                ?: normalCalendarHeightPx
 
             val expansionProgress =
                 if (normalHeightPx == maximizedHeightPx) {
@@ -222,12 +203,18 @@ fun MonthCalendar(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(dragBarHeight)
-                        .background(ColorGray.Gray_300)
                         .anchoredDraggable(
                             state = anchoredState,
                             orientation = Orientation.Vertical
                         )
-                )
+                ){
+                    Icon(
+                        painter = painterResource(Res.drawable.ic_horizontal_rule),
+                        contentDescription = null,
+                        tint = ColorGray.Gray_400,
+                        modifier = Modifier.size(40.dp),
+                    )
+                }
             }
         }
     }
