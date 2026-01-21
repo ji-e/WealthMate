@@ -13,7 +13,6 @@ import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.annotation.InternalVoyagerApi
 import cafe.adriel.voyager.navigator.LocalNavigator
@@ -22,6 +21,8 @@ import cafe.adriel.voyager.navigator.internal.BackHandler
 import com.jie.wealthmate.base.BaseScreen
 import com.jie.wealthmate.component.WMText
 import com.jie.wealthmate.component.textField.WMTextField
+import com.jie.wealthmate.component.textField.rememberIntegerVisualTransformation
+import com.jie.wealthmate.component.textField.toIntegerTextFieldValue
 import com.jie.wealthmate.component.topbar.TopBarItem
 import com.jie.wealthmate.feature.calendar.component.addHistory.component.DateTextField
 import com.jie.wealthmate.feature.calendar.component.addHistory.component.LargeCategorySelectBox
@@ -82,8 +83,10 @@ class AddHistoryScreen() : BaseScreen() {
                 modifier = Modifier
                     .padding(top = 20.dp)
                     .padding(horizontal = 4.dp),
-                value = TextFieldValue("0"),
-                onValueChange = {},
+                value = uiState.amount,
+                onValueChange = {
+                    screenModel.updateAmount(it.toIntegerTextFieldValue())
+                },
                 label = "금액",
                 maxLength = 10,
                 placeholder = "금액을 입력해 주세요.",
@@ -92,7 +95,8 @@ class AddHistoryScreen() : BaseScreen() {
                         text = "원",
                         style = Typography().bodyLarge.copy(fontWeight = FontWeight.SemiBold)
                     )
-                }
+                },
+                visualTransformation = rememberIntegerVisualTransformation(),
             )
         }
     }
