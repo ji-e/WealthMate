@@ -1,6 +1,7 @@
 package com.jie.wealthmate.feature.calendar.component.monthCalendar
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.AnchoredDraggableState
 import androidx.compose.foundation.gestures.DraggableAnchors
 import androidx.compose.foundation.gestures.Orientation
@@ -18,6 +19,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.TextButton
@@ -32,10 +34,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.draw.dropShadow
+import androidx.compose.ui.graphics.shadow.Shadow
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import com.jie.wealthmate.component.WMIconButton
 import com.jie.wealthmate.component.WMText
@@ -207,10 +213,27 @@ fun MonthCalendar(
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(dragBarHeight)
+                            .dropShadow(
+                                shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
+                                shadow = Shadow(
+                                    radius = 8.dp,
+                                    spread = 0.dp,
+                                    color = ColorGray.Gray_100,
+                                    offset = DpOffset(
+                                        x = 0.dp,
+                                        y = (-6).dp
+                                    )
+                                )
+                            )
+                            .clip(
+                                shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
+                            )
+                            .background(color = ColorGray.White)
                             .anchoredDraggable(
                                 state = anchoredState,
                                 orientation = Orientation.Vertical
-                            )
+                            ),
+                        contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             painter = painterResource(Res.drawable.ic_horizontal_rule),

@@ -1,6 +1,5 @@
 package com.jie.wealthmate.feature.calendar
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,7 +16,6 @@ import com.jie.wealthmate.component.WMText
 import com.jie.wealthmate.component.calculateAdjustedToastPadding
 import com.jie.wealthmate.component.topbar.TopBarItem
 import com.jie.wealthmate.feature.calendar.component.monthCalendar.MonthCalendar
-import com.jie.wealthmate.theme.ColorGray
 import com.jie.wealthmate.theme.WMTheme
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.koinInject
@@ -51,9 +49,7 @@ class CalendarScreen() : Screen {
                 onClickDate = screenModel::updateSelectedDate
             ){
                 Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(ColorGray.Gray_200),
+                    modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
                     WMText(text = "리스트뷰 영역 (ListView Area)")
