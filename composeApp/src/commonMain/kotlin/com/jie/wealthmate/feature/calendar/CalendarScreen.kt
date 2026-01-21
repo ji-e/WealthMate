@@ -1,25 +1,29 @@
 package com.jie.wealthmate.feature.calendar
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.jie.wealthmate.component.WMText
+import com.jie.wealthmate.component.calculateAdjustedToastPadding
 import com.jie.wealthmate.component.topbar.TopBarItem
 import com.jie.wealthmate.feature.calendar.component.monthCalendar.MonthCalendar
+import com.jie.wealthmate.theme.ColorGray
 import com.jie.wealthmate.theme.WMTheme
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.koinInject
 
 
-class CalendarScreen(val calculateBottomPadding: Dp) : Screen {
+class CalendarScreen() : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
@@ -37,7 +41,7 @@ class CalendarScreen(val calculateBottomPadding: Dp) : Screen {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(bottom = calculateBottomPadding),
+                .padding(bottom = calculateAdjustedToastPadding(80)),
         ) {
             MonthCalendar(
                 selectedMonth = uiState.selectedMonth,
@@ -45,7 +49,16 @@ class CalendarScreen(val calculateBottomPadding: Dp) : Screen {
                 onMonthChanged = screenModel::updateSelectedMonth,
                 onClickToday = screenModel::updateSelectedMonth,
                 onClickDate = screenModel::updateSelectedDate
-            )
+            ){
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(ColorGray.Gray_200),
+                    contentAlignment = Alignment.Center
+                ) {
+                    WMText(text = "리스트뷰 영역 (ListView Area)")
+                }
+            }
         }
     }
 
@@ -53,7 +66,7 @@ class CalendarScreen(val calculateBottomPadding: Dp) : Screen {
     @Preview(showBackground = true)
     private fun CalendarScreenPreview() {
         WMTheme {
-            CalendarScreen(0.dp)
+            CalendarScreen()
         }
     }
 }

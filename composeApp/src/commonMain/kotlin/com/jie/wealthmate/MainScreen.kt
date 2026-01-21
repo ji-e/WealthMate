@@ -108,10 +108,7 @@ open class MainScreen : Screen {
                         .statusBarsPadding()
                         .navigationBarsPadding()
                         .fillMaxSize()
-                        .padding(
-                            top = 64.dp,
-//                            bottom = if (isBottomNaviVisible) innerPadding.calculateBottomPadding() else 4.dp
-                        ),
+                        .padding(top = 64.dp,),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     when (selectedItem) {
@@ -125,7 +122,7 @@ open class MainScreen : Screen {
                         }
 
                         BottomNavItem.Calendar.route -> {
-                            Navigator(CalendarScreen(innerPadding.calculateBottomPadding())) { navigator ->
+                            Navigator(CalendarScreen()) { navigator ->
                                 SlideTransition(navigator)
                                 LaunchedEffect(navigator.lastItem) {
                                     isBottomNaviVisible = (navigator.lastItem is CalendarScreen)

@@ -77,6 +77,7 @@ fun MonthCalendar(
     onClickToday: () -> Unit = {},
     onClickSelectedMonth: () -> Unit = {},
     onClickDate: (LocalDate) -> Unit = {},
+    bottomContent: @Composable () -> Unit = {},
 ) {
     var displaySelectedMonth by remember {
         mutableStateOf(
@@ -178,42 +179,54 @@ fun MonthCalendar(
             val dayMaxHeight = (maxHeight - dragBarHeight)
 
             Column(
-                modifier = Modifier.height(with(density) { (maximizedHeightPx + currentOffset).toDp() })
+                modifier = Modifier.fillMaxSize()
             ) {
+                // 캘린더 영역 (드래그에 따라 높이 가변)
+                Column(
+                    modifier = Modifier.height(with(density) { (maximizedHeightPx + currentOffset).toDp() })
+                ) {
+                    HorizontalPager(
+                        modifier = Modifier.weight(1f),
+                        state = pagerState,
+                    ) { page ->
+                        val month = startDate.plus(page, DateTimeUnit.MONTH)
+                        MonthCalendarContent(
+                            today = today,
+                            selectedDate = selectedDate,
+                            selectedMonth = month,
+                            dayNormalHeight = dayNormalHeight,
+                            dayMaxHeight = dayMaxHeight,
+                            expansionProgress = expansionProgress,
+                            collapseProgress = collapseProgress,
+                            onClickDate = onClickDate
+                        )
+                    }
 
-                HorizontalPager(
-                    modifier = Modifier.weight(1f),
-                    state = pagerState,
-                ) { page ->
-                    val month = startDate.plus(page, DateTimeUnit.MONTH)
-                    MonthCalendarContent(
-                        today = today,
-                        selectedDate = selectedDate,
-                        selectedMonth = month,
-                        dayNormalHeight = dayNormalHeight,
-                        dayMaxHeight = dayMaxHeight,
-                        expansionProgress = expansionProgress,
-                        collapseProgress = collapseProgress,
-                        onClickDate = onClickDate
-                    )
+                    // dragBar
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(dragBarHeight)
+                            .anchoredDraggable(
+                                state = anchoredState,
+                                orientation = Orientation.Vertical
+                            )
+                    ) {
+                        Icon(
+                            painter = painterResource(Res.drawable.ic_horizontal_rule),
+                            contentDescription = null,
+                            tint = ColorGray.Gray_400,
+                            modifier = Modifier.size(40.dp),
+                        )
+                    }
                 }
-
-                // dragBar
+                // dragBar 아래 공간을 꽉 채우는 리스트뷰 영역
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(dragBarHeight)
-                        .anchoredDraggable(
-                            state = anchoredState,
-                            orientation = Orientation.Vertical
-                        )
-                ){
-                    Icon(
-                        painter = painterResource(Res.drawable.ic_horizontal_rule),
-                        contentDescription = null,
-                        tint = ColorGray.Gray_400,
-                        modifier = Modifier.size(40.dp),
-                    )
+                        .weight(1f)
+                ) {
+                    bottomContent()
                 }
             }
         }
