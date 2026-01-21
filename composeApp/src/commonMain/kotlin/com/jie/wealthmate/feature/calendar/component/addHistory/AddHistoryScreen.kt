@@ -17,8 +17,8 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import cafe.adriel.voyager.navigator.internal.BackHandler
 import com.jie.wealthmate.base.BaseScreen
-import com.jie.wealthmate.component.WMTextField
 import com.jie.wealthmate.component.topbar.TopBarItem
+import com.jie.wealthmate.feature.calendar.component.addHistory.component.DateTextField
 import com.jie.wealthmate.feature.calendar.component.addHistory.component.LargeCategorySelectBox
 import com.jie.wealthmate.theme.WMTheme
 import com.jie.wealthmate.utils.today
@@ -65,15 +65,11 @@ class AddHistoryScreen() : BaseScreen() {
             )
 
             // 날짜 선택
-            WMTextField(
-                value = today.toString(),
-                onValueChange = {},
-                label = "날짜",
-                readOnly = true,
-                isRequire = true,
-                modifier = Modifier
-                    .padding(horizontal = 4.dp)
-                    .padding(top = 20.dp)
+            DateTextField(
+                date = today,
+                onDateClick = {},
+                onRepeatClick = {},
+                onInstallmentClick = {}
             )
         }
     }
