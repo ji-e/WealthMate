@@ -6,7 +6,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Button
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -26,8 +26,8 @@ class AssetScreen() : Screen {
         val screenModel: AssetScreenModel = koinInject()
         val counter by screenModel.counter.collectAsState()
 
-        LaunchedEffect(navigator.lastItem) {
-            if (navigator.lastItem is AssetScreen) {
+        if (navigator.lastItem is AssetScreen) {
+            SideEffect {
                 screenModel.updateTopBar(
                     title = TopBarItem.Title("자산")
                 )

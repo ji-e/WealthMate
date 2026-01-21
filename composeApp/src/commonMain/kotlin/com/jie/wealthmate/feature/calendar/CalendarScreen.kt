@@ -3,7 +3,7 @@ package com.jie.wealthmate.feature.calendar
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import cafe.adriel.voyager.core.screen.Screen
@@ -23,8 +23,8 @@ class CalendarScreen() : Screen {
         val screenModel: CalendarScreenModel = koinInject()
         val uiState = screenModel.container.uiState.collectAsState().value
 
-        LaunchedEffect(navigator.lastItem) {
-            if (navigator.lastItem is CalendarScreen) {
+        if (navigator.lastItem is CalendarScreen) {
+            SideEffect {
                 screenModel.updateTopBar(
                     title = TopBarItem.Title("캘린더")
                 )

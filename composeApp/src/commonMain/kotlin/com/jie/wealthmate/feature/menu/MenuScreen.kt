@@ -4,7 +4,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import cafe.adriel.voyager.core.screen.Screen
@@ -27,6 +27,14 @@ class MenuScreen() : Screen {
         val screenModel: MenuScreenModel = koinInject()
         val uiState = screenModel.container.uiState.collectAsState().value
 
+        if (navigator.lastItem is MenuScreen) {
+            SideEffect {
+                screenModel.updateTopBar(
+                    title = TopBarItem.Title("전체 메뉴")
+                )
+            }
+        }
+
         screenModel.collectSideEffect { effect ->
             when (effect) {
                 is MenuUiSideEffect.OnCLickMenu -> {
@@ -40,14 +48,6 @@ class MenuScreen() : Screen {
                         else -> navigator.push(CategorySettingScreen(effect.menu)) // todo temp
                     }
                 }
-            }
-        }
-
-        LaunchedEffect(navigator.lastItem) {
-            if (navigator.lastItem is MenuScreen) {
-                screenModel.updateTopBar(
-                    title = TopBarItem.Title("전체 메뉴")
-                )
             }
         }
 
