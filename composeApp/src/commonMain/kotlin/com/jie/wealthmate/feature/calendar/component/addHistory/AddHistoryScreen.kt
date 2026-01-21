@@ -21,7 +21,7 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import cafe.adriel.voyager.navigator.internal.BackHandler
 import com.jie.wealthmate.base.BaseScreen
 import com.jie.wealthmate.component.WMText
-import com.jie.wealthmate.component.WMTextField
+import com.jie.wealthmate.component.textField.WMTextField
 import com.jie.wealthmate.component.topbar.TopBarItem
 import com.jie.wealthmate.feature.calendar.component.addHistory.component.DateTextField
 import com.jie.wealthmate.feature.calendar.component.addHistory.component.LargeCategorySelectBox

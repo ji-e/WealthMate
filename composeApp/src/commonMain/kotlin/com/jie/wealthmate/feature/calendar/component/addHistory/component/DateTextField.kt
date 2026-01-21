@@ -15,7 +15,7 @@ import androidx.compose.ui.unit.dp
 import com.jie.wealthmate.component.ButtonSize
 import com.jie.wealthmate.component.ButtonStyle
 import com.jie.wealthmate.component.WMButton
-import com.jie.wealthmate.component.WMTextField
+import com.jie.wealthmate.component.textField.WMTextField
 import com.jie.wealthmate.feature.calendar.component.addHistory.component.RepeatCycleEnum.Companion.formattedDescription
 import com.jie.wealthmate.feature.menu.categorySetting.component.LargeCategoryEnum
 import com.jie.wealthmate.theme.WMTheme
