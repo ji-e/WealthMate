@@ -97,6 +97,12 @@ abstract class BaseScreenModel<S : UiState> : ScreenModel, ContainerHost<S> {
         )
     }
 
+    fun showLoading(
+        isShowLoading: Boolean,
+    ) = screenScope.launch {
+        MainUiManager.emitSideEffect(BaseUiSideEffect.ShowLoading(isShowLoading))
+    }
+
     /**
      * Snackbar 메시지를 표시하는 SideEffect를 발생시킵니다.
      * @param message 표시할 메시지 문자열
@@ -156,10 +162,9 @@ abstract class BaseScreenModel<S : UiState> : ScreenModel, ContainerHost<S> {
             if (isHideKeyboard) hideKeyboard()
 
             if (showLoading) {
-                postSideEffect {
-                    BaseUiSideEffect.ShowLoading(true)
-                }
+                showLoading(true)
             }
+
             try {
                 val result = block()
                 onSuccess?.invoke(result)
@@ -171,9 +176,7 @@ abstract class BaseScreenModel<S : UiState> : ScreenModel, ContainerHost<S> {
                 onError?.invoke(e)
             } finally {
                 if (showLoading) {
-                    postSideEffect {
-                        BaseUiSideEffect.ShowLoading(false)
-                    }
+                    showLoading(false)
                 }
             }
         }
