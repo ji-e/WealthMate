@@ -2,10 +2,13 @@ package com.jie.wealthmate.feature.calendar
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
@@ -16,7 +19,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.koinInject
 
 
-class CalendarScreen() : Screen {
+class CalendarScreen(val calculateBottomPadding: Dp) : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
@@ -32,7 +35,9 @@ class CalendarScreen() : Screen {
         }
 
         Column(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(bottom = calculateBottomPadding),
         ) {
             MonthCalendar(
                 selectedMonth = uiState.selectedMonth,
@@ -48,7 +53,7 @@ class CalendarScreen() : Screen {
     @Preview(showBackground = true)
     private fun CalendarScreenPreview() {
         WMTheme {
-            CalendarScreen()
+            CalendarScreen(0.dp)
         }
     }
 }
