@@ -14,22 +14,22 @@ import com.jie.wealthmate.feature.menu.categorySetting.component.LargeCategoryEn
 @Composable
 fun LargeCategorySelectBox(
     modifier: Modifier = Modifier,
-    isSelectedLargeCategoryEnum: LargeCategoryEnum = LargeCategoryEnum.EXPENSES,
+    selectedLargeCategoryEnum: LargeCategoryEnum = LargeCategoryEnum.EXPENSES,
 ) {
     Row(
         modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         LargeCategoryButton(
-            isSelected = isSelectedLargeCategoryEnum == LargeCategoryEnum.INCOME,
+            isSelected = selectedLargeCategoryEnum == LargeCategoryEnum.INCOME,
             text = "수입"
         )
         LargeCategoryButton(
-            isSelected = isSelectedLargeCategoryEnum == LargeCategoryEnum.EXPENSES,
+            isSelected = selectedLargeCategoryEnum == LargeCategoryEnum.EXPENSES,
             text = "지출"
         )
         LargeCategoryButton(
-            isSelected = isSelectedLargeCategoryEnum == LargeCategoryEnum.SAVING,
+            isSelected = selectedLargeCategoryEnum == LargeCategoryEnum.SAVING,
             text = "저축"
         )
     }

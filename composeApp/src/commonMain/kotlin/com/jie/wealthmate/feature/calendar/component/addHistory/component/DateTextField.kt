@@ -25,7 +25,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @Composable
 fun DateTextField(
     modifier: Modifier = Modifier,
-    isSelectedLargeCategoryEnum: LargeCategoryEnum = LargeCategoryEnum.EXPENSES,
+    selectedLargeCategoryEnum: LargeCategoryEnum = LargeCategoryEnum.EXPENSES,
     date: LocalDate,
     repeatCycle: RepeatCycleEnum? = null,
     installmentCount: Int? = null,
@@ -62,7 +62,7 @@ fun DateTextField(
                 buttonStyle = if (repeatCycle != null) ButtonStyle.FILLED else ButtonStyle.OUTLINED,
             )
 
-            if (isSelectedLargeCategoryEnum == LargeCategoryEnum.EXPENSES) {
+            if (selectedLargeCategoryEnum == LargeCategoryEnum.EXPENSES) {
                 WMButton(
                     text = "할부",
                     onClick = onInstallmentClick,

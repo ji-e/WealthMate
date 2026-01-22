@@ -27,6 +27,7 @@ import com.jie.wealthmate.component.topbar.TopBarItem
 import com.jie.wealthmate.feature.calendar.component.addHistory.component.CategoryTextField
 import com.jie.wealthmate.feature.calendar.component.addHistory.component.DateTextField
 import com.jie.wealthmate.feature.calendar.component.addHistory.component.LargeCategorySelectBox
+import com.jie.wealthmate.feature.calendar.component.addHistory.component.PaymentMethodTextField
 import com.jie.wealthmate.theme.WMTheme
 import com.jie.wealthmate.utils.today
 import com.jie.wealthmate.vo.CategoryTagVo
@@ -115,6 +116,11 @@ class AddHistoryScreen() : BaseScreen() {
                     id = 0,
                     label = "외식"
                 )
+            )
+
+            // 결제수단/자산 선택
+            PaymentMethodTextField(
+                modifier = Modifier.padding(top = 20.dp),
             )
         }
     }
