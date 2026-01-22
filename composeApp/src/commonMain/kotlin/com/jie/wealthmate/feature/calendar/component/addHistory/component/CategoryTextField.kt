@@ -30,7 +30,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @Composable
 fun CategoryTextField(
     modifier: Modifier = Modifier,
-    isSelectedLargeCategoryEnum: LargeCategoryEnum = LargeCategoryEnum.EXPENSES,
+    selectedLargeCategoryEnum: LargeCategoryEnum = LargeCategoryEnum.EXPENSES,
     categoryItemData: CategoryItemData? = null,
     tagLabelItems: List<CategoryTagVo> = emptyList(),
     selectedTagLabel: CategoryTagVo? = null,
@@ -38,7 +38,7 @@ fun CategoryTextField(
     onTagLabelClick: (CategoryTagVo) -> Unit = {},
 ) {
     WMTextField(
-        value = categoryItemData?.label ?: isSelectedLargeCategoryEnum.tempMiddleCategoryLabel,
+        value = categoryItemData?.label ?: selectedLargeCategoryEnum.tempMiddleCategoryLabel,
         onValueChange = {},
         modifier = modifier,
         label = "카테고리",

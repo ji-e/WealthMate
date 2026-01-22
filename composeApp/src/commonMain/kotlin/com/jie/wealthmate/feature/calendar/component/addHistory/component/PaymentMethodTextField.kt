@@ -11,14 +11,14 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @Composable
 fun PaymentMethodTextField(
     modifier: Modifier = Modifier,
-    isSelectedLargeCategoryEnum: LargeCategoryEnum = LargeCategoryEnum.EXPENSES,
+    selectedLargeCategoryEnum: LargeCategoryEnum = LargeCategoryEnum.EXPENSES,
     onPaymentMethodClick: () -> Unit = {},
 ) {
     WMTextField(
         value = "현금",
         onValueChange = {},
         modifier = modifier,
-        label = if (isSelectedLargeCategoryEnum == LargeCategoryEnum.EXPENSES) "결제수단" else "자산",
+        label = if (selectedLargeCategoryEnum == LargeCategoryEnum.EXPENSES) "결제수단" else "자산",
         readOnly = true,
         onClickReadOnly = onPaymentMethodClick,
     )
