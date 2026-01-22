@@ -115,7 +115,7 @@ class AddCategoryScreen(
                     onValueChange = screenModel::updateCategoryLabel,
                     modifier = Modifier
                         .padding(top = 20.dp)
-                        .padding(horizontal = 4.dp),
+                        .padding(horizontal = 20.dp),
                     maxLength = 15,
                     label = "카테고리 이름",
                     placeholder = largeCategory.tempMiddleCategoryLabel,
@@ -126,7 +126,9 @@ class AddCategoryScreen(
 
                 // 카테고리 태그
                 CategoryTag(
-                    modifier = Modifier.padding(top = 20.dp),
+                    modifier = Modifier
+                        .padding(top = 20.dp)
+                        .padding(horizontal = 20.dp),
                     largeCategory = largeCategory,
                     tagLabel = uiState.tagLabel,
                     tagLabelItems = uiState.tagLabelItems,

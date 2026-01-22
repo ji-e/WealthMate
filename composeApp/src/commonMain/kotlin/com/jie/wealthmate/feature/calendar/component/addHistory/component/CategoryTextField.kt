@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Typography
@@ -38,18 +37,15 @@ fun CategoryTextField(
     onCategoryClick: () -> Unit = {},
     onTagLabelClick: (CategoryTagVo) -> Unit = {},
 ) {
-    Box() {
+    Box(modifier = modifier) {
         WMTextField(
             value = categoryItemData?.label ?: isSelectedLargeCategoryEnum.tempMiddleCategoryLabel,
             onValueChange = {},
             label = "카테고리",
             readOnly = true,
             isRequire = true,
-            modifier = Modifier
-                .padding(horizontal = 4.dp)
-                .padding(top = 20.dp),
+            onClickReadOnly = onCategoryClick,
             supportingContent = {
-
                 FlowRow(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -75,15 +71,6 @@ fun CategoryTextField(
                     }
                 }
             }
-        )
-
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(84.dp)
-                .padding(horizontal = 20.dp)
-                .padding(top = 48.dp)
-                .clickable { onCategoryClick() }
         )
     }
 }

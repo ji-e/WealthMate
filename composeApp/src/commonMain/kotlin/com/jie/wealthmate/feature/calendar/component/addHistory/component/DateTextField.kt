@@ -1,12 +1,9 @@
 package com.jie.wealthmate.feature.calendar.component.addHistory.component
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -36,16 +33,14 @@ fun DateTextField(
     onRepeatClick: () -> Unit = {},
     onInstallmentClick: () -> Unit = {},
 ) {
-    Box() {
+    Box(modifier = modifier) {
         WMTextField(
             value = date.convertLocalDateToString(formatDateHyphenYMDE),
             onValueChange = {},
             label = "날짜",
             readOnly = true,
             isRequire = true,
-            modifier = Modifier
-                .padding(horizontal = 4.dp)
-                .padding(top = 20.dp),
+            onClickReadOnly = onDateClick,
             supportingText = when {
                 repeatCycle != null -> repeatCycle.formattedDescription(date)
                 installmentCount != null -> "할부 $installmentCount 개월"
@@ -53,36 +48,27 @@ fun DateTextField(
             },
         )
 
-        Box(
+        Row(
             modifier = Modifier
-                .fillMaxWidth()
-                .height(84.dp)
-                .padding(horizontal = 20.dp)
-                .padding(top = 48.dp)
-                .clickable { onDateClick() }
+                .padding(top = 6.dp)
+                .align(Alignment.CenterEnd),
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Row(
-                modifier = Modifier
-                    .padding(top = 6.dp)
-                    .align(Alignment.CenterEnd),
-                horizontalArrangement = Arrangement.spacedBy(4.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                WMButton(
-                    text = "반복",
-                    onClick = onRepeatClick,
-                    buttonSize = ButtonSize.X_SMALL,
-                    buttonStyle = if (repeatCycle != null) ButtonStyle.FILLED else ButtonStyle.OUTLINED,
-                )
+            WMButton(
+                text = "반복",
+                onClick = onRepeatClick,
+                buttonSize = ButtonSize.X_SMALL,
+                buttonStyle = if (repeatCycle != null) ButtonStyle.FILLED else ButtonStyle.OUTLINED,
+            )
 
-                if (isSelectedLargeCategoryEnum == LargeCategoryEnum.EXPENSES) {
-                    WMButton(
-                        text = "할부",
-                        onClick = onInstallmentClick,
-                        buttonSize = ButtonSize.X_SMALL,
-                        buttonStyle = if (installmentCount != null) ButtonStyle.FILLED else ButtonStyle.OUTLINED,
-                    )
-                }
+            if (isSelectedLargeCategoryEnum == LargeCategoryEnum.EXPENSES) {
+                WMButton(
+                    text = "할부",
+                    onClick = onInstallmentClick,
+                    buttonSize = ButtonSize.X_SMALL,
+                    buttonStyle = if (installmentCount != null) ButtonStyle.FILLED else ButtonStyle.OUTLINED,
+                )
             }
         }
     }

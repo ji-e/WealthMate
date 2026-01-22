@@ -1,6 +1,7 @@
 package com.jie.wealthmate.component.textField
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -27,6 +28,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
@@ -39,11 +41,6 @@ import com.jie.wealthmate.theme.ColorRed
 import com.jie.wealthmate.theme.wantedSansFontFamily
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
-/**
- * WMTextField
- *
- * 기본으로 horizontal padding 16.dp
- */
 @Composable
 fun WMTextField(
     value: String,
@@ -62,6 +59,8 @@ fun WMTextField(
     isCount: Boolean = false,
     isRequire: Boolean = false,
     suffix: @Composable (() -> Unit)? = null,
+    trailingIcon: @Composable (() -> Unit)? = null,
+    onClickReadOnly: (() -> Unit)? = null,
     visualTransformation: VisualTransformation = VisualTransformation.None,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
@@ -96,6 +95,8 @@ fun WMTextField(
         isCount = isCount,
         isRequire = isRequire,
         suffix = suffix,
+        trailingIcon = trailingIcon,
+        onClickReadOnly = onClickReadOnly,
         visualTransformation = visualTransformation,
         keyboardOptions = keyboardOptions,
         keyboardActions = keyboardActions,
@@ -121,6 +122,8 @@ fun WMTextField(
     isCount: Boolean = false,
     isRequire: Boolean = false,
     suffix: @Composable (() -> Unit)? = null,
+    trailingIcon: @Composable (() -> Unit)? = null,
+    onClickReadOnly: (() -> Unit)? = null,
     visualTransformation: VisualTransformation = VisualTransformation.None,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
@@ -139,6 +142,19 @@ fun WMTextField(
         TextField(
             modifier = textFieldModifier
                 .fillMaxWidth()
+                .layout { measurable, constraints ->
+                    val padding = 16.dp.roundToPx()
+                    val expandedWidth = constraints.maxWidth + (padding * 2)
+                    val placeable = measurable.measure(
+                        constraints.copy(
+                            maxWidth = expandedWidth,
+                            minWidth = expandedWidth
+                        )
+                    )
+                    layout(constraints.maxWidth, placeable.height) {
+                        placeable.placeRelative(-padding, 0)
+                    }
+                }
                 .heightIn(min = 92.dp)
                 .focusRequester(focusRequester)
                 .onFocusChanged { focusState ->
@@ -208,6 +224,7 @@ fun WMTextField(
                 },
             singleLine = true,
             suffix = suffix,
+            trailingIcon = trailingIcon,
             visualTransformation = visualTransformation,
             keyboardOptions = keyboardOptions,
             keyboardActions = keyboardActions,
@@ -245,10 +262,21 @@ fun WMTextField(
                 errorSupportingTextColor = errorColor,
             )
         )
+        if (onClickReadOnly != null) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(72.dp)
+                    .padding(top = 28.dp)
+                    .clickable {
+                        focusRequester.requestFocus()
+                        onClickReadOnly()
+                    }
+            )
+        }
         Spacer(
             modifier = Modifier
                 .padding(top = 69.dp)
-                .padding(horizontal = 16.dp)
                 .fillMaxWidth()
                 .height(1.dp)
                 .background(

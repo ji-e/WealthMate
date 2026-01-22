@@ -147,7 +147,7 @@ class ModifyCategoryScreen(
                     onValueChange = screenModel::updateCategoryLabel,
                     modifier = Modifier
                         .padding(top = 20.dp)
-                        .padding(horizontal = 4.dp),
+                        .padding(horizontal = 20.dp),
                     textFieldModifier = Modifier.focusRequester(remember { FocusRequester() })
                         .onFocusChanged { focusState ->
                             isKeyboardOpen = focusState.isFocused
@@ -162,7 +162,9 @@ class ModifyCategoryScreen(
 
                 // 카테고리 태그
                 CategoryTag(
-                    modifier = Modifier.padding(top = 20.dp),
+                    modifier = Modifier
+                        .padding(top = 20.dp)
+                        .padding(horizontal = 20.dp),
                     textFieldModifier = Modifier.focusRequester(remember { FocusRequester() })
                         .onFocusChanged { focusState ->
                             isKeyboardOpen = focusState.isFocused
@@ -250,7 +252,9 @@ class ModifyCategoryScreen(
             onDismissRequest = onDismissRequest,
         ) {
             Column(
-                modifier = Modifier.padding(horizontal = 16.dp).padding(bottom = 20.dp)
+                modifier = Modifier
+                    .padding(horizontal = 20.dp)
+                    .padding(bottom = 20.dp)
             ) {
                 WMTextField(
                     value = tagLabel,
@@ -266,7 +270,6 @@ class ModifyCategoryScreen(
                 Row(
                     modifier = Modifier
                         .padding(top = 20.dp)
-                        .padding(horizontal = 4.dp)
                         .fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
