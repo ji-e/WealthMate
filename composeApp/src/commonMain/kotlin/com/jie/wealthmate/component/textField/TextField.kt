@@ -27,6 +27,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
@@ -39,11 +40,6 @@ import com.jie.wealthmate.theme.ColorRed
 import com.jie.wealthmate.theme.wantedSansFontFamily
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
-/**
- * WMTextField
- *
- * 기본으로 horizontal padding 16.dp
- */
 @Composable
 fun WMTextField(
     value: String,
@@ -139,6 +135,19 @@ fun WMTextField(
         TextField(
             modifier = textFieldModifier
                 .fillMaxWidth()
+                .layout { measurable, constraints ->
+                    val padding = 16.dp.roundToPx()
+                    val expandedWidth = constraints.maxWidth + (padding * 2)
+                    val placeable = measurable.measure(
+                        constraints.copy(
+                            maxWidth = expandedWidth,
+                            minWidth = expandedWidth
+                        )
+                    )
+                    layout(constraints.maxWidth, placeable.height) {
+                        placeable.placeRelative(-padding, 0)
+                    }
+                }
                 .heightIn(min = 92.dp)
                 .focusRequester(focusRequester)
                 .onFocusChanged { focusState ->
@@ -248,7 +257,6 @@ fun WMTextField(
         Spacer(
             modifier = Modifier
                 .padding(top = 69.dp)
-                .padding(horizontal = 16.dp)
                 .fillMaxWidth()
                 .height(1.dp)
                 .background(
