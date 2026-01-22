@@ -24,10 +24,12 @@ import com.jie.wealthmate.component.textField.WMTextField
 import com.jie.wealthmate.component.textField.rememberIntegerVisualTransformation
 import com.jie.wealthmate.component.textField.toIntegerTextFieldValue
 import com.jie.wealthmate.component.topbar.TopBarItem
+import com.jie.wealthmate.feature.calendar.component.addHistory.component.CategoryTextField
 import com.jie.wealthmate.feature.calendar.component.addHistory.component.DateTextField
 import com.jie.wealthmate.feature.calendar.component.addHistory.component.LargeCategorySelectBox
 import com.jie.wealthmate.theme.WMTheme
 import com.jie.wealthmate.utils.today
+import com.jie.wealthmate.vo.CategoryTagVo
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.koinInject
 
@@ -88,6 +90,7 @@ class AddHistoryScreen() : BaseScreen() {
                     screenModel.updateAmount(it.toIntegerTextFieldValue())
                 },
                 label = "금액",
+                isRequire = true,
                 maxLength = 10,
                 placeholder = "금액을 입력해 주세요.",
                 suffix = {
@@ -97,6 +100,27 @@ class AddHistoryScreen() : BaseScreen() {
                     )
                 },
                 visualTransformation = rememberIntegerVisualTransformation(),
+            )
+
+            // 카테고리 선택
+            CategoryTextField(
+                modifier = Modifier
+                    .padding(top = 20.dp)
+                    .padding(horizontal = 4.dp),
+                tagLabelItems = listOf(
+                    CategoryTagVo(
+                        id = 0,
+                        label = "외식"
+                    ),
+                    CategoryTagVo(
+                        id = 1,
+                        label = "주책 청약"
+                    )
+                ),
+                selectedTagLabel = CategoryTagVo(
+                    id = 0,
+                    label = "외식"
+                )
             )
         }
     }

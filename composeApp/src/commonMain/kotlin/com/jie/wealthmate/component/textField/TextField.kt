@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -21,7 +22,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -135,14 +135,11 @@ fun WMTextField(
     val placeholderColor = ColorGray.Gray_300
 
 
-    Box(
-        modifier = modifier,
-        contentAlignment = Alignment.BottomCenter
-    ) {
+    Box(modifier = modifier) {
         TextField(
             modifier = textFieldModifier
                 .fillMaxWidth()
-                .height(92.dp)
+                .heightIn(min = 92.dp)
                 .focusRequester(focusRequester)
                 .onFocusChanged { focusState ->
                     isFocused = focusState.isFocused
@@ -250,7 +247,7 @@ fun WMTextField(
         )
         Spacer(
             modifier = Modifier
-                .padding(bottom = 26.dp)
+                .padding(top = 69.dp)
                 .padding(horizontal = 16.dp)
                 .fillMaxWidth()
                 .height(1.dp)
