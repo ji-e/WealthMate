@@ -37,42 +37,41 @@ fun CategoryTextField(
     onCategoryClick: () -> Unit = {},
     onTagLabelClick: (CategoryTagVo) -> Unit = {},
 ) {
-    Box(modifier = modifier) {
-        WMTextField(
-            value = categoryItemData?.label ?: isSelectedLargeCategoryEnum.tempMiddleCategoryLabel,
-            onValueChange = {},
-            label = "카테고리",
-            readOnly = true,
-            isRequire = true,
-            onClickReadOnly = onCategoryClick,
-            supportingContent = {
-                FlowRow(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 8.dp),
-                    horizontalArrangement = Arrangement.spacedBy(4.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    tagLabelItems.forEach { item ->
-                        val isSelected = selectedTagLabel == item
-                        Box(
-                            modifier = Modifier
-                                .clip(CircleShape)
-                                .background(color = if (isSelected) ColorPrimary.Primary_500 else ColorGray.Gray_100)
-                                .clickable { onTagLabelClick(item) }
-                                .padding(horizontal = 8.dp, vertical = 4.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            WMText(
-                                text = item.label,
-                                style = Typography().labelMedium.copy(color = if (isSelected) ColorGray.White else ColorGray.Gray_700)
-                            )
-                        }
+    WMTextField(
+        value = categoryItemData?.label ?: isSelectedLargeCategoryEnum.tempMiddleCategoryLabel,
+        onValueChange = {},
+        modifier = modifier,
+        label = "카테고리",
+        readOnly = true,
+        isRequire = true,
+        onClickReadOnly = onCategoryClick,
+        supportingContent = {
+            FlowRow(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp),
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                tagLabelItems.forEach { item ->
+                    val isSelected = selectedTagLabel == item
+                    Box(
+                        modifier = Modifier
+                            .clip(CircleShape)
+                            .background(color = if (isSelected) ColorPrimary.Primary_500 else ColorGray.Gray_100)
+                            .clickable { onTagLabelClick(item) }
+                            .padding(horizontal = 8.dp, vertical = 4.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        WMText(
+                            text = item.label,
+                            style = Typography().labelMedium.copy(color = if (isSelected) ColorGray.White else ColorGray.Gray_700)
+                        )
                     }
                 }
             }
-        )
-    }
+        }
+    )
 }
 
 @Composable
