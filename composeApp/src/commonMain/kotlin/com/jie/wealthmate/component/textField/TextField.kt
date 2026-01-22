@@ -1,6 +1,7 @@
 package com.jie.wealthmate.component.textField
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -58,6 +59,7 @@ fun WMTextField(
     isCount: Boolean = false,
     isRequire: Boolean = false,
     suffix: @Composable (() -> Unit)? = null,
+    onClickReadOnly: (() -> Unit)? = null,
     visualTransformation: VisualTransformation = VisualTransformation.None,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
@@ -92,6 +94,7 @@ fun WMTextField(
         isCount = isCount,
         isRequire = isRequire,
         suffix = suffix,
+        onClickReadOnly = onClickReadOnly,
         visualTransformation = visualTransformation,
         keyboardOptions = keyboardOptions,
         keyboardActions = keyboardActions,
@@ -117,6 +120,7 @@ fun WMTextField(
     isCount: Boolean = false,
     isRequire: Boolean = false,
     suffix: @Composable (() -> Unit)? = null,
+    onClickReadOnly: (() -> Unit)? = null,
     visualTransformation: VisualTransformation = VisualTransformation.None,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
@@ -254,6 +258,18 @@ fun WMTextField(
                 errorSupportingTextColor = errorColor,
             )
         )
+        if (onClickReadOnly != null) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(72.dp)
+                    .padding(top = 28.dp)
+                    .clickable {
+                        focusRequester.requestFocus()
+                        onClickReadOnly()
+                    }
+            )
+        }
         Spacer(
             modifier = Modifier
                 .padding(top = 69.dp)
