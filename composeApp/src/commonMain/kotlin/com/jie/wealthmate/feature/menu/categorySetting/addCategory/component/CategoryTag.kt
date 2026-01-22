@@ -55,7 +55,6 @@ fun CategoryTag(
             value = tagLabel,
             onValueChange = onValueChange,
             modifier = Modifier
-                .padding(horizontal = 4.dp)
                 .focusRequester(remember { FocusRequester() })
                 .onFocusChanged { focusState ->
                     if (focusState.isFocused.not()) {
@@ -75,9 +74,7 @@ fun CategoryTag(
         )
 
         CategoryTagItem(
-            modifier = Modifier
-                .padding(top = 12.dp)
-                .padding(horizontal = 20.dp),
+            modifier = Modifier.padding(top = 12.dp),
             trailingIcon = trailingIcon,
             chipItems = tagLabelItems,
             onChipClick = onChipClick

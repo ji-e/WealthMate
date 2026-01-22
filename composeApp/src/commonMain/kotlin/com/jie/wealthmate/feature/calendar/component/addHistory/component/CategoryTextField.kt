@@ -38,16 +38,13 @@ fun CategoryTextField(
     onCategoryClick: () -> Unit = {},
     onTagLabelClick: (CategoryTagVo) -> Unit = {},
 ) {
-    Box() {
+    Box(modifier = modifier) {
         WMTextField(
             value = categoryItemData?.label ?: isSelectedLargeCategoryEnum.tempMiddleCategoryLabel,
             onValueChange = {},
             label = "카테고리",
             readOnly = true,
             isRequire = true,
-            modifier = Modifier
-                .padding(horizontal = 4.dp)
-                .padding(top = 20.dp),
             supportingContent = {
 
                 FlowRow(

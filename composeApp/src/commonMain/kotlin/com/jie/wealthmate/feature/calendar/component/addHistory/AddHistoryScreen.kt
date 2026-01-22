@@ -63,14 +63,11 @@ class AddHistoryScreen() : BaseScreen() {
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .padding(horizontal = 20.dp)
                 .verticalScroll(rememberScrollState())
         ) {
             // 수입, 지출, 저출 카테고리 선택
-            LargeCategorySelectBox(
-                modifier = Modifier
-                    .padding(horizontal = 20.dp)
-                    .padding(top = 4.dp)
-            )
+            LargeCategorySelectBox()
 
             // 날짜 선택
             DateTextField(
@@ -82,9 +79,7 @@ class AddHistoryScreen() : BaseScreen() {
 
             // 금액 입력
             WMTextField(
-                modifier = Modifier
-                    .padding(top = 20.dp)
-                    .padding(horizontal = 4.dp),
+                modifier = Modifier.padding(top = 20.dp),
                 value = uiState.amount,
                 onValueChange = {
                     screenModel.updateAmount(it.toIntegerTextFieldValue())
@@ -104,9 +99,7 @@ class AddHistoryScreen() : BaseScreen() {
 
             // 카테고리 선택
             CategoryTextField(
-                modifier = Modifier
-                    .padding(top = 20.dp)
-                    .padding(horizontal = 4.dp),
+                modifier = Modifier.padding(top = 20.dp),
                 tagLabelItems = listOf(
                     CategoryTagVo(
                         id = 0,
