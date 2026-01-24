@@ -19,6 +19,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -50,12 +51,14 @@ import com.jie.wealthmate.feature.menu.categoryManagement.modifyCategory.ModifyC
 import com.jie.wealthmate.theme.ColorGray
 import com.jie.wealthmate.theme.ColorPrimary
 import com.jie.wealthmate.theme.WMTheme
+import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 import wealthmate.composeapp.generated.resources.Res
 import wealthmate.composeapp.generated.resources.ic_add
 
 class CategoryManagementScreen() : BaseScreen() {
     private val largeCategoryEnum = LargeCategoryEnum.creatorFromMenu("")
+    private val largeCategoryItems = LargeCategoryEnum.entries
 
     @Composable
     override fun Content() {
@@ -64,9 +67,10 @@ class CategoryManagementScreen() : BaseScreen() {
         val navigator = LocalNavigator.currentOrThrow
         val screenModel: CategoryManagementScreenModel = koinInject()
         val uiState = screenModel.container.uiState.collectAsState().value
-        val pagerState = rememberPagerState(pageCount = { LargeCategoryEnum.entries.size })
+        val coroutineScope = rememberCoroutineScope()
         var isDragging by remember { mutableStateOf(false) }
         val hapticFeedback = LocalHapticFeedback.current
+        val pagerState = rememberPagerState(pageCount = { largeCategoryItems.size })
         val listState = rememberReorderableLazyListState(
             onMove = { from, to -> screenModel.handleReorderCategoryItems(from.index, to.index) }
         )
@@ -131,7 +135,16 @@ class CategoryManagementScreen() : BaseScreen() {
             CategoryTap(
                 modifier = Modifier.padding(top = 4.dp),
                 pagerState = pagerState,
-                onTapClick = screenModel::getIncomeCategories
+                onTapClick = {
+                    if (isDragging) {
+                        screenModel.showSnackbar("순서 변경을 저장해 주세요.")
+                    } else {
+                        coroutineScope.launch {
+                            pagerState.animateScrollToPage(it)
+                        }
+                        screenModel.getIncomeCategories(largeCategoryItems[it])
+                    }
+                }
             )
             HorizontalPager(
                 modifier = Modifier.weight(1f),

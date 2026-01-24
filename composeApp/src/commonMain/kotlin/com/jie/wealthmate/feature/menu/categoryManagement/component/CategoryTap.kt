@@ -7,21 +7,18 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import com.jie.wealthmate.component.WMText
 import com.jie.wealthmate.theme.ColorGray
-import kotlinx.coroutines.launch
 
 @Composable
 fun CategoryTap(
     modifier: Modifier = Modifier,
     pagerState: PagerState,
-    onTapClick: (LargeCategoryEnum) -> Unit = {},
+    onTapClick: (Int) -> Unit = {},
 ) {
-    val largeCategoryItems = LargeCategoryEnum.entries.toTypedArray()
-    val coroutineScope = rememberCoroutineScope()
+    val largeCategoryItems = LargeCategoryEnum.entries
 
     PrimaryTabRow(
         modifier = modifier.fillMaxWidth(),
@@ -44,12 +41,7 @@ fun CategoryTap(
                     )
                 },
                 selected = pagerState.currentPage == index,
-                onClick = {
-                    onTapClick(largeCategory)
-                    coroutineScope.launch {
-                        pagerState.animateScrollToPage(index)
-                    }
-                }
+                onClick = { onTapClick(index) }
             )
         }
     }
