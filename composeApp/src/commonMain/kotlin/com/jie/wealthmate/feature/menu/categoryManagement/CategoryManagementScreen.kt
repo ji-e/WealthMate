@@ -193,7 +193,7 @@ class CategoryManagementScreen() : BaseScreen() {
 
     @Composable
     @Preview(showBackground = true)
-    private fun IncomeCategorySettingScreenPreview() {
+    private fun CategorySettingScreenPreview() {
         WMTheme {
             CategoryManagementScreen()
         }

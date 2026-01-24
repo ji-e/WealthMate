@@ -16,7 +16,7 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import com.jie.wealthmate.base.collectSideEffect
 import com.jie.wealthmate.component.topbar.TopBarItem
 import com.jie.wealthmate.feature.menu.categoryManagement.CategoryManagementScreen
-import com.jie.wealthmate.feature.menu.component.MenuContentItem
+import com.jie.wealthmate.feature.menu.component.MenuItem
 import com.jie.wealthmate.feature.menu.component.MenuEnum
 import com.jie.wealthmate.feature.menu.component.MenuTitleItem
 import com.jie.wealthmate.theme.WMTheme
@@ -66,7 +66,7 @@ class MenuScreen(val calculateBottomPadding: Dp) : Screen {
                 Column() {
                     repeat(menu.items.size) { index ->
                         val menuContent = menu.items[index]
-                        MenuContentItem(
+                        MenuItem(
                             menu = menuContent,
                             onClickMenu = {
                                 screenModel.onMenuClick(menuContent)

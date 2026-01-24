@@ -14,29 +14,33 @@ enum class MenuEnum(
         title = "카테고리 관리",
         icon = null,
     ),
-    INCOME_CATEGORY(
-        route = "incomeCategory",
-        label = "수입 카테고리",
-        title = "수입 카테고리 관리",
+    PAYMENT_METHOD(
+        route = "payment_method",
+        label = "결제수단",
+        title = "결제수단 관리",
         icon = null
     ),
-    EXPENSES_CATEGORY(
-        route = "expensesCategory",
-        label = "지출 카테고리",
-        title = "지출 카테고리 관리",
+    ASSET(
+        route = "asset",
+        label = "자산",
+        title = "자산 관리",
         icon = null
     ),
-    SAVING_CATEGORY(
-        route = "savingCategory",
-        label = "저축 카테고리",
-        title = "저축 카테고리 관리",
+    REPEAT_HISTORY(
+        route = "repeat_history",
+        label = "반복내역",
+        title = "반복내역 관리",
         icon = null
-    ),
+    )
+
     ;
 
     companion object {
         val managementMenu = listOf(
-            CATEGORY
+            CATEGORY,
+            PAYMENT_METHOD,
+            ASSET,
+//            REPEAT_HISTORY,
         )
     }
 }

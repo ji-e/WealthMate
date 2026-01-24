@@ -1,20 +1,51 @@
 package com.jie.wealthmate.feature.menu.component
 
-/**
- * Menu 항목을 정의하는 sealed class
- */
-sealed class MenuItem(
-    val label: String,
-    val items: List<MenuEnum>,
-) {
-    object Management : MenuItem(
-        label = "관리",
-        items = MenuEnum.managementMenu
-    )
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Typography
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import com.jie.wealthmate.component.WMText
+import com.jie.wealthmate.theme.ColorPrimary
 
-    companion object {
-        val menuItems = listOf(
-            Management,
+@Composable
+fun MenuTitleItem(
+    label: String,
+) {
+    WMText(
+        text = label,
+        style = Typography().bodyMedium.copy(
+            fontWeight = FontWeight.Bold,
+            color = ColorPrimary.Primary_700,
+        ),
+        modifier = Modifier
+            .padding(top = 12.dp, bottom = 4.dp)
+            .padding(horizontal = 20.dp)
+    )
+}
+
+@Composable
+fun MenuItem(
+    menu: MenuEnum,
+    onClickMenu: () -> Unit = {},
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(48.dp)
+            .clickable { onClickMenu() }
+            .padding(horizontal = 20.dp),
+        contentAlignment = Alignment.CenterStart
+    ) {
+        WMText(
+            text = menu.label,
+            style = Typography().titleMedium.copy(fontWeight = FontWeight.Medium)
         )
     }
 }
