@@ -26,6 +26,7 @@ import com.jie.wealthmate.component.WMFloatingButton
 import com.jie.wealthmate.component.reorderable.rememberReorderableLazyListState
 import com.jie.wealthmate.component.reorderable.reorderable
 import com.jie.wealthmate.component.topbar.TopBarItem
+import com.jie.wealthmate.feature.menu.component.MenuEnum
 import com.jie.wealthmate.theme.ColorGray
 import com.jie.wealthmate.theme.WMTheme
 import org.koin.compose.koinInject
@@ -66,7 +67,7 @@ class PaymentMethodManagementScreen() : BaseScreen() {
             SideEffect {
                 if (isDragging) {
                     screenModel.updateTopBar(
-                        title = TopBarItem.Title("결제수단 순서 변경"),
+                        title = TopBarItem.Title("${MenuEnum.PAYMENT_METHOD.label} 순서 변경"),
                         readingItem = TopBarItem.ReadingItem().copy(
                             action = { onBack() }
                         )
@@ -74,9 +75,7 @@ class PaymentMethodManagementScreen() : BaseScreen() {
                 } else {
                     val isAddItemEnabled = uiState.paymentMethodItems.size < 10
                     screenModel.updateTopBar(
-                        title = TopBarItem.Title(
-                            "결제수단 관리"
-                        ),
+                        title = TopBarItem.Title(MenuEnum.PAYMENT_METHOD.title),
                         readingItem = TopBarItem.ReadingItem().copy(
                             action = { navigator.pop() }
                         ),
