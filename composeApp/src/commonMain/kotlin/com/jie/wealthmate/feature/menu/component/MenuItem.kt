@@ -7,14 +7,14 @@ sealed class MenuItem(
     val label: String,
     val items: List<MenuEnum>,
 ) {
-    object CategoryMenu : MenuItem(
-        label = "카테고리 관리",
-        items = MenuEnum.categoryMenu
+    object Management : MenuItem(
+        label = "관리",
+        items = MenuEnum.managementMenu
     )
 
     companion object {
         val menuItems = listOf(
-            CategoryMenu,
+            Management,
         )
     }
 }

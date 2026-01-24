@@ -8,6 +8,12 @@ enum class MenuEnum(
     val title: String,
     val icon: DrawableResource?,
 ) {
+    CATEGORY(
+        route = "category",
+        label = "카테고리",
+        title = "카테고리 관리",
+        icon = null,
+    ),
     INCOME_CATEGORY(
         route = "incomeCategory",
         label = "수입 카테고리",
@@ -29,10 +35,8 @@ enum class MenuEnum(
     ;
 
     companion object {
-        val categoryMenu = listOf(
-            INCOME_CATEGORY,
-            EXPENSES_CATEGORY,
-            SAVING_CATEGORY,
+        val managementMenu = listOf(
+            CATEGORY
         )
     }
 }
