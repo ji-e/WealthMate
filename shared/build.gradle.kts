@@ -1,7 +1,6 @@
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidLibrary)
-    alias(libs.plugins.sqldelight)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.ksp)
@@ -23,7 +22,6 @@ kotlin {
 
     sourceSets {
         androidMain.dependencies {
-            implementation(libs.sqldelight.android.driver)
             implementation(libs.koin.android)
 
             implementation(libs.androidx.compose.ui)
@@ -33,12 +31,11 @@ kotlin {
 
         }
         iosMain.dependencies {
-            implementation(libs.sqldelight.native.driver)
+
         }
         commonMain.dependencies {
             implementation(libs.kotlinx.datetime)
             implementation(libs.kotlinx.serialization.json)
-            implementation(libs.sqldelight.coroutines.extensions)
             implementation(libs.koin.core)
             implementation(libs.koin.compose)
 
@@ -67,14 +64,6 @@ android {
     }
     defaultConfig {
         minSdk = libs.versions.android.minSdk.get().toInt()
-    }
-}
-
-sqldelight {
-    databases {
-        create("WMDatabase") { // 생성될 데이터베이스 클래스의 이름
-            packageName.set("com.jie.wealthmate.database") // 생성될 파일들의 패키지 경로
-        }
     }
 }
 
