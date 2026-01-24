@@ -20,7 +20,7 @@ class CategoryManagementScreenModel(
         getIncomeCategories()
     }
 
-    fun getIncomeCategories() {
+    fun getIncomeCategories(largeCategoryEnum: LargeCategoryEnum = LargeCategoryEnum.INCOME) {
         categoryRepository.getCategoriesByLargeCategory(largeCategoryEnum.name)
             .apiFlow { response ->
                 reduceState { state ->
