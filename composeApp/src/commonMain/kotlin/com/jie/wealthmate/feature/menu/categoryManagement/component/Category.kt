@@ -2,7 +2,6 @@ package com.jie.wealthmate.feature.menu.categoryManagement.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
@@ -10,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -36,10 +36,12 @@ import com.jie.wealthmate.component.reorderable.detectReorderAfterLongPress
 import com.jie.wealthmate.component.reorderable.reorderable
 import com.jie.wealthmate.theme.ColorGray
 import com.jie.wealthmate.theme.ColorPrimary
+import com.jie.wealthmate.theme.ColorRed
 import com.jie.wealthmate.theme.WMTheme
 import org.jetbrains.compose.resources.painterResource
 import wealthmate.composeapp.generated.resources.Res
 import wealthmate.composeapp.generated.resources.ic_drag_handle
+import wealthmate.composeapp.generated.resources.ic_push_pin
 
 @Composable
 fun ColumnScope.Category(
@@ -119,25 +121,40 @@ fun CategoryItem(
                 horizontal = 20.dp
             ),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        Box(
-            modifier = Modifier
-                .clip(CircleShape)
-                .background(data.largeCategory.backgroundColor)
-                .size(40.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            WMText(
-                text = data.icon,
-                style = Typography().bodyLarge.copy(fontSize = 28.sp)
-            )
+        Box(modifier = Modifier.width(52.dp)) {
+            Box(
+                modifier = Modifier
+                    .clip(CircleShape)
+                    .background(data.largeCategory.backgroundColor)
+                    .size(40.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                WMText(
+                    text = data.icon,
+                    style = Typography().bodyLarge.copy(fontSize = 28.sp)
+                )
+            }
+            if (data.isFixed) {
+                Icon(
+                    painter = painterResource(Res.drawable.ic_push_pin),
+                    contentDescription = null,
+                    tint = ColorRed.Red_300,
+                    modifier = Modifier
+                        .padding()
+                        .size(24.dp)
+                        .align(Alignment.TopEnd)
+                )
+            }
         }
+
 
         WMText(
             text = data.label,
             style = Typography().bodyLarge.copy(fontSize = 18.sp, fontWeight = FontWeight.Medium),
-            modifier = Modifier.weight(1f),
+            modifier = Modifier
+                .weight(1f)
+                .padding(end = 12.dp),
             maxLines = 1,
         )
 
