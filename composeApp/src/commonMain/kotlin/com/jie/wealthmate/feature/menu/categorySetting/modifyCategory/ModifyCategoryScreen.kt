@@ -56,7 +56,7 @@ import wealthmate.composeapp.generated.resources.ic_expand_circle_right
 
 class ModifyCategoryScreen(
     val largeCategory: LargeCategoryEnum,
-    val categoryId: Long,
+    val categoryId: String,
 ) : BaseScreen() {
 
     @Composable
@@ -326,7 +326,7 @@ class ModifyCategoryScreen(
         WMTheme {
             ModifyCategoryScreen(
                 largeCategory = LargeCategoryEnum.INCOME,
-                categoryId = 0
+                categoryId = "0"
             )
         }
     }

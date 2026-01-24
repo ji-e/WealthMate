@@ -6,7 +6,7 @@ import com.jie.wealthmate.theme.ColorPrimary
 import com.jie.wealthmate.theme.ColorRed
 
 data class CategoryItemData(
-    val id: Long,
+    val id: String,
     val icon: String,
     val label: String,
     val sort: Long,

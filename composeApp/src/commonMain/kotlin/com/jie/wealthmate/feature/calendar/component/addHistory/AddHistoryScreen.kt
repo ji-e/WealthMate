@@ -114,16 +114,16 @@ class AddHistoryScreen() : BaseScreen() {
                 modifier = Modifier.padding(top = 20.dp),
                 tagLabelItems = listOf(
                     CategoryTagVo(
-                        id = 0,
+                        id = "0",
                         label = "외식"
                     ),
                     CategoryTagVo(
-                        id = 1,
+                        id = "1",
                         label = "주책 청약"
                     )
                 ),
                 selectedTagLabel = CategoryTagVo(
-                    id = 0,
+                    id = "2",
                     label = "외식"
                 )
             )
