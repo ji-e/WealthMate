@@ -3,10 +3,10 @@ package com.jie.wealthmate.feature.menu
 import com.jie.wealthmate.base.BaseUiState
 import com.jie.wealthmate.base.UiSideEffect
 import com.jie.wealthmate.feature.menu.component.MenuEnum
-import com.jie.wealthmate.feature.menu.component.MenuItem
+import com.jie.wealthmate.feature.menu.component.MenuItemData
 
 data class MenuUiState(
-    val menuEnums: List<MenuItem> = emptyList(),
+    val menuEnums: List<MenuItemData> = emptyList(),
 ) : BaseUiState
 
 sealed class MenuUiSideEffect : UiSideEffect {

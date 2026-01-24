@@ -35,6 +35,7 @@ import com.jie.wealthmate.feature.menu.categoryManagement.component.Category
 import com.jie.wealthmate.feature.menu.categoryManagement.component.CategoryTap
 import com.jie.wealthmate.feature.menu.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.feature.menu.categoryManagement.modifyCategory.ModifyCategoryScreen
+import com.jie.wealthmate.feature.menu.component.MenuEnum
 import com.jie.wealthmate.theme.ColorGray
 import com.jie.wealthmate.theme.WMTheme
 import kotlinx.coroutines.launch
@@ -78,7 +79,7 @@ class CategoryManagementScreen() : BaseScreen() {
             SideEffect {
                 if (isDragging) {
                     screenModel.updateTopBar(
-                        title = TopBarItem.Title("카테고리 순서 변경"),
+                        title = TopBarItem.Title("${MenuEnum.CATEGORY.label} 순서 변경"),
                         readingItem = TopBarItem.ReadingItem().copy(
                             action = { onBack() }
                         )
@@ -86,9 +87,7 @@ class CategoryManagementScreen() : BaseScreen() {
                 } else {
                     val isAddItemEnabled = uiState.categoryItems.size < 10
                     screenModel.updateTopBar(
-                        title = TopBarItem.Title(
-                            "카테고리 관리"
-                        ),
+                        title = TopBarItem.Title(MenuEnum.CATEGORY.title),
                         readingItem = TopBarItem.ReadingItem().copy(
                             action = { navigator.pop() }
                         ),
@@ -193,7 +192,7 @@ class CategoryManagementScreen() : BaseScreen() {
 
     @Composable
     @Preview(showBackground = true)
-    private fun IncomeCategorySettingScreenPreview() {
+    private fun CategorySettingScreenPreview() {
         WMTheme {
             CategoryManagementScreen()
         }

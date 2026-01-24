@@ -8,6 +8,7 @@ import com.jie.wealthmate.feature.menu.MenuScreenModel
 import com.jie.wealthmate.feature.menu.categoryManagement.addCategory.AddCategoryScreenModel
 import com.jie.wealthmate.feature.menu.categoryManagement.CategoryManagementScreenModel
 import com.jie.wealthmate.feature.menu.categoryManagement.modifyCategory.ModifyCategoryScreenModel
+import com.jie.wealthmate.feature.menu.paymentMethodManagement.PaymentMethodManagementScreenModel
 import com.jie.wealthmate.repository.CategoryRepository
 import com.jie.wealthmate.repository.CategoryRepositoryImpl
 import org.koin.dsl.module
@@ -33,4 +34,5 @@ val commonModule = module {
     factory { AddCategoryScreenModel(get()) }
     factory { ModifyCategoryScreenModel(get()) }
     factory { CategoryManagementScreenModel(get()) }
+    factory { PaymentMethodManagementScreenModel(get()) }
 }
