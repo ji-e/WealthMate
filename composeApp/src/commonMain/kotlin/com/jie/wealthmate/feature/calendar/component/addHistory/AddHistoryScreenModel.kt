@@ -15,4 +15,12 @@ class AddHistoryScreenModel() : BaseScreenModel<AddHistoryUiState>() {
             )
         }
     }
+
+    fun updateContent(content: TextFieldValue) {
+        reduceState { state ->
+            state.copy(
+                content = content
+            )
+        }
+    }
 }

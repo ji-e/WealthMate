@@ -6,6 +6,7 @@ import com.jie.wealthmate.base.UiSideEffect
 
 data class AddHistoryUiState(
     val isChangedData: Boolean = false,
+    val content: TextFieldValue = TextFieldValue(""),
     val amount: TextFieldValue = TextFieldValue(""),
 ) : BaseUiState
 
