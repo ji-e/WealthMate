@@ -30,7 +30,7 @@ fun BottomNavigation(
     val navItems = listOf(
         BottomNavItem.Home,
         BottomNavItem.Calendar,
-        BottomNavItem.Asset,
+//        BottomNavItem.Asset,
         BottomNavItem.Menu
     )
     Box(
