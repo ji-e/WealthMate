@@ -105,6 +105,7 @@ class PaymentMethodManagementScreen() : BaseScreen() {
         Column {
             LazyColumn(
                 modifier = Modifier
+                    .fillMaxWidth()
                     .weight(1f)
                     .reorderable(listState),
                 state = listState.listState

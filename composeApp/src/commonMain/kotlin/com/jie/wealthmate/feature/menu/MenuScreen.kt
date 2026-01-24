@@ -8,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
@@ -16,11 +17,11 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import com.jie.wealthmate.base.collectSideEffect
 import com.jie.wealthmate.component.topbar.TopBarItem
 import com.jie.wealthmate.feature.menu.categoryManagement.CategoryManagementScreen
-import com.jie.wealthmate.feature.menu.component.MenuItem
 import com.jie.wealthmate.feature.menu.component.MenuEnum
+import com.jie.wealthmate.feature.menu.component.MenuItem
 import com.jie.wealthmate.feature.menu.component.MenuTitleItem
+import com.jie.wealthmate.feature.menu.paymentMethodManagement.PaymentMethodManagementScreen
 import com.jie.wealthmate.theme.WMTheme
-import androidx.compose.ui.tooling.preview.Preview
 import org.koin.compose.koinInject
 
 class MenuScreen(val calculateBottomPadding: Dp) : Screen {
@@ -42,11 +43,13 @@ class MenuScreen(val calculateBottomPadding: Dp) : Screen {
             when (effect) {
                 is MenuUiSideEffect.OnCLickMenu -> {
                     when (effect.menu) {
+                        MenuEnum.CATEGORY -> {
+                            navigator.push(CategoryManagementScreen())
+                        }
 
-                        MenuEnum.CATEGORY,
-                            -> navigator.push(
-                            CategoryManagementScreen()
-                        )
+                        MenuEnum.PAYMENT_METHOD -> {
+                            navigator.push(PaymentMethodManagementScreen())
+                        }
 
                         else -> Unit
                     }
