@@ -7,11 +7,11 @@ import com.jie.wealthmate.database.dao.CategoryDao
 import com.jie.wealthmate.database.eneity.CategoryEntity
 import com.jie.wealthmate.database.eneity.CategoryTagEntity
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.onEach
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
 class CategoryRepositoryImpl(private val dao: CategoryDao) : CategoryRepository {
+    private val repoName = "CategoryRepository"
     private fun generateId(): String = uuid4().toString()
 
     /**
@@ -24,6 +24,17 @@ class CategoryRepositoryImpl(private val dao: CategoryDao) : CategoryRepository 
         sort: Long,
         isFixed: Boolean,
         tagLabels: List<String>,
+    ) = loggedCall(
+        repositoryName = repoName,
+        methodName = "insertCategory",
+        params = mapOf(
+            "icon" to icon,
+            "largeCategory" to largeCategory,
+            "middleLabel" to middleLabel,
+            "sort" to sort,
+            "isFixed" to isFixed,
+            "tagLabels" to tagLabels
+        )
     ) {
         val tags = tagLabels.map { tagLabel ->
             CategoryTagEntity(
@@ -45,53 +56,65 @@ class CategoryRepositoryImpl(private val dao: CategoryDao) : CategoryRepository 
             updatedAt = Clock.System.now().toEpochMilliseconds(),
             isDeleted = false
         )
-
-        println("insertCategory called\n $category")
-
         dao.insert(category)
     }
 
-    override suspend fun updateCategory(category: CategoryEntity) {
-        println("updateCategory called\n $category")
-
+    override suspend fun updateCategory(category: CategoryEntity) = loggedCall(
+        repositoryName = repoName,
+        methodName = "updateCategory",
+        params = mapOf(
+            "category" to category
+        )
+    ) {
         dao.update(category.copy(updatedAt = Clock.System.now().toEpochMilliseconds()))
     }
 
-    override suspend fun updateCategoriesSort(updates: List<Pair<String, Long>>) {
-        println("updateCategoriesSort called\n updates: $updates")
-
+    override suspend fun updateCategoriesSort(updates: List<Pair<String, Long>>) = loggedCall(
+        repositoryName = repoName,
+        methodName = "updateCategoriesSort",
+        params = mapOf(
+            "updates" to updates
+        )
+    ) {
         dao.updateCategoriesSort(updates)
     }
 
     /**
      * 카테고리 삭제
      */
-    override suspend fun deleteCategory(categoryId: String): Unit {
-        println("deleteCategory called\n categoryId: $categoryId")
-
+    override suspend fun deleteCategory(categoryId: String) = loggedCall(
+        repositoryName = repoName,
+        methodName = "deleteCategory",
+        params = mapOf(
+            "categoryId" to categoryId
+        )
+    ) {
         dao.softDelete(categoryId)
     }
 
     /**
      * 카테고리 조회
      */
-    override suspend fun getCategoryById(categoryId: String): CategoryEntity? {
-        return dao.getById(categoryId).apply {
-            println("getCategoryById called\n $this")
-        }
+    override suspend fun getCategoryById(categoryId: String): CategoryEntity? = loggedCall(
+        repositoryName = repoName,
+        methodName = "getCategoryById",
+        params = mapOf(
+            "categoryId" to categoryId
+        )
+    )
+    {
+        dao.getById(categoryId)
     }
 
     /**
      * largeCategory에 해당하는 모든 카테고리 조회
      */
-    override fun getCategoriesByLargeCategory(largeCategory: String): Flow<List<CategoryEntity>> {
-        println("getCategoriesByLargeCategory called\n largeCategory: $largeCategory")
-
-        return dao.getByLargeCategory(largeCategory).onEach { categories ->
-            println("Categories loaded: ${categories.size} items")
-            categories.forEach {
-                println(it)
-            }
+    override fun getCategoriesByLargeCategory(largeCategory: String): Flow<List<CategoryEntity>> =
+        loggedFlow(
+            repositoryName = repoName,
+            methodName = "getCategoriesByLargeCategory",
+            params = mapOf("largeCategory" to largeCategory)
+        ) {
+            dao.getByLargeCategory(largeCategory)
         }
-    }
 }
