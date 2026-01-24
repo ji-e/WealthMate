@@ -79,6 +79,16 @@ class AddHistoryScreen() : BaseScreen() {
                 onInstallmentClick = {}
             )
 
+            // 내용 입력
+            WMTextField(
+                modifier = Modifier.padding(top = 20.dp),
+                value = uiState.content,
+                onValueChange = screenModel::updateContent,
+                label = "내용",
+                maxLength = 20,
+                placeholder = "내용을 입력해 주세요.",
+            )
+
             // 금액 입력
             WMTextField(
                 modifier = Modifier.padding(top = 20.dp),
