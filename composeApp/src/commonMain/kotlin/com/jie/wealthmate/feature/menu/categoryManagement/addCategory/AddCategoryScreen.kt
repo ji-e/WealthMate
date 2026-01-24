@@ -1,6 +1,6 @@
 @file:OptIn(InternalVoyagerApi::class)
 
-package com.jie.wealthmate.feature.menu.categorySetting.addCategory
+package com.jie.wealthmate.feature.menu.categoryManagement.addCategory
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -32,11 +32,11 @@ import com.jie.wealthmate.component.WMCheckBox
 import com.jie.wealthmate.component.WMModalBottomSheet
 import com.jie.wealthmate.component.textField.WMTextField
 import com.jie.wealthmate.component.topbar.TopBarItem
-import com.jie.wealthmate.feature.menu.categorySetting.addCategory.component.CategoryIcon
-import com.jie.wealthmate.feature.menu.categorySetting.addCategory.component.CategoryIconGrid
-import com.jie.wealthmate.feature.menu.categorySetting.addCategory.component.CategoryTag
-import com.jie.wealthmate.feature.menu.categorySetting.component.CategoryItemData
-import com.jie.wealthmate.feature.menu.categorySetting.component.LargeCategoryEnum
+import com.jie.wealthmate.feature.menu.categoryManagement.addCategory.component.CategoryIcon
+import com.jie.wealthmate.feature.menu.categoryManagement.addCategory.component.CategoryIconGrid
+import com.jie.wealthmate.feature.menu.categoryManagement.addCategory.component.CategoryTag
+import com.jie.wealthmate.feature.menu.categoryManagement.component.CategoryItemData
+import com.jie.wealthmate.feature.menu.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.theme.WMTheme
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.koinInject

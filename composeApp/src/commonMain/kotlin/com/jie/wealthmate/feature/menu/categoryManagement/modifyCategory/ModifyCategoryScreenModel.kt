@@ -1,11 +1,11 @@
-package com.jie.wealthmate.feature.menu.categorySetting.modifyCategory
+package com.jie.wealthmate.feature.menu.categoryManagement.modifyCategory
 
 import androidx.compose.ui.text.input.TextFieldValue
 import com.jie.wealthmate.base.BaseScreenModel
 import com.jie.wealthmate.component.CategoryIconEnum
 import com.jie.wealthmate.database.eneity.CategoryEntity
 import com.jie.wealthmate.database.eneity.CategoryTagEntity
-import com.jie.wealthmate.feature.menu.categorySetting.component.LargeCategoryEnum
+import com.jie.wealthmate.feature.menu.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.repository.CategoryRepository
 import com.jie.wealthmate.utils.default
 import com.jie.wealthmate.vo.CategoryTagVo

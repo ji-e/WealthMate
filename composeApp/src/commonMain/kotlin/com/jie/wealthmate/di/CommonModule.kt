@@ -5,9 +5,9 @@ import com.jie.wealthmate.feature.calendar.CalendarScreenModel
 import com.jie.wealthmate.feature.calendar.component.addHistory.AddHistoryScreenModel
 import com.jie.wealthmate.feature.home.HomeScreenModel
 import com.jie.wealthmate.feature.menu.MenuScreenModel
-import com.jie.wealthmate.feature.menu.categorySetting.addCategory.AddCategoryScreenModel
-import com.jie.wealthmate.feature.menu.categorySetting.categorySetting.CategorySettingScreenModel
-import com.jie.wealthmate.feature.menu.categorySetting.modifyCategory.ModifyCategoryScreenModel
+import com.jie.wealthmate.feature.menu.categoryManagement.addCategory.AddCategoryScreenModel
+import com.jie.wealthmate.feature.menu.categoryManagement.CategoryManagementScreenModel
+import com.jie.wealthmate.feature.menu.categoryManagement.modifyCategory.ModifyCategoryScreenModel
 import com.jie.wealthmate.repository.CategoryRepository
 import com.jie.wealthmate.repository.CategoryRepositoryImpl
 import org.koin.dsl.module
@@ -32,5 +32,5 @@ val commonModule = module {
     factory { MenuScreenModel() }
     factory { AddCategoryScreenModel(get()) }
     factory { ModifyCategoryScreenModel(get()) }
-    factory { CategorySettingScreenModel(get()) }
+    factory { CategoryManagementScreenModel(get()) }
 }

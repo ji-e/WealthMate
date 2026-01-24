@@ -15,7 +15,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.jie.wealthmate.base.collectSideEffect
 import com.jie.wealthmate.component.topbar.TopBarItem
-import com.jie.wealthmate.feature.menu.categorySetting.categorySetting.CategorySettingScreen
+import com.jie.wealthmate.feature.menu.categoryManagement.CategoryManagementScreen
 import com.jie.wealthmate.feature.menu.component.MenuContentItem
 import com.jie.wealthmate.feature.menu.component.MenuEnum
 import com.jie.wealthmate.feature.menu.component.MenuTitleItem
@@ -42,13 +42,10 @@ class MenuScreen(val calculateBottomPadding: Dp) : Screen {
             when (effect) {
                 is MenuUiSideEffect.OnCLickMenu -> {
                     when (effect.menu) {
-                        MenuEnum.INCOME_CATEGORY,
-                        MenuEnum.EXPENSES_CATEGORY,
-                        MenuEnum.SAVING_CATEGORY,
+
+                        MenuEnum.CATEGORY,
                             -> navigator.push(
-                            CategorySettingScreen(
-                                effect.menu
-                            )
+                            CategoryManagementScreen()
                         )
 
                         else -> Unit

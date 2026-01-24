@@ -1,4 +1,4 @@
-package com.jie.wealthmate.feature.menu.categorySetting.component
+package com.jie.wealthmate.feature.menu.categoryManagement.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement

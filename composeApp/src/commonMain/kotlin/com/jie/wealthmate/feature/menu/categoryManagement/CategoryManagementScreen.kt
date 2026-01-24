@@ -1,6 +1,6 @@
 @file:OptIn(InternalVoyagerApi::class)
 
-package com.jie.wealthmate.feature.menu.categorySetting.categorySetting
+package com.jie.wealthmate.feature.menu.categoryManagement
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -38,11 +38,10 @@ import com.jie.wealthmate.component.reorderable.detectReorderAfterLongPress
 import com.jie.wealthmate.component.reorderable.rememberReorderableLazyListState
 import com.jie.wealthmate.component.reorderable.reorderable
 import com.jie.wealthmate.component.topbar.TopBarItem
-import com.jie.wealthmate.feature.menu.categorySetting.addCategory.AddCategoryScreen
-import com.jie.wealthmate.feature.menu.categorySetting.component.CategoryItem
-import com.jie.wealthmate.feature.menu.categorySetting.component.LargeCategoryEnum
-import com.jie.wealthmate.feature.menu.categorySetting.modifyCategory.ModifyCategoryScreen
-import com.jie.wealthmate.feature.menu.component.MenuEnum
+import com.jie.wealthmate.feature.menu.categoryManagement.addCategory.AddCategoryScreen
+import com.jie.wealthmate.feature.menu.categoryManagement.component.CategoryItem
+import com.jie.wealthmate.feature.menu.categoryManagement.component.LargeCategoryEnum
+import com.jie.wealthmate.feature.menu.categoryManagement.modifyCategory.ModifyCategoryScreen
 import com.jie.wealthmate.theme.ColorGray
 import com.jie.wealthmate.theme.ColorPrimary
 import com.jie.wealthmate.theme.WMTheme
@@ -51,17 +50,15 @@ import org.koin.compose.koinInject
 import wealthmate.composeapp.generated.resources.Res
 import wealthmate.composeapp.generated.resources.ic_add
 
-class CategorySettingScreen(
-    val menuEnum: MenuEnum,
-) : BaseScreen() {
-    private val largeCategoryEnum = LargeCategoryEnum.creatorFromMenu(menuEnum.label)
+class CategoryManagementScreen() : BaseScreen() {
+    private val largeCategoryEnum = LargeCategoryEnum.creatorFromMenu("")
 
     @Composable
     override fun Content() {
         super.Content()
 
         val navigator = LocalNavigator.currentOrThrow
-        val screenModel: CategorySettingScreenModel = koinInject()
+        val screenModel: CategoryManagementScreenModel = koinInject()
         val uiState = screenModel.container.uiState.collectAsState().value
 
         var isDragging by remember { mutableStateOf(false) }
@@ -86,11 +83,11 @@ class CategorySettingScreen(
             onBack()
         }
 
-        if (navigator.lastItem is CategorySettingScreen) {
+        if (navigator.lastItem is CategoryManagementScreen) {
             SideEffect {
                 if (isDragging) {
                     screenModel.updateTopBar(
-                        title = TopBarItem.Title("${menuEnum.label} 순서 변경"),
+                        title = TopBarItem.Title("$ 순서 변경"),
                         readingItem = TopBarItem.ReadingItem().copy(
                             action = { onBack() }
                         )
@@ -98,7 +95,7 @@ class CategorySettingScreen(
                 } else if (uiState.isInitialized) {
                     val isAddItemEnabled = uiState.incomeCategoryItems.size < 10
                     screenModel.updateTopBar(
-                        title = TopBarItem.Title(menuEnum.title),
+                        title = TopBarItem.Title(""),
                         readingItem = TopBarItem.ReadingItem().copy(
                             action = { navigator.pop() }
                         ),
@@ -224,7 +221,7 @@ class CategorySettingScreen(
     @Preview(showBackground = true)
     private fun IncomeCategorySettingScreenPreview() {
         WMTheme {
-            CategorySettingScreen(MenuEnum.INCOME_CATEGORY)
+            CategoryManagementScreen()
         }
     }
 }

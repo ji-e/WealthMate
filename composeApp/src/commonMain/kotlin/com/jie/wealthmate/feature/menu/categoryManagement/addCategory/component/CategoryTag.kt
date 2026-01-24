@@ -1,4 +1,4 @@
-package com.jie.wealthmate.feature.menu.categorySetting.addCategory.component
+package com.jie.wealthmate.feature.menu.categoryManagement.addCategory.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -25,7 +25,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.jie.wealthmate.component.WMText
 import com.jie.wealthmate.component.textField.WMTextField
-import com.jie.wealthmate.feature.menu.categorySetting.component.LargeCategoryEnum
+import com.jie.wealthmate.feature.menu.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.theme.ColorGray
 import com.jie.wealthmate.theme.ColorPrimary
 import com.jie.wealthmate.theme.WMTheme

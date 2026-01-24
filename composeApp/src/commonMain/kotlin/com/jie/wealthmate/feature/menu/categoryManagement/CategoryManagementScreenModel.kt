@@ -1,16 +1,16 @@
-package com.jie.wealthmate.feature.menu.categorySetting.categorySetting
+package com.jie.wealthmate.feature.menu.categoryManagement
 
 import com.jie.wealthmate.base.BaseScreenModel
-import com.jie.wealthmate.feature.menu.categorySetting.component.CategoryItemData
-import com.jie.wealthmate.feature.menu.categorySetting.component.LargeCategoryEnum
+import com.jie.wealthmate.feature.menu.categoryManagement.component.CategoryItemData
+import com.jie.wealthmate.feature.menu.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.repository.CategoryRepository
 
-class CategorySettingScreenModel(
+class CategoryManagementScreenModel(
     private val categoryRepository: CategoryRepository,
-) : BaseScreenModel<CategorySettingUiState>() {
+) : BaseScreenModel<CategoryManagementUiState>() {
 
-    override val initialState: CategorySettingUiState
-        get() = CategorySettingUiState()
+    override val initialState: CategoryManagementUiState
+        get() = CategoryManagementUiState()
 
     var largeCategoryEnum: LargeCategoryEnum = LargeCategoryEnum.INCOME
 
