@@ -7,6 +7,12 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 
 /**
@@ -180,5 +186,28 @@ abstract class BaseScreenModel<S : UiState> : ScreenModel, ContainerHost<S> {
                 }
             }
         }
+    }
+
+    protected fun <T> Flow<T>.apiFlow(
+        errorFunc: ((Throwable) -> Unit)? = null,
+        successFunc: suspend (T) -> Unit,
+    ) {
+        this@apiFlow.onStart {
+            showLoading(true)
+        }.onEach { data ->
+            successFunc(data)
+            showLoading(false)
+        }.catch { e ->
+            if (errorFunc == null) {
+                val finalMessage = "오류가 발생했습니다."
+                showSnackbar(message = finalMessage)
+                return@catch
+            }
+            errorFunc(e)
+            showLoading(false)
+
+        }.onCompletion {
+            showLoading(false)
+        }.launchIn(screenScope)
     }
 }
