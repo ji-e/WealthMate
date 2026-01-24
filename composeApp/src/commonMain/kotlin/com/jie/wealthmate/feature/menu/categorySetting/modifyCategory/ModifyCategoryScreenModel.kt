@@ -3,8 +3,8 @@ package com.jie.wealthmate.feature.menu.categorySetting.modifyCategory
 import androidx.compose.ui.text.input.TextFieldValue
 import com.jie.wealthmate.base.BaseScreenModel
 import com.jie.wealthmate.component.CategoryIconEnum
-import com.jie.wealthmate.entity.CategoryEntity
-import com.jie.wealthmate.entity.CategoryTagEntity
+import com.jie.wealthmate.database.eneity.CategoryEntity
+import com.jie.wealthmate.database.eneity.CategoryTagEntity
 import com.jie.wealthmate.feature.menu.categorySetting.component.LargeCategoryEnum
 import com.jie.wealthmate.repository.CategoryRepository
 import com.jie.wealthmate.utils.default
@@ -16,9 +16,9 @@ class ModifyCategoryScreenModel(
     override val initialState: ModifyCategoryUiState
         get() = ModifyCategoryUiState()
 
-    private var categoryId: Long = 0L
+    private var categoryId: String = ""
 
-    fun updateInit(largeCategoryEnum: LargeCategoryEnum, categoryId: Long) {
+    fun updateInit(largeCategoryEnum: LargeCategoryEnum, categoryId: String) {
         this.categoryId = categoryId
 
         reduceState { state ->
@@ -161,7 +161,7 @@ class ModifyCategoryScreenModel(
     fun getCategoryDetail() {
         launchSafe(
             block = {
-                categoryRepository.getCategoryWithTags(categoryId)
+                categoryRepository.getCategoryById(categoryId)
             }
         ) { response ->
             reduceState { state ->
@@ -170,7 +170,8 @@ class ModifyCategoryScreenModel(
                     label = TextFieldValue(response?.middleLabel.default()),
                     tagLabelItems = response?.tags.default()
                         .map { CategoryTagVo(it.id, it.tagLabel) },
-                    isFixed = response?.isFixed.default()
+                    isFixed = response?.isFixed.default(),
+                    sort = response?.sort.default()
                 )
             }
         }
@@ -191,15 +192,20 @@ class ModifyCategoryScreenModel(
         launchSafe(
             block = {
                 val uiState = container.uiState.value
-                categoryRepository.updateCategoryWithTags(
+                categoryRepository.updateCategory(
                     CategoryEntity(
                         id = categoryId,
                         icon = uiState.categoryIcon.text,
                         largeCategory = uiState.largeCategory.name,
                         middleLabel = uiState.label.text,
-                        sort = 0, // 의미 없음, 업데이트 시 사용 안함
+                        sort = uiState.sort,
                         isFixed = uiState.isFixed,
-                        tags = uiState.tagLabelItems.map { CategoryTagEntity(it.id, it.label) },
+                        tags = uiState.tagLabelItems.map {
+                            CategoryTagEntity(
+                                it.id.default(),
+                                it.label
+                            )
+                        },
                     )
                 )
             },

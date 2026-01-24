@@ -26,10 +26,16 @@ import com.jie.wealthmate.component.WMText
 import com.jie.wealthmate.theme.ColorGray
 import com.jie.wealthmate.theme.ColorPrimary
 import com.jie.wealthmate.theme.ColorRed
+import kotlin.jvm.Transient
 
 abstract class BaseScreen : Screen {
+    @Transient
     var isShowSaveBackDialog = mutableStateOf(false)
+
+    @Transient
     var isShowRemoveDialog = mutableStateOf(false)
+
+    @Transient
     var confirmCallback = mutableStateOf({})
 
     fun showSaveBackDialog(

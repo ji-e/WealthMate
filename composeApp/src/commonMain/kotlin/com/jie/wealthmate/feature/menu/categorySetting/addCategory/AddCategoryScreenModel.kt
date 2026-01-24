@@ -107,29 +107,18 @@ class AddCategoryScreenModel(
 
         launchSafe(
             block = {
-                categoryRepository.addCategory(
+                categoryRepository.insertCategory(
                     icon = uiState.categoryIcon.text,
                     largeCategory = uiState.largeCategory.name,
                     middleLabel = uiState.label.text,
                     sort = categoryItems.size.toLong(),
                     isFixed = uiState.isFixed,
-                    tagIds = createTags()
+                    tagLabels = uiState.tagLabelItems.map { it.label }
                 )
             },
         ) {
             showSnackbar("카테고리가 저장되었습니다.")
             postSideEffect { AddCategoryUiSideEffect.OnSuccessSave }
-        }
-    }
-
-    private suspend fun createTags(): List<Long> {
-        val uiState = container.uiState.value
-        return uiState.tagLabelItems.map {
-            categoryRepository.addTag(
-                largeCategory = uiState.largeCategory.name,
-                middleLabel = uiState.label.text,
-                tagLabel = it.label
-            )
         }
     }
 }

@@ -1,47 +1,27 @@
 package com.jie.wealthmate.repository
 
-import com.jie.wealthmate.database.Category
-import com.jie.wealthmate.entity.CategoryEntity
+import com.jie.wealthmate.database.eneity.CategoryEntity
+import kotlinx.coroutines.flow.Flow
 
 
 interface CategoryRepository {
-    suspend fun addCategory(
+    suspend fun insertCategory(
         icon: String,
         largeCategory: String,
         middleLabel: String,
-        tagIds: List<Long> = emptyList(),
         sort: Long,
         isFixed: Boolean,
-    ): Long
-
-    suspend fun updateCategorySorts(updates: List<Pair<Long, Long>>)
-
-    suspend fun deleteCategory(categoryId: Long)
-
-    suspend fun getCategoryById(categoryId: Long): Category?
-
-    suspend fun getCategoryWithTags(categoryId: Long): CategoryEntity?
-
-    suspend fun getAllCategoriesWithTags(): List<CategoryEntity>
-
-    suspend fun addTag(
-        largeCategory: String,
-        middleLabel: String,
-        tagLabel: String,
-    ): Long
-
-    suspend fun deleteTag(tagId: Long)
-    suspend fun addTagToCategory(
-        categoryId: Long,
-        tagId: Long,
+        tagLabels: List<String>,
     )
 
-    suspend fun removeTagFromCategory(
-        categoryId: Long,
-        tagId: Long,
-    )
+    suspend fun updateCategory(category: CategoryEntity)
 
-    suspend fun removeAllTagsFromCategory(categoryId: Long)
+    suspend fun updateCategoriesSort(updates: List<Pair<String, Long>>)
 
-    suspend fun updateCategoryWithTags(categoryEntity: CategoryEntity)
+    suspend fun deleteCategory(categoryId: String)
+
+    suspend fun getCategoryById(categoryId: String): CategoryEntity?
+
+    fun getCategoriesByLargeCategory(largeCategory: String): Flow<List<CategoryEntity>>
+
 }

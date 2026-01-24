@@ -1,6 +1,5 @@
 package com.jie.wealthmate.feature.menu.categorySetting.categorySetting
 
-import androidx.compose.ui.util.fastFilteredMap
 import com.jie.wealthmate.base.BaseScreenModel
 import com.jie.wealthmate.feature.menu.categorySetting.component.CategoryItemData
 import com.jie.wealthmate.feature.menu.categorySetting.component.LargeCategoryEnum
@@ -22,38 +21,31 @@ class CategorySettingScreenModel(
     }
 
     fun getIncomeCategories() {
-        launchSafe(
-            block = {
-                categoryRepository.getAllCategoriesWithTags()
-            },
-        ) { response ->
-            val categories = response.sortedBy { it.sort }
-
-            reduceState { state ->
-                state.copy(
-                    isInitialized = true,
-                    incomeCategoryItems = categories.fastFilteredMap(
-                        { it.largeCategory == largeCategoryEnum.name },
-                    ) {
-                        CategoryItemData(
-                            id = it.id,
-                            icon = it.icon,
-                            label = it.middleLabel,
-                            sort = it.sort,
-                            isFixed = it.isFixed,
-                            largeCategory = LargeCategoryEnum.creator(it.largeCategory)
-                        )
-                    }
-                )
+        categoryRepository.getCategoriesByLargeCategory(largeCategoryEnum.name)
+            .apiFlow { response ->
+                reduceState { state ->
+                    state.copy(
+                        isInitialized = true,
+                        incomeCategoryItems = response.map {
+                            CategoryItemData(
+                                id = it.id,
+                                icon = it.icon,
+                                label = it.middleLabel,
+                                sort = it.sort,
+                                isFixed = it.isFixed,
+                                largeCategory = LargeCategoryEnum.creator(it.largeCategory)
+                            )
+                        }
+                    )
+                }
             }
-        }
     }
 
     fun saveCategorySort() {
         launchSafe(
             block = {
                 val categoryItems = container.uiState.value.incomeCategoryItems
-                categoryRepository.updateCategorySorts(
+                categoryRepository.updateCategoriesSort(
                     categoryItems.mapIndexed { index, item -> item.id to index.toLong() }
                 )
             },

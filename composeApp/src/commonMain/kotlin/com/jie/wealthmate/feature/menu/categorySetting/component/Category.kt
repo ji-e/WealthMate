@@ -79,7 +79,7 @@ private fun CategoryItemPreview() {
     WMTheme {
         CategoryItem(
             CategoryItemData(
-                id = 0,
+                id = "0",
                 icon = CategoryIconEnum.CATEGORY_U1F9D0.text,
                 label = "급여",
                 sort = 1,

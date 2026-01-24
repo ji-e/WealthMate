@@ -211,7 +211,7 @@ class CategorySettingScreen(
         }
     }
 
-    fun goToModifyCategory(navigator: Navigator, categoryId: Long) {
+    fun goToModifyCategory(navigator: Navigator, categoryId: String) {
         navigator.push(
             ModifyCategoryScreen(
                 largeCategory = largeCategoryEnum,

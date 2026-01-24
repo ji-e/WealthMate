@@ -1,11 +1,9 @@
 package com.jie.wealthmate.di
 
-import com.jie.wealthmate.database.DatabaseDriverFactory
+import com.jie.wealthmate.database.DatabaseBuilder
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
 
 actual val platformModule = module {
-    single<DatabaseDriverFactory> {
-        DatabaseDriverFactory(context = androidContext())
-    }
+    single<DatabaseBuilder> { DatabaseBuilder(androidContext()) }
 }

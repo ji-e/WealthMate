@@ -15,6 +15,7 @@ data class ModifyCategoryUiState(
     val tagLabelItems: List<CategoryTagVo> = emptyList(),
     val modifyTagLabel: CategoryTagVo? = null,
     val isFixed: Boolean = false,
+    val sort: Long = 0,
     val isChangedData: Boolean = false,
 ) : BaseUiState
 

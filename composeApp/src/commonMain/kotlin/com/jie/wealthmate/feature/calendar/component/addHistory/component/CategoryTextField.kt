@@ -81,7 +81,7 @@ private fun CategoryTextFieldPreview() {
         Column(verticalArrangement = Arrangement.spacedBy(20.dp)) {
             CategoryTextField(
                 categoryItemData = CategoryItemData(
-                    id = 0,
+                    id = "0",
                     icon = CategoryIconEnum.CATEGORY_U1F9D0.text,
                     label = "급여",
                     sort = 1,
@@ -89,16 +89,16 @@ private fun CategoryTextFieldPreview() {
                 ),
                 tagLabelItems = listOf(
                     CategoryTagVo(
-                        id = 0,
+                        id = "0",
                         label = "외식"
                     ),
                     CategoryTagVo(
-                        id = 1,
+                        id = "1",
                         label = "주책 청약"
                     )
                 ),
                 selectedTagLabel = CategoryTagVo(
-                    id = 0,
+                    id = "0",
                     label = "외식"
                 )
             )
