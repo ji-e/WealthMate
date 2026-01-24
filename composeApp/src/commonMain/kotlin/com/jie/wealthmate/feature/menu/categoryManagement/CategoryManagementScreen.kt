@@ -95,7 +95,7 @@ class CategoryManagementScreen() : BaseScreen() {
             SideEffect {
                 if (isDragging) {
                     screenModel.updateTopBar(
-                        title = TopBarItem.Title("$ 순서 변경"),
+                        title = TopBarItem.Title("카테고리 순서 변경"),
                         readingItem = TopBarItem.ReadingItem().copy(
                             action = { onBack() }
                         )
@@ -103,7 +103,9 @@ class CategoryManagementScreen() : BaseScreen() {
                 } else if (uiState.isInitialized) {
                     val isAddItemEnabled = uiState.incomeCategoryItems.size < 10
                     screenModel.updateTopBar(
-                        title = TopBarItem.Title(""),
+                        title = TopBarItem.Title(
+                            "카테고리 관리"
+                        ),
                         readingItem = TopBarItem.ReadingItem().copy(
                             action = { navigator.pop() }
                         ),
