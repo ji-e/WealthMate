@@ -3,9 +3,9 @@ package com.jie.wealthmate.feature.calendar.component.addHistory.component
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.jie.wealthmate.component.textField.WMTextField
-import com.jie.wealthmate.feature.menu.categorySetting.component.LargeCategoryEnum
+import com.jie.wealthmate.feature.menu.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.theme.WMTheme
-import org.jetbrains.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.Preview
 
 
 @Composable

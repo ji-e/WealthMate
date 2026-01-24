@@ -1,32 +1,23 @@
-package com.jie.wealthmate.feature.menu.categorySetting.categorySetting
+package com.jie.wealthmate.feature.menu.categoryManagement
 
 import com.jie.wealthmate.base.BaseScreenModel
-import com.jie.wealthmate.feature.menu.categorySetting.component.CategoryItemData
-import com.jie.wealthmate.feature.menu.categorySetting.component.LargeCategoryEnum
+import com.jie.wealthmate.feature.menu.categoryManagement.component.CategoryItemData
+import com.jie.wealthmate.feature.menu.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.repository.CategoryRepository
 
-class CategorySettingScreenModel(
+class CategoryManagementScreenModel(
     private val categoryRepository: CategoryRepository,
-) : BaseScreenModel<CategorySettingUiState>() {
+) : BaseScreenModel<CategoryManagementUiState>() {
 
-    override val initialState: CategorySettingUiState
-        get() = CategorySettingUiState()
+    override val initialState: CategoryManagementUiState
+        get() = CategoryManagementUiState()
 
-    var largeCategoryEnum: LargeCategoryEnum = LargeCategoryEnum.INCOME
-
-    fun updateInit(largeCategoryEnum: LargeCategoryEnum) {
-        this.largeCategoryEnum = largeCategoryEnum
-
-        getIncomeCategories()
-    }
-
-    fun getIncomeCategories() {
+    fun getIncomeCategories(largeCategoryEnum: LargeCategoryEnum) {
         categoryRepository.getCategoriesByLargeCategory(largeCategoryEnum.name)
             .apiFlow { response ->
                 reduceState { state ->
                     state.copy(
-                        isInitialized = true,
-                        incomeCategoryItems = response.map {
+                        categoryItems = response.map {
                             CategoryItemData(
                                 id = it.id,
                                 icon = it.icon,
@@ -44,7 +35,7 @@ class CategorySettingScreenModel(
     fun saveCategorySort() {
         launchSafe(
             block = {
-                val categoryItems = container.uiState.value.incomeCategoryItems
+                val categoryItems = container.uiState.value.categoryItems
                 categoryRepository.updateCategoriesSort(
                     categoryItems.mapIndexed { index, item -> item.id to index.toLong() }
                 )
@@ -56,9 +47,9 @@ class CategorySettingScreenModel(
     }
 
     fun handleReorderCategoryItems(from: Int, to: Int) = reduceState { state ->
-        val categoryItems = state.incomeCategoryItems.toMutableList()
+        val categoryItems = state.categoryItems.toMutableList()
         state.copy(
-            incomeCategoryItems = categoryItems.apply { add(to, removeAt(from)) },
+            categoryItems = categoryItems.apply { add(to, removeAt(from)) },
         )
     }
 }

@@ -13,6 +13,7 @@ import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.annotation.InternalVoyagerApi
 import cafe.adriel.voyager.navigator.LocalNavigator
@@ -31,7 +32,6 @@ import com.jie.wealthmate.feature.calendar.component.addHistory.component.Paymen
 import com.jie.wealthmate.theme.WMTheme
 import com.jie.wealthmate.utils.today
 import com.jie.wealthmate.vo.CategoryTagVo
-import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.koinInject
 
 class AddHistoryScreen() : BaseScreen() {

@@ -9,7 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.jie.wealthmate.component.ButtonStyle
 import com.jie.wealthmate.component.WMButton
-import com.jie.wealthmate.feature.menu.categorySetting.component.LargeCategoryEnum
+import com.jie.wealthmate.feature.menu.categoryManagement.component.LargeCategoryEnum
 
 @Composable
 fun LargeCategorySelectBox(
