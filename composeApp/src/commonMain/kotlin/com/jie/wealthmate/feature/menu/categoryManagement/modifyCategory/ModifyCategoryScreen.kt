@@ -48,7 +48,7 @@ import com.jie.wealthmate.feature.menu.categoryManagement.component.LargeCategor
 import com.jie.wealthmate.theme.ColorRed
 import com.jie.wealthmate.theme.WMTheme
 import com.jie.wealthmate.utils.default
-import org.jetbrains.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.Preview
 import org.koin.compose.koinInject
 import wealthmate.composeapp.generated.resources.Res
 import wealthmate.composeapp.generated.resources.ic_delete

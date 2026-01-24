@@ -32,7 +32,7 @@ import com.jie.wealthmate.theme.WMTheme
 import com.jie.wealthmate.vo.CategoryTagVo
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
-import org.jetbrains.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.Preview
 import wealthmate.composeapp.generated.resources.Res
 import wealthmate.composeapp.generated.resources.ic_close_circle2
 

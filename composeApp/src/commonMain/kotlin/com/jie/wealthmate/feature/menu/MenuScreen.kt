@@ -20,7 +20,7 @@ import com.jie.wealthmate.feature.menu.component.MenuContentItem
 import com.jie.wealthmate.feature.menu.component.MenuEnum
 import com.jie.wealthmate.feature.menu.component.MenuTitleItem
 import com.jie.wealthmate.theme.WMTheme
-import org.jetbrains.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.Preview
 import org.koin.compose.koinInject
 
 class MenuScreen(val calculateBottomPadding: Dp) : Screen {

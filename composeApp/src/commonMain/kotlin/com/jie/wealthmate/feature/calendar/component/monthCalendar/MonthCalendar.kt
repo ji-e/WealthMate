@@ -54,7 +54,7 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.monthsUntil
 import kotlinx.datetime.plus
 import org.jetbrains.compose.resources.painterResource
-import org.jetbrains.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.Preview
 import wealthmate.composeapp.generated.resources.Res
 import wealthmate.composeapp.generated.resources.ic_arrow_drop_down
 import wealthmate.composeapp.generated.resources.ic_calendar_today

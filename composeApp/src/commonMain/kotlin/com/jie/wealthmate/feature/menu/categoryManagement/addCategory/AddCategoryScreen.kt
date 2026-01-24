@@ -38,7 +38,7 @@ import com.jie.wealthmate.feature.menu.categoryManagement.addCategory.component.
 import com.jie.wealthmate.feature.menu.categoryManagement.component.CategoryItemData
 import com.jie.wealthmate.feature.menu.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.theme.WMTheme
-import org.jetbrains.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.Preview
 import org.koin.compose.koinInject
 
 class AddCategoryScreen(
