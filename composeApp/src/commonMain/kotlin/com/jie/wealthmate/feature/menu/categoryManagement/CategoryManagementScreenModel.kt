@@ -12,21 +12,12 @@ class CategoryManagementScreenModel(
     override val initialState: CategoryManagementUiState
         get() = CategoryManagementUiState()
 
-    var largeCategoryEnum: LargeCategoryEnum = LargeCategoryEnum.INCOME
-
-    fun updateInit(largeCategoryEnum: LargeCategoryEnum) {
-        this.largeCategoryEnum = largeCategoryEnum
-
-        getIncomeCategories()
-    }
-
-    fun getIncomeCategories(largeCategoryEnum: LargeCategoryEnum = LargeCategoryEnum.INCOME) {
+    fun getIncomeCategories(largeCategoryEnum: LargeCategoryEnum) {
         categoryRepository.getCategoriesByLargeCategory(largeCategoryEnum.name)
             .apiFlow { response ->
                 reduceState { state ->
                     state.copy(
-                        isInitialized = true,
-                        incomeCategoryItems = response.map {
+                        categoryItems = response.map {
                             CategoryItemData(
                                 id = it.id,
                                 icon = it.icon,
@@ -44,7 +35,7 @@ class CategoryManagementScreenModel(
     fun saveCategorySort() {
         launchSafe(
             block = {
-                val categoryItems = container.uiState.value.incomeCategoryItems
+                val categoryItems = container.uiState.value.categoryItems
                 categoryRepository.updateCategoriesSort(
                     categoryItems.mapIndexed { index, item -> item.id to index.toLong() }
                 )
@@ -56,9 +47,9 @@ class CategoryManagementScreenModel(
     }
 
     fun handleReorderCategoryItems(from: Int, to: Int) = reduceState { state ->
-        val categoryItems = state.incomeCategoryItems.toMutableList()
+        val categoryItems = state.categoryItems.toMutableList()
         state.copy(
-            incomeCategoryItems = categoryItems.apply { add(to, removeAt(from)) },
+            categoryItems = categoryItems.apply { add(to, removeAt(from)) },
         )
     }
 }
