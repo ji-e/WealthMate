@@ -27,6 +27,7 @@ import com.jie.wealthmate.component.reorderable.rememberReorderableLazyListState
 import com.jie.wealthmate.component.reorderable.reorderable
 import com.jie.wealthmate.component.topbar.TopBarItem
 import com.jie.wealthmate.feature.menu.component.MenuEnum
+import com.jie.wealthmate.feature.menu.paymentMethodManagement.addPaymentMethod.AddPaymentMethodScreen
 import com.jie.wealthmate.theme.ColorGray
 import com.jie.wealthmate.theme.WMTheme
 import org.koin.compose.koinInject
@@ -86,13 +87,11 @@ class PaymentMethodManagementScreen() : BaseScreen() {
                                 action = {
                                     if (isAddItemEnabled.not()) return@TrailingItem
 
-                                    // todo 결제수단 추가 화면 이동
-//                                    navigator.push(
-//                                        AddCategoryScreen(
-//                                            largeCategory = largeCategoryItems[pagerState.currentPage],
-//                                            categoryItems = uiState.paymentMethodItems
-//                                        )
-//                                    )
+                                    navigator.push(
+                                        AddPaymentMethodScreen(
+                                            paymentMethodItems = uiState.paymentMethodItems
+                                        )
+                                    )
                                 }
                             )
                         )
