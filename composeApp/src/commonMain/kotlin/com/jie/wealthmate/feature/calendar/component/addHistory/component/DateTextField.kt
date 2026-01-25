@@ -40,7 +40,7 @@ fun DateTextField(
             label = "날짜",
             readOnly = true,
             isRequire = true,
-            onClickReadOnly = onDateClick,
+            onReadOnlyClick = onDateClick,
             supportingText = when {
                 repeatCycle != null -> repeatCycle.formattedDescription(date)
                 installmentCount != null -> "할부 $installmentCount 개월"

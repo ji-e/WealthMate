@@ -7,6 +7,7 @@ import com.jie.wealthmate.base.UiSideEffect
 data class AddPaymentMethodUiState(
     val isChangedData: Boolean = false,
     val label: TextFieldValue = TextFieldValue(""),
+    val groupLabel: String = ""
 ) : BaseUiState
 
 sealed class AddPaymentMethodUiSideEffect : UiSideEffect {

@@ -1,5 +1,6 @@
 package com.jie.wealthmate.feature.menu.paymentMethodManagement.addPaymentMethod
 
+import androidx.compose.ui.text.input.TextFieldValue
 import com.jie.wealthmate.base.BaseScreenModel
 import com.jie.wealthmate.feature.menu.categoryManagement.component.CategoryItemData
 import com.jie.wealthmate.repository.CategoryRepository
@@ -18,6 +19,21 @@ class AddPaymentMethodScreenModel(
         this.paymentMethodItems = paymentMethodItems
     }
 
+    fun updatePaymentMethodLabel(textFieldValue: TextFieldValue) {
+        reduceState { state ->
+            state.copy(
+                label = textFieldValue
+            )
+        }
+    }
+
+    fun updatePaymentMethodGroupLabel(text: String){
+        reduceState { state ->
+            state.copy(
+                groupLabel = text
+            )
+        }
+    }
 
     fun savePaymentMethod() {
         val uiState = container.uiState.value

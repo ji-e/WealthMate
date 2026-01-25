@@ -21,6 +21,7 @@ import com.jie.wealthmate.base.BaseScreen
 import com.jie.wealthmate.base.collectSideEffect
 import com.jie.wealthmate.component.ButtonSize
 import com.jie.wealthmate.component.WMButton
+import com.jie.wealthmate.component.textField.WMTextField
 import com.jie.wealthmate.component.topbar.TopBarItem
 import com.jie.wealthmate.feature.menu.categoryManagement.component.CategoryItemData
 import com.jie.wealthmate.feature.menu.component.MenuEnum
@@ -75,7 +76,29 @@ class AddPaymentMethodScreen(
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
+            Column(modifier = Modifier.weight(1f).padding(horizontal = 20.dp)) {
+                // 현금, 체크카드, 신용카드, 선불식, 계좌,
+                WMTextField(
+                    value = uiState.label,
+                    onValueChange = screenModel::updatePaymentMethodLabel,
+                    modifier = Modifier.padding(top = 4.dp),
+                    label = "결제수단 이름",
+                    placeholder = "삼성카드",
+                    isRequire = true,
+                    maxLength = 15,
+                    isCount = true,
+                )
 
+                WMTextField(
+                    value = uiState.groupLabel,
+                    onValueChange = screenModel::updatePaymentMethodGroupLabel,
+                    modifier = Modifier.padding(top = 16.dp),
+                    label = "결제수단 그룹",
+                    placeholder = "신용카드",
+                    readOnly = true,
+                    onReadOnlyClick = {}
+                )
+            }
             // 저장 버튼
             WMButton(
                 text = "저장",
