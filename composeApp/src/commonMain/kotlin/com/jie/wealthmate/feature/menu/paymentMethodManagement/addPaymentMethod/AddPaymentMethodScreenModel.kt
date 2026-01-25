@@ -2,8 +2,8 @@ package com.jie.wealthmate.feature.menu.paymentMethodManagement.addPaymentMethod
 
 import androidx.compose.ui.text.input.TextFieldValue
 import com.jie.wealthmate.base.BaseScreenModel
-import com.jie.wealthmate.feature.menu.categoryManagement.component.CategoryItemData
 import com.jie.wealthmate.feature.menu.paymentMethodManagement.addPaymentMethod.component.PaymentMethodGroupItemData
+import com.jie.wealthmate.feature.menu.paymentMethodManagement.component.PaymentMethodItemData
 import com.jie.wealthmate.repository.PaymentMethodRepository
 import com.jie.wealthmate.utils.default
 import kotlinx.coroutines.delay
@@ -11,13 +11,13 @@ import kotlinx.coroutines.delay
 class AddPaymentMethodScreenModel(
     private val paymentMethodRepository: PaymentMethodRepository,
 ) : BaseScreenModel<AddPaymentMethodUiState>() {
-    private var paymentMethodItems: List<CategoryItemData> = emptyList()
+    private var paymentMethodItems: List<PaymentMethodItemData> = emptyList()
 
     override val initialState: AddPaymentMethodUiState
         get() = AddPaymentMethodUiState()
 
     fun updateInit(
-        paymentMethodItems: List<CategoryItemData>,
+        paymentMethodItems: List<PaymentMethodItemData>,
     ) {
         this.paymentMethodItems = paymentMethodItems
         getPaymentMethodGroups()
@@ -26,6 +26,7 @@ class AddPaymentMethodScreenModel(
     fun updatePaymentMethodLabel(textFieldValue: TextFieldValue) {
         reduceState { state ->
             state.copy(
+                isDataChanged = true,
                 label = textFieldValue
             )
         }
@@ -34,6 +35,7 @@ class AddPaymentMethodScreenModel(
     fun updatePaymentMethodGroup(paymentMethodGroup: PaymentMethodGroupItemData?) {
         reduceState { state ->
             state.copy(
+                isDataChanged = true,
                 group = paymentMethodGroup
             )
         }
@@ -94,7 +96,7 @@ class AddPaymentMethodScreenModel(
             block = {
                 paymentMethodRepository.updatePaymentMethodGroup(
                     paymentMethodGroupId = paymentMethodGroup.id.default(),
-                    label = paymentMethodGroup.label
+                    paymentMethodGroupLabel = paymentMethodGroup.label
                 )
             }
         ) {
@@ -114,7 +116,11 @@ class AddPaymentMethodScreenModel(
 
         launchSafe(
             block = {
-
+                paymentMethodRepository.insertPaymentMethod(
+                    paymentMethodLabel = uiState.label.text,
+                    paymentMethodGroupId = uiState.group?.id,
+                    sort = paymentMethodItems.size.toLong()
+                )
             },
         ) {
             showSnackbar("결제수단이 저장되었습니다.")
