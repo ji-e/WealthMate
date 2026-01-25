@@ -323,7 +323,7 @@ class AddPaymentMethodScreen(
                             .fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
-                        if (tempSelectedPaymentMethodGroup?.id != "notting") {
+                        if (tempSelectedPaymentMethodGroup?.id != AddPaymentMethodScreenModel.GROUP_ID_NONE) {
                             WMButton(
                                 text = "수정",
                                 buttonStyle = ButtonStyle.TONAL,

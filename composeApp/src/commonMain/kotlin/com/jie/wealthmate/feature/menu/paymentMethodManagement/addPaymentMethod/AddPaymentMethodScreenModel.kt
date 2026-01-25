@@ -50,7 +50,7 @@ class AddPaymentMethodScreenModel(
                 }.toMutableList().apply {
                     add(
                         PaymentMethodGroupItemData(
-                            id = "notting",
+                            id = GROUP_ID_NONE,
                             label = "선택 안함"
                         )
                     )
@@ -120,5 +120,9 @@ class AddPaymentMethodScreenModel(
             showSnackbar("결제수단이 저장되었습니다.")
             postSideEffect { AddPaymentMethodUiSideEffect.OnSuccessSave }
         }
+    }
+
+    companion object {
+        const val GROUP_ID_NONE = "none"
     }
 }
