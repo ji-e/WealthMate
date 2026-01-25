@@ -1,7 +1,9 @@
 package com.jie.wealthmate.component
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -25,6 +27,7 @@ import wealthmate.composeapp.generated.resources.ic_horizontal_rule
 fun WMModalBottomSheet(
     modifier: Modifier = Modifier,
     title: String? = null,
+    trailingItem: @Composable (() -> Unit)? = null,
     onDismissRequest: () -> Unit,
     content: @Composable ColumnScope.() -> Unit,
 ) {
@@ -48,14 +51,27 @@ fun WMModalBottomSheet(
         }
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            title?.run {
-                WMText(
-                    text = this,
-                    style = Typography().titleMedium.copy(fontWeight = FontWeight.SemiBold),
-                    modifier = Modifier
-                        .padding(horizontal = 20.dp)
-                        .padding(top = 4.dp, bottom = 12.dp)
-                )
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 4.dp, bottom = 12.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                title?.run {
+                    WMText(
+                        text = this,
+                        style = Typography().titleMedium.copy(fontWeight = FontWeight.SemiBold),
+                        modifier = Modifier.padding(horizontal = 20.dp)
+                    )
+                }
+                Box(
+                    modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 4.dp),
+                    contentAlignment = Alignment.CenterEnd
+                ) {
+                    trailingItem?.invoke()
+                }
             }
             content()
         }
