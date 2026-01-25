@@ -30,13 +30,19 @@ class PaymentMethodRepositoryImpl(
             paymentMethodGroupDao.insert(paymentMethodGroup)
         }
 
-    override suspend fun updatePaymentMethodGroup(paymentMethodGroup: PaymentMethodGroupEntity) =
+    override suspend fun updatePaymentMethodGroup(paymentMethodGroupId: String, label: String) =
         loggedCall(
             repositoryName = repoName,
             methodName = "updatePaymentMethodGroup",
-            params = mapOf("paymentMethod" to paymentMethodGroup)
+            params = mapOf("label" to label)
         ) {
-            paymentMethodGroupDao.update(paymentMethodGroup)
+            paymentMethodGroupDao.update(
+                PaymentMethodGroupEntity(
+                    id = paymentMethodGroupId,
+                    label = label,
+                    updatedAt = Clock.System.now().toEpochMilliseconds()
+                )
+            )
         }
 
     override suspend fun deletePaymentMethodGroup(paymentMethodGroupId: String) =

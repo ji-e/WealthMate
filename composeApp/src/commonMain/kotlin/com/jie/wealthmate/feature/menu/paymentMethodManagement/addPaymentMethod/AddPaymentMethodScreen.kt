@@ -167,17 +167,19 @@ class AddPaymentMethodScreen(
         val listState = rememberLazyListState()
 
         LaunchedEffect(paymentMethodGroupItems) {
-            isModify = false
-            isAdd = false
-
             tempSelectedPaymentMethodGroup =
-                if (addGroupLabel.text.isEmpty()) selectedPaymentMethodGroup else paymentMethodGroupItems.find { it.label == addGroupLabel.text }
+                if (isAdd) paymentMethodGroupItems.find { it.label == addGroupLabel.text }
+                else if (isModify) tempSelectedPaymentMethodGroup
+                else selectedPaymentMethodGroup
 
-            addGroupLabel = TextFieldValue("")
             val movePosition = paymentMethodGroupItems.indexOf(tempSelectedPaymentMethodGroup)
                 .run { if (this <= 0) 0 else this - 1 }
 
             listState.scrollToItem(movePosition)
+
+            addGroupLabel = TextFieldValue("")
+            isModify = false
+            isAdd = false
         }
 
         WMModalBottomSheet(
@@ -283,10 +285,7 @@ class AddPaymentMethodScreen(
                             buttonStyle = ButtonStyle.FILLED,
                             buttonSize = ButtonSize.LARGE,
                             modifier = Modifier.weight(4f),
-                            onClick = {
-                                isModify = false
-                                onUpdateClick(tempSelectedPaymentMethodGroup)
-                            }
+                            onClick = { onUpdateClick(tempSelectedPaymentMethodGroup) }
                         )
                     }
                 } else if (isAdd) {

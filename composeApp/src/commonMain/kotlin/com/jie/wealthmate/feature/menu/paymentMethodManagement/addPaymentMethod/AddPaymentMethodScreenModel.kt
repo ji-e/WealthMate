@@ -57,7 +57,7 @@ class AddPaymentMethodScreenModel(
                 }
                 reduceState { state ->
                     state.copy(
-                        group = groupItems.find { state.group == it },
+                        group = groupItems.find { state.group?.id == it.id },
                         groupItems = groupItems
                     )
                 }
@@ -90,16 +90,17 @@ class AddPaymentMethodScreenModel(
 
     fun modifyPaymentMethodGroup(paymentMethodGroup: PaymentMethodGroupItemData?) {
         paymentMethodGroup ?: return
-        // todo db
-        reduceState { state ->
-            state.copy(
-                groupItems = state.groupItems.toMutableList()
-                    .apply {
-                        val index = this.indexOf(this.find { it.id == paymentMethodGroup.id })
-                        this[index] = paymentMethodGroup
-                    },
-                group = paymentMethodGroup
-            )
+        launchSafe(
+            block = {
+                paymentMethodRepository.updatePaymentMethodGroup(
+                    paymentMethodGroupId = paymentMethodGroup.id.default(),
+                    label = paymentMethodGroup.label
+                )
+            }
+        ) {
+            getPaymentMethodGroups()
+            delay(300)
+            showSnackbar("결제수단 그룹이 수정되었습니다.")
         }
     }
 

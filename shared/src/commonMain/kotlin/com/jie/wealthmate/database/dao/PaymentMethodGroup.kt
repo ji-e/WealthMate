@@ -13,10 +13,10 @@ import kotlin.time.Clock
 interface PaymentMethodGroupDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(paymentGroup: PaymentMethodGroupEntity)
+    suspend fun insert(paymentMethodGroup: PaymentMethodGroupEntity)
 
     @Update
-    suspend fun update(paymentGroup: PaymentMethodGroupEntity)
+    suspend fun update(paymentMethodGroup: PaymentMethodGroupEntity)
 
     @Query("UPDATE payment_method_groups SET isDeleted = 1, updatedAt = :updatedAt WHERE id = :id")
     suspend fun softDelete(id: String, updatedAt: Long = Clock.System.now().toEpochMilliseconds())

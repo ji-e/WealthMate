@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.Flow
 interface PaymentMethodRepository {
     suspend fun insertPaymentMethodGroup(label: String)
 
-    suspend fun updatePaymentMethodGroup(paymentMethodGroup: PaymentMethodGroupEntity)
+    suspend fun updatePaymentMethodGroup(paymentMethodGroupId: String, label: String)
 
     suspend fun deletePaymentMethodGroup(paymentMethodGroupId: String)
 
