@@ -3,14 +3,21 @@ package com.jie.wealthmate.di
 import com.jie.wealthmate.database.AppDatabase
 import com.jie.wealthmate.database.DatabaseBuilder
 import com.jie.wealthmate.database.dao.CategoryDao
+import com.jie.wealthmate.database.dao.PaymentMethodGroupDao
 import com.jie.wealthmate.database.eneity.CategoryConverters
 import com.jie.wealthmate.repository.CategoryRepository
 import com.jie.wealthmate.repository.CategoryRepositoryImpl
+import com.jie.wealthmate.repository.PaymentMethodRepository
+import com.jie.wealthmate.repository.PaymentMethodRepositoryImpl
 import org.koin.dsl.module
 
 val databaseModule = module {
-    single<CategoryConverters> { CategoryConverters() }
     single<AppDatabase> { get<DatabaseBuilder>().build() }
+
+    single<CategoryConverters> { CategoryConverters() }
     single<CategoryDao> { get<AppDatabase>().categoryDao() }
     single<CategoryRepository> { CategoryRepositoryImpl(get()) }
+
+    single<PaymentMethodGroupDao> { get<AppDatabase>().paymentMethodGroupDao() }
+    single<PaymentMethodRepository> { PaymentMethodRepositoryImpl(get()) }
 }
