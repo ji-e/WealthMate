@@ -67,21 +67,14 @@ fun WMTextField(
     keyboardActions: KeyboardActions = KeyboardActions.Default,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
 ) {
-    var textFieldValueState by remember {
-        mutableStateOf(
-            TextFieldValue(
-                text = value,
-                selection = TextRange(value.length)
-            )
-        )
-    }
-
     WMTextField(
         modifier = modifier,
         textFieldModifier = textFieldModifier,
-        value = textFieldValueState,
+        value = TextFieldValue(
+            text = value.default(),
+            selection = TextRange(value.length)
+        ),
         onValueChange = {
-            textFieldValueState = it
             onValueChange(it.text)
         },
         maxLength = maxLength,
@@ -97,7 +90,7 @@ fun WMTextField(
         isRequire = isRequire,
         suffix = suffix,
         trailingIcon = trailingIcon,
-        onClickReadOnly = onReadOnlyClick,
+        onReadOnlyClick = onReadOnlyClick,
         visualTransformation = visualTransformation,
         keyboardOptions = keyboardOptions,
         keyboardActions = keyboardActions,
@@ -124,7 +117,7 @@ fun WMTextField(
     isRequire: Boolean = false,
     suffix: @Composable (() -> Unit)? = null,
     trailingIcon: @Composable (() -> Unit)? = null,
-    onClickReadOnly: (() -> Unit)? = null,
+    onReadOnlyClick: (() -> Unit)? = null,
     visualTransformation: VisualTransformation = VisualTransformation.None,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
@@ -261,15 +254,15 @@ fun WMTextField(
                 errorSupportingTextColor = errorColor,
             )
         )
-        if (onClickReadOnly != null) {
+        if (onReadOnlyClick != null) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(72.dp)
-                    .padding(top = 28.dp)
+                    .height(80.dp)
+                    .padding(top = 24.dp)
                     .clickable {
                         focusRequester.requestFocus()
-                        onClickReadOnly()
+                        onReadOnlyClick()
                     }
             )
         }
