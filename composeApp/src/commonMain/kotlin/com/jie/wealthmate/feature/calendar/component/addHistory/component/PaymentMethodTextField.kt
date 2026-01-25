@@ -20,7 +20,7 @@ fun PaymentMethodTextField(
         modifier = modifier,
         label = if (selectedLargeCategoryEnum == LargeCategoryEnum.EXPENSES) "결제수단" else "자산",
         readOnly = true,
-        onClickReadOnly = onPaymentMethodClick,
+        onReadOnlyClick = onPaymentMethodClick,
     )
 }
 

@@ -44,7 +44,7 @@ fun CategoryTextField(
         label = "카테고리",
         readOnly = true,
         isRequire = true,
-        onClickReadOnly = onCategoryClick,
+        onReadOnlyClick = onCategoryClick,
         supportingContent = {
             FlowRow(
                 modifier = Modifier
