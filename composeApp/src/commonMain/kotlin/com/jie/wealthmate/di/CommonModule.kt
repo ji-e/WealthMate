@@ -12,13 +12,14 @@ import com.jie.wealthmate.feature.menu.paymentMethodManagement.PaymentMethodMana
 import com.jie.wealthmate.feature.menu.paymentMethodManagement.addPaymentMethod.AddPaymentMethodScreenModel
 import com.jie.wealthmate.repository.CategoryRepository
 import com.jie.wealthmate.repository.CategoryRepositoryImpl
+import com.jie.wealthmate.repository.PaymentMethodRepository
+import com.jie.wealthmate.repository.PaymentMethodRepositoryImpl
 import org.koin.dsl.module
 
 val commonModule = module {
 
-    single<CategoryRepository> {
-        CategoryRepositoryImpl(get())
-    }
+    single<CategoryRepository> { CategoryRepositoryImpl(get()) }
+    single<PaymentMethodRepository> { PaymentMethodRepositoryImpl(get()) }
 
     // 홈
     factory { HomeScreenModel() }
