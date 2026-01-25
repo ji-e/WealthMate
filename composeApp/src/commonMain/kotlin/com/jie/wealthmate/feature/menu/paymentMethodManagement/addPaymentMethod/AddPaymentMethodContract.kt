@@ -6,6 +6,7 @@ import com.jie.wealthmate.base.UiSideEffect
 import com.jie.wealthmate.feature.menu.paymentMethodManagement.addPaymentMethod.component.PaymentMethodGroupItemData
 
 data class AddPaymentMethodUiState(
+    val isDataChanged: Boolean = false,
     val label: TextFieldValue = TextFieldValue(""),
     val group: PaymentMethodGroupItemData? = null,
     val groupItems: List<PaymentMethodGroupItemData> = emptyList(),

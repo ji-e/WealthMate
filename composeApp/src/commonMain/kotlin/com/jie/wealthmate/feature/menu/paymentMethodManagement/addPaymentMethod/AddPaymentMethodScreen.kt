@@ -38,10 +38,10 @@ import com.jie.wealthmate.component.WMModalBottomSheet
 import com.jie.wealthmate.component.WMShadowDivider
 import com.jie.wealthmate.component.textField.WMTextField
 import com.jie.wealthmate.component.topbar.TopBarItem
-import com.jie.wealthmate.feature.menu.categoryManagement.component.CategoryItemData
 import com.jie.wealthmate.feature.menu.component.MenuEnum
 import com.jie.wealthmate.feature.menu.paymentMethodManagement.addPaymentMethod.component.PaymentMethodGroupItemData
 import com.jie.wealthmate.feature.menu.paymentMethodManagement.addPaymentMethod.component.PaymentMethodGroupList
+import com.jie.wealthmate.feature.menu.paymentMethodManagement.component.PaymentMethodItemData
 import com.jie.wealthmate.theme.ColorRed
 import com.jie.wealthmate.theme.WMTheme
 import com.jie.wealthmate.utils.default
@@ -51,7 +51,7 @@ import wealthmate.composeapp.generated.resources.ic_add
 import wealthmate.composeapp.generated.resources.ic_delete
 
 class AddPaymentMethodScreen(
-    val paymentMethodItems: List<CategoryItemData> = emptyList(),
+    val paymentMethodItems: List<PaymentMethodItemData> = emptyList(),
 ) : BaseScreen() {
 
     @Composable
@@ -64,10 +64,10 @@ class AddPaymentMethodScreen(
 
         var isShowPaymentMethodModalBottomSheet by remember { mutableStateOf(false) }
 
-        val onBack: () -> Unit = remember(uiState.label.text) {
+        val onBack: () -> Unit = remember(uiState.isDataChanged) {
             {
                 showSaveBackDialog(
-                    isShow = uiState.label.text.isNotEmpty(),
+                    isShow = uiState.isDataChanged,
                     callback = { navigator.pop() }
                 )
             }

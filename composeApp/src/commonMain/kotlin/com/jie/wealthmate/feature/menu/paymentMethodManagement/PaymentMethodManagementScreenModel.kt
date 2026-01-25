@@ -1,14 +1,38 @@
 package com.jie.wealthmate.feature.menu.paymentMethodManagement
 
 import com.jie.wealthmate.base.BaseScreenModel
-import com.jie.wealthmate.repository.CategoryRepository
+import com.jie.wealthmate.feature.menu.paymentMethodManagement.component.PaymentMethodItemData
+import com.jie.wealthmate.repository.PaymentMethodRepository
 
 class PaymentMethodManagementScreenModel(
-    private val categoryRepository: CategoryRepository,
+    private val paymentMethodRepository: PaymentMethodRepository,
 ) : BaseScreenModel<PaymentMethodManagementUiState>() {
 
     override val initialState: PaymentMethodManagementUiState
         get() = PaymentMethodManagementUiState()
+
+    init {
+        getPaymentMethods()
+    }
+
+    private fun getPaymentMethods() {
+        paymentMethodRepository.getPaymentMethods()
+            .apiFlow { response ->
+                println("response: $response")
+                reduceState { state ->
+                    state.copy(
+                        paymentMethodItems = response.map {
+                            PaymentMethodItemData(
+                                id = it.id,
+                                label = it.label,
+                                groupId = it.groupId,
+                                sort = it.sort
+                            )
+                        }
+                    )
+                }
+            }
+    }
 
 
     fun handleReorderCategoryItems(from: Int, to: Int) = reduceState { state ->
@@ -17,4 +41,6 @@ class PaymentMethodManagementScreenModel(
             paymentMethodItems = paymentMethodItems.apply { add(to, removeAt(from)) },
         )
     }
+
+
 }
