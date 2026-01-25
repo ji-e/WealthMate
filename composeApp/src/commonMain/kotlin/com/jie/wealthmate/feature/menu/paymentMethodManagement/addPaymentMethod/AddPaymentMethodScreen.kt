@@ -5,6 +5,7 @@ package com.jie.wealthmate.feature.menu.paymentMethodManagement.addPaymentMethod
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -59,17 +60,23 @@ class AddPaymentMethodScreen(
 
         val navigator = LocalNavigator.currentOrThrow
         val screenModel: AddPaymentMethodScreenModel = koinInject()
-        val uiState = screenModel.container.uiState.collectAsState().value
+        val uiState by screenModel.container.uiState.collectAsState()
 
         var isShowPaymentMethodModalBottomSheet by remember { mutableStateOf(false) }
 
-        fun onBack() {
-            showSaveBackDialog(uiState.label.text.isNotEmpty()) {
-                navigator.pop()
+        val onBack: () -> Unit = remember(uiState.label.text) {
+            {
+                showSaveBackDialog(
+                    isShow = uiState.label.text.isNotEmpty(),
+                    callback = { navigator.pop() }
+                )
             }
         }
 
-        BackHandler(true) { onBack() }
+        BackHandler(
+            enabled = true,
+            onBack = onBack
+        )
 
         if (navigator.lastItem is AddPaymentMethodScreen) {
             SideEffect {
@@ -84,23 +91,24 @@ class AddPaymentMethodScreen(
 
         LaunchedEffect(Unit) {
             screenModel.updateInit(
-                paymentMethodItems = paymentMethodItems,
+                paymentMethodItems = paymentMethodItems
             )
         }
 
         screenModel.collectSideEffect { sideEffect ->
             when (sideEffect) {
-                is AddPaymentMethodUiSideEffect.OnSuccessSave -> {
-                    navigator.pop()
-                }
+                is AddPaymentMethodUiSideEffect.OnSuccessSave -> navigator.pop()
             }
         }
 
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
-            Column(modifier = Modifier.weight(1f).padding(horizontal = 20.dp)) {
-                // 현금, 체크카드, 신용카드, 선불식, 계좌,
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = 20.dp)
+            ) {
                 WMTextField(
                     value = uiState.label,
                     onValueChange = screenModel::updatePaymentMethodLabel,
@@ -131,21 +139,24 @@ class AddPaymentMethodScreen(
                     .padding(bottom = 20.dp)
                     .fillMaxWidth(),
                 enabled = uiState.label.text.isNotBlank(),
-                onClick = { screenModel.savePaymentMethod() }
+                onClick = screenModel::savePaymentMethod
             )
         }
+
+        // 결제수단 그룹  ModalBottomSheet
         if (isShowPaymentMethodModalBottomSheet) {
             ShowPaymentMethodGroupModalBottomSheet(
                 selectedPaymentMethodGroup = uiState.group,
                 paymentMethodGroupItems = uiState.groupItems,
                 onAddClick = screenModel::addPaymentMethodGroup,
                 onSelectClick = screenModel::updatePaymentMethodGroup,
-                onRemoveClick = {
+                onRemoveClick = { item ->
                     showRemoveDialog() {
-                        screenModel.removePaymentMethodGroup(it)
+                        screenModel.removePaymentMethodGroup(item)
                     }
                 },
                 onUpdateClick = screenModel::modifyPaymentMethodGroup,
+                showSnackbar = screenModel::showSnackbar,
                 onDismissRequest = { isShowPaymentMethodModalBottomSheet = false }
             )
         }
@@ -156,28 +167,28 @@ class AddPaymentMethodScreen(
         selectedPaymentMethodGroup: PaymentMethodGroupItemData? = null,
         paymentMethodGroupItems: List<PaymentMethodGroupItemData>,
         onAddClick: (TextFieldValue) -> Unit = {},
-        onSelectClick: (PaymentMethodGroupItemData) -> Unit = {},
+        onSelectClick: (PaymentMethodGroupItemData?) -> Unit = {},
         onRemoveClick: (PaymentMethodGroupItemData?) -> Unit = {},
         onUpdateClick: (PaymentMethodGroupItemData?) -> Unit = {},
+        showSnackbar: (String) -> Unit = {},
         onDismissRequest: () -> Unit,
     ) {
         var isModify by remember { mutableStateOf(false) }
         var isAdd by remember { mutableStateOf(false) }
-        var tempSelectedPaymentMethodGroup by remember {
-            mutableStateOf<PaymentMethodGroupItemData?>(selectedPaymentMethodGroup)
-        }
+        var tempSelectedPaymentMethodGroup by remember { mutableStateOf(selectedPaymentMethodGroup) }
         var addGroupLabel by remember { mutableStateOf(TextFieldValue("")) }
 
         val listState = rememberLazyListState()
+
         LaunchedEffect(paymentMethodGroupItems) {
-            tempSelectedPaymentMethodGroup =
-                if (isAdd) paymentMethodGroupItems.find { it.label == addGroupLabel.text }
-                else if (isModify) tempSelectedPaymentMethodGroup
-                else selectedPaymentMethodGroup
+            tempSelectedPaymentMethodGroup = when {
+                isAdd -> paymentMethodGroupItems.find { it.label == addGroupLabel.text }
+                isModify -> tempSelectedPaymentMethodGroup
+                else -> selectedPaymentMethodGroup
+            }
 
-            val movePosition = paymentMethodGroupItems.indexOf(tempSelectedPaymentMethodGroup)
-                .run { if (this <= 0) 0 else this - 1 }
-
+            val index = paymentMethodGroupItems.indexOf(tempSelectedPaymentMethodGroup)
+            val movePosition = if (index <= 0) 0 else index - 1
             listState.scrollToItem(movePosition)
 
             addGroupLabel = TextFieldValue("")
@@ -197,10 +208,8 @@ class AddPaymentMethodScreen(
             },
             onDismissRequest = onDismissRequest,
         ) {
-
             Column(
-                modifier = Modifier
-                    .padding(bottom = 20.dp)
+                modifier = Modifier.padding(bottom = 20.dp)
             ) {
                 PaymentMethodGroupList(
                     modifier = Modifier
@@ -210,11 +219,14 @@ class AddPaymentMethodScreen(
                     paymentMethodGroupItems = paymentMethodGroupItems,
                     tempSelectedPaymentMethodGroup = tempSelectedPaymentMethodGroup,
                     onGroupClick = {
-                        if (isModify.not() && isAdd.not()) {
-                            tempSelectedPaymentMethodGroup = it
+                        when {
+                            isModify -> showSnackbar("결제수단 그룹 수정을 완료해 주세요.")
+                            isAdd -> showSnackbar("결제수단 그룹 추가를 완료해 주세요.")
+                            else -> tempSelectedPaymentMethodGroup = it
                         }
                     }
                 )
+
                 if (isModify) {
                     WMShadowDivider()
 
@@ -266,89 +278,75 @@ class AddPaymentMethodScreen(
                         isCount = true,
                     )
                 }
-
-                if (isModify) {
-                    Row(
-                        modifier = Modifier
-                            .padding(horizontal = 20.dp)
-                            .padding(top = 20.dp)
-                            .fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(4.dp)
-                    ) {
-                        WMButton(
-                            text = "취소",
-                            buttonStyle = ButtonStyle.TONAL,
-                            buttonSize = ButtonSize.LARGE,
-                            modifier = Modifier.weight(1f),
-                            onClick = { isModify = false },
-                        )
-
-                        WMButton(
-                            text = "수정 완료",
-                            buttonStyle = ButtonStyle.FILLED,
-                            buttonSize = ButtonSize.LARGE,
-                            modifier = Modifier.weight(4f),
-                            onClick = { onUpdateClick(tempSelectedPaymentMethodGroup) }
-                        )
-                    }
-                } else if (isAdd) {
-                    Row(
-                        modifier = Modifier
-                            .padding(horizontal = 20.dp)
-                            .padding(top = 20.dp)
-                            .fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(4.dp)
-                    ) {
-                        WMButton(
-                            text = "취소",
-                            buttonStyle = ButtonStyle.TONAL,
-                            buttonSize = ButtonSize.LARGE,
-                            modifier = Modifier.weight(1f),
-                            onClick = { isAdd = false },
-                        )
-
-                        WMButton(
-                            text = "추가",
-                            buttonStyle = ButtonStyle.FILLED,
-                            buttonSize = ButtonSize.LARGE,
-                            modifier = Modifier.weight(4f),
-                            onClick = { onAddClick(addGroupLabel) }
-                        )
-                    }
-                } else {
-                    Row(
-                        modifier = Modifier
-                            .padding(horizontal = 20.dp)
-                            .padding(top = 20.dp)
-                            .fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(4.dp)
-                    ) {
-                        if (tempSelectedPaymentMethodGroup?.id != AddPaymentMethodScreenModel.GROUP_ID_NONE) {
-                            WMButton(
-                                text = "수정",
-                                buttonStyle = ButtonStyle.TONAL,
-                                buttonSize = ButtonSize.LARGE,
-                                modifier = Modifier.weight(1f),
-                                onClick = { isModify = true },
+                // 버튼 영역 통합 및 최적화
+                Row(
+                    modifier = Modifier
+                        .padding(horizontal = 20.dp)
+                        .padding(top = 20.dp)
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    when {
+                        isModify -> {
+                            ActionButtons(
+                                secondaryText = "취소",
+                                onSecondaryClick = { isModify = false },
+                                primaryText = "수정 완료",
+                                onPrimaryClick = { onUpdateClick(tempSelectedPaymentMethodGroup) }
                             )
                         }
 
-                        WMButton(
-                            text = "선택",
-                            buttonStyle = ButtonStyle.FILLED,
-                            buttonSize = ButtonSize.LARGE,
-                            modifier = Modifier.weight(4f),
-                            onClick = {
-                                onDismissRequest()
-                                tempSelectedPaymentMethodGroup?.let {
-                                    onSelectClick(it)
+                        isAdd -> {
+                            ActionButtons(
+                                secondaryText = "취소",
+                                onSecondaryClick = { isAdd = false },
+                                primaryText = "추가",
+                                onPrimaryClick = { onAddClick(addGroupLabel) }
+                            )
+                        }
+
+                        else -> {
+                            ActionButtons(
+                                isSecondaryVisible = tempSelectedPaymentMethodGroup?.id != AddPaymentMethodScreenModel.GROUP_ID_NONE,
+                                secondaryText = "수정",
+                                onSecondaryClick = { isModify = true },
+                                primaryText = "선택",
+                                onPrimaryClick = {
+                                    onDismissRequest()
+                                    tempSelectedPaymentMethodGroup?.let(onSelectClick)
                                 }
-                            }
-                        )
+                            )
+                        }
                     }
                 }
             }
         }
+    }
+
+    @Composable
+    private fun RowScope.ActionButtons(
+        isSecondaryVisible: Boolean = true,
+        secondaryText: String,
+        onSecondaryClick: () -> Unit,
+        primaryText: String,
+        onPrimaryClick: () -> Unit,
+    ) {
+        if (isSecondaryVisible) {
+            WMButton(
+                text = secondaryText,
+                buttonStyle = ButtonStyle.TONAL,
+                buttonSize = ButtonSize.LARGE,
+                modifier = Modifier.weight(1f),
+                onClick = onSecondaryClick,
+            )
+        }
+        WMButton(
+            text = primaryText,
+            buttonStyle = ButtonStyle.FILLED,
+            buttonSize = ButtonSize.LARGE,
+            modifier = Modifier.weight(4f),
+            onClick = onPrimaryClick
+        )
     }
 
     @Composable

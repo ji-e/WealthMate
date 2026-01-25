@@ -31,7 +31,7 @@ class AddPaymentMethodScreenModel(
         }
     }
 
-    fun updatePaymentMethodGroup(paymentMethodGroup: PaymentMethodGroupItemData) {
+    fun updatePaymentMethodGroup(paymentMethodGroup: PaymentMethodGroupItemData?) {
         reduceState { state ->
             state.copy(
                 group = paymentMethodGroup
