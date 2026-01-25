@@ -140,7 +140,11 @@ class AddPaymentMethodScreen(
                 paymentMethodGroupItems = uiState.groupItems,
                 onAddClick = screenModel::addPaymentMethodGroup,
                 onSelectClick = screenModel::updatePaymentMethodGroup,
-                onRemoveClick = screenModel::removePaymentMethodGroup,
+                onRemoveClick = {
+                    showRemoveDialog() {
+                        screenModel.removePaymentMethodGroup(it)
+                    }
+                },
                 onUpdateClick = screenModel::modifyPaymentMethodGroup,
                 onDismissRequest = { isShowPaymentMethodModalBottomSheet = false }
             )
@@ -165,7 +169,6 @@ class AddPaymentMethodScreen(
         var addGroupLabel by remember { mutableStateOf(TextFieldValue("")) }
 
         val listState = rememberLazyListState()
-
         LaunchedEffect(paymentMethodGroupItems) {
             tempSelectedPaymentMethodGroup =
                 if (isAdd) paymentMethodGroupItems.find { it.label == addGroupLabel.text }
