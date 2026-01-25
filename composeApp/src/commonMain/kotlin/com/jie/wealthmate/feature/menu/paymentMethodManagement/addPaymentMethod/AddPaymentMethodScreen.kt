@@ -5,11 +5,17 @@ package com.jie.wealthmate.feature.menu.paymentMethodManagement.addPaymentMethod
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -21,6 +27,7 @@ import com.jie.wealthmate.base.BaseScreen
 import com.jie.wealthmate.base.collectSideEffect
 import com.jie.wealthmate.component.ButtonSize
 import com.jie.wealthmate.component.WMButton
+import com.jie.wealthmate.component.WMModalBottomSheet
 import com.jie.wealthmate.component.textField.WMTextField
 import com.jie.wealthmate.component.topbar.TopBarItem
 import com.jie.wealthmate.feature.menu.categoryManagement.component.CategoryItemData
@@ -39,6 +46,8 @@ class AddPaymentMethodScreen(
         val navigator = LocalNavigator.currentOrThrow
         val screenModel: AddPaymentMethodScreenModel = koinInject()
         val uiState = screenModel.container.uiState.collectAsState().value
+
+        var isShowPaymentMethodModalBottomSheet by remember { mutableStateOf(false) }
 
         fun onBack() {
             showSaveBackDialog(uiState.isChangedData) {
@@ -96,7 +105,7 @@ class AddPaymentMethodScreen(
                     label = "결제수단 그룹",
                     placeholder = "신용카드",
                     readOnly = true,
-                    onReadOnlyClick = {}
+                    onReadOnlyClick = { isShowPaymentMethodModalBottomSheet = true }
                 )
             }
             // 저장 버튼
@@ -110,6 +119,38 @@ class AddPaymentMethodScreen(
                 enabled = uiState.label.text.isNotBlank(),
                 onClick = { screenModel.savePaymentMethod() }
             )
+        }
+
+        ShowPaymentMethodGroupModalBottomSheet(
+            isShow = isShowPaymentMethodModalBottomSheet,
+            onDismissRequest = { isShowPaymentMethodModalBottomSheet = false }
+        )
+    }
+
+    @Composable
+    private fun ShowPaymentMethodGroupModalBottomSheet(
+        isShow: Boolean,
+        onDismissRequest: () -> Unit,
+    ) {
+        if (isShow.not()) return
+        WMModalBottomSheet(
+            title = "결제수단 그룹 관리",
+            onDismissRequest = onDismissRequest,
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp)
+                    .padding(bottom = 20.dp)
+            ) {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(200.dp)
+                ) {
+
+                }
+            }
         }
     }
 
