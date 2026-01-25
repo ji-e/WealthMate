@@ -19,7 +19,7 @@ import org.koin.dsl.module
 val commonModule = module {
 
     single<CategoryRepository> { CategoryRepositoryImpl(get()) }
-    single<PaymentMethodRepository> { PaymentMethodRepositoryImpl(get()) }
+    single<PaymentMethodRepository> { PaymentMethodRepositoryImpl(get(), get()) }
 
     // 홈
     factory { HomeScreenModel() }

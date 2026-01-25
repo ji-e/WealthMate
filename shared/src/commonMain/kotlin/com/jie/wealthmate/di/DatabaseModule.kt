@@ -3,6 +3,7 @@ package com.jie.wealthmate.di
 import com.jie.wealthmate.database.AppDatabase
 import com.jie.wealthmate.database.DatabaseBuilder
 import com.jie.wealthmate.database.dao.CategoryDao
+import com.jie.wealthmate.database.dao.PaymentMethodDao
 import com.jie.wealthmate.database.dao.PaymentMethodGroupDao
 import com.jie.wealthmate.database.eneity.CategoryConverters
 import com.jie.wealthmate.repository.CategoryRepository
@@ -18,6 +19,7 @@ val databaseModule = module {
     single<CategoryDao> { get<AppDatabase>().categoryDao() }
     single<CategoryRepository> { CategoryRepositoryImpl(get()) }
 
+    single<PaymentMethodDao> { get<AppDatabase>().paymentMethodDao() }
     single<PaymentMethodGroupDao> { get<AppDatabase>().paymentMethodGroupDao() }
-    single<PaymentMethodRepository> { PaymentMethodRepositoryImpl(get()) }
+    single<PaymentMethodRepository> { PaymentMethodRepositoryImpl(get(), get()) }
 }
