@@ -82,11 +82,21 @@ class AddPaymentMethodScreen(
                     value = uiState.label,
                     onValueChange = screenModel::updatePaymentMethodLabel,
                     modifier = Modifier.padding(top = 4.dp),
-                    label = "결제수단명",
+                    label = "결제수단 이름",
                     placeholder = "삼성카드",
                     isRequire = true,
                     maxLength = 15,
                     isCount = true,
+                )
+
+                WMTextField(
+                    value = uiState.groupLabel,
+                    onValueChange = screenModel::updatePaymentMethodGroupLabel,
+                    modifier = Modifier.padding(top = 16.dp),
+                    label = "결제수단 그룹",
+                    placeholder = "신용카드",
+                    readOnly = true,
+                    onReadOnlyClick = {}
                 )
             }
             // 저장 버튼

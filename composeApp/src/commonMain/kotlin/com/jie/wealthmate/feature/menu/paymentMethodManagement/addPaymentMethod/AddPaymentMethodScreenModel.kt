@@ -27,6 +27,13 @@ class AddPaymentMethodScreenModel(
         }
     }
 
+    fun updatePaymentMethodGroupLabel(text: String){
+        reduceState { state ->
+            state.copy(
+                groupLabel = text
+            )
+        }
+    }
 
     fun savePaymentMethod() {
         val uiState = container.uiState.value
