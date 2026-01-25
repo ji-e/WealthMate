@@ -5,6 +5,7 @@ import com.jie.wealthmate.base.BaseScreenModel
 import com.jie.wealthmate.feature.menu.categoryManagement.component.CategoryItemData
 import com.jie.wealthmate.feature.menu.paymentMethodManagement.addPaymentMethod.component.PaymentMethodGroupItemData
 import com.jie.wealthmate.repository.PaymentMethodRepository
+import com.jie.wealthmate.utils.default
 import kotlinx.coroutines.delay
 
 class AddPaymentMethodScreenModel(
@@ -41,21 +42,23 @@ class AddPaymentMethodScreenModel(
     private fun getPaymentMethodGroups() {
         paymentMethodRepository.getPaymentMethodGroups()
             .apiFlow { response ->
+                val groupItems = response.map {
+                    PaymentMethodGroupItemData(
+                        id = it.id,
+                        label = it.label
+                    )
+                }.toMutableList().apply {
+                    add(
+                        PaymentMethodGroupItemData(
+                            id = "notting",
+                            label = "선택 안함"
+                        )
+                    )
+                }
                 reduceState { state ->
                     state.copy(
-                        groupItems = response.map {
-                            PaymentMethodGroupItemData(
-                                id = it.id,
-                                label = it.label
-                            )
-                        }.toMutableList().apply {
-                            add(
-                                PaymentMethodGroupItemData(
-                                    id = "notting",
-                                    label = "선택 안함"
-                                )
-                            )
-                        }
+                        group = groupItems.find { state.group == it },
+                        groupItems = groupItems
                     )
                 }
             }
@@ -74,13 +77,14 @@ class AddPaymentMethodScreenModel(
     }
 
     fun removePaymentMethodGroup(paymentMethodGroup: PaymentMethodGroupItemData?) {
-        // todo db
-        reduceState { state ->
-            state.copy(
-                groupItems = state.groupItems.toMutableList()
-                    .apply { remove(paymentMethodGroup) },
-                group = if (state.group == paymentMethodGroup) null else state.group,
-            )
+        launchSafe(
+            block = {
+                paymentMethodRepository.deletePaymentMethodGroup(paymentMethodGroup?.id.default())
+            }
+        ) {
+            getPaymentMethodGroups()
+            delay(300)
+            showSnackbar("결제수단 그룹이 삭제되었습니다.")
         }
     }
 
