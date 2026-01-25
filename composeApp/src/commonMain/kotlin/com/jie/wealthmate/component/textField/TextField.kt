@@ -33,13 +33,14 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.jie.wealthmate.component.WMText
 import com.jie.wealthmate.theme.ColorGray
 import com.jie.wealthmate.theme.ColorPrimary
 import com.jie.wealthmate.theme.ColorRed
 import com.jie.wealthmate.theme.wantedSansFontFamily
-import androidx.compose.ui.tooling.preview.Preview
+import com.jie.wealthmate.utils.default
 
 @Composable
 fun WMTextField(
@@ -212,9 +213,7 @@ fun WMTextField(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
-                        supportingText?.let {
-                            WMText(text = it, modifier = Modifier.weight(1f))
-                        }
+                        WMText(text = supportingText.default(), modifier = Modifier.weight(1f))
 
                         if (isCount) {
                             WMText(text = "${value.text.length}/$maxLength")
