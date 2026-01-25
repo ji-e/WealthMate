@@ -1,13 +1,33 @@
 package com.jie.wealthmate.repository
 
+import com.jie.wealthmate.database.eneity.PaymentMethodEntity
 import com.jie.wealthmate.database.eneity.PaymentMethodGroupEntity
 import kotlinx.coroutines.flow.Flow
 
 
 interface PaymentMethodRepository {
+    suspend fun insertPaymentMethod(
+        paymentMethodLabel: String,
+        paymentMethodGroupId: String?,
+        sort: Long,
+    )
+
+    suspend fun updatePaymentMethod(paymentMethod: PaymentMethodEntity)
+
+    suspend fun updatePaymentMethodSort(updates: List<Pair<String, Long>>)
+
+    suspend fun deletePaymentMethod(paymentMethodId: String)
+
+    suspend fun getPaymentMethodById(paymentMethodId: String): PaymentMethodEntity?
+
+    fun getPaymentMethods(): Flow<List<PaymentMethodEntity>>
+
     suspend fun insertPaymentMethodGroup(label: String)
 
-    suspend fun updatePaymentMethodGroup(paymentMethodGroupId: String, label: String)
+    suspend fun updatePaymentMethodGroup(
+        paymentMethodGroupId: String,
+        paymentMethodGroupLabel: String,
+    )
 
     suspend fun deletePaymentMethodGroup(paymentMethodGroupId: String)
 

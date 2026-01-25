@@ -79,3 +79,9 @@ dependencies {
         add("kspIosSimulatorArm64", this)
     }
 }
+
+// 각 타겟의 스키마 복사 태스크가 서로 다른 경로를 바라보게 설정
+tasks.withType<androidx.room.gradle.RoomSchemaCopyTask>().configureEach {
+    val targetName = name.substringAfter("copyRoomSchemas").replaceFirstChar { it.lowercase() }
+    schemaDirectory.set(file("$projectDir/schemas/$targetName"))
+}
