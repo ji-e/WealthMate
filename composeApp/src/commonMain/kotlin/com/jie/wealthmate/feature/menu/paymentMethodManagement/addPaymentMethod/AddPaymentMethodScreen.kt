@@ -17,7 +17,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -45,7 +44,6 @@ import com.jie.wealthmate.feature.menu.paymentMethodManagement.addPaymentMethod.
 import com.jie.wealthmate.theme.ColorRed
 import com.jie.wealthmate.theme.WMTheme
 import com.jie.wealthmate.utils.default
-import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 import wealthmate.composeapp.generated.resources.Res
 import wealthmate.composeapp.generated.resources.ic_add
@@ -166,10 +164,16 @@ class AddPaymentMethodScreen(
         }
         var addGroupLabel by remember { mutableStateOf(TextFieldValue("")) }
 
-        val coroutineScope = rememberCoroutineScope()
         val listState = rememberLazyListState()
 
-        LaunchedEffect(Unit) {
+        LaunchedEffect(paymentMethodGroupItems) {
+            isModify = false
+            isAdd = false
+
+            tempSelectedPaymentMethodGroup =
+                if (addGroupLabel.text.isEmpty()) selectedPaymentMethodGroup else paymentMethodGroupItems.find { it.label == addGroupLabel.text }
+
+            addGroupLabel = TextFieldValue("")
             val movePosition = paymentMethodGroupItems.indexOf(tempSelectedPaymentMethodGroup)
                 .run { if (this <= 0) 0 else this - 1 }
 
@@ -306,17 +310,7 @@ class AddPaymentMethodScreen(
                             buttonStyle = ButtonStyle.FILLED,
                             buttonSize = ButtonSize.LARGE,
                             modifier = Modifier.weight(4f),
-                            onClick = {
-                                onAddClick(addGroupLabel)
-                                isAdd = false
-
-                                coroutineScope.launch {
-                                    listState.animateScrollToItem(paymentMethodGroupItems.lastIndex)
-                                }
-                                tempSelectedPaymentMethodGroup =
-                                    paymentMethodGroupItems.find { it.label == addGroupLabel.text }
-                                addGroupLabel = TextFieldValue("")
-                            }
+                            onClick = { onAddClick(addGroupLabel) }
                         )
                     }
                 } else {

@@ -4,27 +4,22 @@ import androidx.compose.ui.text.input.TextFieldValue
 import com.jie.wealthmate.base.BaseScreenModel
 import com.jie.wealthmate.feature.menu.categoryManagement.component.CategoryItemData
 import com.jie.wealthmate.feature.menu.paymentMethodManagement.addPaymentMethod.component.PaymentMethodGroupItemData
-import com.jie.wealthmate.repository.CategoryRepository
+import com.jie.wealthmate.repository.PaymentMethodRepository
+import kotlinx.coroutines.delay
 
 class AddPaymentMethodScreenModel(
-    private val categoryRepository: CategoryRepository,
+    private val paymentMethodRepository: PaymentMethodRepository,
 ) : BaseScreenModel<AddPaymentMethodUiState>() {
     private var paymentMethodItems: List<CategoryItemData> = emptyList()
 
     override val initialState: AddPaymentMethodUiState
-        get() = AddPaymentMethodUiState(
-            groupItems = listOf(
-                PaymentMethodGroupItemData(id = "1", label = "신용카드"),
-                PaymentMethodGroupItemData(id = "2", label = "체크카드"),
-                PaymentMethodGroupItemData(id = "3", label = "현금"),
-                PaymentMethodGroupItemData(id = "notting", label = "선택 안함")
-            )
-        )
+        get() = AddPaymentMethodUiState()
 
     fun updateInit(
         paymentMethodItems: List<CategoryItemData>,
     ) {
         this.paymentMethodItems = paymentMethodItems
+        getPaymentMethodGroups()
     }
 
     fun updatePaymentMethodLabel(textFieldValue: TextFieldValue) {
@@ -43,21 +38,38 @@ class AddPaymentMethodScreenModel(
         }
     }
 
-    fun addPaymentMethodGroup(label: TextFieldValue) {
-        // todo db
-        reduceState { state ->
-            state.copy(
-                groupItems = state.groupItems.toMutableList()
-                    .apply {
-                        add(
-                            index = this.lastIndex,
-                            element = PaymentMethodGroupItemData(
-                                id = label.text,
-                                label = label.text
+    private fun getPaymentMethodGroups() {
+        paymentMethodRepository.getPaymentMethodGroups()
+            .apiFlow { response ->
+                reduceState { state ->
+                    state.copy(
+                        groupItems = response.map {
+                            PaymentMethodGroupItemData(
+                                id = it.id,
+                                label = it.label
                             )
-                        )
-                    }
-            )
+                        }.toMutableList().apply {
+                            add(
+                                PaymentMethodGroupItemData(
+                                    id = "notting",
+                                    label = "선택 안함"
+                                )
+                            )
+                        }
+                    )
+                }
+            }
+    }
+
+    fun addPaymentMethodGroup(label: TextFieldValue) {
+        launchSafe(
+            block = {
+                paymentMethodRepository.insertPaymentMethodGroup(label.text)
+            }
+        ) {
+            getPaymentMethodGroups()
+            delay(300)
+            showSnackbar("결제수단 그룹이 추가되었습니다.")
         }
     }
 
