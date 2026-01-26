@@ -28,8 +28,8 @@ import com.jie.wealthmate.component.WMButton
 import com.jie.wealthmate.component.textField.WMTextField
 import com.jie.wealthmate.component.topbar.TopBarItem
 import com.jie.wealthmate.feature.menu.component.MenuEnum
-import com.jie.wealthmate.feature.menu.paymentMethodManagement.addPaymentMethod.component.ShowPaymentMethodGroupModalBottomSheet
 import com.jie.wealthmate.feature.menu.paymentMethodManagement.component.PaymentMethodItemData
+import com.jie.wealthmate.feature.menu.paymentMethodManagement.paymentMethodGroup.PaymentMethodGroupModalBottomSheet
 import com.jie.wealthmate.theme.WMTheme
 import com.jie.wealthmate.utils.default
 import org.koin.compose.koinInject
@@ -129,18 +129,14 @@ class AddPaymentMethodScreen(
 
         // 결제수단 그룹  ModalBottomSheet
         if (isShowPaymentMethodModalBottomSheet) {
-            ShowPaymentMethodGroupModalBottomSheet(
+            PaymentMethodGroupModalBottomSheet(
                 selectedPaymentMethodGroup = uiState.group,
-                paymentMethodGroupItems = uiState.groupItems,
-                onAddClick = screenModel::addPaymentMethodGroup,
                 onSelectClick = screenModel::updatePaymentMethodGroup,
-                onRemoveClick = { item ->
+                onRemoveClick = { onConfirmClick ->
                     showRemoveDialog() {
-                        screenModel.removePaymentMethodGroup(item)
+                        onConfirmClick()
                     }
                 },
-                onUpdateClick = screenModel::modifyPaymentMethodGroup,
-                showSnackbar = screenModel::showSnackbar,
                 onDismissRequest = { isShowPaymentMethodModalBottomSheet = false }
             )
         }
