@@ -75,7 +75,7 @@ class ModifyPaymentMethodScreen(
                             tint = ColorRed.Red_300,
                             action = {
                                 showRemoveDialog() {
-                                    // todo 삭제
+                                    screenModel.removePaymentMethod()
                                 }
                             }
                         )

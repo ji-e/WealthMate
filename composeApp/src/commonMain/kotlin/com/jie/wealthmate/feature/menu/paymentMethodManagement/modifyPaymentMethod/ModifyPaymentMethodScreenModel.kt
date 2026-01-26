@@ -89,6 +89,17 @@ class ModifyPaymentMethodScreenModel(
         }
     }
 
+    fun removePaymentMethod() {
+        launchSafe(
+            block = {
+                paymentMethodRepository.deletePaymentMethod(paymentMethodId)
+            },
+        ) {
+            showSnackbar("결제수단이 삭제되었습니다.")
+            postSideEffect { ModifyPaymentMethodUiSideEffect.OnSuccess }
+        }
+    }
+
     private fun getPaymentMethods() {
         paymentMethodRepository.getPaymentMethods()
             .apiFlow { response ->
