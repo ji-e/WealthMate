@@ -9,9 +9,9 @@ data class ModifyPaymentMethodUiState(
     val isDataChanged: Boolean = false,
     val label: TextFieldValue = TextFieldValue(""),
     val group: PaymentMethodGroupItemData? = null,
-    val groupItems: List<PaymentMethodGroupItemData> = emptyList(),
+    val sort: Long = 0L,
 ) : BaseUiState
 
 sealed class ModifyPaymentMethodUiSideEffect : UiSideEffect {
-    data object OnSuccessSave : ModifyPaymentMethodUiSideEffect()
+    data object OnSuccess : ModifyPaymentMethodUiSideEffect()
 }
