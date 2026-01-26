@@ -6,7 +6,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
-import com.jie.wealthmate.database.eneity.PaymentGroupWithMethods
+import com.jie.wealthmate.database.eneity.PaymentMethodWithGroupEntity
 import com.jie.wealthmate.database.eneity.PaymentMethodEntity
 import kotlinx.coroutines.flow.Flow
 import kotlin.time.Clock
@@ -27,7 +27,6 @@ interface PaymentMethodDao {
         updatedAt: Long = Clock.System.now().toEpochMilliseconds(),
     )
 
-
     @Transaction
     suspend fun updatePaymentMethodSort(sortUpdates: List<Pair<String, Long>>) {
         val now = Clock.System.now().toEpochMilliseconds()
@@ -43,6 +42,9 @@ interface PaymentMethodDao {
     @Query("SELECT * FROM payment_method WHERE id = :id AND isDeleted = 0 LIMIT 1")
     suspend fun getById(id: String): PaymentMethodEntity?
 
+    @Transaction
+    @Query("SELECT * FROM payment_method WHERE id = :paymentMethodId")
+    suspend fun getPaymentMethodById(paymentMethodId: String): PaymentMethodWithGroupEntity?
 
     @Query("SELECT * FROM payment_method WHERE isDeleted = 0 ORDER BY sort ASC")
     fun getAllPaymentMethods(): Flow<List<PaymentMethodEntity>>
@@ -50,7 +52,4 @@ interface PaymentMethodDao {
     @Query("SELECT * FROM payment_method WHERE groupId = :groupId AND isDeleted = 0")
     fun getMethodsByGroupId(groupId: String): Flow<List<PaymentMethodEntity>>
 
-    @Transaction
-    @Query("SELECT * FROM payment_method_groups WHERE isDeleted = 0")
-    fun getGroupsWithMethods(): Flow<List<PaymentGroupWithMethods>>
 }

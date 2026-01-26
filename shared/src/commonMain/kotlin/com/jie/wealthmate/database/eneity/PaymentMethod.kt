@@ -16,11 +16,11 @@ data class PaymentMethodEntity(
     val isDeleted: Boolean = false,
 )
 
-data class PaymentGroupWithMethods(
-    @Embedded val group: PaymentMethodGroupEntity,
+data class PaymentMethodWithGroupEntity(
+    @Embedded val paymentMethod: PaymentMethodEntity,
     @Relation(
-        parentColumn = "id",      // PaymentMethodGroupEntity의 PK
-        entityColumn = "groupId"  // PaymentMethodEntity의 FK
+        parentColumn = "groupId", // PaymentMethodEntity의 컬럼
+        entityColumn = "id"       // PaymentMethodGroupEntity의 컬럼
     )
-    val methods: List<PaymentMethodEntity>
+    val group: PaymentMethodGroupEntity?
 )
