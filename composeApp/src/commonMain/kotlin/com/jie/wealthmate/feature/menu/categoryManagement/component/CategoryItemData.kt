@@ -35,7 +35,7 @@ enum class LargeCategoryEnum(
     ),
     SAVING(
         label = "저축",
-        backgroundColor = ColorPrimary.Primary_200,
+        backgroundColor = ColorPrimary.Primary_300,
         tempMiddleCategoryLabel = "정기 저축",
         tempTagLabel = "주책 청약"
     ),
