@@ -92,7 +92,7 @@ class ModifyPaymentMethodScreen(
 
         screenModel.collectSideEffect { sideEffect ->
             when (sideEffect) {
-                is ModifyPaymentMethodUiSideEffect.OnSuccessSave -> navigator.pop()
+                is ModifyPaymentMethodUiSideEffect.OnSuccess -> navigator.pop()
             }
         }
 

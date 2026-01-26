@@ -9,7 +9,6 @@ data class AddPaymentMethodUiState(
     val isDataChanged: Boolean = false,
     val label: TextFieldValue = TextFieldValue(""),
     val group: PaymentMethodGroupItemData? = null,
-    val groupItems: List<PaymentMethodGroupItemData> = emptyList(),
 ) : BaseUiState
 
 sealed class AddPaymentMethodUiSideEffect : UiSideEffect {

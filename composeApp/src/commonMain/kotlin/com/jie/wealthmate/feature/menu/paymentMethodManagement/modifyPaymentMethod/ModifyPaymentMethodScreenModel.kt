@@ -2,6 +2,7 @@ package com.jie.wealthmate.feature.menu.paymentMethodManagement.modifyPaymentMet
 
 import androidx.compose.ui.text.input.TextFieldValue
 import com.jie.wealthmate.base.BaseScreenModel
+import com.jie.wealthmate.database.eneity.PaymentMethodEntity
 import com.jie.wealthmate.feature.menu.paymentMethodManagement.addPaymentMethod.component.PaymentMethodGroupItemData
 import com.jie.wealthmate.repository.PaymentMethodRepository
 import com.jie.wealthmate.utils.default
@@ -33,8 +34,9 @@ class ModifyPaymentMethodScreenModel(
                     label = TextFieldValue(response.paymentMethod.label),
                     group = PaymentMethodGroupItemData(
                         id = response.group?.id.default(),
-                        label = response.group?.label.default()
-                    )
+                        label = response.group?.label.default(),
+                    ),
+                    sort = response.paymentMethod.sort
                 )
             }
         }
@@ -59,6 +61,21 @@ class ModifyPaymentMethodScreenModel(
     }
 
     fun savePaymentMethod() {
-
+        launchSafe(
+            block = {
+                val uiState = container.uiState.value
+                paymentMethodRepository.updatePaymentMethod(
+                    PaymentMethodEntity(
+                        id = paymentMethodId,
+                        label = uiState.label.text,
+                        groupId = uiState.group?.id.default(),
+                        sort = uiState.sort
+                    )
+                )
+            },
+        ) {
+            showSnackbar("결제수단이 수정되었습니다.")
+            postSideEffect { ModifyPaymentMethodUiSideEffect.OnSuccess }
+        }
     }
 }
