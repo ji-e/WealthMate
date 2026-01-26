@@ -3,6 +3,7 @@
 package com.jie.wealthmate.feature.menu.paymentMethodManagement
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
@@ -108,6 +109,15 @@ class PaymentMethodManagementScreen() : BaseScreen() {
         }
 
         Column {
+            if (uiState.paymentMethodItems.isEmpty()) {
+                EmptyListView(
+                    modifier = Modifier.fillMaxSize().padding(20.dp),
+                    contentText = "결제수단을 추가해주세요.",
+                )
+
+                return
+            }
+
             PaymentMethod(
                 listState = listState,
                 paymentMethodItems = uiState.paymentMethodItems,
