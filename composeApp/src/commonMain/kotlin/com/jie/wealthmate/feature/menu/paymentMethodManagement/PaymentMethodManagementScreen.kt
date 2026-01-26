@@ -18,6 +18,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.annotation.InternalVoyagerApi
 import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import cafe.adriel.voyager.navigator.internal.BackHandler
 import com.jie.wealthmate.base.BaseScreen
@@ -28,6 +29,7 @@ import com.jie.wealthmate.component.topbar.TopBarItem
 import com.jie.wealthmate.feature.menu.component.MenuEnum
 import com.jie.wealthmate.feature.menu.paymentMethodManagement.addPaymentMethod.AddPaymentMethodScreen
 import com.jie.wealthmate.feature.menu.paymentMethodManagement.component.PaymentMethod
+import com.jie.wealthmate.feature.menu.paymentMethodManagement.modifyPaymentMethod.ModifyPaymentMethodScreen
 import com.jie.wealthmate.theme.ColorGray
 import com.jie.wealthmate.theme.WMTheme
 import org.koin.compose.koinInject
@@ -124,7 +126,10 @@ class PaymentMethodManagementScreen() : BaseScreen() {
                 isDragging = isDragging,
                 onIsDraggingChange = { isDragging = it },
                 onItemClick = {
-                    // todo
+                    goToModifyPaymentMethod(
+                        navigator = navigator,
+                        paymentMethodId = it.id
+                    )
                 }
             )
 
@@ -144,6 +149,17 @@ class PaymentMethodManagementScreen() : BaseScreen() {
                 )
             }
         }
+    }
+
+    private fun goToModifyPaymentMethod(
+        navigator: Navigator,
+        paymentMethodId: String,
+    ) {
+        navigator.push(
+            ModifyPaymentMethodScreen(
+                paymentMethodId = paymentMethodId
+            )
+        )
     }
 
 
