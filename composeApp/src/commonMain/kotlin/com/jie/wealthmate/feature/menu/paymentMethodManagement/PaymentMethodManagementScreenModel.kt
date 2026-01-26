@@ -15,7 +15,7 @@ class PaymentMethodManagementScreenModel(
         getPaymentMethods()
     }
 
-    private fun getPaymentMethods() {
+    fun getPaymentMethods() {
         paymentMethodRepository.getPaymentMethods()
             .apiFlow { response ->
                 println("response: $response")
