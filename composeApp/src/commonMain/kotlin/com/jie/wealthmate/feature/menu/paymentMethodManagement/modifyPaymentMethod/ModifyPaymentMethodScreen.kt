@@ -18,7 +18,10 @@ import com.jie.wealthmate.base.BaseScreen
 import com.jie.wealthmate.base.collectSideEffect
 import com.jie.wealthmate.component.topbar.TopBarItem
 import com.jie.wealthmate.feature.menu.component.MenuEnum
+import com.jie.wealthmate.theme.ColorRed
 import org.koin.compose.koinInject
+import wealthmate.composeapp.generated.resources.Res
+import wealthmate.composeapp.generated.resources.ic_delete
 
 class ModifyPaymentMethodScreen(
     val paymentMethodId: String,
@@ -55,6 +58,17 @@ class ModifyPaymentMethodScreen(
                     readingItem = TopBarItem.ReadingItem().copy(
                         action = { onBack() }
                     ),
+                    trailingItem = listOf(
+                        TopBarItem.TrailingItem(
+                            iconRes = Res.drawable.ic_delete,
+                            tint = ColorRed.Red_300,
+                            action = {
+                                showRemoveDialog() {
+                                   // todo 삭제
+                                }
+                            }
+                        )
+                    )
                 )
             }
         }
