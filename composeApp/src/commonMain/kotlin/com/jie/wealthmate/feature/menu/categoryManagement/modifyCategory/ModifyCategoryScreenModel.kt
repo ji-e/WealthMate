@@ -5,10 +5,12 @@ import com.jie.wealthmate.base.BaseScreenModel
 import com.jie.wealthmate.component.CategoryIconEnum
 import com.jie.wealthmate.database.eneity.CategoryEntity
 import com.jie.wealthmate.database.eneity.CategoryTagEntity
+import com.jie.wealthmate.feature.menu.categoryManagement.component.CategoryItemData
 import com.jie.wealthmate.feature.menu.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.repository.CategoryRepository
 import com.jie.wealthmate.utils.default
 import com.jie.wealthmate.vo.CategoryTagVo
+import kotlinx.coroutines.delay
 
 class ModifyCategoryScreenModel(
     private val categoryRepository: CategoryRepository,
@@ -16,6 +18,7 @@ class ModifyCategoryScreenModel(
     override val initialState: ModifyCategoryUiState
         get() = ModifyCategoryUiState()
 
+    private var categoryItems: List<CategoryItemData> = emptyList()
     private var categoryId: String = ""
 
     fun updateInit(largeCategoryEnum: LargeCategoryEnum, categoryId: String) {
@@ -26,7 +29,7 @@ class ModifyCategoryScreenModel(
                 largeCategory = largeCategoryEnum,
             )
         }
-
+        getCategories(largeCategoryEnum)
         getCategoryDetail()
     }
 
@@ -34,7 +37,7 @@ class ModifyCategoryScreenModel(
         reduceState { state ->
             state.copy(
                 categoryIcon = icon,
-                isChangedData = true
+                isDataChanged = true
             )
         }
     }
@@ -43,7 +46,7 @@ class ModifyCategoryScreenModel(
         reduceState { state ->
             state.copy(
                 label = textFieldValue,
-                isChangedData = true
+                isDataChanged = true
             )
         }
     }
@@ -52,7 +55,7 @@ class ModifyCategoryScreenModel(
         reduceState { state ->
             state.copy(
                 tagLabel = textFieldValue,
-                isChangedData = true
+                isDataChanged = true
             )
         }
     }
@@ -61,7 +64,8 @@ class ModifyCategoryScreenModel(
         reduceState { state ->
             state.copy(
                 modifyTagLabel = categoryTagVo,
-                isChangedData = true
+                selectedTagLabel = categoryTagVo.label,
+                isDataChanged = true
             )
         }
     }
@@ -70,7 +74,7 @@ class ModifyCategoryScreenModel(
         reduceState { state ->
             state.copy(
                 modifyTagLabel = state.modifyTagLabel?.copy(label = text),
-                isChangedData = true
+                isDataChanged = true
             )
         }
     }
@@ -85,13 +89,18 @@ class ModifyCategoryScreenModel(
             }
 
             val categoryTag = CategoryTagVo(label = modifyTagLabelText)
-            val isExisted = state.tagLabelItems.any { it.label == categoryTag.label }
+            val isExisted = state.tagLabelItems.any {
+                it.label != state.selectedTagLabel && it.label == categoryTag.label
+            }
 
             if (isExisted) {
                 showSnackbar("이미 존재하는 태그 입니다.")
                 state
             } else {
                 postSideEffect {
+                    delay(300)
+                    showSnackbar("상세 태그 이름이 수정되었습니다.")
+
                     ModifyCategoryUiSideEffect.OnSuccessModifyTagLabel
                 }
 
@@ -105,8 +114,9 @@ class ModifyCategoryScreenModel(
                                 set(index, modifyTagLabel)
                             }
                         },
-                    isChangedData = true
+                    isDataChanged = true
                 )
+
             }
         }
     }
@@ -132,7 +142,7 @@ class ModifyCategoryScreenModel(
                 state.copy(
                     tagLabel = TextFieldValue(""),
                     tagLabelItems = state.tagLabelItems.toMutableList().apply { add(categoryTag) },
-                    isChangedData = true
+                    isDataChanged = true
                 )
             }
         }
@@ -144,7 +154,7 @@ class ModifyCategoryScreenModel(
                 modifyTagLabel = null,
                 tagLabelItems = state.tagLabelItems.toMutableList()
                     .apply { remove(state.modifyTagLabel) },
-                isChangedData = true
+                isDataChanged = true
             )
         }
     }
@@ -153,7 +163,7 @@ class ModifyCategoryScreenModel(
         reduceState { state ->
             state.copy(
                 isFixed = isFixed,
-                isChangedData = true
+                isDataChanged = true
             )
         }
     }
@@ -189,9 +199,16 @@ class ModifyCategoryScreenModel(
     }
 
     fun saveCategory() {
+        val uiState = container.uiState.value
+        val isExisted = categoryItems.any { it.id != categoryId && it.label == uiState.label.text }
+
+        if (isExisted) {
+            showSnackbar("이미 존재하는 카테고리 입니다.")
+            return
+        }
+
         launchSafe(
             block = {
-                val uiState = container.uiState.value
                 categoryRepository.updateCategory(
                     CategoryEntity(
                         id = categoryId,
@@ -213,5 +230,21 @@ class ModifyCategoryScreenModel(
             showSnackbar("카테고리가 수정되었습니다.")
             postSideEffect { ModifyCategoryUiSideEffect.OnSuccess }
         }
+    }
+
+    fun getCategories(largeCategoryEnum: LargeCategoryEnum) {
+        categoryRepository.getCategoriesByLargeCategory(largeCategoryEnum.name)
+            .apiFlow { response ->
+                categoryItems = response.map {
+                    CategoryItemData(
+                        id = it.id,
+                        icon = it.icon,
+                        label = it.middleLabel,
+                        sort = it.sort,
+                        isFixed = it.isFixed,
+                        largeCategory = LargeCategoryEnum.creator(it.largeCategory)
+                    )
+                }
+            }
     }
 }

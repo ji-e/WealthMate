@@ -26,6 +26,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.annotation.InternalVoyagerApi
 import cafe.adriel.voyager.navigator.LocalNavigator
@@ -48,7 +49,6 @@ import com.jie.wealthmate.feature.menu.categoryManagement.component.LargeCategor
 import com.jie.wealthmate.theme.ColorRed
 import com.jie.wealthmate.theme.WMTheme
 import com.jie.wealthmate.utils.default
-import androidx.compose.ui.tooling.preview.Preview
 import org.koin.compose.koinInject
 import wealthmate.composeapp.generated.resources.Res
 import wealthmate.composeapp.generated.resources.ic_delete
@@ -73,13 +73,19 @@ class ModifyCategoryScreen(
         val focusManager = LocalFocusManager.current
         var isKeyboardOpen by remember { mutableStateOf(false) }
 
-        fun onBack() {
-            showSaveBackDialog(uiState.isChangedData) {
-                navigator.pop()
+        val onBack: () -> Unit = remember(uiState.isDataChanged) {
+            {
+                showSaveBackDialog(
+                    isShow = uiState.isDataChanged,
+                    callback = { navigator.pop() }
+                )
             }
         }
 
-        BackHandler(true) { onBack() }
+        BackHandler(
+            enabled = true,
+            onBack = onBack
+        )
 
         if (navigator.lastItem is ModifyCategoryScreen) {
             SideEffect {
@@ -117,6 +123,7 @@ class ModifyCategoryScreen(
                 }
 
                 is ModifyCategoryUiSideEffect.OnSuccessModifyTagLabel -> {
+                    focusManager.clearFocus()
                     isShowCategoryTagLabelModalBottomSheet = false
                 }
             }
@@ -202,7 +209,7 @@ class ModifyCategoryScreen(
                     .padding(horizontal = 20.dp)
                     .padding(bottom = 20.dp)
                     .fillMaxWidth(),
-                enabled = uiState.isChangedData,
+                enabled = uiState.isDataChanged,
                 onClick = screenModel::saveCategory
             )
 
@@ -210,6 +217,7 @@ class ModifyCategoryScreen(
                 ShowCategoryTagLabelModalBottomSheet(
                     isKeyboardOpen = isKeyboardOpen,
                     tagLabel = uiState.modifyTagLabel?.label.default(),
+                    selectedTagLabel = uiState.selectedTagLabel,
                     onTagLabelChange = screenModel::updateModifyCategoryTagLabel,
                     onRemoveClick = screenModel::removeCategoryTagLabel,
                     onModifyClick = screenModel::modifyCategoryTagLabel,
@@ -234,6 +242,7 @@ class ModifyCategoryScreen(
     private fun ShowCategoryTagLabelModalBottomSheet(
         isKeyboardOpen: Boolean,
         tagLabel: String,
+        selectedTagLabel: String,
         onTagLabelChange: (String) -> Unit,
         onRemoveClick: () -> Unit = {},
         onModifyClick: () -> Unit = {},
@@ -248,7 +257,7 @@ class ModifyCategoryScreen(
         }
 
         WMModalBottomSheet(
-            title = "상세 태그 수정",
+            title = "$selectedTagLabel 상세 태그 수정",
             onDismissRequest = onDismissRequest,
         ) {
             Column(
@@ -261,7 +270,7 @@ class ModifyCategoryScreen(
                     onValueChange = onTagLabelChange,
                     maxLength = 15,
                     label = "상세 태그 이름",
-                    placeholder = largeCategory.tempTagLabel,
+                    placeholder = selectedTagLabel,
                     supportingText = "15자 이내로 입력해 주세요.",
                     isCount = true,
                     textFieldModifier = Modifier.focusRequester(focusRequester)
