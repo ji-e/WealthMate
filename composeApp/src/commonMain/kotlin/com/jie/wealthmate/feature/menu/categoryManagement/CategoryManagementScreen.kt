@@ -64,7 +64,7 @@ class CategoryManagementScreen() : BaseScreen() {
             if (isDragging) {
                 showSaveBackDialog(isDragging) {
                     isDragging = false
-                    screenModel.getIncomeCategories(largeCategoryItems[pagerState.currentPage])
+                    screenModel.getCategories(largeCategoryItems[pagerState.currentPage])
                 }
             } else {
                 navigator.pop()
@@ -100,7 +100,6 @@ class CategoryManagementScreen() : BaseScreen() {
                                     navigator.push(
                                         AddCategoryScreen(
                                             largeCategory = largeCategoryItems[pagerState.currentPage],
-                                            categoryItems = uiState.categoryItems
                                         )
                                     )
                                 }
@@ -112,7 +111,7 @@ class CategoryManagementScreen() : BaseScreen() {
         }
 
         LaunchedEffect(Unit) {
-            screenModel.getIncomeCategories(largeCategoryItems[pagerState.currentPage])
+            screenModel.getCategories(largeCategoryItems[pagerState.currentPage])
         }
 
         Column {
@@ -122,7 +121,7 @@ class CategoryManagementScreen() : BaseScreen() {
                     if (isDragging) {
                         screenModel.showSnackbar("순서 변경을 저장해 주세요.")
                     } else {
-                        screenModel.getIncomeCategories(largeCategoryItems[it])
+                        screenModel.getCategories(largeCategoryItems[it])
                         coroutineScope.launch {
                             pagerState.animateScrollToPage(it)
                         }

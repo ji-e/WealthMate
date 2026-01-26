@@ -19,6 +19,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.annotation.InternalVoyagerApi
 import cafe.adriel.voyager.navigator.LocalNavigator
@@ -35,15 +36,12 @@ import com.jie.wealthmate.component.topbar.TopBarItem
 import com.jie.wealthmate.feature.menu.categoryManagement.addCategory.component.CategoryIcon
 import com.jie.wealthmate.feature.menu.categoryManagement.addCategory.component.CategoryIconGrid
 import com.jie.wealthmate.feature.menu.categoryManagement.addCategory.component.CategoryTag
-import com.jie.wealthmate.feature.menu.categoryManagement.component.CategoryItemData
 import com.jie.wealthmate.feature.menu.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.theme.WMTheme
-import androidx.compose.ui.tooling.preview.Preview
 import org.koin.compose.koinInject
 
 class AddCategoryScreen(
     val largeCategory: LargeCategoryEnum,
-    val categoryItems: List<CategoryItemData> = emptyList(),
 ) : BaseScreen() {
 
     @Composable
@@ -52,15 +50,21 @@ class AddCategoryScreen(
 
         val navigator = LocalNavigator.currentOrThrow
         val screenModel: AddCategoryScreenModel = koinInject()
-        val uiState = screenModel.container.uiState.collectAsState().value
+        val uiState by screenModel.container.uiState.collectAsState()
 
-        fun onBack() {
-            showSaveBackDialog(uiState.label.text.isNotEmpty()) {
-                navigator.pop()
+        val onBack: () -> Unit = remember(uiState.isDataChanged) {
+            {
+                showSaveBackDialog(
+                    isShow = uiState.isDataChanged,
+                    callback = { navigator.pop() }
+                )
             }
         }
 
-        BackHandler(true) { onBack() }
+        BackHandler(
+            enabled = true,
+            onBack = onBack
+        )
 
         if (navigator.lastItem is AddCategoryScreen) {
             SideEffect {
@@ -70,13 +74,11 @@ class AddCategoryScreen(
                         action = { onBack() }
                     ),
                 )
-                println(categoryItems)
             }
         }
 
         LaunchedEffect(Unit) {
             screenModel.updateInit(
-                categoryItems = categoryItems,
                 largeCategoryEnum = largeCategory
             )
         }

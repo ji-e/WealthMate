@@ -12,7 +12,7 @@ class CategoryManagementScreenModel(
     override val initialState: CategoryManagementUiState
         get() = CategoryManagementUiState()
 
-    fun getIncomeCategories(largeCategoryEnum: LargeCategoryEnum) {
+    fun getCategories(largeCategoryEnum: LargeCategoryEnum) {
         categoryRepository.getCategoriesByLargeCategory(largeCategoryEnum.name)
             .apiFlow { response ->
                 reduceState { state ->

@@ -8,6 +8,7 @@ import com.jie.wealthmate.feature.menu.categoryManagement.component.LargeCategor
 import com.jie.wealthmate.vo.CategoryTagVo
 
 data class AddCategoryUiState(
+    val isDataChanged: Boolean = false,
     val largeCategory: LargeCategoryEnum = LargeCategoryEnum.INCOME,
     val categoryIcon: CategoryIconEnum = CategoryIconEnum.defaultCategoryIcon,
     val label: TextFieldValue = TextFieldValue(""),
