@@ -2,6 +2,7 @@ package com.jie.wealthmate.repository
 
 import com.jie.wealthmate.database.eneity.PaymentMethodEntity
 import com.jie.wealthmate.database.eneity.PaymentMethodGroupEntity
+import com.jie.wealthmate.database.eneity.PaymentMethodWithGroupEntity
 import kotlinx.coroutines.flow.Flow
 
 
@@ -18,7 +19,7 @@ interface PaymentMethodRepository {
 
     suspend fun deletePaymentMethod(paymentMethodId: String)
 
-    suspend fun getPaymentMethodById(paymentMethodId: String): PaymentMethodEntity?
+    suspend fun getPaymentMethodById(paymentMethodId: String): PaymentMethodWithGroupEntity?
 
     fun getPaymentMethods(): Flow<List<PaymentMethodEntity>>
 

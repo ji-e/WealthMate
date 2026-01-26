@@ -39,4 +39,26 @@ class ModifyPaymentMethodScreenModel(
             }
         }
     }
+
+    fun updatePaymentMethodLabel(textFieldValue: TextFieldValue) {
+        reduceState { state ->
+            state.copy(
+                isDataChanged = true,
+                label = textFieldValue
+            )
+        }
+    }
+
+    fun updatePaymentMethodGroup(paymentMethodGroup: PaymentMethodGroupItemData?) {
+        reduceState { state ->
+            state.copy(
+                isDataChanged = true,
+                group = paymentMethodGroup
+            )
+        }
+    }
+
+    fun savePaymentMethod() {
+
+    }
 }

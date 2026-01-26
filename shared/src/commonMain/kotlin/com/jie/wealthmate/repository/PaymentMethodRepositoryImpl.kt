@@ -7,6 +7,7 @@ import com.jie.wealthmate.database.dao.PaymentMethodDao
 import com.jie.wealthmate.database.dao.PaymentMethodGroupDao
 import com.jie.wealthmate.database.eneity.PaymentMethodEntity
 import com.jie.wealthmate.database.eneity.PaymentMethodGroupEntity
+import com.jie.wealthmate.database.eneity.PaymentMethodWithGroupEntity
 import kotlinx.coroutines.flow.Flow
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
@@ -68,13 +69,13 @@ class PaymentMethodRepositoryImpl(
         paymentMethodDao.softDelete(paymentMethodId)
     }
 
-    override suspend fun getPaymentMethodById(paymentMethodId: String): PaymentMethodEntity? =
+    override suspend fun getPaymentMethodById(paymentMethodId: String): PaymentMethodWithGroupEntity? =
         loggedCall(
             repositoryName = repoName,
             methodName = "getPaymentMethodById",
             params = mapOf("paymentMethodId" to paymentMethodId)
         ) {
-            paymentMethodDao.getById(paymentMethodId)
+            paymentMethodDao.getPaymentMethodById(paymentMethodId)
         }
 
     override fun getPaymentMethods(): Flow<List<PaymentMethodEntity>> = loggedFlow(
