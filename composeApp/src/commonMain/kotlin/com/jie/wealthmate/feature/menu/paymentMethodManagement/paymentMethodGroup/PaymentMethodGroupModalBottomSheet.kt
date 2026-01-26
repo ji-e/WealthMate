@@ -40,22 +40,31 @@ fun PaymentMethodGroupModalBottomSheet(
     selectedPaymentMethodGroup: PaymentMethodGroupItemData? = null,
     onSelectClick: (PaymentMethodGroupItemData?) -> Unit,
     onRemoveClick: (onConfirmClick: () -> Unit) -> Unit,
+    onSuccessRemove: () -> Unit = {},
     onDismissRequest: () -> Unit,
 ) {
     val screenModel: PaymentMethodGroupScreenModel = koinInject()
     val paymentMethodGroupItems = screenModel.paymentMethodGroupItems
-    var isModify by remember { mutableStateOf(false) }
-    var isAdd by remember { mutableStateOf(false) }
     var tempSelectedPaymentMethodGroup by remember { mutableStateOf(selectedPaymentMethodGroup) }
     var addGroupLabel by remember { mutableStateOf(TextFieldValue("")) }
+
+    var isModify by remember { mutableStateOf(false) }
+    var isAdd by remember { mutableStateOf(false) }
+    var isRemoved by remember { mutableStateOf(false) }
 
     val listState = rememberLazyListState()
 
     LaunchedEffect(paymentMethodGroupItems) {
         tempSelectedPaymentMethodGroup = when {
             isAdd -> paymentMethodGroupItems.find { it.label == addGroupLabel.text }
-            isModify -> tempSelectedPaymentMethodGroup
-            else -> selectedPaymentMethodGroup
+            isRemoved -> {
+                if (selectedPaymentMethodGroup == tempSelectedPaymentMethodGroup) {
+                    onSuccessRemove()
+                }
+                selectedPaymentMethodGroup
+            }
+
+            else -> tempSelectedPaymentMethodGroup
         }
 
         val index = paymentMethodGroupItems.indexOf(tempSelectedPaymentMethodGroup)
@@ -65,6 +74,7 @@ fun PaymentMethodGroupModalBottomSheet(
         addGroupLabel = TextFieldValue("")
         isModify = false
         isAdd = false
+        isRemoved = false
     }
 
     WMModalBottomSheet(
@@ -128,7 +138,7 @@ fun PaymentMethodGroupModalBottomSheet(
                             isModify = false
                             onRemoveClick {
                                 screenModel.removePaymentMethodGroup(tempSelectedPaymentMethodGroup)
-                                tempSelectedPaymentMethodGroup = null
+                                isRemoved = true
                             }
                         }
                     )
@@ -169,6 +179,7 @@ fun PaymentMethodGroupModalBottomSheet(
                                 screenModel.updatePaymentMethodGroup(
                                     tempSelectedPaymentMethodGroup
                                 )
+                                isModify = false
                             }
                         )
                     }

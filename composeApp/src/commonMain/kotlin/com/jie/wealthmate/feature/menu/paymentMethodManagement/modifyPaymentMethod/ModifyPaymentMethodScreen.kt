@@ -148,6 +148,7 @@ class ModifyPaymentMethodScreen(
                         onConfirmClick()
                     }
                 },
+                onSuccessRemove = { screenModel.updatePaymentMethodGroup(null) },
                 onDismissRequest = { isShowPaymentMethodModalBottomSheet = false }
             )
         }

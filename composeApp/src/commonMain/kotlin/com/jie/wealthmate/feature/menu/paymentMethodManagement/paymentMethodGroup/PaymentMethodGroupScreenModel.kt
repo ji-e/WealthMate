@@ -11,6 +11,7 @@ import com.jie.wealthmate.feature.menu.paymentMethodManagement.addPaymentMethod.
 import com.jie.wealthmate.repository.PaymentMethodRepository
 import com.jie.wealthmate.utils.default
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class PaymentMethodGroupScreenModel(
     private val paymentMethodRepository: PaymentMethodRepository,
@@ -48,6 +49,15 @@ class PaymentMethodGroupScreenModel(
     }
 
     fun addPaymentMethodGroup(label: TextFieldValue) {
+        val isExisted = paymentMethodGroupItems.any { it.label == label.text }
+        if (isExisted) {
+            screenScope.launch {
+                delay(300)
+                showSnackbar("이미 존재하는 결제수단 그룹 입니다.")
+            }
+            return
+        }
+
         launchSafe(
             block = {
                 paymentMethodRepository.insertPaymentMethodGroup(label.text)
@@ -73,6 +83,18 @@ class PaymentMethodGroupScreenModel(
 
     fun updatePaymentMethodGroup(paymentMethodGroup: PaymentMethodGroupItemData?) {
         paymentMethodGroup ?: return
+
+        val isExisted = paymentMethodGroupItems.any {
+            it.id != paymentMethodGroup.id && it.label == paymentMethodGroup.label
+        }
+        if (isExisted) {
+            screenScope.launch {
+                delay(300)
+                showSnackbar("이미 존재하는 결제수단 그룹 입니다.")
+            }
+            return
+        }
+
         launchSafe(
             block = {
                 paymentMethodRepository.updatePaymentMethodGroup(
