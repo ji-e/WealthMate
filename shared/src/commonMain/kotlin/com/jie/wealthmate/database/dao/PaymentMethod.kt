@@ -20,7 +20,7 @@ interface PaymentMethodDao {
     @Update
     suspend fun update(paymentMethod: PaymentMethodEntity)
 
-    @Query("UPDATE categories SET sort = :sort, updatedAt = :updatedAt WHERE id = :id")
+    @Query("UPDATE payment_method SET sort = :sort, updatedAt = :updatedAt WHERE id = :id")
     suspend fun updateSort(
         id: String,
         sort: Long,

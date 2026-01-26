@@ -42,5 +42,18 @@ class PaymentMethodManagementScreenModel(
         )
     }
 
+    fun savePaymentMethodSort() {
+        launchSafe(
+            block = {
+                val paymentMethodItems = container.uiState.value.paymentMethodItems
+                paymentMethodRepository.updatePaymentMethodSort(
+                    paymentMethodItems.mapIndexed { index, item -> item.id to index.toLong() }
+                )
+            },
+        ) {
+            showSnackbar("저장되었습니다.")
+        }
+    }
+
 
 }
