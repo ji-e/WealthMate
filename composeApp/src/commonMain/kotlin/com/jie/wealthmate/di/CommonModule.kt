@@ -10,6 +10,7 @@ import com.jie.wealthmate.feature.menu.categoryManagement.addCategory.AddCategor
 import com.jie.wealthmate.feature.menu.categoryManagement.modifyCategory.ModifyCategoryScreenModel
 import com.jie.wealthmate.feature.menu.paymentMethodManagement.PaymentMethodManagementScreenModel
 import com.jie.wealthmate.feature.menu.paymentMethodManagement.addPaymentMethod.AddPaymentMethodScreenModel
+import com.jie.wealthmate.feature.menu.paymentMethodManagement.modifyPaymentMethod.ModifyPaymentMethodScreenModel
 import com.jie.wealthmate.repository.CategoryRepository
 import com.jie.wealthmate.repository.CategoryRepositoryImpl
 import com.jie.wealthmate.repository.PaymentMethodRepository
@@ -38,4 +39,6 @@ val commonModule = module {
     factory { CategoryManagementScreenModel(get()) }
     factory { PaymentMethodManagementScreenModel(get()) }
     factory { AddPaymentMethodScreenModel(get()) }
+    factory { ModifyPaymentMethodScreenModel(get()) }
+
 }
