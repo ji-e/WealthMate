@@ -143,7 +143,7 @@ class PaymentMethodManagementScreen() : BaseScreen() {
                         .padding(bottom = 20.dp)
                         .fillMaxWidth(),
                     onClick = {
-                        // todo 저장
+                        screenModel.savePaymentMethodSort()
                         isDragging = false
                     }
                 )
