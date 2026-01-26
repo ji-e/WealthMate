@@ -17,23 +17,19 @@ class AddCategoryScreenModel(
     override val initialState: AddCategoryUiState
         get() = AddCategoryUiState()
 
-    fun updateInit(
-        categoryItems: List<CategoryItemData>,
-        largeCategoryEnum: LargeCategoryEnum,
-    ) {
-        this.categoryItems = categoryItems
-
-        println(largeCategoryEnum)
+    fun updateInit(largeCategoryEnum: LargeCategoryEnum) {
         reduceState { state ->
             state.copy(
                 largeCategory = largeCategoryEnum,
             )
         }
+        getCategories(largeCategoryEnum)
     }
 
     fun updateCategoryIcon(icon: CategoryIconEnum) {
         reduceState { state ->
             state.copy(
+                isDataChanged = true,
                 categoryIcon = icon
             )
         }
@@ -42,6 +38,7 @@ class AddCategoryScreenModel(
     fun updateCategoryLabel(textFieldValue: TextFieldValue) {
         reduceState { state ->
             state.copy(
+                isDataChanged = true,
                 label = textFieldValue
             )
         }
@@ -74,6 +71,7 @@ class AddCategoryScreenModel(
                 state
             } else {
                 state.copy(
+                    isDataChanged = true,
                     tagLabel = TextFieldValue(""),
                     tagLabelItems = state.tagLabelItems.toMutableList().apply { add(categoryTag) }
                 )
@@ -84,6 +82,7 @@ class AddCategoryScreenModel(
     fun removeCategoryTagLabel(tag: CategoryTagVo) {
         reduceState { state ->
             state.copy(
+                isDataChanged = true,
                 tagLabelItems = state.tagLabelItems.toMutableList().apply { remove(tag) }
             )
         }
@@ -92,6 +91,7 @@ class AddCategoryScreenModel(
     fun updateIsFixed(isFixed: Boolean) {
         reduceState { state ->
             state.copy(
+                isDataChanged = true,
                 isFixed = isFixed
             )
         }
@@ -101,7 +101,7 @@ class AddCategoryScreenModel(
         val uiState = container.uiState.value
 
         if (categoryItems.any { it.label == uiState.label.text }) {
-            showSnackbar("존재하는 카테고리입니다.")
+            showSnackbar("이미 존재하는 카테고리입니다.")
             return
         }
 
@@ -120,5 +120,21 @@ class AddCategoryScreenModel(
             showSnackbar("카테고리가 저장되었습니다.")
             postSideEffect { AddCategoryUiSideEffect.OnSuccessSave }
         }
+    }
+
+    fun getCategories(largeCategoryEnum: LargeCategoryEnum) {
+        categoryRepository.getCategoriesByLargeCategory(largeCategoryEnum.name)
+            .apiFlow { response ->
+                categoryItems = response.map {
+                    CategoryItemData(
+                        id = it.id,
+                        icon = it.icon,
+                        label = it.middleLabel,
+                        sort = it.sort,
+                        isFixed = it.isFixed,
+                        largeCategory = LargeCategoryEnum.creator(it.largeCategory)
+                    )
+                }
+            }
     }
 }
