@@ -3,9 +3,9 @@
 package com.jie.wealthmate.feature.menu.paymentMethodManagement
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
@@ -24,10 +24,10 @@ import com.jie.wealthmate.base.BaseScreen
 import com.jie.wealthmate.component.ButtonSize
 import com.jie.wealthmate.component.WMFloatingButton
 import com.jie.wealthmate.component.reorderable.rememberReorderableLazyListState
-import com.jie.wealthmate.component.reorderable.reorderable
 import com.jie.wealthmate.component.topbar.TopBarItem
 import com.jie.wealthmate.feature.menu.component.MenuEnum
 import com.jie.wealthmate.feature.menu.paymentMethodManagement.addPaymentMethod.AddPaymentMethodScreen
+import com.jie.wealthmate.feature.menu.paymentMethodManagement.component.PaymentMethod
 import com.jie.wealthmate.theme.ColorGray
 import com.jie.wealthmate.theme.WMTheme
 import org.koin.compose.koinInject
@@ -42,27 +42,35 @@ class PaymentMethodManagementScreen() : BaseScreen() {
 
         val navigator = LocalNavigator.currentOrThrow
         val screenModel: PaymentMethodManagementScreenModel = koinInject()
-        val uiState = screenModel.container.uiState.collectAsState().value
+        val uiState by screenModel.container.uiState.collectAsState()
 
         var isDragging by remember { mutableStateOf(false) }
         val listState = rememberReorderableLazyListState(
-            onMove = { from, to -> screenModel.handleReorderCategoryItems(from.index, to.index) }
+            onMove = { from, to ->
+                screenModel.handleReorderCategoryItems(
+                    from = from.index,
+                    to = to.index
+                )
+            }
         )
 
-        fun onBack() {
-            if (isDragging) {
-                showSaveBackDialog(isDragging) {
-                    isDragging = false
-                    // todo 새로고침
+        val onBack: () -> Unit = remember(isDragging) {
+            {
+                if (isDragging) {
+                    showSaveBackDialog(
+                        isShow = isDragging,
+                        callback = { isDragging = false }
+                    )
+                } else {
+                    navigator.pop()
                 }
-            } else {
-                navigator.pop()
             }
         }
 
-        BackHandler(true) {
-            onBack()
-        }
+        BackHandler(
+            enabled = true,
+            onBack = onBack
+        )
 
         if (navigator.lastItem is PaymentMethodManagementScreen) {
             SideEffect {
@@ -101,16 +109,25 @@ class PaymentMethodManagementScreen() : BaseScreen() {
         }
 
         Column {
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-                    .reorderable(listState),
-                state = listState.listState
-            ) {
-                // todo 결제수단 리스트
+            if (uiState.paymentMethodItems.isEmpty()) {
+                EmptyListView(
+                    modifier = Modifier.fillMaxSize().padding(20.dp),
+                    contentText = "결제수단을 추가해주세요.",
+                )
 
+                return
             }
+
+            PaymentMethod(
+                listState = listState,
+                paymentMethodItems = uiState.paymentMethodItems,
+                isDragging = isDragging,
+                onIsDraggingChange = { isDragging = it },
+                onItemClick = {
+                    // todo
+                }
+            )
+
             // Drag and Drop 저장 버튼
             if (isDragging) {
                 WMFloatingButton(
