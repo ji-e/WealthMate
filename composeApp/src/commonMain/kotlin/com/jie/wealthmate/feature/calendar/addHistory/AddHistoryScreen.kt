@@ -74,8 +74,9 @@ class AddHistoryScreen() : BaseScreen() {
 
             // 날짜 선택
             DateTextField(
-                modifier = Modifier.padding(top = 20.dp),
+                modifier = Modifier.padding(top = 24.dp),
                 date = today,
+                installmentCount = 3,
                 onDateClick = {},
                 onRepeatClick = {},
                 onInstallmentClick = {}
