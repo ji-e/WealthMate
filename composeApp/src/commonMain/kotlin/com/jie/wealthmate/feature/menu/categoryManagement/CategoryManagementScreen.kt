@@ -52,7 +52,7 @@ class CategoryManagementScreen() : BaseScreen() {
 
         val navigator = LocalNavigator.currentOrThrow
         val screenModel: CategoryManagementScreenModel = koinInject()
-        val uiState = screenModel.container.uiState.collectAsState().value
+        val uiState by screenModel.container.uiState.collectAsState()
         val coroutineScope = rememberCoroutineScope()
         var isDragging by remember { mutableStateOf(false) }
         val pagerState = rememberPagerState(pageCount = { largeCategoryItems.size })
@@ -60,20 +60,23 @@ class CategoryManagementScreen() : BaseScreen() {
             onMove = { from, to -> screenModel.handleReorderCategoryItems(from.index, to.index) }
         )
 
-        fun onBack() {
-            if (isDragging) {
-                showSaveBackDialog(isDragging) {
-                    isDragging = false
-                    screenModel.getCategories(largeCategoryItems[pagerState.currentPage])
+        val onBack: () -> Unit = remember(isDragging) {
+            {
+                if (isDragging) {
+                    showSaveBackDialog(isDragging) {
+                        isDragging = false
+                        screenModel.getCategories(largeCategoryItems[pagerState.currentPage])
+                    }
+                } else {
+                    navigator.pop()
                 }
-            } else {
-                navigator.pop()
             }
         }
 
-        BackHandler(true) {
-            onBack()
-        }
+        BackHandler(
+            enabled = true,
+            onBack = onBack
+        )
 
         if (navigator.lastItem is CategoryManagementScreen) {
             SideEffect {

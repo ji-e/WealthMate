@@ -108,10 +108,10 @@ abstract class BaseScreen : Screen {
                     WMText(
                         text = contentText,
                         textAlign = TextAlign.Center,
-                        style = Typography().bodyLarge,
+                        style = Typography().bodyMedium,
                     )
                 }
-                Row() {
+                Row {
                     Box(
                         modifier = Modifier
                             .height(60.dp)

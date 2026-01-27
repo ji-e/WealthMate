@@ -30,11 +30,10 @@ import com.jie.wealthmate.base.collectSideEffect
 import com.jie.wealthmate.component.ButtonSize
 import com.jie.wealthmate.component.WMButton
 import com.jie.wealthmate.component.WMCheckBox
-import com.jie.wealthmate.component.WMModalBottomSheet
 import com.jie.wealthmate.component.textField.WMTextField
 import com.jie.wealthmate.component.topbar.TopBarItem
 import com.jie.wealthmate.feature.menu.categoryManagement.addCategory.component.CategoryIcon
-import com.jie.wealthmate.feature.menu.categoryManagement.addCategory.component.CategoryIconGrid
+import com.jie.wealthmate.feature.menu.categoryManagement.addCategory.component.CategoryIconModalBottomSheet
 import com.jie.wealthmate.feature.menu.categoryManagement.addCategory.component.CategoryTag
 import com.jie.wealthmate.feature.menu.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.theme.WMTheme
@@ -105,23 +104,22 @@ class AddCategoryScreen(
 
                 // 카테고리 아이콘
                 CategoryIcon(
-                    modifier = Modifier.padding(top = 24.dp),
+                    modifier = Modifier.padding(top = 32.dp),
                     largeCategory = largeCategory,
                     selectedCategoryIcon = uiState.categoryIcon,
                     onClickChange = { isShowCategoryIconModalBottomSheet = true }
                 )
 
-                // 카테고리 라벨
+                // 카테고리 이름
                 WMTextField(
                     value = uiState.label,
                     onValueChange = screenModel::updateCategoryLabel,
                     modifier = Modifier
-                        .padding(top = 20.dp)
+                        .padding(top = 32.dp)
                         .padding(horizontal = 20.dp),
                     maxLength = 15,
                     label = "카테고리 이름",
                     placeholder = largeCategory.tempMiddleCategoryLabel,
-                    supportingText = "15자 이내로 입력해 주세요.",
                     isCount = true,
                     isRequire = true,
                 )
@@ -167,14 +165,11 @@ class AddCategoryScreen(
 
             // 아이콘 변경 ModalBottomSheet
             if (isShowCategoryIconModalBottomSheet) {
-                WMModalBottomSheet(
-                    onDismissRequest = { isShowCategoryIconModalBottomSheet = false },
-                ) {
-                    CategoryIconGrid(
-                        selectedCategoryIcon = uiState.categoryIcon,
-                        onIconChange = screenModel::updateCategoryIcon
-                    )
-                }
+                CategoryIconModalBottomSheet(
+                    selectedCategoryIcon = uiState.categoryIcon,
+                    onIconChange = screenModel::updateCategoryIcon,
+                    onDismissRequest = { isShowCategoryIconModalBottomSheet = false }
+                )
             }
         }
     }

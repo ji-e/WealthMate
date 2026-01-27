@@ -43,7 +43,7 @@ import com.jie.wealthmate.component.WMModalBottomSheet
 import com.jie.wealthmate.component.textField.WMTextField
 import com.jie.wealthmate.component.topbar.TopBarItem
 import com.jie.wealthmate.feature.menu.categoryManagement.addCategory.component.CategoryIcon
-import com.jie.wealthmate.feature.menu.categoryManagement.addCategory.component.CategoryIconGrid
+import com.jie.wealthmate.feature.menu.categoryManagement.addCategory.component.CategoryIconModalBottomSheet
 import com.jie.wealthmate.feature.menu.categoryManagement.addCategory.component.CategoryTag
 import com.jie.wealthmate.feature.menu.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.theme.ColorRed
@@ -139,7 +139,7 @@ class ModifyCategoryScreen(
 
                 // 카테고리 아이콘
                 CategoryIcon(
-                    modifier = Modifier.padding(top = 24.dp),
+                    modifier = Modifier.padding(top = 32.dp),
                     largeCategory = largeCategory,
                     selectedCategoryIcon = uiState.categoryIcon,
                     onClickChange = {
@@ -148,12 +148,12 @@ class ModifyCategoryScreen(
                     }
                 )
 
-                // 카테고리 라벨
+                // 카테고리 이름
                 WMTextField(
                     value = uiState.label,
                     onValueChange = screenModel::updateCategoryLabel,
                     modifier = Modifier
-                        .padding(top = 20.dp)
+                        .padding(top = 32.dp)
                         .padding(horizontal = 20.dp),
                     textFieldModifier = Modifier.focusRequester(remember { FocusRequester() })
                         .onFocusChanged { focusState ->
@@ -162,7 +162,6 @@ class ModifyCategoryScreen(
                     maxLength = 15,
                     label = "카테고리 이름",
                     placeholder = largeCategory.tempMiddleCategoryLabel,
-                    supportingText = "15자 이내로 입력해 주세요.",
                     isCount = true,
                     isRequire = true,
                 )
@@ -319,14 +318,11 @@ class ModifyCategoryScreen(
         onIconChange: (CategoryIconEnum) -> Unit = {},
         onDismissRequest: () -> Unit = {},
     ) {
-        WMModalBottomSheet(
-            onDismissRequest = { onDismissRequest() },
-        ) {
-            CategoryIconGrid(
-                selectedCategoryIcon = selectedCategoryIcon,
-                onIconChange = onIconChange,
-            )
-        }
+        CategoryIconModalBottomSheet(
+            selectedCategoryIcon = selectedCategoryIcon,
+            onIconChange = onIconChange,
+            onDismissRequest = onDismissRequest
+        )
     }
 
     @Composable

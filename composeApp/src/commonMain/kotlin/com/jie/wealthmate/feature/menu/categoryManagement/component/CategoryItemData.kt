@@ -35,7 +35,7 @@ enum class LargeCategoryEnum(
     ),
     SAVING(
         label = "저축",
-        backgroundColor = ColorPrimary.Primary_200,
+        backgroundColor = ColorPrimary.Primary_300,
         tempMiddleCategoryLabel = "정기 저축",
         tempTagLabel = "주책 청약"
     ),
@@ -44,11 +44,6 @@ enum class LargeCategoryEnum(
     companion object {
         fun creator(name: String): LargeCategoryEnum {
             return LargeCategoryEnum.entries.find { it.name == name } ?: INCOME
-        }
-
-        fun creatorFromMenu(label: String): LargeCategoryEnum {
-            return LargeCategoryEnum.entries.find { label.contains(it.label) } ?: INCOME
-
         }
     }
 }
