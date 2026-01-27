@@ -102,6 +102,25 @@ class AddHistoryScreen() : BaseScreen() {
                 visualTransformation = rememberIntegerVisualTransformation(),
             )
 
+            // 카테고리 선택
+            CategoryTextField(
+//                modifier = Modifier.padding(top = 4.dp),
+                tagLabelItems = listOf(
+                    CategoryTagVo(
+                        id = "0",
+                        label = "외식"
+                    ),
+                    CategoryTagVo(
+                        id = "1",
+                        label = "배달"
+                    )
+                ),
+                selectedTagLabel = CategoryTagVo(
+                    id = "0",
+                    label = "외식"
+                )
+            )
+
             // 내용 입력
             WMTextField(
                 modifier = Modifier.padding(top = 20.dp),
@@ -110,27 +129,6 @@ class AddHistoryScreen() : BaseScreen() {
                 label = "내용",
                 maxLength = 20,
                 placeholder = "내용을 입력해 주세요.",
-            )
-
-
-
-            // 카테고리 선택
-            CategoryTextField(
-                modifier = Modifier.padding(top = 20.dp),
-                tagLabelItems = listOf(
-                    CategoryTagVo(
-                        id = "0",
-                        label = "외식"
-                    ),
-                    CategoryTagVo(
-                        id = "1",
-                        label = "주책 청약"
-                    )
-                ),
-                selectedTagLabel = CategoryTagVo(
-                    id = "2",
-                    label = "외식"
-                )
             )
 
             // 결제수단/자산 선택
