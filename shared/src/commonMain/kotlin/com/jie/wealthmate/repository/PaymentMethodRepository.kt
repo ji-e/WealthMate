@@ -10,6 +10,7 @@ interface PaymentMethodRepository {
     suspend fun insertPaymentMethod(
         paymentMethodLabel: String,
         paymentMethodGroupId: String?,
+        paymentMethodGroupLabel: String?,
         sort: Long,
     )
 
@@ -21,7 +22,7 @@ interface PaymentMethodRepository {
 
     suspend fun getPaymentMethodById(paymentMethodId: String): PaymentMethodWithGroupEntity?
 
-    fun getPaymentMethods(): Flow<List<PaymentMethodEntity>>
+    fun getPaymentMethods(): Flow<List<PaymentMethodWithGroupEntity>>
 
     suspend fun insertPaymentMethodGroup(label: String)
 

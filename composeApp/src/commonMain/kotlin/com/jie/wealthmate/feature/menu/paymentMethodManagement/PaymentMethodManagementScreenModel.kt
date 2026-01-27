@@ -23,10 +23,11 @@ class PaymentMethodManagementScreenModel(
                     state.copy(
                         paymentMethodItems = response.map {
                             PaymentMethodItemData(
-                                id = it.id,
-                                label = it.label,
-                                groupId = it.groupId,
-                                sort = it.sort
+                                id = it.paymentMethod.id,
+                                label = it.paymentMethod.label,
+                                groupId = it.group?.id,
+                                groupLabel = it.group?.label,
+                                sort = it.paymentMethod.sort
                             )
                         }
                     )

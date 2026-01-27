@@ -3,6 +3,7 @@ package com.jie.wealthmate.feature.menu.paymentMethodManagement.modifyPaymentMet
 import androidx.compose.ui.text.input.TextFieldValue
 import com.jie.wealthmate.base.BaseScreenModel
 import com.jie.wealthmate.database.eneity.PaymentMethodEntity
+import com.jie.wealthmate.database.eneity.PaymentMethodWithGroupEntity
 import com.jie.wealthmate.feature.menu.paymentMethodManagement.addPaymentMethod.component.PaymentMethodGroupItemData
 import com.jie.wealthmate.repository.PaymentMethodRepository
 import com.jie.wealthmate.utils.default
@@ -10,7 +11,7 @@ import com.jie.wealthmate.utils.default
 class ModifyPaymentMethodScreenModel(
     private val paymentMethodRepository: PaymentMethodRepository,
 ) : BaseScreenModel<ModifyPaymentMethodUiState>() {
-    private var paymentMethodItems: List<PaymentMethodEntity> = emptyList()
+    private var paymentMethodItems: List<PaymentMethodWithGroupEntity> = emptyList()
     private var paymentMethodId: String = ""
 
     override val initialState: ModifyPaymentMethodUiState
@@ -65,7 +66,7 @@ class ModifyPaymentMethodScreenModel(
     fun savePaymentMethod() {
         val uiState = container.uiState.value
         val isExisted = paymentMethodItems.any {
-            it.id != paymentMethodId && it.groupId == uiState.group?.id && it.label == uiState.label.text
+            it.paymentMethod.id != paymentMethodId && it.group?.id == uiState.group?.id && it.paymentMethod.label == uiState.label.text
         }
         if (isExisted) {
             showSnackbar("이미 존재하는 결제수단 입니다.")
@@ -79,6 +80,7 @@ class ModifyPaymentMethodScreenModel(
                         id = paymentMethodId,
                         label = uiState.label.text,
                         groupId = uiState.group?.id.default(),
+                        groupLabel = uiState.group?.label.default(),
                         sort = uiState.sort
                     )
                 )

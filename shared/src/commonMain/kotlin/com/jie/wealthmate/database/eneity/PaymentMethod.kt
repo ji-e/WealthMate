@@ -11,6 +11,7 @@ data class PaymentMethodEntity(
     @PrimaryKey val id: String,
     val label: String,
     val groupId: String?,
+    val groupLabel: String?,
     val sort: Long,
     val updatedAt: Long = Clock.System.now().toEpochMilliseconds(),
     val isDeleted: Boolean = false,

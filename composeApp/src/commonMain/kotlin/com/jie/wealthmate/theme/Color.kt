@@ -74,3 +74,29 @@ object ColorBlue {
     )
 }
 
+object ColorGroup {
+    val Group_Lavender = Color(0xFFF3E8FF)
+    val Group_Sky = Color(0xFFE8F3FF)
+    val Group_Mint = Color(0xFFE8FFED)
+    val Group_Cream = Color(0xFFFFF9E8)
+    val Group_Rose = Color(0xFFFFE8F0)
+    val Group_Purple = Color(0xFFF0E8FF)
+    val Group_Cyan = Color(0xFFE8FFFF)
+    val Group_Peach = Color(0xFFFFF3E8)
+    val Group_Lime = Color(0xFFF3FFE8)
+    val Group_Coral = Color(0xFFFFE8E8)
+
+    fun getColorList() = listOf(
+        Pair("Group_Lavender", Group_Lavender),
+        Pair("Group_Sky", Group_Sky),
+        Pair("Group_Mint", Group_Mint),
+        Pair("Group_Cream", Group_Cream),
+        Pair("Group_Rose", Group_Rose),
+        Pair("Group_Purple", Group_Purple),
+        Pair("Group_Cyan", Group_Cyan),
+        Pair("Group_Peach", Group_Peach),
+        Pair("Group_Lime", Group_Lime),
+        Pair("Group_Coral", Group_Coral)
+    )
+}
+

@@ -41,7 +41,7 @@ class AddPaymentMethodScreenModel(
     fun savePaymentMethod() {
         val uiState = container.uiState.value
 
-        if (paymentMethodItems.any { it.label == uiState.label.text }) {
+        if (paymentMethodItems.any { it.groupId == uiState.group?.id && it.label == uiState.label.text }) {
             showSnackbar("존재하는 결제수단입니다.")
             return
         }
@@ -51,6 +51,7 @@ class AddPaymentMethodScreenModel(
                 paymentMethodRepository.insertPaymentMethod(
                     paymentMethodLabel = uiState.label.text,
                     paymentMethodGroupId = uiState.group?.id,
+                    paymentMethodGroupLabel = uiState.group?.label,
                     sort = paymentMethodItems.size.toLong()
                 )
             },

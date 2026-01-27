@@ -46,6 +46,10 @@ interface PaymentMethodDao {
     @Query("SELECT * FROM payment_method WHERE id = :paymentMethodId")
     suspend fun getPaymentMethodById(paymentMethodId: String): PaymentMethodWithGroupEntity?
 
+    @Transaction
+    @Query("SELECT * FROM payment_method WHERE isDeleted = 0 ORDER BY sort ASC")
+    fun getAllPaymentMethodsWithGroup(): Flow<List<PaymentMethodWithGroupEntity>>
+
     @Query("SELECT * FROM payment_method WHERE isDeleted = 0 ORDER BY sort ASC")
     fun getAllPaymentMethods(): Flow<List<PaymentMethodEntity>>
 
