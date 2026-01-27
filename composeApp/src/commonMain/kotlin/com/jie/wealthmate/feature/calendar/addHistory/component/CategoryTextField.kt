@@ -1,4 +1,4 @@
-package com.jie.wealthmate.feature.calendar.component.addHistory.component
+package com.jie.wealthmate.feature.calendar.addHistory.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -43,13 +43,12 @@ fun CategoryTextField(
         modifier = modifier,
         label = "카테고리",
         readOnly = true,
-        isRequire = true,
         onReadOnlyClick = onCategoryClick,
         supportingContent = {
             FlowRow(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 8.dp),
+                    .padding(top = 4.dp),
                 horizontalArrangement = Arrangement.spacedBy(4.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
@@ -58,7 +57,7 @@ fun CategoryTextField(
                     Box(
                         modifier = Modifier
                             .clip(CircleShape)
-                            .background(color = if (isSelected) ColorPrimary.Primary_500 else ColorGray.Gray_100)
+                            .background(color = if (isSelected) ColorPrimary.Primary_500 else ColorGray.Gray_50)
                             .clickable { onTagLabelClick(item) }
                             .padding(horizontal = 8.dp, vertical = 4.dp),
                         contentAlignment = Alignment.Center

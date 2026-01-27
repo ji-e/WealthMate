@@ -7,10 +7,12 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -95,7 +97,8 @@ open class MainScreen : Screen {
                     WMTobBar(
                         title = uiState.title ?: TopBarItem.Title(""),
                         readingItem = uiState.readingItem,
-                        trailingItem = uiState.trailingItem
+                        trailingItem = uiState.trailingItem,
+                        trailingCustomItem = uiState.trailingCustomItem
                     )
                 },
                 bottomBar = {
@@ -110,6 +113,7 @@ open class MainScreen : Screen {
                         )
                     }
                 },
+                contentWindowInsets = WindowInsets.systemBars,
                 containerColor = ColorGray.White,
             ) { innerPadding ->
                 Column(

@@ -2,7 +2,7 @@ package com.jie.wealthmate.di
 
 import com.jie.wealthmate.feature.asset.AssetScreenModel
 import com.jie.wealthmate.feature.calendar.CalendarScreenModel
-import com.jie.wealthmate.feature.calendar.component.addHistory.AddHistoryScreenModel
+import com.jie.wealthmate.feature.calendar.addHistory.AddHistoryScreenModel
 import com.jie.wealthmate.feature.home.HomeScreenModel
 import com.jie.wealthmate.feature.menu.MenuScreenModel
 import com.jie.wealthmate.feature.menu.categoryManagement.CategoryManagementScreenModel

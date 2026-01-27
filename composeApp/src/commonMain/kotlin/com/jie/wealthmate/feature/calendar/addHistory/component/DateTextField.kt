@@ -1,26 +1,35 @@
-package com.jie.wealthmate.feature.calendar.component.addHistory.component
+package com.jie.wealthmate.feature.calendar.addHistory.component
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.jie.wealthmate.component.ButtonSize
-import com.jie.wealthmate.component.ButtonStyle
-import com.jie.wealthmate.component.WMButton
 import com.jie.wealthmate.component.textField.WMTextField
-import com.jie.wealthmate.feature.calendar.component.addHistory.component.RepeatCycleEnum.Companion.formattedDescription
+import com.jie.wealthmate.feature.calendar.addHistory.component.RepeatCycleEnum.Companion.formattedDescription
 import com.jie.wealthmate.feature.menu.categoryManagement.component.LargeCategoryEnum
+import com.jie.wealthmate.theme.ColorGray
+import com.jie.wealthmate.theme.ColorPrimary
 import com.jie.wealthmate.theme.WMTheme
 import com.jie.wealthmate.utils.convertLocalDateToString
 import com.jie.wealthmate.utils.formatDateHyphenYMDE
 import com.jie.wealthmate.utils.today
 import kotlinx.datetime.LocalDate
-import androidx.compose.ui.tooling.preview.Preview
+import org.jetbrains.compose.resources.painterResource
+import wealthmate.composeapp.generated.resources.Res
+import wealthmate.composeapp.generated.resources.ic_percent
+import wealthmate.composeapp.generated.resources.ic_repeat
 
 @Composable
 fun DateTextField(
@@ -50,25 +59,35 @@ fun DateTextField(
 
         Row(
             modifier = Modifier
-                .padding(top = 6.dp)
+                .padding(bottom = 4.dp)
                 .align(Alignment.CenterEnd),
-            horizontalArrangement = Arrangement.spacedBy(4.dp),
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            WMButton(
-                text = "반복",
-                onClick = onRepeatClick,
-                buttonSize = ButtonSize.X_SMALL,
-                buttonStyle = if (repeatCycle != null) ButtonStyle.FILLED else ButtonStyle.OUTLINED,
+            Icon(
+                painter = painterResource(Res.drawable.ic_repeat),
+                contentDescription = "반복",
+                modifier = Modifier
+                    .size(30.dp)
+                    .clip(CircleShape)
+                    .background(if (repeatCycle != null) ColorPrimary.Primary_500 else ColorGray.Gray_50)
+                    .clickable { onRepeatClick() }
+                    .padding(6.dp),
+                tint = if (repeatCycle != null) ColorGray.White else ColorGray.Gray_500
             )
-
             if (selectedLargeCategoryEnum == LargeCategoryEnum.EXPENSES) {
-                WMButton(
-                    text = "할부",
-                    onClick = onInstallmentClick,
-                    buttonSize = ButtonSize.X_SMALL,
-                    buttonStyle = if (installmentCount != null) ButtonStyle.FILLED else ButtonStyle.OUTLINED,
+                Icon(
+                    painter = painterResource(Res.drawable.ic_percent),
+                    contentDescription = "할부",
+                    modifier = Modifier
+                        .size(30.dp)
+                        .clip(CircleShape)
+                        .background(if (installmentCount != null) ColorPrimary.Primary_500 else ColorGray.Gray_50)
+                        .clickable { onInstallmentClick() }
+                        .padding(6.dp),
+                    tint = if (installmentCount != null) ColorGray.White else ColorGray.Gray_500
                 )
+
             }
         }
     }

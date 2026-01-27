@@ -18,7 +18,11 @@ fun CategoryTap(
     pagerState: PagerState,
     onTapClick: (Int) -> Unit = {},
 ) {
-    val largeCategoryItems = LargeCategoryEnum.entries
+    val largeCategoryItems = listOf(
+        LargeCategoryEnum.INCOME,
+        LargeCategoryEnum.EXPENSES,
+        LargeCategoryEnum.SAVING,
+    )
 
     PrimaryTabRow(
         modifier = modifier.fillMaxWidth(),
