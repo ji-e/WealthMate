@@ -2,6 +2,7 @@
 
 package com.jie.wealthmate.feature.calendar.addHistory
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -10,12 +11,18 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -45,8 +52,16 @@ class AddHistoryScreen() : BaseScreen() {
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val screenModel: AddHistoryScreenModel = koinInject()
-        val uiState = screenModel.container.uiState.collectAsState().value
+        val uiState by screenModel.container.uiState.collectAsState()
 
+        val scrollState = rememberScrollState()
+        val density = LocalDensity.current
+
+        val isLargeCategoryVisible by remember {
+            derivedStateOf {
+                scrollState.value > with(density) { 56.dp.toPx() }
+            }
+        }
 
         fun onBack() {
             showSaveBackDialog(uiState.isDataChanged) {
@@ -56,26 +71,45 @@ class AddHistoryScreen() : BaseScreen() {
 
         BackHandler(true) { onBack() }
 
-        if (navigator.lastItem is AddHistoryScreen) {
-            SideEffect {
-                screenModel.updateTopBar(
-                    title = TopBarItem.Title("내역 추가"),
-                    readingItem = TopBarItem.ReadingItem().copy(
-                        action = { onBack() }
-                    ),
-                )
-            }
+        // 스크롤 상태에 따라 TopBar 업데이트
+        LaunchedEffect(isLargeCategoryVisible) {
+            screenModel.updateTopBar(
+                title = TopBarItem.Title("내역 추가"),
+                readingItem = TopBarItem.ReadingItem().copy(
+                    action = { onBack() }
+                ),
+                trailingCustomItem = if(isLargeCategoryVisible){
+                    TopBarItem.TrailingCustomItem {
+                        val selectedLargeCategoryEnum = uiState.largeCategoryEnum
+                        WMText(
+                            text = selectedLargeCategoryEnum.label,
+                            style = Typography().labelMedium.copy(fontWeight = FontWeight.SemiBold),
+                            modifier = Modifier
+                                .padding(horizontal = 16.dp)
+                                .clip(CircleShape)
+                                .background(selectedLargeCategoryEnum.backgroundColor)
+                                .padding(horizontal = 8.dp, vertical = 4.dp)
+                        )
+                    }
+                } else null
+            )
         }
-        Column(modifier = Modifier.fillMaxSize().imePadding()) {
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .imePadding()
+        ) {
             Column(
                 modifier = Modifier
                     .weight(1f)
                     .padding(horizontal = 20.dp)
-                    .verticalScroll(rememberScrollState())
+                    .verticalScroll(scrollState)
             ) {
                 // 수입, 지출, 저출 카테고리 선택
                 LargeCategorySelectBox(
-                    modifier = Modifier.padding(top = 8.dp)
+                    modifier = Modifier.padding(top = 8.dp),
+                    selectedLargeCategoryEnum = uiState.largeCategoryEnum
                 )
 
                 // 날짜 선택
