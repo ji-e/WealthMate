@@ -68,7 +68,9 @@ class AddHistoryScreen() : BaseScreen() {
                 .verticalScroll(rememberScrollState())
         ) {
             // 수입, 지출, 저출 카테고리 선택
-            LargeCategorySelectBox()
+            LargeCategorySelectBox(
+                modifier = Modifier.padding(top=8.dp)
+            )
 
             // 날짜 선택
             DateTextField(
