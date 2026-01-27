@@ -54,7 +54,7 @@ fun WMModalBottomSheet(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 4.dp, bottom = 12.dp),
+                    .padding(bottom = 12.dp),
                 contentAlignment = Alignment.Center
             ) {
                 title?.run {

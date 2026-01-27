@@ -43,7 +43,7 @@ import com.jie.wealthmate.component.WMModalBottomSheet
 import com.jie.wealthmate.component.textField.WMTextField
 import com.jie.wealthmate.component.topbar.TopBarItem
 import com.jie.wealthmate.feature.menu.categoryManagement.addCategory.component.CategoryIcon
-import com.jie.wealthmate.feature.menu.categoryManagement.addCategory.component.CategoryIconGrid
+import com.jie.wealthmate.feature.menu.categoryManagement.addCategory.component.CategoryIconModalBottomSheet
 import com.jie.wealthmate.feature.menu.categoryManagement.addCategory.component.CategoryTag
 import com.jie.wealthmate.feature.menu.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.theme.ColorRed
@@ -318,14 +318,11 @@ class ModifyCategoryScreen(
         onIconChange: (CategoryIconEnum) -> Unit = {},
         onDismissRequest: () -> Unit = {},
     ) {
-        WMModalBottomSheet(
-            onDismissRequest = { onDismissRequest() },
-        ) {
-            CategoryIconGrid(
-                selectedCategoryIcon = selectedCategoryIcon,
-                onIconChange = onIconChange,
-            )
-        }
+        CategoryIconModalBottomSheet(
+            selectedCategoryIcon = selectedCategoryIcon,
+            onIconChange = onIconChange,
+            onDismissRequest = onDismissRequest
+        )
     }
 
     @Composable
