@@ -22,6 +22,7 @@ fun WMTobBar(
     title: TopBarItem.Title,
     readingItem: TopBarItem.ReadingItem? = TopBarItem.ReadingItem(),
     trailingItem: List<TopBarItem.TrailingItem>? = null,
+    trailingCustomItem: TopBarItem.TrailingCustomItem? = null,
 ) {
     val focusManager = LocalFocusManager.current
 
@@ -57,6 +58,10 @@ fun WMTobBar(
                         it.action()
                     }
                 )
+            }
+
+            trailingCustomItem?.let {
+                it.content()
             }
         },
         colors = TopAppBarDefaults.topAppBarColors().copy(

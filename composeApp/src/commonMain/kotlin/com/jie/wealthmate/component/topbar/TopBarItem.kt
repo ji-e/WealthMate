@@ -1,5 +1,6 @@
 package com.jie.wealthmate.component.topbar
 
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import com.jie.wealthmate.theme.ColorGray
 import org.jetbrains.compose.resources.DrawableResource
@@ -25,6 +26,10 @@ sealed class TopBarItem {
         val iconRes: DrawableResource = Res.drawable.ic_close,
         val tint: Color = ColorGray.Gray_700,
         val action: () -> Unit = {},
+    ) : TopBarItem()
+
+    data class TrailingCustomItem(
+        val content: @Composable () -> Unit,
     ) : TopBarItem()
 
 }
