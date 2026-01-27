@@ -65,7 +65,6 @@ fun CategoryTag(
             maxLength = 15,
             label = "상세 태그 이름",
             placeholder = largeCategory.tempTagLabel,
-            supportingText = "15자 이내로 입력해 주세요.",
             enabled = tagLabelItems.size <= 10,
             isCount = true,
             keyboardActions = KeyboardActions(

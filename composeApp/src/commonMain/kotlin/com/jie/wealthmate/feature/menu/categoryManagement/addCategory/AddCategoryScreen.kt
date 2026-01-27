@@ -105,23 +105,22 @@ class AddCategoryScreen(
 
                 // 카테고리 아이콘
                 CategoryIcon(
-                    modifier = Modifier.padding(top = 24.dp),
+                    modifier = Modifier.padding(top = 32.dp),
                     largeCategory = largeCategory,
                     selectedCategoryIcon = uiState.categoryIcon,
                     onClickChange = { isShowCategoryIconModalBottomSheet = true }
                 )
 
-                // 카테고리 라벨
+                // 카테고리 이름
                 WMTextField(
                     value = uiState.label,
                     onValueChange = screenModel::updateCategoryLabel,
                     modifier = Modifier
-                        .padding(top = 20.dp)
+                        .padding(top = 32.dp)
                         .padding(horizontal = 20.dp),
                     maxLength = 15,
                     label = "카테고리 이름",
                     placeholder = largeCategory.tempMiddleCategoryLabel,
-                    supportingText = "15자 이내로 입력해 주세요.",
                     isCount = true,
                     isRequire = true,
                 )
