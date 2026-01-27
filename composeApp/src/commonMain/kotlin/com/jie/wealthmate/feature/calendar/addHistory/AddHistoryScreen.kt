@@ -104,7 +104,6 @@ class AddHistoryScreen() : BaseScreen() {
 
             // 카테고리 선택
             CategoryTextField(
-//                modifier = Modifier.padding(top = 4.dp),
                 tagLabelItems = listOf(
                     CategoryTagVo(
                         id = "0",
@@ -121,9 +120,13 @@ class AddHistoryScreen() : BaseScreen() {
                 )
             )
 
+            // 결제수단/자산 선택
+            PaymentMethodTextField(
+                modifier = Modifier.padding(top = 24.dp),
+            )
+
             // 내용 입력
             WMTextField(
-                modifier = Modifier.padding(top = 20.dp),
                 value = uiState.content,
                 onValueChange = screenModel::updateContent,
                 label = "내용",
@@ -131,10 +134,7 @@ class AddHistoryScreen() : BaseScreen() {
                 placeholder = "내용을 입력해 주세요.",
             )
 
-            // 결제수단/자산 선택
-            PaymentMethodTextField(
-                modifier = Modifier.padding(top = 20.dp),
-            )
+
         }
     }
 }
