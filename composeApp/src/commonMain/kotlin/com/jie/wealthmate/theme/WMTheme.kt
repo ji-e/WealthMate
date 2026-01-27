@@ -10,9 +10,12 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.unit.Density
 
 @Composable
 fun WMTheme(
@@ -44,13 +47,22 @@ fun WMTheme(
             background = ColorGray.White
         )
     }
+
     val focusManager = LocalFocusManager.current
+    val currentDensity = LocalDensity.current
+    val fixedDensity = remember(currentDensity) {
+        Density(
+            density = currentDensity.density,
+            fontScale = 1f
+        )
+    }
 
     MaterialTheme(
         colorScheme = colorScheme,
     ) {
         CompositionLocalProvider(
-            LocalRippleConfiguration provides RippleConfiguration(color = ColorPrimary.Primary_400)
+            LocalRippleConfiguration provides RippleConfiguration(color = ColorPrimary.Primary_400),
+            LocalDensity provides fixedDensity,
         ) {
             Column(
                 modifier = Modifier.pointerInput(Unit) {
