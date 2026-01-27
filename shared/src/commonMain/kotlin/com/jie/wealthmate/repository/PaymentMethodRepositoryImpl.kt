@@ -22,6 +22,7 @@ class PaymentMethodRepositoryImpl(
     override suspend fun insertPaymentMethod(
         paymentMethodLabel: String,
         paymentMethodGroupId: String?,
+        paymentMethodGroupLabel: String?,
         sort: Long,
     ) = loggedCall(
         repositoryName = repoName,
@@ -29,6 +30,7 @@ class PaymentMethodRepositoryImpl(
         params = mapOf(
             "paymentMethodLabel" to paymentMethodLabel,
             "paymentMethodGroupId" to paymentMethodGroupId,
+            "paymentMethodGroupLabel" to paymentMethodGroupLabel,
             "sort" to sort
         )
     ) {
@@ -36,6 +38,7 @@ class PaymentMethodRepositoryImpl(
             id = generateId(),
             label = paymentMethodLabel,
             groupId = paymentMethodGroupId,
+            groupLabel = paymentMethodGroupLabel,
             updatedAt = Clock.System.now().toEpochMilliseconds(),
             sort = sort
         )
@@ -78,12 +81,12 @@ class PaymentMethodRepositoryImpl(
             paymentMethodDao.getPaymentMethodById(paymentMethodId)
         }
 
-    override fun getPaymentMethods(): Flow<List<PaymentMethodEntity>> = loggedFlow(
+    override fun getPaymentMethods(): Flow<List<PaymentMethodWithGroupEntity>> = loggedFlow(
         repositoryName = repoName,
         methodName = "getPaymentMethods",
         params = mapOf()
     ) {
-        paymentMethodDao.getAllPaymentMethods()
+        paymentMethodDao.getAllPaymentMethodsWithGroup()
     }
 
     override suspend fun insertPaymentMethodGroup(label: String) =

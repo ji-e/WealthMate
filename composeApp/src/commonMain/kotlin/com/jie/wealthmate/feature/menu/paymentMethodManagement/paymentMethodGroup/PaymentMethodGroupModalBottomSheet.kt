@@ -80,7 +80,7 @@ fun PaymentMethodGroupModalBottomSheet(
     WMModalBottomSheet(
         title = "결제수단 그룹",
         trailingItem = {
-            if (isModify.not()) {
+            if (isModify.not() && paymentMethodGroupItems.size < 10) {
                 WMIconButton(
                     iconRes = Res.drawable.ic_add,
                     onClick = { isAdd = true },
@@ -114,7 +114,7 @@ fun PaymentMethodGroupModalBottomSheet(
                 Row(
                     modifier = Modifier
                         .padding(horizontal = 20.dp)
-                        .padding(top = 8.dp),
+                        .padding(top = 20.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     WMTextField(
@@ -151,7 +151,7 @@ fun PaymentMethodGroupModalBottomSheet(
                 WMTextField(
                     modifier = Modifier
                         .padding(horizontal = 20.dp)
-                        .padding(top = 8.dp),
+                        .padding(top = 20.dp),
                     value = addGroupLabel,
                     onValueChange = { addGroupLabel = it },
                     maxLength = 15,
