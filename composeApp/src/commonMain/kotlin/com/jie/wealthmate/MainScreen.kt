@@ -97,7 +97,8 @@ open class MainScreen : Screen {
                     WMTobBar(
                         title = uiState.title ?: TopBarItem.Title(""),
                         readingItem = uiState.readingItem,
-                        trailingItem = uiState.trailingItem
+                        trailingItem = uiState.trailingItem,
+                        trailingCustomItem = uiState.trailingCustomItem
                     )
                 },
                 bottomBar = {

@@ -95,11 +95,13 @@ abstract class BaseScreenModel<S : UiState> : ScreenModel, ContainerHost<S> {
         title: TopBarItem.Title? = null,
         readingItem: TopBarItem.ReadingItem? = null,
         trailingItem: List<TopBarItem.TrailingItem>? = null,
+        trailingCustomItem: TopBarItem.TrailingCustomItem? = null,
     ) {
         MainUiManager.updateTopBar(
             title = title,
             readingItem = readingItem,
-            trailingItem = trailingItem
+            trailingItem = trailingItem,
+            trailingCustomItem = trailingCustomItem,
         )
     }
 

@@ -13,6 +13,7 @@ data class MainUiState(
     val title: TopBarItem.Title? = null,
     val readingItem: TopBarItem.ReadingItem? = null,
     val trailingItem: List<TopBarItem.TrailingItem>? = null,
+    val trailingCustomItem: TopBarItem.TrailingCustomItem? = null,
 ) : BaseUiState
 
 
@@ -27,6 +28,7 @@ object MainUiManager {
         title: TopBarItem.Title? = null,
         readingItem: TopBarItem.ReadingItem? = null,
         trailingItem: List<TopBarItem.TrailingItem>? = null,
+        trailingCustomItem: TopBarItem.TrailingCustomItem? = null,
     ) {
         println("updateTopBar called with title: $title, readingItem: $readingItem, trailingItem: $trailingItem")
 
@@ -34,7 +36,8 @@ object MainUiManager {
             it.copy(
                 title = title,
                 readingItem = readingItem,
-                trailingItem = trailingItem
+                trailingItem = trailingItem,
+                trailingCustomItem = trailingCustomItem,
             )
         }
     }
