@@ -1,20 +1,20 @@
 package com.jie.wealthmate.component.textField
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.selection.TextSelectionColors
-import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
@@ -25,9 +25,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.layout
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
@@ -121,13 +119,39 @@ fun WMTextField(
     keyboardActions: KeyboardActions = KeyboardActions.Default,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
 ) {
-    var isFocused by remember { mutableStateOf(false) }
     val focusRequester = remember { FocusRequester() }
 
     val defaultColor = ColorGray.Gray_700
     val errorColor = ColorRed.Red_300
     val disabledColor = ColorGray.Gray_100
     val placeholderColor = ColorGray.Gray_300
+    val colors = TextFieldDefaults.colors().copy(
+        focusedTextColor = defaultColor,
+        disabledTextColor = disabledColor,
+        unfocusedTextColor = defaultColor,
+        errorTextColor = defaultColor,
+        focusedContainerColor = ColorGray.White,
+        disabledContainerColor = ColorGray.White,
+        unfocusedContainerColor = ColorGray.White,
+        errorContainerColor = ColorGray.White,
+        cursorColor = ColorPrimary.Primary_500,
+        errorCursorColor = errorColor,
+        textSelectionColors = TextSelectionColors(
+            handleColor = if (isError) errorColor else ColorPrimary.Primary_500,
+            backgroundColor = ColorPrimary.Primary_200
+        ),
+        unfocusedIndicatorColor = placeholderColor,
+        disabledIndicatorColor = disabledColor,
+        errorIndicatorColor = errorColor,
+        focusedPlaceholderColor = placeholderColor,
+        unfocusedPlaceholderColor = placeholderColor,
+        disabledPlaceholderColor = placeholderColor,
+        errorPlaceholderColor = placeholderColor,
+        focusedSupportingTextColor = placeholderColor,
+        unfocusedSupportingTextColor = placeholderColor,
+        disabledSupportingTextColor = disabledColor,
+        errorSupportingTextColor = errorColor,
+    )
 
     var height by remember { mutableStateOf(60.dp) }
 
@@ -158,27 +182,10 @@ fun WMTextField(
             }
         }
         Box {
-            TextField(
+            BasicTextField(
                 modifier = textFieldModifier
                     .fillMaxWidth()
-                    .layout { measurable, constraints ->
-                        val padding = 16.dp.roundToPx()
-                        val expandedWidth = constraints.maxWidth + (padding * 2)
-                        val placeable = measurable.measure(
-                            constraints.copy(
-                                maxWidth = expandedWidth,
-                                minWidth = expandedWidth
-                            )
-                        )
-                        height = placeable.height.toDp() - 24.dp
-                        layout(constraints.maxWidth, placeable.height) {
-                            placeable.placeRelative(-padding, 0)
-                        }
-                    }
-                    .focusRequester(focusRequester)
-                    .onFocusChanged { focusState ->
-                        isFocused = focusState.isFocused
-                    },
+                    .focusRequester(focusRequester),
                 value = value,
                 onValueChange = {
                     if (it.text.length <= maxLength) {
@@ -187,66 +194,53 @@ fun WMTextField(
                 },
                 enabled = enabled,
                 readOnly = readOnly,
-                isError = isError,
                 maxLines = maxLines,
-                placeholder = placeholder?.let {
-                    {
-                        WMText(text = it, style = Typography().bodyLarge)
-                    }
-                },
-                supportingText =
-                    {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(4.dp)
-                        ) {
-                            WMText(text = supportingText.default(), modifier = Modifier.weight(1f))
-
-                            if (isCount) {
-                                WMText(text = "${value.text.length}/$maxLength")
-                            }
-                            supportingContent?.invoke()
-                        }
-                    },
                 singleLine = true,
-                suffix = suffix,
-                trailingIcon = trailingIcon,
                 visualTransformation = visualTransformation,
                 keyboardOptions = keyboardOptions,
                 keyboardActions = keyboardActions,
                 interactionSource = interactionSource,
-                colors = TextFieldDefaults.colors().copy(
-                    focusedTextColor = defaultColor,
-                    disabledTextColor = disabledColor,
-                    unfocusedTextColor = defaultColor,
-                    errorTextColor = defaultColor,
-                    focusedContainerColor = ColorGray.White,
-                    disabledContainerColor = ColorGray.White,
-                    unfocusedContainerColor = ColorGray.White,
-                    errorContainerColor = ColorGray.White,
-                    cursorColor = ColorPrimary.Primary_500,
-                    errorCursorColor = errorColor,
-                    textSelectionColors = TextSelectionColors(
-                        handleColor = if (isError) errorColor else ColorPrimary.Primary_500,
-                        backgroundColor = ColorPrimary.Primary_200
-                    ),
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent,
-                    disabledIndicatorColor = Color.Transparent,
-                    errorIndicatorColor = Color.Transparent,
-                    focusedLabelColor = defaultColor,
-                    unfocusedLabelColor = defaultColor,
-                    disabledLabelColor = disabledColor,
-                    errorLabelColor = defaultColor,
-                    focusedPlaceholderColor = placeholderColor,
-                    unfocusedPlaceholderColor = placeholderColor,
-                    disabledPlaceholderColor = placeholderColor,
-                    errorPlaceholderColor = placeholderColor,
-                    focusedSupportingTextColor = placeholderColor,
-                    unfocusedSupportingTextColor = placeholderColor,
-                    disabledSupportingTextColor = disabledColor,
-                    errorSupportingTextColor = errorColor,
-                )
+                textStyle = Typography().bodyLarge.copy(
+                    color = if (enabled.not()) disabledColor else defaultColor,
+                ),
+                cursorBrush = SolidColor(if (isError) errorColor else ColorPrimary.Primary_500),
+                decorationBox = { innerTextField ->
+                    TextFieldDefaults.DecorationBox(
+                        value = value.text,
+                        innerTextField = innerTextField,
+                        enabled = enabled,
+                        singleLine = true,
+                        visualTransformation = visualTransformation,
+                        interactionSource = interactionSource,
+                        isError = isError,
+                        placeholder = placeholder?.let {
+                            {
+                                WMText(
+                                    text = it,
+                                    style = Typography().bodyLarge
+                                )
+                            }
+                        },
+                        suffix = suffix,
+                        trailingIcon = trailingIcon,
+                        shape = TextFieldDefaults.shape,
+                        colors = colors,
+                        contentPadding = PaddingValues(
+                            vertical = 12.dp,
+                            horizontal = 0.dp
+                        ),
+                        container = {
+                            TextFieldDefaults.Container(
+                                enabled = enabled,
+                                isError = isError,
+                                interactionSource = interactionSource,
+                                colors = colors,
+                                shape = TextFieldDefaults.shape,
+                            )
+                        }
+
+                    )
+                }
             )
             if (onReadOnlyClick != null) {
                 Box(
@@ -259,21 +253,29 @@ fun WMTextField(
                         }
                 )
             }
-            Spacer(
+        }
+
+        Row(
+            modifier = Modifier
+                .padding(top = 4.dp)
+                .fillMaxWidth()
+                .heightIn(min = 14.dp),
+        ) {
+            WMText(
+                text = supportingText.default(),
+                style = Typography().bodyMedium.copy(color = placeholderColor),
                 modifier = Modifier
-                    .padding(top = height)
-                    .fillMaxWidth()
-                    .height(1.dp)
-                    .background(
-                        when {
-                            enabled.not() -> disabledColor
-                            isError -> errorColor
-                            isFocused -> ColorPrimary.Primary_500
-                            value.text.isNotEmpty() -> ColorGray.Gray_500
-                            else -> placeholderColor
-                        }
-                    )
+                    .weight(1f)
+                    .padding(end = 4.dp)
             )
+
+            if (isCount) {
+                WMText(
+                    text = "${value.text.length}/$maxLength",
+                    style = Typography().bodyMedium.copy(color = placeholderColor)
+                )
+            }
+            supportingContent?.invoke()
         }
     }
 }
