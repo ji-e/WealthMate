@@ -153,8 +153,6 @@ fun WMTextField(
         errorSupportingTextColor = errorColor,
     )
 
-    var height by remember { mutableStateOf(60.dp) }
-
     Column(modifier = modifier) {
         label?.let {
             Row(
@@ -226,7 +224,7 @@ fun WMTextField(
                         shape = TextFieldDefaults.shape,
                         colors = colors,
                         contentPadding = PaddingValues(
-                            vertical = 12.dp,
+                            vertical = 10.dp,
                             horizontal = 0.dp
                         ),
                         container = {
@@ -246,7 +244,7 @@ fun WMTextField(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(height)
+                        .height(44.dp)
                         .clickable {
                             focusRequester.requestFocus()
                             onReadOnlyClick()
