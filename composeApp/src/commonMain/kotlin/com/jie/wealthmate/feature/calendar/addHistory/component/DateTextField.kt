@@ -1,4 +1,4 @@
-package com.jie.wealthmate.feature.calendar.component.addHistory.component
+package com.jie.wealthmate.feature.calendar.addHistory.component
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -13,7 +13,7 @@ import com.jie.wealthmate.component.ButtonSize
 import com.jie.wealthmate.component.ButtonStyle
 import com.jie.wealthmate.component.WMButton
 import com.jie.wealthmate.component.textField.WMTextField
-import com.jie.wealthmate.feature.calendar.component.addHistory.component.RepeatCycleEnum.Companion.formattedDescription
+import com.jie.wealthmate.feature.calendar.addHistory.component.RepeatCycleEnum.Companion.formattedDescription
 import com.jie.wealthmate.feature.menu.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.theme.WMTheme
 import com.jie.wealthmate.utils.convertLocalDateToString

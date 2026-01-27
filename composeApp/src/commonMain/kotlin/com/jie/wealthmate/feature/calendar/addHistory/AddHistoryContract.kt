@@ -1,4 +1,4 @@
-package com.jie.wealthmate.feature.calendar.component.addHistory
+package com.jie.wealthmate.feature.calendar.addHistory
 
 import androidx.compose.ui.text.input.TextFieldValue
 import com.jie.wealthmate.base.BaseUiState

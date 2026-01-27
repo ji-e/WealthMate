@@ -1,4 +1,4 @@
-package com.jie.wealthmate.feature.calendar.component.addHistory.component
+package com.jie.wealthmate.feature.calendar.addHistory.component
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row

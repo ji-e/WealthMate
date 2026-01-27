@@ -1,6 +1,6 @@
 @file:OptIn(InternalVoyagerApi::class)
 
-package com.jie.wealthmate.feature.calendar.component.addHistory
+package com.jie.wealthmate.feature.calendar.addHistory
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -25,10 +25,10 @@ import com.jie.wealthmate.component.textField.WMTextField
 import com.jie.wealthmate.component.textField.rememberIntegerVisualTransformation
 import com.jie.wealthmate.component.textField.toIntegerTextFieldValue
 import com.jie.wealthmate.component.topbar.TopBarItem
-import com.jie.wealthmate.feature.calendar.component.addHistory.component.CategoryTextField
-import com.jie.wealthmate.feature.calendar.component.addHistory.component.DateTextField
-import com.jie.wealthmate.feature.calendar.component.addHistory.component.LargeCategorySelectBox
-import com.jie.wealthmate.feature.calendar.component.addHistory.component.PaymentMethodTextField
+import com.jie.wealthmate.feature.calendar.addHistory.component.CategoryTextField
+import com.jie.wealthmate.feature.calendar.addHistory.component.DateTextField
+import com.jie.wealthmate.feature.calendar.addHistory.component.LargeCategorySelectBox
+import com.jie.wealthmate.feature.calendar.addHistory.component.PaymentMethodTextField
 import com.jie.wealthmate.theme.WMTheme
 import com.jie.wealthmate.utils.today
 import com.jie.wealthmate.vo.CategoryTagVo
