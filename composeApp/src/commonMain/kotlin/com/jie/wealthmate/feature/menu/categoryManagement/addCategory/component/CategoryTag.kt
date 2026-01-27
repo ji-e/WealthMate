@@ -69,14 +69,15 @@ fun CategoryTag(
             isCount = true,
             keyboardActions = KeyboardActions(
                 onDone = { onChipAdd(tagLabel) }
-            )
-        )
-
-        CategoryTagItem(
-            modifier = Modifier.padding(top = 12.dp),
-            trailingIcon = trailingIcon,
-            chipItems = tagLabelItems,
-            onChipClick = onChipClick
+            ),
+            supportingContent = {
+                CategoryTagItem(
+                    modifier = Modifier.padding(top = 4.dp),
+                    trailingIcon = trailingIcon,
+                    chipItems = tagLabelItems,
+                    onChipClick = onChipClick
+                )
+            }
         )
     }
 }
