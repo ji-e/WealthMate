@@ -3,7 +3,10 @@
 package com.jie.wealthmate.feature.calendar.addHistory
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -21,6 +24,8 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import cafe.adriel.voyager.navigator.internal.BackHandler
 import com.jie.wealthmate.base.BaseScreen
+import com.jie.wealthmate.component.ButtonSize
+import com.jie.wealthmate.component.WMFloatingButton
 import com.jie.wealthmate.component.WMText
 import com.jie.wealthmate.component.textField.WMTextField
 import com.jie.wealthmate.component.textField.rememberIntegerVisualTransformation
@@ -44,7 +49,7 @@ class AddHistoryScreen() : BaseScreen() {
 
 
         fun onBack() {
-            showSaveBackDialog(uiState.isChangedData) {
+            showSaveBackDialog(uiState.isDataChanged) {
                 navigator.pop()
             }
         }
@@ -61,82 +66,95 @@ class AddHistoryScreen() : BaseScreen() {
                 )
             }
         }
+        Column(modifier = Modifier.fillMaxSize().imePadding()) {
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = 20.dp)
+                    .verticalScroll(rememberScrollState())
+            ) {
+                // 수입, 지출, 저출 카테고리 선택
+                LargeCategorySelectBox(
+                    modifier = Modifier.padding(top = 8.dp)
+                )
 
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .imePadding()
-                .padding(horizontal = 20.dp)
-                .verticalScroll(rememberScrollState())
-        ) {
-            // 수입, 지출, 저출 카테고리 선택
-            LargeCategorySelectBox(
-                modifier = Modifier.padding(top=8.dp)
-            )
+                // 날짜 선택
+                DateTextField(
+                    modifier = Modifier.padding(top = 24.dp),
+                    date = today,
+                    installmentCount = 3,
+                    onDateClick = {},
+                    onRepeatClick = {},
+                    onInstallmentClick = {}
+                )
 
-            // 날짜 선택
-            DateTextField(
-                modifier = Modifier.padding(top = 24.dp),
-                date = today,
-                installmentCount = 3,
-                onDateClick = {},
-                onRepeatClick = {},
-                onInstallmentClick = {}
-            )
+                // 금액 입력
+                WMTextField(
+                    modifier = Modifier.padding(top = 20.dp),
+                    value = uiState.amount,
+                    onValueChange = {
+                        screenModel.updateAmount(it.toIntegerTextFieldValue())
+                    },
+                    label = "금액",
+                    isRequire = true,
+                    maxLength = 10,
+                    placeholder = "금액을 입력해 주세요.",
+                    suffix = {
+                        WMText(
+                            text = "원",
+                            style = Typography().bodyLarge.copy(fontWeight = FontWeight.SemiBold)
+                        )
+                    },
+                    visualTransformation = rememberIntegerVisualTransformation(),
+                )
 
-            // 금액 입력
-            WMTextField(
-                modifier = Modifier.padding(top = 20.dp),
-                value = uiState.amount,
-                onValueChange = {
-                    screenModel.updateAmount(it.toIntegerTextFieldValue())
-                },
-                label = "금액",
-                isRequire = true,
-                maxLength = 10,
-                placeholder = "금액을 입력해 주세요.",
-                suffix = {
-                    WMText(
-                        text = "원",
-                        style = Typography().bodyLarge.copy(fontWeight = FontWeight.SemiBold)
-                    )
-                },
-                visualTransformation = rememberIntegerVisualTransformation(),
-            )
-
-            // 카테고리 선택
-            CategoryTextField(
-                tagLabelItems = listOf(
-                    CategoryTagVo(
+                // 카테고리 선택
+                CategoryTextField(
+                    tagLabelItems = listOf(
+                        CategoryTagVo(
+                            id = "0",
+                            label = "외식"
+                        ),
+                        CategoryTagVo(
+                            id = "1",
+                            label = "배달"
+                        )
+                    ),
+                    selectedTagLabel = CategoryTagVo(
                         id = "0",
                         label = "외식"
-                    ),
-                    CategoryTagVo(
-                        id = "1",
-                        label = "배달"
                     )
-                ),
-                selectedTagLabel = CategoryTagVo(
-                    id = "0",
-                    label = "외식"
                 )
+
+                // 결제수단/자산 선택
+                PaymentMethodTextField(
+                    modifier = Modifier.padding(top = 24.dp),
+                )
+
+                // 내용 입력
+                WMTextField(
+                    value = uiState.content,
+                    onValueChange = screenModel::updateContent,
+                    label = "내용",
+                    maxLength = 20,
+                    placeholder = "내용을 입력해 주세요.",
+                )
+
+                Spacer(modifier = Modifier.height(32.dp))
+
+            }
+
+            // 저장 버튼
+            WMFloatingButton(
+                text = "저장",
+                buttonSize = ButtonSize.LARGE,
+                modifier = Modifier
+                    .padding(horizontal = 20.dp)
+                    .padding(bottom = 20.dp)
+                    .fillMaxWidth(),
+                enabled = uiState.isSaveButtonEnable,
+                onClick = screenModel::saveHistory
             )
-
-            // 결제수단/자산 선택
-            PaymentMethodTextField(
-                modifier = Modifier.padding(top = 24.dp),
-            )
-
-            // 내용 입력
-            WMTextField(
-                value = uiState.content,
-                onValueChange = screenModel::updateContent,
-                label = "내용",
-                maxLength = 20,
-                placeholder = "내용을 입력해 주세요.",
-            )
-
-
         }
     }
 }

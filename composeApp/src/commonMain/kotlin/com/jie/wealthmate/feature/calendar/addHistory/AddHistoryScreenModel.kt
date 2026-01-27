@@ -23,4 +23,8 @@ class AddHistoryScreenModel() : BaseScreenModel<AddHistoryUiState>() {
             )
         }
     }
+
+    fun saveHistory() {
+        // todo
+    }
 }

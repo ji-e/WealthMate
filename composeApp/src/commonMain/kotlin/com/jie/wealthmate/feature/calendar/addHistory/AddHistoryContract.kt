@@ -5,10 +5,12 @@ import com.jie.wealthmate.base.BaseUiState
 import com.jie.wealthmate.base.UiSideEffect
 
 data class AddHistoryUiState(
-    val isChangedData: Boolean = false,
+    val isDataChanged: Boolean = false,
     val content: TextFieldValue = TextFieldValue(""),
     val amount: TextFieldValue = TextFieldValue(""),
-) : BaseUiState
+) : BaseUiState {
+    val isSaveButtonEnable = amount.text.isNotBlank()
+}
 
 sealed class AddHistoryUiSideEffect : UiSideEffect {
 
