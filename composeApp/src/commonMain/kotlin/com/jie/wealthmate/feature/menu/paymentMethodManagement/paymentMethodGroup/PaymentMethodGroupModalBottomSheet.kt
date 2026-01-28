@@ -18,6 +18,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import cafe.adriel.voyager.core.annotation.InternalVoyagerApi
+import cafe.adriel.voyager.navigator.internal.BackHandler
 import com.jie.wealthmate.component.ButtonSize
 import com.jie.wealthmate.component.ButtonStyle
 import com.jie.wealthmate.component.WMButton
@@ -35,6 +37,7 @@ import wealthmate.composeapp.generated.resources.Res
 import wealthmate.composeapp.generated.resources.ic_add
 import wealthmate.composeapp.generated.resources.ic_delete
 
+@InternalVoyagerApi
 @Composable
 fun PaymentMethodGroupModalBottomSheet(
     selectedPaymentMethodGroup: PaymentMethodGroupItemData? = null,
@@ -89,6 +92,11 @@ fun PaymentMethodGroupModalBottomSheet(
         },
         onDismissRequest = onDismissRequest,
     ) {
+        BackHandler(enabled = isAdd || isModify) {
+            isAdd = false
+            isModify = false
+        }
+
         Column(
             modifier = Modifier.padding(bottom = 20.dp)
         ) {
