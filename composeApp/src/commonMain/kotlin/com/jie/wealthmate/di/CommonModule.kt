@@ -28,7 +28,7 @@ val commonModule = module {
 
     // 캘린더
     factory { CalendarScreenModel() }
-    factory { AddHistoryScreenModel() }
+    factory { AddHistoryScreenModel(get(), get()) }
 
     // 자산
     factory { AssetScreenModel() }
