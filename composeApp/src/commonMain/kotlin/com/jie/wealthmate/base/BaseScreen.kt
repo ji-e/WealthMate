@@ -12,6 +12,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -30,6 +31,16 @@ import kotlin.jvm.Transient
 
 abstract class BaseScreen : Screen {
     @Transient
+    var isShowConfirmDialog = mutableStateOf(false)
+
+    @Transient
+    var confirmContent = mutableStateOf("")
+
+    @Transient
+    var confirmDialogButtonLabel: MutableState<Pair<String?, String>> = mutableStateOf("취소" to "확인")
+
+
+    @Transient
     var isShowSaveBackDialog = mutableStateOf(false)
 
     @Transient
@@ -37,6 +48,19 @@ abstract class BaseScreen : Screen {
 
     @Transient
     var confirmCallback = mutableStateOf({})
+
+    fun showConfirmDialog(
+        isShow: Boolean,
+        content: String,
+        confirmLabel: String = "확인",
+        cancelLabel: String? = "취소",
+        callback: () -> Unit,
+    ) {
+        isShowConfirmDialog.value = isShow
+        confirmContent.value = content
+        confirmDialogButtonLabel.value = cancelLabel to confirmLabel
+        confirmCallback.value = callback
+    }
 
     fun showSaveBackDialog(
         isShow: Boolean,
@@ -63,6 +87,15 @@ abstract class BaseScreen : Screen {
     @Composable
     override fun Content() {
 
+        if (isShowConfirmDialog.value) {
+            BaseDialog(
+                contentText = confirmContent.value,
+                cancelLabel = confirmDialogButtonLabel.value.first,
+                confirmLabel = confirmDialogButtonLabel.value.second,
+                onDismissRequest = { isShowConfirmDialog.value = false }
+            )
+        }
+
         if (isShowSaveBackDialog.value) {
             BaseDialog(
                 contentText = "저장되지 않았습니다.\n이전 화면으로 돌아갈까요?",
@@ -84,7 +117,7 @@ abstract class BaseScreen : Screen {
     private fun BaseDialog(
         contentText: String,
         confirmLabel: String = "확인",
-        cancelLabel: String = "취소",
+        cancelLabel: String? = "취소",
         confirmColor: Color = ColorPrimary.Primary_500,
         onDismissRequest: () -> Unit,
     ) {
@@ -112,20 +145,22 @@ abstract class BaseScreen : Screen {
                     )
                 }
                 Row {
-                    Box(
-                        modifier = Modifier
-                            .height(60.dp)
-                            .weight(1f)
-                            .background(ColorGray.Gray_50)
-                            .clickable {
-                                onDismissRequest()
-                            },
-                        contentAlignment = Alignment.Center
-                    ) {
-                        WMText(
-                            text = cancelLabel,
-                            style = Typography().titleMedium.copy(fontWeight = FontWeight.Medium),
-                        )
+                    cancelLabel?.let {
+                        Box(
+                            modifier = Modifier
+                                .height(60.dp)
+                                .weight(1f)
+                                .background(ColorGray.Gray_50)
+                                .clickable {
+                                    onDismissRequest()
+                                },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            WMText(
+                                text = cancelLabel,
+                                style = Typography().titleMedium.copy(fontWeight = FontWeight.Medium),
+                            )
+                        }
                     }
                     Box(
                         modifier = Modifier
