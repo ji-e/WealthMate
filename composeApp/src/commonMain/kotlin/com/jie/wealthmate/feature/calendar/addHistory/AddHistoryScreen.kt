@@ -133,7 +133,11 @@ class AddHistoryScreen() : BaseScreen() {
                     installmentCount = uiState.installmentCount,
                     onDateClick = { isShowDateSelectModalBottomSheet = true },
                     onRepeatClick = { isShowRepeatCycleModalBottomSheet = true },
-                    onInstallmentClick = { isShowInstallmentModalBottomSheet = true }
+                    onInstallmentClick = { isShowInstallmentModalBottomSheet = true },
+                    onResetClick = {
+                        screenModel.updateRepeatCycle(null)
+                        screenModel.updateInstallmentCount(null)
+                    }
                 )
 
                 // 금액 입력

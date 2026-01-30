@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -19,6 +18,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.jie.wealthmate.component.WMIconButton
 import com.jie.wealthmate.component.WMText
 import com.jie.wealthmate.component.textField.WMTextField
 import com.jie.wealthmate.feature.calendar.addHistory.component.RepeatCycleEnum.Companion.formattedDescription
@@ -33,6 +33,7 @@ import com.jie.wealthmate.utils.today
 import kotlinx.datetime.LocalDate
 import org.jetbrains.compose.resources.painterResource
 import wealthmate.composeapp.generated.resources.Res
+import wealthmate.composeapp.generated.resources.ic_close_circle
 import wealthmate.composeapp.generated.resources.ic_percent
 import wealthmate.composeapp.generated.resources.ic_repeat
 
@@ -47,6 +48,7 @@ fun DateTextField(
     onDateClick: () -> Unit = {},
     onRepeatClick: () -> Unit = {},
     onInstallmentClick: () -> Unit = {},
+    onResetClick: () -> Unit = {},
 ) {
     Box(modifier = modifier) {
         WMTextField(
@@ -73,12 +75,22 @@ fun DateTextField(
 
                     else -> ""
                 }
+                Row {
+                    WMText(
+                        text = supportingText,
+                        style = Typography().bodyMedium.copy(color = ColorGray.Gray_500),
+                        modifier = Modifier.weight(1f)
+                    )
 
-                WMText(
-                    text = supportingText,
-                    style = Typography().bodyMedium.copy(color = ColorGray.Gray_500),
-                    modifier = Modifier.fillMaxWidth()
-                )
+                    if (supportingText.isNotEmpty()) {
+                        WMIconButton(
+                            iconButtonModifier = Modifier.size(20.dp),
+                            iconRes = Res.drawable.ic_close_circle,
+                            tint = ColorGray.Gray_400,
+                            onClick = onResetClick
+                        )
+                    }
+                }
             },
         )
 

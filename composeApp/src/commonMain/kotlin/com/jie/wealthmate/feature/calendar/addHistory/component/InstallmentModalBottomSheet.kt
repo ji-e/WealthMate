@@ -33,6 +33,7 @@ fun InstallmentModalBottomSheet(
     }
 
     WMModalBottomSheet(
+        title = "할부 기간",
         onDismissRequest = onDismissRequest,
     ) {
         Column(
@@ -44,7 +45,6 @@ fun InstallmentModalBottomSheet(
                 value = tempInstallmentCount,
                 onValueChange = { tempInstallmentCount = it },
                 maxLength = 2,
-                label = "할부 기간",
                 placeholder = "할부 기간을 입력해주세요.",
                 suffix = {
                     WMText(
