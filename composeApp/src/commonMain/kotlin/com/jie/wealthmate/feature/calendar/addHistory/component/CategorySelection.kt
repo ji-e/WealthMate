@@ -36,10 +36,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.jie.wealthmate.component.WMText
+import com.jie.wealthmate.feature.menu.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.theme.ColorGray
 import com.jie.wealthmate.theme.ColorPrimary
 import com.jie.wealthmate.theme.ColorRed
 import com.jie.wealthmate.theme.noRippleClickable
+import com.jie.wealthmate.utils.default
 import com.jie.wealthmate.vo.CategoryTagVo
 import com.jie.wealthmate.vo.CategoryVo
 import org.jetbrains.compose.resources.painterResource
@@ -222,6 +224,7 @@ fun CategorySelectionAllTagColumn(
 fun CategorySelectionRow(
     modifier: Modifier = Modifier,
     categoryItems: List<CategoryVo>,
+    selectedLargeCategory: LargeCategoryEnum,
     selectedCategory: CategoryVo?,
     selectedCategoryTag: CategoryTagVo?,
     onCategoryClick: (CategoryVo) -> Unit,
@@ -252,6 +255,8 @@ fun CategorySelectionRow(
                 return
             }
 
+
+
             LazyRow(
                 contentPadding = PaddingValues(
                     start = 16.dp,
@@ -274,6 +279,9 @@ fun CategorySelectionRow(
                     )
                 }
             }
+
+
+
             Spacer(
                 modifier = Modifier
                     .height(1.dp)
@@ -281,32 +289,38 @@ fun CategorySelectionRow(
                     .background(ColorGray.Gray_100)
             )
 
-            FlowRow(
+            LazyRow(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(20.dp),
+                    .height(60.dp)
+                    .padding(horizontal = 20.dp),
                 horizontalArrangement = Arrangement.spacedBy(4.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                selectedCategory?.tags?.forEach { item ->
-                    val isSelectedTag = selectedCategoryTag?.id == item.id
+                if (selectedLargeCategory != selectedCategory?.largeCategory) return@LazyRow
+
+                items(
+                    count = selectedCategory?.tags?.size.default(),
+                    key = { index -> selectedCategory?.tags?.get(index)?.id.default() }
+                ) {
+                    val tag = selectedCategory?.tags?.get(it) ?: return@items
+                    val isSelectedTag = selectedCategoryTag?.id == tag.id
 
                     Box(
                         modifier = Modifier
                             .clip(CircleShape)
                             .background(color = if (isSelectedTag) ColorPrimary.Primary_500 else ColorGray.White)
-                            .clickable { onCategoryTagClick(item) }
+                            .clickable { onCategoryTagClick(tag) }
                             .padding(horizontal = 8.dp, vertical = 4.dp),
                         contentAlignment = Alignment.Center
                     ) {
                         WMText(
-                            text = item.label,
+                            text = tag.label,
                             style = Typography().labelMedium.copy(color = if (isSelectedTag) ColorGray.White else ColorGray.Gray_700)
                         )
                     }
                 }
             }
-
         }
     }
 }

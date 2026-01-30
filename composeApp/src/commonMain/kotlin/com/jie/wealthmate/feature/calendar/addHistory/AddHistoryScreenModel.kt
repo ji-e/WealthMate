@@ -22,13 +22,13 @@ class AddHistoryScreenModel(
         getPaymentMethods()
     }
 
-    fun updateLargeCategory(largeCategoryEnum: LargeCategoryEnum){
+    fun updateLargeCategory(largeCategory: LargeCategoryEnum){
         reduceState { state ->
             state.copy(
-                largeCategoryEnum = largeCategoryEnum
+                selectedLargeCategory = largeCategory
             )
         }
-        getCategories(largeCategoryEnum)
+        getCategories(largeCategory)
     }
 
     fun updateAmount(amount: TextFieldValue) {

@@ -22,7 +22,7 @@ import com.jie.wealthmate.theme.ColorPrimary
 @Composable
 fun LargeCategorySelectBox(
     modifier: Modifier = Modifier,
-    selectedLargeCategoryEnum: LargeCategoryEnum,
+    selectedLargeCategory: LargeCategoryEnum,
     onLargeCategoryClick : (LargeCategoryEnum) -> Unit,
 ) {
     Row(
@@ -33,7 +33,7 @@ fun LargeCategorySelectBox(
     ) {
         LargeCategoryEnum.entries.forEach {
             LargeCategoryButton(
-                isSelected = selectedLargeCategoryEnum == it,
+                isSelected = selectedLargeCategory == it,
                 text = it.label,
                 onClick = { onLargeCategoryClick(it) }
             )

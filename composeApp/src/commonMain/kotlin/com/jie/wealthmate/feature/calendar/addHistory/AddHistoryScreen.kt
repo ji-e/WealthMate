@@ -42,6 +42,7 @@ import com.jie.wealthmate.feature.calendar.addHistory.component.CategorySelectio
 import com.jie.wealthmate.feature.calendar.addHistory.component.DateTextField
 import com.jie.wealthmate.feature.calendar.addHistory.component.LargeCategorySelectBox
 import com.jie.wealthmate.feature.calendar.addHistory.component.PaymentMethodTextField
+import com.jie.wealthmate.feature.menu.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.theme.WMTheme
 import com.jie.wealthmate.utils.today
 import org.koin.compose.koinInject
@@ -81,7 +82,7 @@ class AddHistoryScreen() : BaseScreen() {
                 ),
                 trailingCustomItem = if (isLargeCategoryVisible) {
                     TopBarItem.TrailingCustomItem {
-                        val selectedLargeCategoryEnum = uiState.largeCategoryEnum
+                        val selectedLargeCategoryEnum = uiState.selectedLargeCategory
                         WMText(
                             text = selectedLargeCategoryEnum.label,
                             style = Typography().labelMedium.copy(fontWeight = FontWeight.SemiBold),
@@ -110,7 +111,7 @@ class AddHistoryScreen() : BaseScreen() {
                 // 수입, 지출, 저출 카테고리 선택
                 LargeCategorySelectBox(
                     modifier = Modifier.padding(top = 8.dp),
-                    selectedLargeCategoryEnum = uiState.largeCategoryEnum,
+                    selectedLargeCategory = uiState.selectedLargeCategory,
                     onLargeCategoryClick = screenModel::updateLargeCategory
                 )
 
@@ -157,18 +158,20 @@ class AddHistoryScreen() : BaseScreen() {
 //                    selectedCategoryTag = uiState.categoryItems.firstOrNull()?.tags?.firstOrNull(), // todo temp
 //                )
 
-                CategorySelectionRow(
-                    categoryItems = uiState.categoryItems,
-                    selectedCategory = uiState.category,
-                    selectedCategoryTag = uiState.categoryTag,
-                    onCategoryClick = screenModel:: updateCategory,
-                    onCategoryTagClick = screenModel:: updateCategoryTag
-                )
+                if (uiState.selectedLargeCategory != LargeCategoryEnum.TRANSFER) {
+                    CategorySelectionRow(
+                        modifier = Modifier.padding(bottom = 24.dp),
+                        categoryItems = uiState.categoryItems,
+                        selectedLargeCategory = uiState.selectedLargeCategory,
+                        selectedCategory = uiState.category,
+                        selectedCategoryTag = uiState.categoryTag,
+                        onCategoryClick = screenModel::updateCategory,
+                        onCategoryTagClick = screenModel::updateCategoryTag
+                    )
+                }
 
                 // 결제수단/자산 선택
-                PaymentMethodTextField(
-                    modifier = Modifier.padding(top = 24.dp),
-                )
+                PaymentMethodTextField()
 
                 // 내용 입력
                 WMTextField(
