@@ -41,7 +41,7 @@ import com.jie.wealthmate.component.textField.rememberIntegerVisualTransformatio
 import com.jie.wealthmate.component.textField.toIntegerTextFieldValue
 import com.jie.wealthmate.component.topbar.TopBarItem
 import com.jie.wealthmate.feature.calendar.addHistory.component.CategorySelectModalBottomSheet
-import com.jie.wealthmate.feature.calendar.addHistory.component.CategorySelectionAllTagColumn
+import com.jie.wealthmate.feature.calendar.addHistory.component.CategorySelectionRow
 import com.jie.wealthmate.feature.calendar.addHistory.component.DateTextField
 import com.jie.wealthmate.feature.calendar.addHistory.component.LargeCategorySelectBox
 import com.jie.wealthmate.feature.calendar.addHistory.component.PaymentMethodTextField
@@ -153,16 +153,17 @@ class AddHistoryScreen() : BaseScreen() {
 //                    onCategoryClick = { isShowCategorySelectModalBottomSheet = true }
 //                )
 
-//                CategorySelectionColumn(
+//                CategorySelectionAllTagColumn(
 //                    categoryItems = uiState.categoryItems,
 //                    selectedCategory = uiState.categoryItems.firstOrNull(), // todo temp
 //                    selectedCategoryTag = uiState.categoryItems.firstOrNull()?.tags?.firstOrNull(), // todo temp
 //                )
 
-                CategorySelectionAllTagColumn(
+                CategorySelectionRow(
                     categoryItems = uiState.categoryItems,
-                    selectedCategory = uiState.categoryItems.firstOrNull(), // todo temp
-                    selectedCategoryTag = uiState.categoryItems.firstOrNull()?.tags?.firstOrNull(), // todo temp
+                    selectedCategory = uiState.category,
+                    selectedCategoryTag = uiState.categoryTag,
+                    onCategoryClick = screenModel:: updateCategory
                 )
 
                 // 결제수단/자산 선택

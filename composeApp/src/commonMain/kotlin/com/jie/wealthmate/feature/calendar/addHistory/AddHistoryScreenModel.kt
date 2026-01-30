@@ -30,6 +30,14 @@ class AddHistoryScreenModel(
         }
     }
 
+    fun updateCategory(category: CategoryVo){
+        reduceState { state ->
+            state.copy(
+                category = category
+            )
+        }
+    }
+
     fun updateContent(content: TextFieldValue) {
         reduceState { state ->
             state.copy(

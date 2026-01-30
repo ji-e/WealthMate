@@ -224,6 +224,7 @@ fun CategorySelectionRow(
     categoryItems: List<CategoryVo>,
     selectedCategory: CategoryVo?,
     selectedCategoryTag: CategoryTagVo?,
+    onCategoryClick: (CategoryVo) -> Unit,
 ) {
     Column(modifier = modifier) {
         WMText(
@@ -254,7 +255,7 @@ fun CategorySelectionRow(
                     CategorySelectionItem(
                         modifier = Modifier
                             .size(70.dp)
-                            .noRippleClickable { },
+                            .noRippleClickable { onCategoryClick(category)},
                         category = category,
                         isSelectedCategory = category.id == selectedCategory?.id,
                     )
