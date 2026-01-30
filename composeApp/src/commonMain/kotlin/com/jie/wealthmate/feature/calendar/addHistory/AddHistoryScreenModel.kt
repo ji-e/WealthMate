@@ -27,6 +27,7 @@ class AddHistoryScreenModel(
     fun updateLargeCategory(largeCategory: LargeCategoryEnum) {
         reduceState { state ->
             state.copy(
+                isDataChanged = true,
                 selectedLargeCategory = largeCategory
             )
         }
@@ -36,6 +37,7 @@ class AddHistoryScreenModel(
     fun updateDate(date: LocalDate) {
         reduceState { state ->
             state.copy(
+                isDataChanged = true,
                 date = date
             )
         }
@@ -44,6 +46,7 @@ class AddHistoryScreenModel(
     fun updateRepeatCycle(repeatCycle: RepeatCycleEnum?) {
         reduceState { state ->
             state.copy(
+                isDataChanged = true,
                 repeatCycle = repeatCycle
             )
         }
@@ -52,6 +55,7 @@ class AddHistoryScreenModel(
     fun updateInstallmentCount(installmentCount: Int?) {
         reduceState { state ->
             state.copy(
+                isDataChanged = true,
                 installmentCount = installmentCount
             )
         }
@@ -60,6 +64,7 @@ class AddHistoryScreenModel(
     fun updateAmount(amount: TextFieldValue) {
         reduceState { state ->
             state.copy(
+                isDataChanged = true,
                 amount = amount
             )
         }
@@ -68,6 +73,7 @@ class AddHistoryScreenModel(
     fun updateCategory(category: CategoryVo) {
         reduceState { state ->
             state.copy(
+                isDataChanged = true,
                 category = category
             )
         }
@@ -76,6 +82,7 @@ class AddHistoryScreenModel(
     fun updateCategoryTag(categoryTag: CategoryTagVo) {
         reduceState { state ->
             state.copy(
+                isDataChanged = true,
                 categoryTag = categoryTag
             )
         }
@@ -84,6 +91,7 @@ class AddHistoryScreenModel(
     fun updateContent(content: TextFieldValue) {
         reduceState { state ->
             state.copy(
+                isDataChanged = true,
                 content = content
             )
         }

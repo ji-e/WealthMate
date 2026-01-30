@@ -56,6 +56,8 @@ import org.koin.compose.koinInject
 class AddHistoryScreen() : BaseScreen() {
     @Composable
     override fun Content() {
+        super.Content()
+
         val navigator = LocalNavigator.currentOrThrow
         val screenModel: AddHistoryScreenModel = koinInject()
         val uiState by screenModel.container.uiState.collectAsState()
@@ -132,8 +134,34 @@ class AddHistoryScreen() : BaseScreen() {
                     repeatCycle = uiState.repeatCycle,
                     installmentCount = uiState.installmentCount,
                     onDateClick = { isShowDateSelectModalBottomSheet = true },
-                    onRepeatClick = { isShowRepeatCycleModalBottomSheet = true },
-                    onInstallmentClick = { isShowInstallmentModalBottomSheet = true },
+                    onRepeatClick = {
+                        if (uiState.installmentCount != null) {
+                            showConfirmDialog(
+                                isShow = true,
+                                content = "할부가 선택되어있습니다.\n할부 선택을 취소하시겠습니까?",
+                                callback = {
+                                    screenModel.updateInstallmentCount(null)
+                                    isShowRepeatCycleModalBottomSheet = true
+                                }
+                            )
+                        } else {
+                            isShowRepeatCycleModalBottomSheet = true
+                        }
+                    },
+                    onInstallmentClick = {
+                        if (uiState.repeatCycle != null) {
+                            showConfirmDialog(
+                                isShow = true,
+                                content = "반복 주기가 선택되어있습니다.\n반복 주기 선택을 취소하시겠습니까?",
+                                callback = {
+                                    screenModel.updateRepeatCycle(null)
+                                    isShowInstallmentModalBottomSheet = true
+                                }
+                            )
+                        } else {
+                            isShowInstallmentModalBottomSheet = true
+                        }
+                    },
                     onResetClick = {
                         screenModel.updateRepeatCycle(null)
                         screenModel.updateInstallmentCount(null)
