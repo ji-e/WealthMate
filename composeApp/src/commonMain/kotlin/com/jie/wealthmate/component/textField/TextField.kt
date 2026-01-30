@@ -18,7 +18,10 @@ import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -60,14 +63,21 @@ fun WMTextField(
     keyboardActions: KeyboardActions = KeyboardActions.Default,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
 ) {
+    var textFieldValueState by remember {
+        mutableStateOf(
+            TextFieldValue(
+                text = value,
+                selection = TextRange(value.length)
+            )
+        )
+    }
+
     WMTextField(
         modifier = modifier,
         textFieldModifier = textFieldModifier,
-        value = TextFieldValue(
-            text = value.default(),
-            selection = TextRange(value.length)
-        ),
+        value = textFieldValueState,
         onValueChange = {
+            textFieldValueState = it
             onValueChange(it.text)
         },
         maxLength = maxLength,
