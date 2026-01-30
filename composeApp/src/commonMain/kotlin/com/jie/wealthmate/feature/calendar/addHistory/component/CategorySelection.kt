@@ -32,6 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.jie.wealthmate.component.WMText
@@ -121,7 +122,6 @@ fun CategorySelectionColumn(
                     }
                 }
             }
-
         }
     }
 }
@@ -240,6 +240,18 @@ fun CategorySelectionRow(
                 .clip(RoundedCornerShape(8.dp))
                 .background(ColorGray.Gray_50)
         ) {
+            if (categoryItems.isEmpty()) {
+                WMText(
+                    text = "카테고리가 없습니다.",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    textAlign = TextAlign.Center,
+                    style = Typography().bodyMedium.copy(color = ColorGray.Gray_500)
+                )
+                return
+            }
+
             LazyRow(
                 contentPadding = PaddingValues(
                     start = 16.dp,
