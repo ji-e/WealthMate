@@ -88,6 +88,15 @@ class AddHistoryScreenModel(
         }
     }
 
+    fun updatePaymentMethod(paymentMethod: PaymentMethodVo?) {
+        reduceState { state ->
+            state.copy(
+                isDataChanged = true,
+                paymentMethod = paymentMethod
+            )
+        }
+    }
+
     fun updateContent(content: TextFieldValue) {
         reduceState { state ->
             state.copy(

@@ -21,6 +21,7 @@ data class AddHistoryUiState(
     val amount: TextFieldValue = TextFieldValue(""),
     val category: CategoryVo? = null,
     val categoryTag: CategoryTagVo? = null,
+    val paymentMethod: PaymentMethodVo? = null,
     val categoryItems: List<CategoryVo> = emptyList(),
     val paymentMethodItems: List<PaymentMethodVo> = emptyList(),
 ) : BaseUiState {
