@@ -10,7 +10,6 @@ import com.jie.wealthmate.feature.menu.categoryManagement.component.LargeCategor
 import com.jie.wealthmate.repository.CategoryRepository
 import com.jie.wealthmate.utils.default
 import com.jie.wealthmate.vo.CategoryTagVo
-import kotlinx.coroutines.delay
 
 class ModifyCategoryScreenModel(
     private val categoryRepository: CategoryRepository,
@@ -98,9 +97,6 @@ class ModifyCategoryScreenModel(
                 state
             } else {
                 postSideEffect {
-                    delay(300)
-                    showSnackbar("상세 태그 이름이 수정되었습니다.")
-
                     ModifyCategoryUiSideEffect.OnSuccessModifyTagLabel
                 }
 

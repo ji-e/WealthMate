@@ -10,7 +10,7 @@ import com.jie.wealthmate.vo.PaymentMethodVo
 
 data class AddHistoryUiState(
     val isDataChanged: Boolean = false,
-    val largeCategoryEnum: LargeCategoryEnum = LargeCategoryEnum.EXPENSES,
+    val selectedLargeCategory: LargeCategoryEnum = LargeCategoryEnum.EXPENSES,
     val content: TextFieldValue = TextFieldValue(""),
     val amount: TextFieldValue = TextFieldValue(""),
     val category: CategoryVo? = null,
