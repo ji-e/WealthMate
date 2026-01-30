@@ -224,6 +224,8 @@ fun CategorySelectionRow(
     categoryItems: List<CategoryVo>,
     selectedCategory: CategoryVo?,
     selectedCategoryTag: CategoryTagVo?,
+    onCategoryClick: (CategoryVo) -> Unit,
+    onCategoryTagClick: (CategoryTagVo) -> Unit,
 ) {
     Column(modifier = modifier) {
         WMText(
@@ -254,7 +256,7 @@ fun CategorySelectionRow(
                     CategorySelectionItem(
                         modifier = Modifier
                             .size(70.dp)
-                            .noRippleClickable { },
+                            .noRippleClickable { onCategoryClick(category) },
                         category = category,
                         isSelectedCategory = category.id == selectedCategory?.id,
                     )
@@ -281,7 +283,7 @@ fun CategorySelectionRow(
                         modifier = Modifier
                             .clip(CircleShape)
                             .background(color = if (isSelectedTag) ColorPrimary.Primary_500 else ColorGray.White)
-                            .clickable { }
+                            .clickable { onCategoryTagClick(item) }
                             .padding(horizontal = 8.dp, vertical = 4.dp),
                         contentAlignment = Alignment.Center
                     ) {
