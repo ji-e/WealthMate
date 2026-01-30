@@ -8,6 +8,7 @@ import com.jie.wealthmate.repository.PaymentMethodRepository
 import com.jie.wealthmate.vo.CategoryTagVo
 import com.jie.wealthmate.vo.CategoryVo
 import com.jie.wealthmate.vo.PaymentMethodVo
+import kotlinx.datetime.LocalDate
 
 class AddHistoryScreenModel(
     private val categoryRepository: CategoryRepository,
@@ -22,13 +23,21 @@ class AddHistoryScreenModel(
         getPaymentMethods()
     }
 
-    fun updateLargeCategory(largeCategory: LargeCategoryEnum){
+    fun updateLargeCategory(largeCategory: LargeCategoryEnum) {
         reduceState { state ->
             state.copy(
                 selectedLargeCategory = largeCategory
             )
         }
         getCategories(largeCategory)
+    }
+
+    fun updateDate(date: LocalDate) {
+        reduceState { state ->
+            state.copy(
+                date = date
+            )
+        }
     }
 
     fun updateAmount(amount: TextFieldValue) {
@@ -39,7 +48,7 @@ class AddHistoryScreenModel(
         }
     }
 
-    fun updateCategory(category: CategoryVo){
+    fun updateCategory(category: CategoryVo) {
         reduceState { state ->
             state.copy(
                 category = category
@@ -47,7 +56,7 @@ class AddHistoryScreenModel(
         }
     }
 
-    fun updateCategoryTag(categoryTag: CategoryTagVo){
+    fun updateCategoryTag(categoryTag: CategoryTagVo) {
         reduceState { state ->
             state.copy(
                 categoryTag = categoryTag

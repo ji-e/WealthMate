@@ -35,7 +35,7 @@ import wealthmate.composeapp.generated.resources.ic_repeat
 fun DateTextField(
     modifier: Modifier = Modifier,
     selectedLargeCategoryEnum: LargeCategoryEnum = LargeCategoryEnum.EXPENSES,
-    date: LocalDate,
+    selectedDate: LocalDate,
     repeatCycle: RepeatCycleEnum? = null,
     installmentCount: Int? = null,
     onDateClick: () -> Unit = {},
@@ -44,14 +44,14 @@ fun DateTextField(
 ) {
     Box(modifier = modifier) {
         WMTextField(
-            value = date.convertLocalDateToString(formatDateHyphenYMDE),
+            value = selectedDate.convertLocalDateToString(formatDateHyphenYMDE),
             onValueChange = {},
             label = "날짜",
             readOnly = true,
             isRequire = true,
             onReadOnlyClick = onDateClick,
             supportingText = when {
-                repeatCycle != null -> repeatCycle.formattedDescription(date)
+                repeatCycle != null -> repeatCycle.formattedDescription(selectedDate)
                 installmentCount != null -> "할부 $installmentCount 개월"
                 else -> ""
             },
@@ -99,18 +99,18 @@ private fun DateTextFieldPreview() {
     WMTheme {
         Column(verticalArrangement = Arrangement.spacedBy(20.dp)) {
             DateTextField(
-                date = today,
+                selectedDate = today,
             )
             DateTextField(
-                date = today,
+                selectedDate = today,
                 repeatCycle = RepeatCycleEnum.WEEKLY,
             )
             DateTextField(
-                date = today,
+                selectedDate = today,
                 repeatCycle = RepeatCycleEnum.YEARLY,
             )
             DateTextField(
-                date = today,
+                selectedDate = today,
                 installmentCount = 4
             )
         }

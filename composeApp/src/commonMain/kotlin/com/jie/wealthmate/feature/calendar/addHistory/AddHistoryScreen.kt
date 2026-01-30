@@ -19,7 +19,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalDensity
@@ -39,12 +41,12 @@ import com.jie.wealthmate.component.textField.rememberIntegerVisualTransformatio
 import com.jie.wealthmate.component.textField.toIntegerTextFieldValue
 import com.jie.wealthmate.component.topbar.TopBarItem
 import com.jie.wealthmate.feature.calendar.addHistory.component.CategorySelectionRow
+import com.jie.wealthmate.feature.calendar.addHistory.component.DateSelectModalBottomSheet
 import com.jie.wealthmate.feature.calendar.addHistory.component.DateTextField
 import com.jie.wealthmate.feature.calendar.addHistory.component.LargeCategorySelectBox
 import com.jie.wealthmate.feature.calendar.addHistory.component.PaymentMethodTextField
 import com.jie.wealthmate.feature.menu.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.theme.WMTheme
-import com.jie.wealthmate.utils.today
 import org.koin.compose.koinInject
 
 class AddHistoryScreen() : BaseScreen() {
@@ -54,7 +56,7 @@ class AddHistoryScreen() : BaseScreen() {
         val screenModel: AddHistoryScreenModel = koinInject()
         val uiState by screenModel.container.uiState.collectAsState()
 
-//        var isShowCategorySelectModalBottomSheet by remember { mutableStateOf(false) }
+        var isShowDateSelectModalBottomSheet by remember { mutableStateOf(false) }
 
         val scrollState = rememberScrollState()
         val density = LocalDensity.current
@@ -118,9 +120,9 @@ class AddHistoryScreen() : BaseScreen() {
                 // 날짜 선택
                 DateTextField(
                     modifier = Modifier.padding(top = 24.dp),
-                    date = today,
+                    selectedDate = uiState.date,
                     installmentCount = 3,
-                    onDateClick = {},
+                    onDateClick = { isShowDateSelectModalBottomSheet = true },
                     onRepeatClick = {},
                     onInstallmentClick = {}
                 )
@@ -199,13 +201,13 @@ class AddHistoryScreen() : BaseScreen() {
             )
         }
 
-//        if (isShowCategorySelectModalBottomSheet) {
-//            CategorySelectModalBottomSheet(
-//                categoryItems = uiState.categoryItems,
-//                selectedCategory = uiState.categoryItems.firstOrNull(), // todo temp
-//                onDismissRequest = { isShowCategorySelectModalBottomSheet = false }
-//            )
-//        }
+        if (isShowDateSelectModalBottomSheet) {
+            DateSelectModalBottomSheet(
+                selectedDate = uiState.date,
+                onSelectClick = screenModel::updateDate,
+                onDismissRequest = { isShowDateSelectModalBottomSheet = false }
+            )
+        }
     }
 }
 
