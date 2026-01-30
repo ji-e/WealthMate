@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
@@ -26,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.annotation.InternalVoyagerApi
@@ -43,6 +45,7 @@ import com.jie.wealthmate.component.topbar.TopBarItem
 import com.jie.wealthmate.feature.calendar.addHistory.component.CategorySelectionRow
 import com.jie.wealthmate.feature.calendar.addHistory.component.DateSelectModalBottomSheet
 import com.jie.wealthmate.feature.calendar.addHistory.component.DateTextField
+import com.jie.wealthmate.feature.calendar.addHistory.component.InstallmentModalBottomSheet
 import com.jie.wealthmate.feature.calendar.addHistory.component.LargeCategorySelectBox
 import com.jie.wealthmate.feature.calendar.addHistory.component.PaymentMethodTextField
 import com.jie.wealthmate.feature.menu.categoryManagement.component.LargeCategoryEnum
@@ -57,6 +60,8 @@ class AddHistoryScreen() : BaseScreen() {
         val uiState by screenModel.container.uiState.collectAsState()
 
         var isShowDateSelectModalBottomSheet by remember { mutableStateOf(false) }
+        var isInstallmentModalBottomSheet by remember { mutableStateOf(false) }
+
 
         val scrollState = rememberScrollState()
         val density = LocalDensity.current
@@ -121,10 +126,11 @@ class AddHistoryScreen() : BaseScreen() {
                 DateTextField(
                     modifier = Modifier.padding(top = 24.dp),
                     selectedDate = uiState.date,
-                    installmentCount = 3,
+                    amount = uiState.amount,
+                    installmentCount = uiState.installmentCount,
                     onDateClick = { isShowDateSelectModalBottomSheet = true },
                     onRepeatClick = {},
-                    onInstallmentClick = {}
+                    onInstallmentClick = { isInstallmentModalBottomSheet = true }
                 )
 
                 // 금액 입력
@@ -145,6 +151,9 @@ class AddHistoryScreen() : BaseScreen() {
                         )
                     },
                     visualTransformation = rememberIntegerVisualTransformation(),
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Number
+                    ),
                 )
 
                 // 카테고리 선택
@@ -206,6 +215,14 @@ class AddHistoryScreen() : BaseScreen() {
                 selectedDate = uiState.date,
                 onSelectClick = screenModel::updateDate,
                 onDismissRequest = { isShowDateSelectModalBottomSheet = false }
+            )
+        }
+
+        if (isInstallmentModalBottomSheet) {
+            InstallmentModalBottomSheet(
+                installmentCount = uiState.installmentCount,
+                onConfirmClick = screenModel::updateInstallmentCount,
+                onDismissRequest = { isInstallmentModalBottomSheet = false }
             )
         }
     }

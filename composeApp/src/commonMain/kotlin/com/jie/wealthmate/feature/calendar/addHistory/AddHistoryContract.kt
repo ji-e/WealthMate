@@ -14,6 +14,7 @@ data class AddHistoryUiState(
     val isDataChanged: Boolean = false,
     val selectedLargeCategory: LargeCategoryEnum = LargeCategoryEnum.EXPENSES,
     val date: LocalDate = today,
+    val installmentCount: Int? = null,
     val content: TextFieldValue = TextFieldValue(""),
     val amount: TextFieldValue = TextFieldValue(""),
     val category: CategoryVo? = null,

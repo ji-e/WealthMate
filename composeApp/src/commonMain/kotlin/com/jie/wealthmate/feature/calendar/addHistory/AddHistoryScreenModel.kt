@@ -40,6 +40,14 @@ class AddHistoryScreenModel(
         }
     }
 
+    fun updateInstallmentCount(installmentCount: Int?) {
+        reduceState { state ->
+            state.copy(
+                installmentCount = installmentCount
+            )
+        }
+    }
+
     fun updateAmount(amount: TextFieldValue) {
         reduceState { state ->
             state.copy(

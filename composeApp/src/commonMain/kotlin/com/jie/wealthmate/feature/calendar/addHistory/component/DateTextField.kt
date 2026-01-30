@@ -6,16 +6,20 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.jie.wealthmate.component.WMText
 import com.jie.wealthmate.component.textField.WMTextField
 import com.jie.wealthmate.feature.calendar.addHistory.component.RepeatCycleEnum.Companion.formattedDescription
 import com.jie.wealthmate.feature.menu.categoryManagement.component.LargeCategoryEnum
@@ -24,6 +28,7 @@ import com.jie.wealthmate.theme.ColorPrimary
 import com.jie.wealthmate.theme.WMTheme
 import com.jie.wealthmate.utils.convertLocalDateToString
 import com.jie.wealthmate.utils.formatDateHyphenYMDE
+import com.jie.wealthmate.utils.formatWithCommas
 import com.jie.wealthmate.utils.today
 import kotlinx.datetime.LocalDate
 import org.jetbrains.compose.resources.painterResource
@@ -36,6 +41,7 @@ fun DateTextField(
     modifier: Modifier = Modifier,
     selectedLargeCategoryEnum: LargeCategoryEnum = LargeCategoryEnum.EXPENSES,
     selectedDate: LocalDate,
+    amount: TextFieldValue? = null,
     repeatCycle: RepeatCycleEnum? = null,
     installmentCount: Int? = null,
     onDateClick: () -> Unit = {},
@@ -50,10 +56,29 @@ fun DateTextField(
             readOnly = true,
             isRequire = true,
             onReadOnlyClick = onDateClick,
-            supportingText = when {
-                repeatCycle != null -> repeatCycle.formattedDescription(selectedDate)
-                installmentCount != null -> "할부 $installmentCount 개월"
-                else -> ""
+            supportingContent = {
+                val supportingText = when {
+                    repeatCycle != null -> repeatCycle.formattedDescription(selectedDate)
+                    installmentCount != null -> {
+                        val installmentAmount = amount?.text?.toIntOrNull()?.div(installmentCount)
+
+                        "할부 ${installmentCount}개월" +
+                                if (installmentAmount != null) {
+                                    " (매월 ${formatWithCommas(installmentAmount.toString())}원)"
+                                } else {
+                                    ""
+                                }
+
+                    }
+
+                    else -> ""
+                }
+
+                WMText(
+                    text = supportingText,
+                    style = Typography().bodyMedium.copy(color = ColorGray.Gray_500),
+                    modifier = Modifier.fillMaxWidth()
+                )
             },
         )
 
@@ -87,7 +112,6 @@ fun DateTextField(
                         .padding(6.dp),
                     tint = if (installmentCount != null) ColorGray.White else ColorGray.Gray_500
                 )
-
             }
         }
     }
@@ -115,6 +139,5 @@ private fun DateTextFieldPreview() {
             )
         }
     }
-
 }
 
