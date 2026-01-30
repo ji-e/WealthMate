@@ -8,6 +8,7 @@ import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.VisualTransformation
+import com.jie.wealthmate.utils.formatWithCommas
 
 private class IntegerVisualTransformation : VisualTransformation {
 
@@ -26,14 +27,6 @@ private class IntegerVisualTransformation : VisualTransformation {
             AnnotatedString(formattedText),
             IntegerOffsetMapping(originalText, formattedText)
         )
-    }
-
-    private fun formatWithCommas(number: String): String {
-        if (number.isEmpty()) return ""
-
-        val reversed = number.reversed()
-        val withCommas = reversed.chunked(3).joinToString(",")
-        return withCommas.reversed()
     }
 }
 

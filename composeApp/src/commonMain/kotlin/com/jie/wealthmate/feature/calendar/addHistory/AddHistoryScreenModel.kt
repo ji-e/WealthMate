@@ -2,12 +2,14 @@ package com.jie.wealthmate.feature.calendar.addHistory
 
 import androidx.compose.ui.text.input.TextFieldValue
 import com.jie.wealthmate.base.BaseScreenModel
+import com.jie.wealthmate.feature.calendar.addHistory.component.RepeatCycleEnum
 import com.jie.wealthmate.feature.menu.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.repository.CategoryRepository
 import com.jie.wealthmate.repository.PaymentMethodRepository
 import com.jie.wealthmate.vo.CategoryTagVo
 import com.jie.wealthmate.vo.CategoryVo
 import com.jie.wealthmate.vo.PaymentMethodVo
+import kotlinx.datetime.LocalDate
 
 class AddHistoryScreenModel(
     private val categoryRepository: CategoryRepository,
@@ -22,34 +24,65 @@ class AddHistoryScreenModel(
         getPaymentMethods()
     }
 
-    fun updateLargeCategory(largeCategory: LargeCategoryEnum){
+    fun updateLargeCategory(largeCategory: LargeCategoryEnum) {
         reduceState { state ->
             state.copy(
+                isDataChanged = true,
                 selectedLargeCategory = largeCategory
             )
         }
         getCategories(largeCategory)
     }
 
+    fun updateDate(date: LocalDate) {
+        reduceState { state ->
+            state.copy(
+                isDataChanged = true,
+                date = date
+            )
+        }
+    }
+
+    fun updateRepeatCycle(repeatCycle: RepeatCycleEnum?) {
+        reduceState { state ->
+            state.copy(
+                isDataChanged = true,
+                repeatCycle = repeatCycle
+            )
+        }
+    }
+
+    fun updateInstallmentCount(installmentCount: Int?) {
+        reduceState { state ->
+            state.copy(
+                isDataChanged = true,
+                installmentCount = installmentCount
+            )
+        }
+    }
+
     fun updateAmount(amount: TextFieldValue) {
         reduceState { state ->
             state.copy(
+                isDataChanged = true,
                 amount = amount
             )
         }
     }
 
-    fun updateCategory(category: CategoryVo){
+    fun updateCategory(category: CategoryVo) {
         reduceState { state ->
             state.copy(
+                isDataChanged = true,
                 category = category
             )
         }
     }
 
-    fun updateCategoryTag(categoryTag: CategoryTagVo){
+    fun updateCategoryTag(categoryTag: CategoryTagVo) {
         reduceState { state ->
             state.copy(
+                isDataChanged = true,
                 categoryTag = categoryTag
             )
         }
@@ -58,6 +91,7 @@ class AddHistoryScreenModel(
     fun updateContent(content: TextFieldValue) {
         reduceState { state ->
             state.copy(
+                isDataChanged = true,
                 content = content
             )
         }

@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
@@ -19,11 +20,14 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.annotation.InternalVoyagerApi
@@ -39,22 +43,29 @@ import com.jie.wealthmate.component.textField.rememberIntegerVisualTransformatio
 import com.jie.wealthmate.component.textField.toIntegerTextFieldValue
 import com.jie.wealthmate.component.topbar.TopBarItem
 import com.jie.wealthmate.feature.calendar.addHistory.component.CategorySelectionRow
+import com.jie.wealthmate.feature.calendar.addHistory.component.DateSelectModalBottomSheet
 import com.jie.wealthmate.feature.calendar.addHistory.component.DateTextField
+import com.jie.wealthmate.feature.calendar.addHistory.component.InstallmentModalBottomSheet
 import com.jie.wealthmate.feature.calendar.addHistory.component.LargeCategorySelectBox
 import com.jie.wealthmate.feature.calendar.addHistory.component.PaymentMethodTextField
+import com.jie.wealthmate.feature.calendar.addHistory.component.RepeatCycleModalBottomSheet
 import com.jie.wealthmate.feature.menu.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.theme.WMTheme
-import com.jie.wealthmate.utils.today
 import org.koin.compose.koinInject
 
 class AddHistoryScreen() : BaseScreen() {
     @Composable
     override fun Content() {
+        super.Content()
+
         val navigator = LocalNavigator.currentOrThrow
         val screenModel: AddHistoryScreenModel = koinInject()
         val uiState by screenModel.container.uiState.collectAsState()
 
-//        var isShowCategorySelectModalBottomSheet by remember { mutableStateOf(false) }
+        var isShowDateSelectModalBottomSheet by remember { mutableStateOf(false) }
+        var isShowRepeatCycleModalBottomSheet by remember { mutableStateOf(false) }
+        var isShowInstallmentModalBottomSheet by remember { mutableStateOf(false) }
+
 
         val scrollState = rememberScrollState()
         val density = LocalDensity.current
@@ -118,11 +129,43 @@ class AddHistoryScreen() : BaseScreen() {
                 // 날짜 선택
                 DateTextField(
                     modifier = Modifier.padding(top = 24.dp),
-                    date = today,
-                    installmentCount = 3,
-                    onDateClick = {},
-                    onRepeatClick = {},
-                    onInstallmentClick = {}
+                    selectedDate = uiState.date,
+                    amount = uiState.amount,
+                    repeatCycle = uiState.repeatCycle,
+                    installmentCount = uiState.installmentCount,
+                    onDateClick = { isShowDateSelectModalBottomSheet = true },
+                    onRepeatClick = {
+                        if (uiState.installmentCount != null) {
+                            showConfirmDialog(
+                                isShow = true,
+                                content = "할부가 선택되어있습니다.\n할부 선택을 취소하시겠습니까?",
+                                callback = {
+                                    screenModel.updateInstallmentCount(null)
+                                    isShowRepeatCycleModalBottomSheet = true
+                                }
+                            )
+                        } else {
+                            isShowRepeatCycleModalBottomSheet = true
+                        }
+                    },
+                    onInstallmentClick = {
+                        if (uiState.repeatCycle != null) {
+                            showConfirmDialog(
+                                isShow = true,
+                                content = "반복 주기가 선택되어있습니다.\n반복 주기 선택을 취소하시겠습니까?",
+                                callback = {
+                                    screenModel.updateRepeatCycle(null)
+                                    isShowInstallmentModalBottomSheet = true
+                                }
+                            )
+                        } else {
+                            isShowInstallmentModalBottomSheet = true
+                        }
+                    },
+                    onResetClick = {
+                        screenModel.updateRepeatCycle(null)
+                        screenModel.updateInstallmentCount(null)
+                    }
                 )
 
                 // 금액 입력
@@ -143,6 +186,9 @@ class AddHistoryScreen() : BaseScreen() {
                         )
                     },
                     visualTransformation = rememberIntegerVisualTransformation(),
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Number
+                    ),
                 )
 
                 // 카테고리 선택
@@ -199,13 +245,29 @@ class AddHistoryScreen() : BaseScreen() {
             )
         }
 
-//        if (isShowCategorySelectModalBottomSheet) {
-//            CategorySelectModalBottomSheet(
-//                categoryItems = uiState.categoryItems,
-//                selectedCategory = uiState.categoryItems.firstOrNull(), // todo temp
-//                onDismissRequest = { isShowCategorySelectModalBottomSheet = false }
-//            )
-//        }
+        if (isShowDateSelectModalBottomSheet) {
+            DateSelectModalBottomSheet(
+                selectedDate = uiState.date,
+                onSelectClick = screenModel::updateDate,
+                onDismissRequest = { isShowDateSelectModalBottomSheet = false }
+            )
+        }
+
+        if (isShowRepeatCycleModalBottomSheet) {
+            RepeatCycleModalBottomSheet(
+                selectedRepeatCycle = uiState.repeatCycle,
+                onConfirmClick = screenModel::updateRepeatCycle,
+                onDismissRequest = { isShowRepeatCycleModalBottomSheet = false }
+            )
+        }
+
+        if (isShowInstallmentModalBottomSheet) {
+            InstallmentModalBottomSheet(
+                installmentCount = uiState.installmentCount,
+                onConfirmClick = screenModel::updateInstallmentCount,
+                onDismissRequest = { isShowInstallmentModalBottomSheet = false }
+            )
+        }
     }
 }
 

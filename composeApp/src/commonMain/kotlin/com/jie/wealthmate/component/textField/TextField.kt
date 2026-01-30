@@ -75,7 +75,14 @@ fun WMTextField(
     WMTextField(
         modifier = modifier,
         textFieldModifier = textFieldModifier,
-        value = textFieldValueState,
+        value = if (readOnly) {
+            TextFieldValue(
+                text = value.default(),
+                selection = TextRange(value.length)
+            )
+        } else {
+            textFieldValueState
+        },
         onValueChange = {
             textFieldValueState = it
             onValueChange(it.text)
