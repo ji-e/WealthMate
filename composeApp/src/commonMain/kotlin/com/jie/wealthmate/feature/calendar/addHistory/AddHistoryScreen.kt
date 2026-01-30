@@ -110,7 +110,8 @@ class AddHistoryScreen() : BaseScreen() {
                 // 수입, 지출, 저출 카테고리 선택
                 LargeCategorySelectBox(
                     modifier = Modifier.padding(top = 8.dp),
-                    selectedLargeCategoryEnum = uiState.largeCategoryEnum
+                    selectedLargeCategoryEnum = uiState.largeCategoryEnum,
+                    onLargeCategoryClick = screenModel::updateLargeCategory
                 )
 
                 // 날짜 선택

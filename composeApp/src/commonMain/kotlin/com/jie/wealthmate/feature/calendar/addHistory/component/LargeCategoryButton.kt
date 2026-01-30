@@ -22,7 +22,8 @@ import com.jie.wealthmate.theme.ColorPrimary
 @Composable
 fun LargeCategorySelectBox(
     modifier: Modifier = Modifier,
-    selectedLargeCategoryEnum: LargeCategoryEnum = LargeCategoryEnum.EXPENSES,
+    selectedLargeCategoryEnum: LargeCategoryEnum,
+    onLargeCategoryClick : (LargeCategoryEnum) -> Unit,
 ) {
     Row(
         modifier = modifier
@@ -30,23 +31,13 @@ fun LargeCategorySelectBox(
             .clip(RoundedCornerShape(8.dp))
             .background(ColorGray.Gray_50),
     ) {
-        LargeCategoryButton(
-            isSelected = selectedLargeCategoryEnum == LargeCategoryEnum.INCOME,
-            text = "수입"
-        )
-        LargeCategoryButton(
-            isSelected = selectedLargeCategoryEnum == LargeCategoryEnum.EXPENSES,
-            text = "지출"
-        )
-        LargeCategoryButton(
-            isSelected = selectedLargeCategoryEnum == LargeCategoryEnum.SAVING,
-            text = "저축"
-        )
-
-        LargeCategoryButton(
-            isSelected = selectedLargeCategoryEnum == LargeCategoryEnum.TRANSFER,
-            text = "이체"
-        )
+        LargeCategoryEnum.entries.forEach {
+            LargeCategoryButton(
+                isSelected = selectedLargeCategoryEnum == it,
+                text = it.label,
+                onClick = { onLargeCategoryClick(it) }
+            )
+        }
     }
 }
 
@@ -63,7 +54,7 @@ private fun RowScope.LargeCategoryButton(
             .weight(1f)
             .clip(RoundedCornerShape(8.dp))
             .background(if (isSelected) ColorPrimary.Primary_500 else ColorGray.Gray_50)
-            .clickable { onClick }
+            .clickable { onClick() }
             .padding(vertical = 8.dp),
         textAlign = TextAlign.Center,
         style = Typography().bodyMedium.copy(
