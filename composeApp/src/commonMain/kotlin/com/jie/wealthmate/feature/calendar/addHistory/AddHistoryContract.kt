@@ -3,6 +3,7 @@ package com.jie.wealthmate.feature.calendar.addHistory
 import androidx.compose.ui.text.input.TextFieldValue
 import com.jie.wealthmate.base.BaseUiState
 import com.jie.wealthmate.base.UiSideEffect
+import com.jie.wealthmate.feature.calendar.addHistory.component.RepeatCycleEnum
 import com.jie.wealthmate.feature.menu.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.utils.today
 import com.jie.wealthmate.vo.CategoryTagVo
@@ -14,6 +15,7 @@ data class AddHistoryUiState(
     val isDataChanged: Boolean = false,
     val selectedLargeCategory: LargeCategoryEnum = LargeCategoryEnum.EXPENSES,
     val date: LocalDate = today,
+    val repeatCycle: RepeatCycleEnum? = null,
     val installmentCount: Int? = null,
     val content: TextFieldValue = TextFieldValue(""),
     val amount: TextFieldValue = TextFieldValue(""),

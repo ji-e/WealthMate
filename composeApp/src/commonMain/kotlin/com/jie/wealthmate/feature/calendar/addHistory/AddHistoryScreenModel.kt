@@ -2,6 +2,7 @@ package com.jie.wealthmate.feature.calendar.addHistory
 
 import androidx.compose.ui.text.input.TextFieldValue
 import com.jie.wealthmate.base.BaseScreenModel
+import com.jie.wealthmate.feature.calendar.addHistory.component.RepeatCycleEnum
 import com.jie.wealthmate.feature.menu.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.repository.CategoryRepository
 import com.jie.wealthmate.repository.PaymentMethodRepository
@@ -36,6 +37,14 @@ class AddHistoryScreenModel(
         reduceState { state ->
             state.copy(
                 date = date
+            )
+        }
+    }
+
+    fun updateRepeatCycle(repeatCycle: RepeatCycleEnum?) {
+        reduceState { state ->
+            state.copy(
+                repeatCycle = repeatCycle
             )
         }
     }
