@@ -19,9 +19,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalDensity
@@ -40,7 +38,6 @@ import com.jie.wealthmate.component.textField.WMTextField
 import com.jie.wealthmate.component.textField.rememberIntegerVisualTransformation
 import com.jie.wealthmate.component.textField.toIntegerTextFieldValue
 import com.jie.wealthmate.component.topbar.TopBarItem
-import com.jie.wealthmate.feature.calendar.addHistory.component.CategorySelectModalBottomSheet
 import com.jie.wealthmate.feature.calendar.addHistory.component.CategorySelectionRow
 import com.jie.wealthmate.feature.calendar.addHistory.component.DateTextField
 import com.jie.wealthmate.feature.calendar.addHistory.component.LargeCategorySelectBox
@@ -56,7 +53,7 @@ class AddHistoryScreen() : BaseScreen() {
         val screenModel: AddHistoryScreenModel = koinInject()
         val uiState by screenModel.container.uiState.collectAsState()
 
-        var isShowCategorySelectModalBottomSheet by remember { mutableStateOf(false) }
+//        var isShowCategorySelectModalBottomSheet by remember { mutableStateOf(false) }
 
         val scrollState = rememberScrollState()
         val density = LocalDensity.current
@@ -163,7 +160,8 @@ class AddHistoryScreen() : BaseScreen() {
                     categoryItems = uiState.categoryItems,
                     selectedCategory = uiState.category,
                     selectedCategoryTag = uiState.categoryTag,
-                    onCategoryClick = screenModel:: updateCategory
+                    onCategoryClick = screenModel:: updateCategory,
+                    onCategoryTagClick = screenModel:: updateCategoryTag
                 )
 
                 // 결제수단/자산 선택
@@ -197,13 +195,13 @@ class AddHistoryScreen() : BaseScreen() {
             )
         }
 
-        if (isShowCategorySelectModalBottomSheet) {
-            CategorySelectModalBottomSheet(
-                categoryItems = uiState.categoryItems,
-                selectedCategory = uiState.categoryItems.firstOrNull(), // todo temp
-                onDismissRequest = { isShowCategorySelectModalBottomSheet = false }
-            )
-        }
+//        if (isShowCategorySelectModalBottomSheet) {
+//            CategorySelectModalBottomSheet(
+//                categoryItems = uiState.categoryItems,
+//                selectedCategory = uiState.categoryItems.firstOrNull(), // todo temp
+//                onDismissRequest = { isShowCategorySelectModalBottomSheet = false }
+//            )
+//        }
     }
 }
 

@@ -38,6 +38,14 @@ class AddHistoryScreenModel(
         }
     }
 
+    fun updateCategoryTag(categoryTag: CategoryTagVo){
+        reduceState { state ->
+            state.copy(
+                categoryTag = categoryTag
+            )
+        }
+    }
+
     fun updateContent(content: TextFieldValue) {
         reduceState { state ->
             state.copy(
