@@ -47,6 +47,7 @@ import com.jie.wealthmate.feature.calendar.addHistory.component.DateSelectModalB
 import com.jie.wealthmate.feature.calendar.addHistory.component.DateTextField
 import com.jie.wealthmate.feature.calendar.addHistory.component.InstallmentModalBottomSheet
 import com.jie.wealthmate.feature.calendar.addHistory.component.LargeCategorySelectBox
+import com.jie.wealthmate.feature.calendar.addHistory.component.PaymentMethodModalBottomSheet
 import com.jie.wealthmate.feature.calendar.addHistory.component.PaymentMethodTextField
 import com.jie.wealthmate.feature.calendar.addHistory.component.RepeatCycleModalBottomSheet
 import com.jie.wealthmate.feature.menu.categoryManagement.component.LargeCategoryEnum
@@ -65,7 +66,7 @@ class AddHistoryScreen() : BaseScreen() {
         var isShowDateSelectModalBottomSheet by remember { mutableStateOf(false) }
         var isShowRepeatCycleModalBottomSheet by remember { mutableStateOf(false) }
         var isShowInstallmentModalBottomSheet by remember { mutableStateOf(false) }
-
+        var isShowPaymentMethodModalBottomSheet by remember { mutableStateOf(false) }
 
         val scrollState = rememberScrollState()
         val density = LocalDensity.current
@@ -217,7 +218,11 @@ class AddHistoryScreen() : BaseScreen() {
                 }
 
                 // 결제수단/자산 선택
-                PaymentMethodTextField()
+                PaymentMethodTextField(
+                    selectedLargeCategory = uiState.selectedLargeCategory,
+                    selectedPaymentMethod = uiState.paymentMethod,
+                    onPaymentMethodClick = { isShowPaymentMethodModalBottomSheet = true }
+                )
 
                 // 내용 입력
                 WMTextField(
@@ -266,6 +271,15 @@ class AddHistoryScreen() : BaseScreen() {
                 installmentCount = uiState.installmentCount,
                 onConfirmClick = screenModel::updateInstallmentCount,
                 onDismissRequest = { isShowInstallmentModalBottomSheet = false }
+            )
+        }
+
+        if (isShowPaymentMethodModalBottomSheet) {
+            PaymentMethodModalBottomSheet(
+                selectedPaymentMethod = uiState.paymentMethod,
+                paymentMethodItems = uiState.paymentMethodItems,
+                onConfirmClick = screenModel::updatePaymentMethod,
+                onDismissRequest = { isShowPaymentMethodModalBottomSheet = false }
             )
         }
     }

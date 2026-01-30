@@ -4,31 +4,27 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.jie.wealthmate.component.textField.WMTextField
 import com.jie.wealthmate.feature.menu.categoryManagement.component.LargeCategoryEnum
-import com.jie.wealthmate.theme.WMTheme
-import androidx.compose.ui.tooling.preview.Preview
+import com.jie.wealthmate.utils.default
+import com.jie.wealthmate.vo.PaymentMethodVo
 
 
 @Composable
 fun PaymentMethodTextField(
     modifier: Modifier = Modifier,
-    selectedLargeCategoryEnum: LargeCategoryEnum = LargeCategoryEnum.EXPENSES,
+    selectedLargeCategory: LargeCategoryEnum = LargeCategoryEnum.EXPENSES,
+    selectedPaymentMethod: PaymentMethodVo?,
     onPaymentMethodClick: () -> Unit = {},
 ) {
+    val label = if (selectedLargeCategory == LargeCategoryEnum.EXPENSES) "결제수단" else "자산"
+
     WMTextField(
-        value = "현금",
+        value = selectedPaymentMethod?.label.default(),
         onValueChange = {},
         modifier = modifier,
-        label = if (selectedLargeCategoryEnum == LargeCategoryEnum.EXPENSES) "결제수단" else "자산",
+        label = label,
         readOnly = true,
+        placeholder = "${label}을 선택해주세요.",
         onReadOnlyClick = onPaymentMethodClick,
     )
-}
-
-@Composable
-@Preview(showBackground = true)
-private fun PaymentMethodTextFieldPreview() {
-    WMTheme {
-        PaymentMethodTextField()
-    }
 }
 
