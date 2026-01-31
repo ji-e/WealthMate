@@ -7,3 +7,7 @@ fun formatWithCommas(number: String): String {
     val withCommas = reversed.chunked(3).joinToString(",")
     return withCommas.reversed()
 }
+
+fun String.formatRemoveCommas(): String {
+    return replace(",", "")
+}
