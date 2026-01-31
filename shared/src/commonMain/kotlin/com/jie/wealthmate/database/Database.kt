@@ -7,10 +7,12 @@ import androidx.room.RoomDatabase
 import androidx.room.RoomDatabaseConstructor
 import androidx.room.TypeConverters
 import com.jie.wealthmate.database.dao.CategoryDao
+import com.jie.wealthmate.database.dao.HistoryDao
 import com.jie.wealthmate.database.dao.PaymentMethodDao
 import com.jie.wealthmate.database.dao.PaymentMethodGroupDao
 import com.jie.wealthmate.database.eneity.CategoryConverters
 import com.jie.wealthmate.database.eneity.CategoryEntity
+import com.jie.wealthmate.database.eneity.HistoryEntity
 import com.jie.wealthmate.database.eneity.PaymentMethodEntity
 import com.jie.wealthmate.database.eneity.PaymentMethodGroupEntity
 
@@ -19,11 +21,12 @@ import com.jie.wealthmate.database.eneity.PaymentMethodGroupEntity
         CategoryEntity::class,
         PaymentMethodEntity::class,
         PaymentMethodGroupEntity::class,
+        HistoryEntity::class,
     ],
-    version = 3,
+    version = 2,
     exportSchema = true,
     autoMigrations = [
-        AutoMigration(from = 2, to = 3)
+        AutoMigration(from = 1, to = 2)
     ]
 )
 
@@ -33,6 +36,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun categoryDao(): CategoryDao
     abstract fun paymentMethodDao(): PaymentMethodDao
     abstract fun paymentMethodGroupDao(): PaymentMethodGroupDao
+    abstract fun historyDao(): HistoryDao
 }
 
 @Suppress("KotlinNoActualForExpect")
