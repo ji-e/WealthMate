@@ -2,10 +2,15 @@ package com.jie.wealthmate.feature.calendar.addHistory
 
 import androidx.compose.ui.text.input.TextFieldValue
 import com.jie.wealthmate.base.BaseScreenModel
+import com.jie.wealthmate.database.eneity.HistoryEntity
 import com.jie.wealthmate.feature.calendar.addHistory.component.RepeatCycleEnum
 import com.jie.wealthmate.feature.menu.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.repository.CategoryRepository
+import com.jie.wealthmate.repository.HistoryRepository
 import com.jie.wealthmate.repository.PaymentMethodRepository
+import com.jie.wealthmate.usecase.HistorySaveUseCase
+import com.jie.wealthmate.utils.formatRemoveCommas
+import com.jie.wealthmate.utils.toEpochMilliseconds
 import com.jie.wealthmate.vo.CategoryTagVo
 import com.jie.wealthmate.vo.CategoryVo
 import com.jie.wealthmate.vo.PaymentMethodVo
@@ -14,6 +19,8 @@ import kotlinx.datetime.LocalDate
 class AddHistoryScreenModel(
     private val categoryRepository: CategoryRepository,
     private val paymentMethodRepository: PaymentMethodRepository,
+    private val historyRepository: HistoryRepository,
+    private val historySaveUseCase: HistorySaveUseCase,
 ) : BaseScreenModel<AddHistoryUiState>() {
 
     override val initialState: AddHistoryUiState
@@ -154,6 +161,25 @@ class AddHistoryScreenModel(
     }
 
     fun saveHistory() {
-        // todo
+        val uiState = container.uiState.value
+        launchSafe(
+            block = {
+                historySaveUseCase(
+                    history = HistoryEntity(
+                        largeCategory = uiState.selectedLargeCategory.name,
+                        date = uiState.date.toEpochMilliseconds(),
+                        amount = uiState.amount.text.formatRemoveCommas().toLong(),
+                        categoryId = uiState.category?.id,
+                        categoryTagId = uiState.categoryTag?.id,
+                        paymentMethodId = uiState.paymentMethod?.id,
+                        content = uiState.content.text,
+                    ),
+                    repeatCycle = uiState.repeatCycle?.name
+                )
+            }
+        ) {
+            showSnackbar("저장되었습니다.")
+            postSideEffect { AddHistoryUiSideEffect.OnSuccessSave }
+        }
     }
 }
