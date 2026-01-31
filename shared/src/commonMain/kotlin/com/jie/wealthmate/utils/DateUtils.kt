@@ -12,6 +12,7 @@ import kotlinx.datetime.toLocalDateTime
 import kotlinx.datetime.todayIn
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 
 const val formatDateHyphen: String = "yyyy-MM-dd"
@@ -114,6 +115,14 @@ fun LocalDate.toEpochMilliseconds(): Long {
     return this.atStartOfDayIn(TimeZone.UTC).toEpochMilliseconds()
 }
 
+/**
+ * EpochMilliseconds를 LocalDate로 변환
+ */
+fun Long.toLocalDate(): LocalDate {
+    return Instant.fromEpochMilliseconds(this)
+        .toLocalDateTime(TimeZone.UTC)
+        .date
+}
 
 
 private enum class WeekEnum(val korDisplayName: String, val isoDayNumber: Int) {

@@ -18,6 +18,9 @@ import com.jie.wealthmate.repository.HistoryRepository
 import com.jie.wealthmate.repository.HistoryRepositoryImpl
 import com.jie.wealthmate.repository.PaymentMethodRepository
 import com.jie.wealthmate.repository.PaymentMethodRepositoryImpl
+import com.jie.wealthmate.repository.RepeatCycleRepository
+import com.jie.wealthmate.repository.RepeatCycleRepositoryImpl
+import com.jie.wealthmate.usecase.HistorySaveUseCase
 import org.koin.dsl.module
 
 val commonModule = module {
@@ -25,13 +28,18 @@ val commonModule = module {
     single<CategoryRepository> { CategoryRepositoryImpl(get()) }
     single<PaymentMethodRepository> { PaymentMethodRepositoryImpl(get(), get()) }
     single<HistoryRepository> { HistoryRepositoryImpl(get()) }
+    single<RepeatCycleRepository> { RepeatCycleRepositoryImpl(get()) }
+
+
+    single { HistorySaveUseCase(get(), get()) }
+
 
     // 홈
     factory { HomeScreenModel() }
 
     // 캘린더
-    factory { CalendarScreenModel(get()) }
-    factory { AddHistoryScreenModel(get(), get(), get()) }
+    factory { CalendarScreenModel(get(), get()) }
+    factory { AddHistoryScreenModel(get(), get(), get(), get()) }
 
     // 자산
     factory { AssetScreenModel() }

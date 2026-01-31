@@ -35,6 +35,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import cafe.adriel.voyager.navigator.internal.BackHandler
 import com.jie.wealthmate.base.BaseScreen
+import com.jie.wealthmate.base.collectSideEffect
 import com.jie.wealthmate.component.ButtonSize
 import com.jie.wealthmate.component.WMFloatingButton
 import com.jie.wealthmate.component.WMText
@@ -84,6 +85,14 @@ class AddHistoryScreen() : BaseScreen() {
         }
 
         BackHandler(true) { onBack() }
+
+        screenModel.collectSideEffect { sideEffect ->
+            when (sideEffect) {
+                is AddHistoryUiSideEffect.OnSuccessSave -> {
+                    navigator.pop()
+                }
+            }
+        }
 
         // 스크롤 상태에 따라 TopBar 업데이트
         LaunchedEffect(isLargeCategoryVisible) {

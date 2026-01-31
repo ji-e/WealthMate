@@ -29,5 +29,5 @@ data class AddHistoryUiState(
 }
 
 sealed class AddHistoryUiSideEffect : UiSideEffect {
-
+    data object OnSuccessSave : AddHistoryUiSideEffect()
 }
