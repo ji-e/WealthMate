@@ -1,14 +1,26 @@
 package com.jie.wealthmate.feature.calendar
 
 import com.jie.wealthmate.base.BaseScreenModel
+import com.jie.wealthmate.repository.HistoryRepository
+import com.jie.wealthmate.repository.RepeatCycleRepository
+import com.jie.wealthmate.utils.firstDayOfMonth
 import com.jie.wealthmate.utils.lastDayOfMonth
+import com.jie.wealthmate.utils.toEpochMilliseconds
 import com.jie.wealthmate.utils.today
 import kotlinx.datetime.LocalDate
 
 
-class CalendarScreenModel() : BaseScreenModel<CalendarUiState>() {
+class CalendarScreenModel(
+    private val historyRepository: HistoryRepository,
+    private val repeatCycleRepository: RepeatCycleRepository,
+) : BaseScreenModel<CalendarUiState>() {
     override val initialState: CalendarUiState
         get() = CalendarUiState()
+
+    init {
+        getHistoriesByMonth()
+        getRepeatCycle()
+    }
 
     fun updateSelectedMonth(month: LocalDate = today) {
         reduceState { state ->
@@ -30,4 +42,19 @@ class CalendarScreenModel() : BaseScreenModel<CalendarUiState>() {
         }
     }
 
+    fun getHistoriesByMonth() {
+        val selectedMonth = container.uiState.value.selectedMonth
+        historyRepository.getHistoriesByMonth(
+            startDate = selectedMonth.firstDayOfMonth().toEpochMilliseconds(),
+            endDate = selectedMonth.lastDayOfMonth().toEpochMilliseconds()
+        ).apiFlow {
+            println(it)
+        }
+    }
+
+    fun getRepeatCycle() {
+        repeatCycleRepository.getRepeatCycles().apiFlow {
+            println(it)
+        }
+    }
 }
