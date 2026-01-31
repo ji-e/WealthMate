@@ -8,15 +8,16 @@ import kotlin.time.Clock
 
 @Entity(tableName = "histories")
 data class HistoryEntity(
-    @PrimaryKey val id: String,
+    @PrimaryKey val id: String = "",
     val largeCategory: String,
     val date: Long,
     val amount: Long,
-    val installment: Long?,
-    val categoryId: String?,
-    val categoryTagId: String?,
-    val paymentMethodId: String?,
-    val content: String?,
+    val repeatCycleId: String? = null,
+    val installment: Long? = null,
+    val categoryId: String? = null,
+    val categoryTagId: String? = null,
+    val paymentMethodId: String? = null,
+    val content: String? = null,
     val updatedAt: Long = Clock.System.now().toEpochMilliseconds(),
     val isDeleted: Boolean = false,
 )
@@ -28,9 +29,16 @@ data class HistoryWithDetails(
         entityColumn = "id"
     )
     val category: CategoryEntity?,
+
     @Relation(
         parentColumn = "paymentMethodId",
         entityColumn = "id"
     )
     val paymentMethod: PaymentMethodEntity?,
+
+    @Relation(
+        parentColumn = "repeatCycleId",
+        entityColumn = "id"
+    )
+    val repeatCycle: RepeatCycleEntity?,
 )

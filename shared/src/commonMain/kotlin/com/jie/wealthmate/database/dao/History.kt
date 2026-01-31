@@ -18,7 +18,7 @@ interface HistoryDao {
     @Query("SELECT * FROM histories WHERE isDeleted = 0 ORDER BY date DESC")
     fun getAllHistories(): Flow<List<HistoryEntity>>
 
-    // 상세 정보(카테고리, 결제수단)를 포함한 내역 조회
+    // 상세 정보(카테고리, 결제수단, 반복 내역)를 포함한 내역 조회
     @Transaction
     @Query("SELECT * FROM histories WHERE isDeleted = 0 ORDER BY date DESC")
     fun getHistoriesWithDetails(): Flow<List<HistoryWithDetails>>
@@ -75,4 +75,30 @@ interface HistoryDao {
         AND largeCategory = :categoryType
     """)
     fun getSumByMonth(startDate: Long, endDate: Long, categoryType: String): Flow<Long?>
+
+    /**
+     * 특정 반복 규칙으로부터 특정 날짜에 생성된 내역이 있는지 확인
+     * 중복 생성 방지를 위해 사용됩니다.
+     */
+    @Query("""
+        SELECT EXISTS(
+            SELECT 1 FROM histories 
+            WHERE repeatCycleId = :repeatCycleId AND date = :date AND isDeleted = 0
+        )
+    """)
+    suspend fun existsHistoryByRule(repeatCycleId: String, date: Long): Boolean
+
+    /**
+     * 특정 반복 규칙에 의해 생성된 모든 미래 내역을 삭제 (반복 취소 시 사용)
+     */
+    @Query("""
+        UPDATE histories 
+        SET isDeleted = 1, updatedAt = :timestamp 
+        WHERE repeatCycleId = :repeatCycleId AND date > :currentTimestamp
+    """)
+    suspend fun softDeleteFutureHistories(
+        repeatCycleId: String,
+        currentTimestamp: Long,
+        timestamp: Long = Clock.System.now().toEpochMilliseconds()
+    )
 }

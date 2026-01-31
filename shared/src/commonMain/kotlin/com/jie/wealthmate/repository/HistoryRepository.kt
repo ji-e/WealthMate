@@ -12,16 +12,7 @@ interface HistoryRepository {
 
     suspend fun getHistoryById(id: String): HistoryEntity?
 
-    suspend fun insertHistory(
-        largeCategory: String,
-        date: Long,
-        amount: Long,
-        installment: Long? = null,
-        categoryId: String? = null,
-        categoryTagId: String? = null,
-        paymentMethodId: String? = null,
-        content: String? = null,
-    )
+    suspend fun insertHistory(history: HistoryEntity)
 
     suspend fun updateHistory(history: HistoryEntity)
 
