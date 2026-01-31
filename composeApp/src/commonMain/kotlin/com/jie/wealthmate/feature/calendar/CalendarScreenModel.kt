@@ -7,6 +7,7 @@ import com.jie.wealthmate.utils.firstDayOfMonth
 import com.jie.wealthmate.utils.lastDayOfMonth
 import com.jie.wealthmate.utils.toEpochMilliseconds
 import com.jie.wealthmate.utils.today
+import com.jie.wealthmate.vo.HistoryVo.Companion.mapperToVo
 import kotlinx.datetime.LocalDate
 
 
@@ -47,10 +48,17 @@ class CalendarScreenModel(
         historyRepository.getHistoriesByMonth(
             startDate = selectedMonth.firstDayOfMonth().toEpochMilliseconds(),
             endDate = selectedMonth.lastDayOfMonth().toEpochMilliseconds()
-        ).apiFlow {
-            println(it)
+        ).apiFlow { response ->
+            val historyVo = response.map { it.mapperToVo() }
+            println("getHistoriesByMonth::: $historyVo")
+            reduceState { state ->
+                state.copy(
+                    histories = historyVo
+                )
+            }
         }
     }
+
 
     fun getRepeatCycle() {
         repeatCycleRepository.getRepeatCycles().apiFlow {
