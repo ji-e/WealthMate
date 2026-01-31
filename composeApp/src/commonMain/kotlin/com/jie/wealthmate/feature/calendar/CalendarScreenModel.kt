@@ -35,6 +35,7 @@ class CalendarScreenModel(
                 selectedDate = if (month == today) today else newSelectedDate
             )
         }
+        getHistoriesByMonth()
     }
 
     fun updateSelectedDate(date: LocalDate) {

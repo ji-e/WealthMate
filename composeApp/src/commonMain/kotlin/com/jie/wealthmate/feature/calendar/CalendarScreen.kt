@@ -98,6 +98,7 @@ class CalendarScreen() : Screen {
                 MonthCalendar(
                     selectedMonth = uiState.selectedMonth,
                     selectedDate = uiState.selectedDate,
+                    historyItems = uiState.histories,
                     onMonthChanged = screenModel::updateSelectedMonth,
                     onTodayClick = screenModel::updateSelectedMonth,
                     onSelectedMonthClick = { isShowSelectedCalendarModalBottomSheet = true },
