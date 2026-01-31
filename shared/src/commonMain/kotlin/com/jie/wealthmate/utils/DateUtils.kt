@@ -118,7 +118,8 @@ fun LocalDate.toEpochMilliseconds(): Long {
 /**
  * EpochMilliseconds를 LocalDate로 변환
  */
-fun Long.toLocalDate(): LocalDate {
+fun Long?.toLocalDate(): LocalDate {
+    this ?: return today
     return Instant.fromEpochMilliseconds(this)
         .toLocalDateTime(TimeZone.UTC)
         .date

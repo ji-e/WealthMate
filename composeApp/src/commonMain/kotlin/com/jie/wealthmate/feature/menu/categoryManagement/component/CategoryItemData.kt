@@ -48,7 +48,7 @@ enum class LargeCategoryEnum(
     ;
 
     companion object {
-        fun creator(name: String): LargeCategoryEnum {
+        fun creator(name: String?): LargeCategoryEnum {
             return LargeCategoryEnum.entries.find { it.name == name } ?: INCOME
         }
     }

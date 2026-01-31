@@ -19,7 +19,7 @@ class RepeatCycleRepositoryImpl(private val dao: RepeatCycleDao) : RepeatCycleRe
         params = mapOf("repeatCycle" to repeatCycle)
     ) {
         val repeatCycle = repeatCycle.copy(
-            id = generateId(),
+            id = repeatCycle.id.ifEmpty { generateId() },
             updatedAt = Clock.System.now().toEpochMilliseconds(),
         )
 
