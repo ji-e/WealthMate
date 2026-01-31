@@ -14,6 +14,8 @@ import com.jie.wealthmate.feature.menu.paymentMethodManagement.modifyPaymentMeth
 import com.jie.wealthmate.feature.menu.paymentMethodManagement.paymentMethodGroup.PaymentMethodGroupScreenModel
 import com.jie.wealthmate.repository.CategoryRepository
 import com.jie.wealthmate.repository.CategoryRepositoryImpl
+import com.jie.wealthmate.repository.HistoryRepository
+import com.jie.wealthmate.repository.HistoryRepositoryImpl
 import com.jie.wealthmate.repository.PaymentMethodRepository
 import com.jie.wealthmate.repository.PaymentMethodRepositoryImpl
 import org.koin.dsl.module
@@ -22,13 +24,14 @@ val commonModule = module {
 
     single<CategoryRepository> { CategoryRepositoryImpl(get()) }
     single<PaymentMethodRepository> { PaymentMethodRepositoryImpl(get(), get()) }
+    single<HistoryRepository> { HistoryRepositoryImpl(get()) }
 
     // 홈
     factory { HomeScreenModel() }
 
     // 캘린더
-    factory { CalendarScreenModel() }
-    factory { AddHistoryScreenModel(get(), get()) }
+    factory { CalendarScreenModel(get()) }
+    factory { AddHistoryScreenModel(get(), get(), get()) }
 
     // 자산
     factory { AssetScreenModel() }

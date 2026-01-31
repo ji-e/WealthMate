@@ -3,6 +3,7 @@ package com.jie.wealthmate.utils
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.atStartOfDayIn
 import kotlinx.datetime.isoDayNumber
 import kotlinx.datetime.minus
 import kotlinx.datetime.number
@@ -105,6 +106,15 @@ fun LocalDate.lastDayOfMonth(): LocalDate {
 fun LocalDate.firstDayOfMonth(): LocalDate {
     return LocalDate(this.year, this.month, 1)
 }
+
+/**
+ * toEpochMilliseconds
+ */
+fun LocalDate.toEpochMilliseconds(): Long {
+    return this.atStartOfDayIn(TimeZone.UTC).toEpochMilliseconds()
+}
+
+
 
 private enum class WeekEnum(val korDisplayName: String, val isoDayNumber: Int) {
     SUN(
