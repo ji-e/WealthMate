@@ -53,41 +53,14 @@ class HistoryRepositoryImpl(private val dao: HistoryDao) : HistoryRepository {
     /**
      * 내역 추가 (Entity 생성 및 ID 발급 로직 포함)
      */
-    override suspend fun insertHistory(
-        largeCategory: String,
-        date: Long,
-        amount: Long,
-        installment: Long?,
-        categoryId: String?,
-        categoryTagId: String?,
-        paymentMethodId: String?,
-        content: String?,
-    ) = loggedCall(
+    override suspend fun insertHistory(history: HistoryEntity) = loggedCall(
         repositoryName = repoName,
         methodName = "insertHistory",
-        params = mapOf(
-            "largeCategory" to largeCategory,
-            "date" to date,
-            "amount" to amount,
-            "installment" to installment,
-            "categoryId" to categoryId,
-            "categoryTagId" to categoryTagId,
-            "paymentMethodId" to paymentMethodId,
-            "content" to content,
-        )
+        params = mapOf("history" to history)
     ) {
-        val history = HistoryEntity(
+        val history = history.copy(
             id = generateId(),
-            largeCategory = largeCategory,
-            amount = amount,
-            installment = installment,
-            date = date,
-            categoryId = categoryId,
-            categoryTagId = categoryTagId,
-            paymentMethodId = paymentMethodId,
-            content = content,
             updatedAt = Clock.System.now().toEpochMilliseconds(),
-            isDeleted = false
         )
         dao.insertHistory(history)
     }
