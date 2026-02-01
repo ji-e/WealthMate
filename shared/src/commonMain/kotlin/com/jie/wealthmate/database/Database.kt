@@ -1,5 +1,6 @@
 package com.jie.wealthmate.database
 
+import androidx.room.AutoMigration
 import androidx.room.ConstructedBy
 import androidx.room.Database
 import androidx.room.RoomDatabase
@@ -25,10 +26,10 @@ import com.jie.wealthmate.database.eneity.RepeatCycleEntity
         HistoryEntity::class,
         RepeatCycleEntity::class
     ],
-    version = 1,
+    version = 2,
     exportSchema = true,
     autoMigrations = [
-//        AutoMigration(from = 1, to = 2),
+        AutoMigration(from = 1, to = 2),
 //        AutoMigration(from = 2, to = 3),
 //        AutoMigration(from = 3, to = 4)
     ]
