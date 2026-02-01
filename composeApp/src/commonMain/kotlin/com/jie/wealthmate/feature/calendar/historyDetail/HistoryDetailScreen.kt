@@ -12,15 +12,20 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.annotation.InternalVoyagerApi
 import cafe.adriel.voyager.navigator.LocalNavigator
@@ -31,10 +36,22 @@ import com.jie.wealthmate.base.collectSideEffect
 import com.jie.wealthmate.component.ButtonSize
 import com.jie.wealthmate.component.WMFloatingButton
 import com.jie.wealthmate.component.WMText
+import com.jie.wealthmate.component.textField.WMTextField
+import com.jie.wealthmate.component.textField.rememberIntegerVisualTransformation
+import com.jie.wealthmate.component.textField.toIntegerTextFieldValue
 import com.jie.wealthmate.component.topbar.TopBarItem
+import com.jie.wealthmate.feature.calendar.addHistory.component.DateSelectModalBottomSheet
+import com.jie.wealthmate.feature.calendar.addHistory.component.DateTextField
+import com.jie.wealthmate.feature.calendar.addHistory.component.InstallmentModalBottomSheet
+import com.jie.wealthmate.feature.calendar.addHistory.component.PaymentMethodModalBottomSheet
+import com.jie.wealthmate.feature.calendar.addHistory.component.PaymentMethodTextField
+import com.jie.wealthmate.feature.calendar.addHistory.component.RepeatCycleModalBottomSheet
+import com.jie.wealthmate.feature.calendar.historyDetail.component.Category
+import com.jie.wealthmate.feature.menu.categoryManagement.component.LargeCategoryEnum
 import org.koin.compose.koinInject
 
 class HistoryDetailScreen(
+    val largeCategory: LargeCategoryEnum,
     val historyId: String,
 ) : BaseScreen() {
     @Composable
@@ -44,6 +61,11 @@ class HistoryDetailScreen(
         val navigator = LocalNavigator.currentOrThrow
         val screenModel: HistoryDetailScreenModel = koinInject()
         val uiState by screenModel.container.uiState.collectAsState()
+
+        var isShowDateSelectModalBottomSheet by remember { mutableStateOf(false) }
+        var isShowRepeatCycleModalBottomSheet by remember { mutableStateOf(false) }
+        var isShowInstallmentModalBottomSheet by remember { mutableStateOf(false) }
+        var isShowPaymentMethodModalBottomSheet by remember { mutableStateOf(false) }
 
         fun onBack() {
             showSaveBackDialog(uiState.isDataChanged) {
@@ -69,14 +91,13 @@ class HistoryDetailScreen(
                 ),
                 trailingCustomItem =
                     TopBarItem.TrailingCustomItem {
-                        val selectedLargeCategoryEnum = uiState.selectedLargeCategory
                         WMText(
-                            text = selectedLargeCategoryEnum.label,
+                            text = largeCategory.label,
                             style = Typography().labelMedium.copy(fontWeight = FontWeight.SemiBold),
                             modifier = Modifier
                                 .padding(horizontal = 16.dp)
                                 .clip(CircleShape)
-                                .background(selectedLargeCategoryEnum.backgroundColor)
+                                .background(largeCategory.backgroundColor)
                                 .padding(horizontal = 8.dp, vertical = 4.dp)
                         )
                     }
@@ -102,6 +123,95 @@ class HistoryDetailScreen(
                     .verticalScroll(rememberScrollState())
             ) {
 
+                // 날짜 선택
+                DateTextField(
+                    modifier = Modifier.padding(top = 24.dp),
+                    selectedDate = uiState.date,
+                    amount = uiState.amount,
+//                    repeatCycle = uiState.repeatCycle,
+//                    installmentCount = uiState.installmentCount,
+                    onDateClick = { isShowDateSelectModalBottomSheet = true },
+//                    onRepeatClick = {
+//                        if (uiState.installmentCount != null) {
+//                            showConfirmDialog(
+//                                isShow = true,
+//                                content = "할부가 선택되어있습니다.\n할부 선택을 취소하시겠습니까?",
+//                                callback = {
+//                                    screenModel.updateInstallmentCount(null)
+//                                    isShowRepeatCycleModalBottomSheet = true
+//                                }
+//                            )
+//                        } else {
+//                            isShowRepeatCycleModalBottomSheet = true
+//                        }
+//                    },
+//                    onInstallmentClick = {
+//                        if (uiState.repeatCycle != null) {
+//                            showConfirmDialog(
+//                                isShow = true,
+//                                content = "반복 주기가 선택되어있습니다.\n반복 주기 선택을 취소하시겠습니까?",
+//                                callback = {
+//                                    screenModel.updateRepeatCycle(null)
+//                                    isShowInstallmentModalBottomSheet = true
+//                                }
+//                            )
+//                        } else {
+//                            isShowInstallmentModalBottomSheet = true
+//                        }
+//                    },
+//                    onResetClick = {
+//                        screenModel.updateRepeatCycle(null)
+//                        screenModel.updateInstallmentCount(null)
+//                    }
+                )
+
+                // 금액 입력
+                WMTextField(
+//                    modifier = Modifier.padding(top = 20.dp),
+                    value = uiState.amount,
+                    onValueChange = {
+                        screenModel.updateAmount(it.toIntegerTextFieldValue())
+                    },
+                    label = "금액",
+                    isRequire = true,
+                    maxLength = 10,
+                    placeholder = "금액을 입력해 주세요.",
+                    suffix = {
+                        WMText(
+                            text = "원",
+                            style = Typography().bodyLarge.copy(fontWeight = FontWeight.SemiBold)
+                        )
+                    },
+                    visualTransformation = rememberIntegerVisualTransformation(),
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Number
+                    ),
+                )
+
+                // 카테고리
+                Category(
+                    category = uiState.category,
+                    categoryTag = uiState.categoryTag
+                )
+
+
+                // 결제수단/자산
+                PaymentMethodTextField(
+                    modifier = Modifier.padding(top = 24.dp),
+                    selectedLargeCategory = uiState.selectedLargeCategory,
+                    selectedPaymentMethod = uiState.paymentMethod,
+                    placeholder = " 없음",
+                    onPaymentMethodClick = { isShowPaymentMethodModalBottomSheet = true }
+                )
+
+                // 내용 입력
+                WMTextField(
+                    value = uiState.content,
+                    onValueChange = screenModel::updateContent,
+                    label = "내용",
+                    maxLength = 20,
+                    placeholder = "내용 없음",
+                )
 
                 Spacer(modifier = Modifier.height(32.dp))
 
@@ -117,6 +227,39 @@ class HistoryDetailScreen(
                     .fillMaxWidth(),
                 enabled = uiState.isSaveButtonEnable,
                 onClick = screenModel::saveHistory
+            )
+        }
+
+        if (isShowDateSelectModalBottomSheet) {
+            DateSelectModalBottomSheet(
+                selectedDate = uiState.date,
+                onSelectClick = screenModel::updateDate,
+                onDismissRequest = { isShowDateSelectModalBottomSheet = false }
+            )
+        }
+
+        if (isShowRepeatCycleModalBottomSheet) {
+            RepeatCycleModalBottomSheet(
+                selectedRepeatCycle = uiState.repeatCycle,
+                onConfirmClick = screenModel::updateRepeatCycle,
+                onDismissRequest = { isShowRepeatCycleModalBottomSheet = false }
+            )
+        }
+
+        if (isShowInstallmentModalBottomSheet) {
+            InstallmentModalBottomSheet(
+                installmentCount = uiState.installmentCount,
+                onConfirmClick = screenModel::updateInstallmentCount,
+                onDismissRequest = { isShowInstallmentModalBottomSheet = false }
+            )
+        }
+
+        if (isShowPaymentMethodModalBottomSheet) {
+            PaymentMethodModalBottomSheet(
+                selectedPaymentMethod = uiState.paymentMethod,
+                paymentMethodItems = uiState.paymentMethodItems,
+                onConfirmClick = screenModel::updatePaymentMethod,
+                onDismissRequest = { isShowPaymentMethodModalBottomSheet = false }
             )
         }
     }

@@ -117,7 +117,10 @@ class CalendarScreen() : Screen {
                                     text = "${it.content} ${formatWithCommas(it.amount.toString())}",
                                     modifier = Modifier.clickable {
                                         navigator.push(
-                                            HistoryDetailScreen(it.id)
+                                            HistoryDetailScreen(
+                                                largeCategory = it.largeCategory,
+                                                historyId = it.id
+                                            )
                                         )
                                     }
                                 )
