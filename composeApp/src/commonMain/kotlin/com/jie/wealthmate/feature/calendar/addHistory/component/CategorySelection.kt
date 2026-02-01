@@ -250,7 +250,7 @@ fun CategorySelectionRow(
                         .fillMaxWidth()
                         .padding(16.dp),
                     textAlign = TextAlign.Center,
-                    style = Typography().bodyMedium.copy(color = ColorGray.Gray_500)
+                    style = Typography().bodyMedium.copy(color = ColorGray.Gray_300)
                 )
                 return
             }
@@ -337,7 +337,7 @@ private fun CategorySelectionItem(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Box(modifier = Modifier.width(52.dp)) {
+        Box(modifier = Modifier.width(60.dp)) {
             Box(
                 modifier = Modifier
                     .clip(CircleShape)
@@ -356,9 +356,9 @@ private fun CategorySelectionItem(
                     contentDescription = null,
                     tint = ColorRed.Red_300,
                     modifier = Modifier
-                        .padding()
+                        .padding(start = 24.dp)
                         .size(24.dp)
-                        .align(Alignment.TopEnd)
+                        .align(Alignment.TopStart)
                 )
             }
 
@@ -368,9 +368,9 @@ private fun CategorySelectionItem(
                     contentDescription = null,
                     tint = ColorPrimary.Primary_500,
                     modifier = Modifier
-                        .padding()
+                        .padding(start = 30.dp)
                         .size(24.dp)
-                        .align(Alignment.BottomEnd)
+                        .align(Alignment.BottomStart)
                 )
             }
         }
