@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -22,15 +23,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.jie.wealthmate.component.ButtonSize
-import com.jie.wealthmate.component.ButtonStyle
-import com.jie.wealthmate.component.WMButton
 import com.jie.wealthmate.component.WMModalBottomSheet
 import com.jie.wealthmate.component.WMText
 import com.jie.wealthmate.theme.ColorGray
+import com.jie.wealthmate.theme.ColorGroup
 import com.jie.wealthmate.theme.ColorPrimary
 import com.jie.wealthmate.vo.PaymentMethodVo
 
@@ -64,21 +64,25 @@ fun PaymentMethodModalBottomSheet(
                 listState = listState,
                 paymentMethodItems = paymentMethodItems,
                 tempSelectedPaymentMethod = tempSelectedPaymentMethod,
-                onPaymentMethodClick = { tempSelectedPaymentMethod = it }
-            )
-
-            WMButton(
-                text = "확인",
-                buttonStyle = ButtonStyle.FILLED,
-                buttonSize = ButtonSize.LARGE,
-                modifier = Modifier
-                    .padding(top = 20.dp)
-                    .fillMaxWidth(),
-                onClick = {
+                onPaymentMethodClick = {
+                    tempSelectedPaymentMethod = it
                     onDismissRequest()
                     onConfirmClick(tempSelectedPaymentMethod)
                 }
             )
+            // todo 사용자 액션 줄일까 고민 중
+//            WMButton(
+//                text = "확인",
+//                buttonStyle = ButtonStyle.FILLED,
+//                buttonSize = ButtonSize.LARGE,
+//                modifier = Modifier
+//                    .padding(top = 20.dp)
+//                    .fillMaxWidth(),
+//                onClick = {
+//                    onDismissRequest()
+//                    onConfirmClick(tempSelectedPaymentMethod)
+//                }
+//            )
         }
     }
 }
@@ -97,6 +101,14 @@ fun PaymentMethodList(
             .heightIn(max = 180.dp),
         state = listState,
     ) {
+        val colorList = ColorGroup.getColorList()
+        val groupColorMap = paymentMethodItems
+            .distinctBy { it.groupLabel }
+            .mapIndexed { index, item ->
+                item.groupLabel to colorList[index % colorList.size].second
+            }
+            .toMap()
+
         items(
             count = paymentMethodItems.size,
             key = { index -> paymentMethodItems[index].id },
@@ -105,6 +117,9 @@ fun PaymentMethodList(
 
             PaymentMethodItem(
                 label = paymentMethod.label,
+                groupLabel = paymentMethod.groupLabel,
+                groupBackgroundColor = groupColorMap[paymentMethod.groupLabel]
+                    ?: ColorGray.Gray_200,
                 isSelected = paymentMethod == tempSelectedPaymentMethod,
                 onClick = { onPaymentMethodClick(paymentMethod) }
             )
@@ -115,6 +130,8 @@ fun PaymentMethodList(
 @Composable
 fun PaymentMethodItem(
     label: String,
+    groupLabel: String?,
+    groupBackgroundColor: Color,
     isSelected: Boolean,
     onClick: () -> Unit = {},
 ) {
@@ -127,13 +144,28 @@ fun PaymentMethodItem(
             .clickable { onClick() },
         contentAlignment = Alignment.Center
     ) {
-        WMText(
-            text = label,
-            style = Typography().bodyLarge.copy(
-                fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
-                color = if (isSelected) ColorPrimary.Primary_700 else ColorGray.Gray_700,
-                fontSize = if (isSelected) 18.sp else 16.sp
-            ),
-        )
+        Row {
+
+            WMText(
+                text = label,
+                style = Typography().bodyLarge.copy(
+                    fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
+                    color = if (isSelected) ColorPrimary.Primary_700 else ColorGray.Gray_700,
+                    fontSize = if (isSelected) 18.sp else 16.sp
+                ),
+            )
+
+            if (groupLabel != null) {
+                WMText(
+                    text = groupLabel,
+                    style = Typography().labelMedium.copy(fontWeight = FontWeight.SemiBold),
+                    modifier = Modifier
+                        .padding(horizontal = 6.dp)
+                        .clip(CircleShape)
+                        .background(groupBackgroundColor)
+                        .padding(horizontal = 8.dp, vertical = 4.dp)
+                )
+            }
+        }
     }
 }

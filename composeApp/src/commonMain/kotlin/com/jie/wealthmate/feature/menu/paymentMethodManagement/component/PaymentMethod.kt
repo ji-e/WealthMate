@@ -39,6 +39,7 @@ import org.jetbrains.compose.resources.painterResource
 import wealthmate.composeapp.generated.resources.Res
 import wealthmate.composeapp.generated.resources.ic_drag_handle
 
+@Suppress("SuspiciousIndentation")
 @Composable
 fun ColumnScope.PaymentMethod(
     modifier: Modifier = Modifier,
