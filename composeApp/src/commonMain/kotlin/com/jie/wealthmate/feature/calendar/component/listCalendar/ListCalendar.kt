@@ -1,15 +1,10 @@
 package com.jie.wealthmate.feature.calendar.component.listCalendar
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -18,12 +13,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import com.jie.wealthmate.component.WMText
-import com.jie.wealthmate.utils.formatWithCommas
 import com.jie.wealthmate.vo.HistoryVo
 import kotlinx.datetime.LocalDate
-import kotlinx.datetime.number
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -88,7 +79,6 @@ fun ListCalendar(
                 // 프로그램에 의한 스크롤 중이 아닐 때만(즉, 사용자 스크롤 시에만) 업데이트 호출
                 if (isProgrammaticScroll.not()) {
 
-
                     // 리스트 최하단에 도달했고(canScrollForward가 false),
                     // 위로 스크롤한 적이 있다면(canScrollBackward가 true) 마지막 날짜를 선택. (추측: 마지막 헤더가 상단에 닿지 못할 경우 대비)
                     val dateAtTop =
@@ -122,8 +112,8 @@ fun ListCalendar(
                 items = items,
                 key = { it.id }
             ) { item ->
-                HistoryItemRow(
-                    item = item,
+                HistoryItem(
+                    history = item,
                     onItemClick = {
                         onHistoryClick(item)
                     }
@@ -131,34 +121,4 @@ fun ListCalendar(
             }
         }
     }
-}
-
-@Composable
-private fun DateHeader(
-    date: LocalDate,
-) {
-    WMText(
-        text = "${date.year}년 ${date.month.number}월 ${date.day}일",
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(color = MaterialTheme.colorScheme.surfaceVariant)
-            .padding(
-                horizontal = 16.dp,
-                vertical = 8.dp
-            )
-    )
-}
-
-@Composable
-private fun HistoryItemRow(
-    item: HistoryVo,
-    onItemClick: () -> Unit,
-) {
-    WMText(
-        text = "${item.content} ${formatWithCommas(item.amount.toString())}원",
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onItemClick() }
-            .padding(all = 16.dp)
-    )
 }
