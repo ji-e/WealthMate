@@ -32,7 +32,7 @@ data class HistoryVo(
             category = this?.category?.mapperToVo(),
             categoryTag = this?.category?.mapperToVo()?.tags?.find { it.id == this.history.categoryTagId },
             paymentMethod = this?.paymentMethod?.mapperToVo(),
-            content = this?.history?.content.default(),
+            content = this?.history?.content,
         )
     }
 }

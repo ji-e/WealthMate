@@ -8,14 +8,16 @@ data class PaymentMethodVo(
     val label: String,
     val groupId: String?,
     val groupLabel: String?,
+    val assetId: String? = null,
     val sort: Long,
 ) {
     companion object {
         fun PaymentMethodEntity?.mapperToVo() = PaymentMethodVo(
             id = this?.id.default(),
             label = this?.label.default(),
-            groupId = this?.groupId.default(),
-            groupLabel = this?.groupLabel.default(),
+            groupId = this?.groupId,
+            groupLabel = this?.groupLabel,
+            assetId = this?.assetId,
             sort = this?.sort.default(),
         )
     }
