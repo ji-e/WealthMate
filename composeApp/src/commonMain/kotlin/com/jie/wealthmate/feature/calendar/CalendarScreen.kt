@@ -24,12 +24,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.dropShadow
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.shadow.Shadow
-import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
-import androidx.compose.ui.input.nestedscroll.NestedScrollSource
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -45,18 +42,19 @@ import com.jie.wealthmate.component.calculateAdjustedToastPadding
 import com.jie.wealthmate.component.topbar.TopBarItem
 import com.jie.wealthmate.feature.calendar.addHistory.AddHistoryScreen
 import com.jie.wealthmate.feature.calendar.component.monthCalendar.MonthCalendar
+import com.jie.wealthmate.feature.calendar.historyDetail.HistoryDetailScreen
 import com.jie.wealthmate.theme.ColorGray
 import com.jie.wealthmate.theme.ColorPrimary
 import com.jie.wealthmate.theme.WMTheme
 import com.jie.wealthmate.utils.convertLocalDateToString
 import com.jie.wealthmate.utils.firstDayOfMonth
 import com.jie.wealthmate.utils.formatDateKorYM
+import com.jie.wealthmate.utils.formatWithCommas
 import com.jie.wealthmate.utils.today
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.plus
 import kotlinx.datetime.yearMonth
-import androidx.compose.ui.tooling.preview.Preview
 import org.koin.compose.koinInject
 import wealthmate.composeapp.generated.resources.Res
 import wealthmate.composeapp.generated.resources.ic_add
@@ -112,7 +110,19 @@ class CalendarScreen() : Screen {
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
                     ) {
-                        WMText(text = "리스트뷰 영역 (ListView Area)")
+                        // todo
+                        Column {
+                            uiState.histories.forEach {
+                                WMText(
+                                    text = "${it.content} ${formatWithCommas(it.amount.toString())}",
+                                    modifier = Modifier.clickable {
+                                        navigator.push(
+                                            HistoryDetailScreen(it.id)
+                                        )
+                                    }
+                                )
+                            }
+                        }
                     }
                 }
             }
@@ -173,17 +183,7 @@ class CalendarScreen() : Screen {
             }
 
             LazyColumn(
-                modifier = Modifier.height(240.dp)
-                    .nestedScroll(object :
-                        NestedScrollConnection {
-                        override fun onPreScroll(
-                            available: Offset,
-                            source: NestedScrollSource,
-                        ): Offset {
-                            // 위로 스크롤하거나 아래로 스크롤할 때 시트가 움직이지 않도록 이벤트를 여기서 소비하지 않음
-                            return super.onPreScroll(available, source)
-                        }
-                    }),
+                modifier = Modifier.height(240.dp),
                 state = listState
             ) {
                 items(monthItem.size) {
@@ -207,8 +207,7 @@ class CalendarScreen() : Screen {
                                 color = if (isSelected) ColorPrimary.Primary_700 else ColorGray.Gray_700,
                                 fontSize = if (isSelected) 18.sp else 16.sp
                             ),
-
-                            )
+                        )
                     }
                 }
             }

@@ -3,6 +3,7 @@ package com.jie.wealthmate.di
 import com.jie.wealthmate.feature.asset.AssetScreenModel
 import com.jie.wealthmate.feature.calendar.CalendarScreenModel
 import com.jie.wealthmate.feature.calendar.addHistory.AddHistoryScreenModel
+import com.jie.wealthmate.feature.calendar.historyDetail.HistoryDetailScreenModel
 import com.jie.wealthmate.feature.home.HomeScreenModel
 import com.jie.wealthmate.feature.menu.MenuScreenModel
 import com.jie.wealthmate.feature.menu.categoryManagement.CategoryManagementScreenModel
@@ -40,6 +41,8 @@ val commonModule = module {
     // 캘린더
     factory { CalendarScreenModel(get(), get()) }
     factory { AddHistoryScreenModel(get(), get(), get(), get()) }
+    factory { HistoryDetailScreenModel(get(), get(), get(), get()) }
+
 
     // 자산
     factory { AssetScreenModel() }

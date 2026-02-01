@@ -42,7 +42,7 @@ class HistoryRepositoryImpl(private val dao: HistoryDao) : HistoryRepository {
     /**
      * ID를 통한 단일 내역 조회
      */
-    override suspend fun getHistoryById(id: String): HistoryEntity? = loggedCall(
+    override suspend fun getHistoryById(id: String): HistoryWithDetails? = loggedCall(
         repositoryName = repoName,
         methodName = "getHistoryById",
         params = mapOf("id" to id)
