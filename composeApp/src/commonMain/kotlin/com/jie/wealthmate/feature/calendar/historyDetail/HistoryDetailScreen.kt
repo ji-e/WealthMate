@@ -48,6 +48,7 @@ import com.jie.wealthmate.feature.calendar.addHistory.component.PaymentMethodTex
 import com.jie.wealthmate.feature.calendar.addHistory.component.RepeatCycleModalBottomSheet
 import com.jie.wealthmate.feature.calendar.historyDetail.component.Category
 import com.jie.wealthmate.feature.calendar.historyDetail.component.Installment
+import com.jie.wealthmate.feature.calendar.historyDetail.component.RepeatCycle
 import com.jie.wealthmate.feature.menu.categoryManagement.component.LargeCategoryEnum
 import org.koin.compose.koinInject
 
@@ -187,9 +188,16 @@ class HistoryDetailScreen(
                         keyboardType = KeyboardType.Number
                     ),
                     supportingContent = {
-                        // 할부
-                        if (uiState.history?.installment != null) {
-                            uiState.history?.let { history ->
+                        uiState.history?.let { history ->
+                            // 반복
+                            if (history.repeatCycle != null) {
+                                RepeatCycle(
+                                    modifier = Modifier.padding(top = 4.dp, bottom = 24.dp),
+                                    repeatCycle = history.repeatCycle
+                                )
+                            }
+                            // 할부
+                            if (history.installment != null) {
                                 Installment(
                                     modifier = Modifier.padding(top = 4.dp, bottom = 24.dp),
                                     date = history.date,
