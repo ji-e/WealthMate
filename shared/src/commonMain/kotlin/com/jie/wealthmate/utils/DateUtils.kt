@@ -23,6 +23,7 @@ const val formatDateKorYM: String = "yyyy년 M월"
 const val formatDateKorMD: String = "M월 d일"
 
 const val formatDateDotYYMD: String = "yy.M.d"
+const val formatDateDotYYMDE: String = "yy.M.d (E)"
 
 
 @OptIn(ExperimentalTime::class)
@@ -85,12 +86,14 @@ fun LocalDate?.convertLocalDateToString(
 
     this ?: return defaultValue
 
+    val e =  WeekEnum.creator(this.dayOfWeek.isoDayNumber).korDisplayName
     return when (convertPattern) {
-        formatDateHyphenYMDE -> this.toString() + " (${WeekEnum.creator(this.dayOfWeek.isoDayNumber).korDisplayName})"
+        formatDateHyphenYMDE -> "$this ($e)"
         formatDateKor -> "${this.year}년 ${this.month.number}월 ${this.day}일"
         formatDateKorYM -> "${this.year}년 ${this.month.number}월"
         formatDateKorMD -> "${this.month.number}월 ${this.day}일 "
         formatDateDotYYMD -> "${this.year.toString().takeLast(2)}.${this.month.number}.${this.day}"
+        formatDateDotYYMDE -> "${this.year.toString().takeLast(2)}.${this.month.number}.${this.day} ($e)"
         else -> defaultValue
     }
 }
