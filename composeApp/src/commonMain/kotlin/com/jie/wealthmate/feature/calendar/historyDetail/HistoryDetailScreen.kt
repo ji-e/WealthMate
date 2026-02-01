@@ -50,7 +50,10 @@ import com.jie.wealthmate.feature.calendar.historyDetail.component.Category
 import com.jie.wealthmate.feature.calendar.historyDetail.component.Installment
 import com.jie.wealthmate.feature.calendar.historyDetail.component.RepeatCycle
 import com.jie.wealthmate.feature.menu.categoryManagement.component.LargeCategoryEnum
+import com.jie.wealthmate.theme.ColorRed
 import org.koin.compose.koinInject
+import wealthmate.composeapp.generated.resources.Res
+import wealthmate.composeapp.generated.resources.ic_delete
 
 class HistoryDetailScreen(
     val largeCategory: LargeCategoryEnum,
@@ -85,24 +88,23 @@ class HistoryDetailScreen(
             }
         }
 
-        LaunchedEffect(uiState.isDataChanged) {
+        LaunchedEffect(Unit) {
             screenModel.updateTopBar(
                 title = TopBarItem.Title("내역 상세"),
                 readingItem = TopBarItem.ReadingItem().copy(
                     action = { onBack() }
                 ),
-                trailingCustomItem =
-                    TopBarItem.TrailingCustomItem {
-                        WMText(
-                            text = largeCategory.label,
-                            style = Typography().labelMedium.copy(fontWeight = FontWeight.SemiBold),
-                            modifier = Modifier
-                                .padding(horizontal = 16.dp)
-                                .clip(CircleShape)
-                                .background(largeCategory.backgroundColor)
-                                .padding(horizontal = 8.dp, vertical = 4.dp)
-                        )
-                    }
+                trailingItem = listOf(
+                    TopBarItem.TrailingItem(
+                        iconRes = Res.drawable.ic_delete,
+                        tint = ColorRed.Red_300,
+                        action = {
+                            showRemoveDialog() {
+//                                screenModel.removeHistory()
+                            }
+                        }
+                    )
+                )
             )
         }
 
@@ -124,10 +126,19 @@ class HistoryDetailScreen(
                     .padding(horizontal = 20.dp)
                     .verticalScroll(rememberScrollState())
             ) {
+                // 카테고리
+                WMText(
+                    text = largeCategory.label,
+                    style = Typography().labelMedium.copy(fontWeight = FontWeight.SemiBold),
+                    modifier = Modifier
+                        .clip(CircleShape)
+                        .background(largeCategory.backgroundColor)
+                        .padding(horizontal = 8.dp, vertical = 4.dp)
+                )
 
                 // 날짜 선택
                 DateTextField(
-                    modifier = Modifier.padding(top = 4.dp),
+                    modifier = Modifier.padding(top = 20.dp),
                     selectedDate = uiState.date,
                     amount = uiState.amount,
                     isTrailingIconVisible = false,
