@@ -47,6 +47,7 @@ import com.jie.wealthmate.feature.calendar.addHistory.component.PaymentMethodMod
 import com.jie.wealthmate.feature.calendar.addHistory.component.PaymentMethodTextField
 import com.jie.wealthmate.feature.calendar.addHistory.component.RepeatCycleModalBottomSheet
 import com.jie.wealthmate.feature.calendar.historyDetail.component.Category
+import com.jie.wealthmate.feature.calendar.historyDetail.component.Installment
 import com.jie.wealthmate.feature.menu.categoryManagement.component.LargeCategoryEnum
 import org.koin.compose.koinInject
 
@@ -128,8 +129,7 @@ class HistoryDetailScreen(
                     modifier = Modifier.padding(top = 24.dp),
                     selectedDate = uiState.date,
                     amount = uiState.amount,
-//                    repeatCycle = uiState.repeatCycle,
-//                    installmentCount = uiState.installmentCount,
+                    isTrailingIconVisible = false,
                     onDateClick = { isShowDateSelectModalBottomSheet = true },
 //                    onRepeatClick = {
 //                        if (uiState.installmentCount != null) {
@@ -186,6 +186,18 @@ class HistoryDetailScreen(
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Number
                     ),
+                    supportingContent = {
+                        // 할부
+                        if (uiState.history?.installment != null) {
+                            uiState.history?.let { history ->
+                                Installment(
+                                    modifier = Modifier.padding(top = 4.dp, bottom = 24.dp),
+                                    date = history.date,
+                                    installment = history.installment,
+                                )
+                            }
+                        }
+                    }
                 )
 
                 // 카테고리
@@ -193,7 +205,6 @@ class HistoryDetailScreen(
                     category = uiState.category,
                     categoryTag = uiState.categoryTag
                 )
-
 
                 // 결제수단/자산
                 PaymentMethodTextField(

@@ -110,6 +110,7 @@ class HistoryDetailScreenModel(
             val history = response.mapperToVo()
             reduceState { state ->
                 state.copy(
+                    history = history,
                     date = history.date,
                     amount = TextFieldValue(history.amount.toString()),
                     category = history.category,

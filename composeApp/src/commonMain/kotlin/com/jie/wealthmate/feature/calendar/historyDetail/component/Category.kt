@@ -52,7 +52,7 @@ fun Category(
             if (category == null) {
                 WMText(
                     text = "카테고리 없음",
-                    style = Typography().titleSmall.copy(color = ColorGray.Gray_500),
+                    style = Typography().titleSmall.copy(color = ColorGray.Gray_300),
                     modifier = Modifier.fillMaxWidth(),
                     textAlign = TextAlign.Center
                 )

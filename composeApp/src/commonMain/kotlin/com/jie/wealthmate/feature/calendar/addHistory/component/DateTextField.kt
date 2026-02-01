@@ -45,6 +45,7 @@ fun DateTextField(
     amount: TextFieldValue? = null,
     repeatCycle: RepeatCycleEnum? = null,
     totalInstallment: Int? = null,
+    isTrailingIconVisible: Boolean = true,
     onDateClick: () -> Unit = {},
     onRepeatClick: () -> Unit = {},
     onInstallmentClick: () -> Unit = {},
@@ -94,36 +95,38 @@ fun DateTextField(
             },
         )
 
-        Row(
-            modifier = Modifier
-                .padding(bottom = 4.dp)
-                .align(Alignment.CenterEnd),
-            horizontalArrangement = Arrangement.spacedBy(6.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                painter = painterResource(Res.drawable.ic_repeat),
-                contentDescription = "반복",
+        if (isTrailingIconVisible) {
+            Row(
                 modifier = Modifier
-                    .size(30.dp)
-                    .clip(CircleShape)
-                    .background(if (repeatCycle != null) ColorPrimary.Primary_500 else ColorGray.Gray_50)
-                    .clickable { onRepeatClick() }
-                    .padding(6.dp),
-                tint = if (repeatCycle != null) ColorGray.White else ColorGray.Gray_500
-            )
-            if (selectedLargeCategoryEnum == LargeCategoryEnum.EXPENSES) {
+                    .padding(bottom = 4.dp)
+                    .align(Alignment.CenterEnd),
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Icon(
-                    painter = painterResource(Res.drawable.ic_percent),
-                    contentDescription = "할부",
+                    painter = painterResource(Res.drawable.ic_repeat),
+                    contentDescription = "반복",
                     modifier = Modifier
                         .size(30.dp)
                         .clip(CircleShape)
-                        .background(if (totalInstallment != null) ColorPrimary.Primary_500 else ColorGray.Gray_50)
-                        .clickable { onInstallmentClick() }
+                        .background(if (repeatCycle != null) ColorPrimary.Primary_500 else ColorGray.Gray_50)
+                        .clickable { onRepeatClick() }
                         .padding(6.dp),
-                    tint = if (totalInstallment != null) ColorGray.White else ColorGray.Gray_500
+                    tint = if (repeatCycle != null) ColorGray.White else ColorGray.Gray_500
                 )
+                if (selectedLargeCategoryEnum == LargeCategoryEnum.EXPENSES) {
+                    Icon(
+                        painter = painterResource(Res.drawable.ic_percent),
+                        contentDescription = "할부",
+                        modifier = Modifier
+                            .size(30.dp)
+                            .clip(CircleShape)
+                            .background(if (totalInstallment != null) ColorPrimary.Primary_500 else ColorGray.Gray_50)
+                            .clickable { onInstallmentClick() }
+                            .padding(6.dp),
+                        tint = if (totalInstallment != null) ColorGray.White else ColorGray.Gray_500
+                    )
+                }
             }
         }
     }

@@ -8,11 +8,13 @@ import com.jie.wealthmate.feature.menu.categoryManagement.component.LargeCategor
 import com.jie.wealthmate.utils.today
 import com.jie.wealthmate.vo.CategoryTagVo
 import com.jie.wealthmate.vo.CategoryVo
+import com.jie.wealthmate.vo.HistoryVo
 import com.jie.wealthmate.vo.PaymentMethodVo
 import kotlinx.datetime.LocalDate
 
 data class HistoryDetailUiState(
     val isDataChanged: Boolean = false,
+    val history: HistoryVo? = null,
     val selectedLargeCategory: LargeCategoryEnum = LargeCategoryEnum.EXPENSES,
     val date: LocalDate = today,
     val repeatCycle: RepeatCycleEnum? = null,
