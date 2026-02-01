@@ -90,7 +90,7 @@ class HistoryDetailScreen(
 
         LaunchedEffect(Unit) {
             screenModel.updateTopBar(
-                title = TopBarItem.Title("내역 상세"),
+                title = TopBarItem.Title("${largeCategory.label} 내역 상세"),
                 readingItem = TopBarItem.ReadingItem().copy(
                     action = { onBack() }
                 ),
@@ -126,19 +126,19 @@ class HistoryDetailScreen(
                     .padding(horizontal = 20.dp)
                     .verticalScroll(rememberScrollState())
             ) {
-                // 카테고리
-                WMText(
-                    text = largeCategory.label,
-                    style = Typography().labelMedium.copy(fontWeight = FontWeight.SemiBold),
-                    modifier = Modifier
-                        .clip(CircleShape)
-                        .background(largeCategory.backgroundColor)
-                        .padding(horizontal = 8.dp, vertical = 4.dp)
-                )
+//                // 카테고리
+//                WMText(
+//                    text = largeCategory.label,
+//                    style = Typography().labelMedium.copy(fontWeight = FontWeight.SemiBold),
+//                    modifier = Modifier
+//                        .clip(CircleShape)
+//                        .background(largeCategory.backgroundColor)
+//                        .padding(horizontal = 8.dp, vertical = 4.dp)
+//                )
 
                 // 날짜 선택
                 DateTextField(
-                    modifier = Modifier.padding(top = 20.dp),
+                    modifier = Modifier.padding(top = 4.dp),
                     selectedDate = uiState.date,
                     amount = uiState.amount,
                     isTrailingIconVisible = false,
