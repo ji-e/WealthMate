@@ -25,7 +25,7 @@ interface HistoryDao {
 
     // 특정 ID의 내역 조회
     @Query("SELECT * FROM histories WHERE id = :id AND isDeleted = 0")
-    suspend fun getHistoryById(id: String): HistoryEntity?
+    suspend fun getHistoryById(id: String): HistoryWithDetails?
 
     // 데이터 삽입 (이미 존재하면 덮어쓰기)
     @Insert(onConflict = OnConflictStrategy.REPLACE)

@@ -6,17 +6,56 @@ import com.jie.wealthmate.utils.formatDateKorMD
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.isoDayNumber
 
-enum class RepeatCycleEnum(val label: String, val description: String) {
-    DAILY(label = "매일", description = "매일 반복돼요."),
-    WEEKDAY(label = "평일", description = "매주 월요일부터 금요일까지 반복돼요."),
-    WEEKEND(label = "주말", description = "매주 토요일과 일요일에 반복돼요."),
-    WEEKLY(label = "매주", description = "매주 같은 요일에 반복돼요."),
-    MONTHLY(label = "매달", description = "매월 같은 날짜에 반복돼요."),
-    MONTH_END(label = "월말", description = "매월 마지막 날에 반복돼요."),
-    YEARLY(label = "매년", description = "매년 같은 날짜에 반복돼요."),
+enum class RepeatCycleEnum(
+    val label: String,
+    val description: String,
+    val shortDescription: String,
+) {
+    DAILY(
+        label = "매일",
+        description = "매일 반복돼요.",
+        shortDescription = "매일 반복"
+    ),
+    WEEKDAY(
+        label = "평일",
+        description = "매주 월요일부터 금요일까지 반복돼요.",
+        shortDescription = "매주 평일 반복"
+    ),
+    WEEKEND(
+        label = "주말",
+        description = "매주 토요일과 일요일에 반복돼요.",
+        shortDescription = "매주 주말 반복"
+    ),
+    WEEKLY(
+        label = "매주",
+        description = "매주 같은 요일에 반복돼요.",
+        shortDescription = "매주 반복"
+    ),
+    MONTHLY(
+        label = "매달",
+        description = "매월 같은 날짜에 반복돼요.",
+        shortDescription = "매월 반복"
+    ),
+    MONTH_END(
+        label = "월말",
+        description = "매월 마지막 날에 반복돼요.",
+        shortDescription = "매월 말 반복"
+    ),
+    YEARLY(
+        label = "매년",
+        description = "매년 같은 날짜에 반복돼요.",
+        shortDescription = "매년 반복"
+    ),
+    UNKNOWN(
+        label = "반복 없음",
+        description = "반복 없음",
+        shortDescription = "반복 없음"
+    )
     ;
 
     companion object {
+        fun create(name: String?) = RepeatCycleEnum.entries.find { it.name == name } ?: UNKNOWN
+
         fun RepeatCycleEnum.formattedDescription(data: LocalDate): String {
             return when (this) {
                 RepeatCycleEnum.WEEKLY -> {
@@ -32,6 +71,24 @@ enum class RepeatCycleEnum(val label: String, val description: String) {
                 }
 
                 else -> description
+            }
+        }
+
+        fun RepeatCycleEnum.formattedShortDescription(data: LocalDate): String {
+            return when (this) {
+                RepeatCycleEnum.WEEKLY -> {
+                    "매주 ${WeekEnum.creator(data.dayOfWeek.isoDayNumber).korDisplayName}요일 반복"
+                }
+
+                RepeatCycleEnum.MONTHLY -> {
+                    "매월 ${data.day}일 반복"
+                }
+
+                RepeatCycleEnum.YEARLY -> {
+                    "매년 ${data.convertLocalDateToString(formatDateKorMD)} 반복"
+                }
+
+                else -> shortDescription
             }
         }
     }

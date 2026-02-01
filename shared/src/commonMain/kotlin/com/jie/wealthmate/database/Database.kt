@@ -1,6 +1,5 @@
 package com.jie.wealthmate.database
 
-import androidx.room.AutoMigration
 import androidx.room.ConstructedBy
 import androidx.room.Database
 import androidx.room.RoomDatabase
@@ -8,12 +7,14 @@ import androidx.room.RoomDatabaseConstructor
 import androidx.room.TypeConverters
 import com.jie.wealthmate.database.dao.CategoryDao
 import com.jie.wealthmate.database.dao.HistoryDao
+import com.jie.wealthmate.database.dao.InstallmentDao
 import com.jie.wealthmate.database.dao.PaymentMethodDao
 import com.jie.wealthmate.database.dao.PaymentMethodGroupDao
 import com.jie.wealthmate.database.dao.RepeatCycleDao
 import com.jie.wealthmate.database.eneity.CategoryConverters
 import com.jie.wealthmate.database.eneity.CategoryEntity
 import com.jie.wealthmate.database.eneity.HistoryEntity
+import com.jie.wealthmate.database.eneity.InstallmentEntity
 import com.jie.wealthmate.database.eneity.PaymentMethodEntity
 import com.jie.wealthmate.database.eneity.PaymentMethodGroupEntity
 import com.jie.wealthmate.database.eneity.RepeatCycleEntity
@@ -24,14 +25,15 @@ import com.jie.wealthmate.database.eneity.RepeatCycleEntity
         PaymentMethodEntity::class,
         PaymentMethodGroupEntity::class,
         HistoryEntity::class,
-        RepeatCycleEntity::class
+        InstallmentEntity::class,
+        RepeatCycleEntity::class,
     ],
-    version = 4,
+    version = 1,
     exportSchema = true,
     autoMigrations = [
-        AutoMigration(from = 1, to = 2),
-        AutoMigration(from = 2, to = 3),
-        AutoMigration(from = 3, to = 4)
+//        AutoMigration(from = 1, to = 2),
+//        AutoMigration(from = 2, to = 3),
+//        AutoMigration(from = 3, to = 4)
     ]
 )
 
@@ -42,6 +44,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun paymentMethodDao(): PaymentMethodDao
     abstract fun paymentMethodGroupDao(): PaymentMethodGroupDao
     abstract fun historyDao(): HistoryDao
+    abstract fun installmentDao(): InstallmentDao
     abstract fun repeatCycleDao(): RepeatCycleDao
 }
 

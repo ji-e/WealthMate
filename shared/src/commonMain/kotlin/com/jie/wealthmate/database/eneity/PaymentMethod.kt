@@ -13,6 +13,7 @@ data class PaymentMethodEntity(
     val groupId: String?,
     val groupLabel: String?,
     val sort: Long,
+    val assetId: String? = null,
     val updatedAt: Long = Clock.System.now().toEpochMilliseconds(),
     val isDeleted: Boolean = false,
 )
@@ -23,5 +24,5 @@ data class PaymentMethodWithGroupEntity(
         parentColumn = "groupId", // PaymentMethodEntity의 컬럼
         entityColumn = "id"       // PaymentMethodGroupEntity의 컬럼
     )
-    val group: PaymentMethodGroupEntity?
+    val group: PaymentMethodGroupEntity?,
 )

@@ -3,6 +3,7 @@ package com.jie.wealthmate.di
 import com.jie.wealthmate.feature.asset.AssetScreenModel
 import com.jie.wealthmate.feature.calendar.CalendarScreenModel
 import com.jie.wealthmate.feature.calendar.addHistory.AddHistoryScreenModel
+import com.jie.wealthmate.feature.calendar.historyDetail.HistoryDetailScreenModel
 import com.jie.wealthmate.feature.home.HomeScreenModel
 import com.jie.wealthmate.feature.menu.MenuScreenModel
 import com.jie.wealthmate.feature.menu.categoryManagement.CategoryManagementScreenModel
@@ -16,6 +17,8 @@ import com.jie.wealthmate.repository.CategoryRepository
 import com.jie.wealthmate.repository.CategoryRepositoryImpl
 import com.jie.wealthmate.repository.HistoryRepository
 import com.jie.wealthmate.repository.HistoryRepositoryImpl
+import com.jie.wealthmate.repository.InstallmentRepository
+import com.jie.wealthmate.repository.InstallmentRepositoryImpl
 import com.jie.wealthmate.repository.PaymentMethodRepository
 import com.jie.wealthmate.repository.PaymentMethodRepositoryImpl
 import com.jie.wealthmate.repository.RepeatCycleRepository
@@ -28,10 +31,11 @@ val commonModule = module {
     single<CategoryRepository> { CategoryRepositoryImpl(get()) }
     single<PaymentMethodRepository> { PaymentMethodRepositoryImpl(get(), get()) }
     single<HistoryRepository> { HistoryRepositoryImpl(get()) }
+    single<InstallmentRepository> { InstallmentRepositoryImpl(get()) }
     single<RepeatCycleRepository> { RepeatCycleRepositoryImpl(get()) }
 
 
-    single { HistorySaveUseCase(get(), get()) }
+    single { HistorySaveUseCase(get(), get(), get()) }
 
 
     // 홈
@@ -40,6 +44,8 @@ val commonModule = module {
     // 캘린더
     factory { CalendarScreenModel(get(), get()) }
     factory { AddHistoryScreenModel(get(), get(), get(), get()) }
+    factory { HistoryDetailScreenModel(get(), get(), get(), get()) }
+
 
     // 자산
     factory { AssetScreenModel() }

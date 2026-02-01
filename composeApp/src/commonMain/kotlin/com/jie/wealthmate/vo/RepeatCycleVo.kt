@@ -1,6 +1,7 @@
 package com.jie.wealthmate.vo
 
 import com.jie.wealthmate.database.eneity.RepeatCycleEntity
+import com.jie.wealthmate.feature.calendar.addHistory.component.RepeatCycleEnum
 import com.jie.wealthmate.feature.menu.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.utils.default
 import com.jie.wealthmate.utils.toLocalDate
@@ -12,7 +13,7 @@ data class RepeatCycleVo(
     val largeCategory: LargeCategoryEnum,
     val content: String?,
     val amount: Long,
-    val repeatCycle: String,        // RepeatCycleEnum
+    val repeatCycle: RepeatCycleEnum,        // RepeatCycleEnum
     val dayOfWeek: Int? = null,     // WEEKLY일 때 사용 (1=월, 7=일)
     val dayOfMonth: Int? = null,    // MONTHLY일 때 사용 (1~31)
     val startDate: LocalDate,
@@ -26,11 +27,11 @@ data class RepeatCycleVo(
             largeCategory = LargeCategoryEnum.creator(this?.largeCategory),
             content = this?.content.default(),
             amount = this?.amount.default(),
-            repeatCycle = this?.repeatCycle.default(),
+            repeatCycle = RepeatCycleEnum.create(this?.repeatCycle),
             dayOfWeek = this?.dayOfWeek.default(),
             dayOfMonth = this?.dayOfMonth.default(),
             startDate = this?.startDate.toLocalDate(),
-            endDate = this?.endDate.toLocalDate(),
+            endDate = this?.endDate?.toLocalDate(),
             categoryId = this?.categoryId.default(),
             paymentMethodId = this?.paymentMethodId.default(),
         )

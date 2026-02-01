@@ -1,4 +1,4 @@
-package com.jie.wealthmate.feature.calendar.addHistory
+package com.jie.wealthmate.feature.calendar.historyDetail
 
 import androidx.compose.ui.text.input.TextFieldValue
 import com.jie.wealthmate.base.BaseUiState
@@ -8,15 +8,17 @@ import com.jie.wealthmate.feature.menu.categoryManagement.component.LargeCategor
 import com.jie.wealthmate.utils.today
 import com.jie.wealthmate.vo.CategoryTagVo
 import com.jie.wealthmate.vo.CategoryVo
+import com.jie.wealthmate.vo.HistoryVo
 import com.jie.wealthmate.vo.PaymentMethodVo
 import kotlinx.datetime.LocalDate
 
-data class AddHistoryUiState(
+data class HistoryDetailUiState(
     val isDataChanged: Boolean = false,
+    val history: HistoryVo? = null,
     val selectedLargeCategory: LargeCategoryEnum = LargeCategoryEnum.EXPENSES,
     val date: LocalDate = today,
     val repeatCycle: RepeatCycleEnum? = null,
-    val totalInstallment: Int? = null,
+    val installmentCount: Int? = null,
     val content: TextFieldValue = TextFieldValue(""),
     val amount: TextFieldValue = TextFieldValue(""),
     val category: CategoryVo? = null,
@@ -28,6 +30,6 @@ data class AddHistoryUiState(
     val isSaveButtonEnable = amount.text.isNotBlank()
 }
 
-sealed class AddHistoryUiSideEffect : UiSideEffect {
-    data object OnSuccessSave : AddHistoryUiSideEffect()
+sealed class HistoryDetailUiSideEffect : UiSideEffect {
+    data object OnSuccessSave : HistoryDetailUiSideEffect()
 }

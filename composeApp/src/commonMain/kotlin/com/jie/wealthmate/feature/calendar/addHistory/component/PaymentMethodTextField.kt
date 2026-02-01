@@ -13,6 +13,7 @@ fun PaymentMethodTextField(
     modifier: Modifier = Modifier,
     selectedLargeCategory: LargeCategoryEnum = LargeCategoryEnum.EXPENSES,
     selectedPaymentMethod: PaymentMethodVo?,
+    placeholder: String = "을 선택해 주세요.",
     onPaymentMethodClick: () -> Unit = {},
 ) {
     val label = if (selectedLargeCategory == LargeCategoryEnum.EXPENSES) "결제수단" else "자산"
@@ -23,7 +24,7 @@ fun PaymentMethodTextField(
         modifier = modifier,
         label = label,
         readOnly = true,
-        placeholder = "${label}을 선택해주세요.",
+        placeholder = "$label$placeholder",
         onReadOnlyClick = onPaymentMethodClick,
     )
 }

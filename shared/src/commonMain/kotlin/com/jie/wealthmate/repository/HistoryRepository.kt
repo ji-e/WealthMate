@@ -10,7 +10,7 @@ interface HistoryRepository {
 
     fun getHistoriesWithDetails(): Flow<List<HistoryWithDetails>>
 
-    suspend fun getHistoryById(id: String): HistoryEntity?
+    suspend fun getHistoryById(id: String): HistoryWithDetails?
 
     suspend fun insertHistory(history: HistoryEntity)
 

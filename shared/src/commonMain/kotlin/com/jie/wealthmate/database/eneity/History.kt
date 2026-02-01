@@ -13,11 +13,12 @@ data class HistoryEntity(
     val date: Long,
     val amount: Long,
     val repeatCycleId: String? = null,
-    val installment: Long? = null,
+    val installmentId: String? = null,
     val categoryId: String? = null,
     val categoryTagId: String? = null,
     val paymentMethodId: String? = null,
     val content: String? = null,
+    val isVisibility: Boolean = true,
     val updatedAt: Long = Clock.System.now().toEpochMilliseconds(),
     val isDeleted: Boolean = false,
 )
@@ -41,4 +42,10 @@ data class HistoryWithDetails(
         entityColumn = "id"
     )
     val repeatCycle: RepeatCycleEntity?,
+
+    @Relation(
+        parentColumn = "installmentId",
+        entityColumn = "id"
+        )
+    val installment: InstallmentEntity?,
 )
