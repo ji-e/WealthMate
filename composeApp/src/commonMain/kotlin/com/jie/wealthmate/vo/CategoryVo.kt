@@ -1,6 +1,9 @@
 package com.jie.wealthmate.vo
 
+import com.jie.wealthmate.database.eneity.CategoryEntity
 import com.jie.wealthmate.feature.menu.categoryManagement.component.LargeCategoryEnum
+import com.jie.wealthmate.utils.default
+import com.jie.wealthmate.vo.CategoryTagVo.Companion.mapperToVo
 
 data class CategoryVo(
     val id: String,
@@ -10,4 +13,16 @@ data class CategoryVo(
     val sort: Long,
     val isFixed: Boolean,
     val tags: List<CategoryTagVo>,
-)
+) {
+    companion object {
+        fun CategoryEntity?.mapperToVo() = CategoryVo(
+            id = this?.id.default(),
+            icon = this?.icon.default(),
+            largeCategory = LargeCategoryEnum.creator(this?.largeCategory),
+            middleLabel = this?.middleLabel.default(),
+            sort = this?.sort.default(),
+            isFixed = this?.isFixed.default(),
+            tags = this?.tags?.map { it.mapperToVo() }.default()
+        )
+    }
+}

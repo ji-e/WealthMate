@@ -39,6 +39,7 @@ import androidx.compose.ui.draw.dropShadow
 import androidx.compose.ui.graphics.shadow.Shadow
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
@@ -49,12 +50,12 @@ import com.jie.wealthmate.theme.ColorGray
 import com.jie.wealthmate.utils.convertLocalDateToString
 import com.jie.wealthmate.utils.formatDateKorYM
 import com.jie.wealthmate.utils.today
+import com.jie.wealthmate.vo.HistoryVo
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.monthsUntil
 import kotlinx.datetime.plus
 import org.jetbrains.compose.resources.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import wealthmate.composeapp.generated.resources.Res
 import wealthmate.composeapp.generated.resources.ic_arrow_drop_down
 import wealthmate.composeapp.generated.resources.ic_calendar_today
@@ -77,6 +78,7 @@ fun MonthCalendar(
     modifier: Modifier = Modifier,
     selectedMonth: LocalDate,
     selectedDate: LocalDate,
+    historyItems: List<HistoryVo> = emptyList(),
     onMonthChanged: (LocalDate) -> Unit = {},
     onTodayClick: () -> Unit = {},
     onSelectedMonthClick: () -> Unit = {},
@@ -96,18 +98,20 @@ fun MonthCalendar(
         pageCount = { (today.year - startDate.year) * 12 + 12 }
     )
 
-    LaunchedEffect(pagerState) {
-        snapshotFlow { pagerState.targetPage }.collect { page ->
-            val newMonth = startDate.plus(value = page, unit = DateTimeUnit.MONTH)
-            onMonthChanged(newMonth)
-        }
-    }
+//    LaunchedEffect(pagerState) {
+//        snapshotFlow { pagerState.targetPage }.collect { page ->
+//            val newMonth = startDate.plus(value = page, unit = DateTimeUnit.MONTH)
+//            onMonthChanged(newMonth)
+//        }
+//    }
     LaunchedEffect(pagerState) {
         snapshotFlow { pagerState.settledPage }.collect { page ->
             val newMonth = startDate.plus(value = page, unit = DateTimeUnit.MONTH)
             displaySelectedMonth = newMonth.convertLocalDateToString(formatDateKorYM)
+            onMonthChanged(newMonth)
         }
     }
+
 
     LaunchedEffect(selectedMonth) {
         val page = startDate.monthsUntil(selectedMonth)
@@ -120,7 +124,6 @@ fun MonthCalendar(
         modifier = modifier.fillMaxSize()
     ) {
         MonthCalendarHeader(
-            today = today,
             displaySelectedMonth = displaySelectedMonth,
             onTodayClick = onTodayClick,
             onSelectedMonthClick = onSelectedMonthClick,
@@ -139,7 +142,7 @@ fun MonthCalendar(
 
             val maximizedHeightPx = with(density) { maxHeight.toPx() }
             val minimizedHeightPx = dayHeightPx + dragBarHeightPx
-            val normalCalendarHeight = 360.dp
+            val normalCalendarHeight = 400.dp
             val normalCalendarHeightPx = with(density) { normalCalendarHeight.toPx() }
 
             val anchoredState = remember(maximizedHeightPx) {
@@ -191,9 +194,9 @@ fun MonthCalendar(
                     ) { page ->
                         val month = startDate.plus(page, DateTimeUnit.MONTH)
                         MonthCalendarContent(
-                            today = today,
                             selectedDate = selectedDate,
                             selectedMonth = month,
+                            historyItems = historyItems,
                             dayNormalHeight = dayNormalHeight,
                             dayMaxHeight = dayMaxHeight,
                             expansionProgress = expansionProgress,
@@ -252,7 +255,6 @@ fun MonthCalendar(
 
 @Composable
 private fun MonthCalendarHeader(
-    today: LocalDate,
     displaySelectedMonth: String,
     onTodayClick: () -> Unit,
     onSelectedMonthClick: () -> Unit,
@@ -260,7 +262,7 @@ private fun MonthCalendarHeader(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = 12.dp, end = 4.dp),
+            .padding(horizontal = 4.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         TextButton(
@@ -319,9 +321,9 @@ private fun MonthCalendarHeader(
 @Composable
 private fun MonthCalendarContent(
     modifier: Modifier = Modifier,
-    today: LocalDate,
     selectedDate: LocalDate,
     selectedMonth: LocalDate,
+    historyItems: List<HistoryVo>,
     dayNormalHeight: Dp,
     dayMaxHeight: Dp,
     expansionProgress: Float,
@@ -330,9 +332,9 @@ private fun MonthCalendarContent(
 ) {
     Column(modifier = modifier) {
         DayGrid(
-            today = today,
             selectedDate = selectedDate,
             selectedMonth = selectedMonth,
+            historyItems = historyItems,
             dayNormalHeight = dayNormalHeight,
             dayMaxHeight = dayMaxHeight,
             expansionProgress = expansionProgress,

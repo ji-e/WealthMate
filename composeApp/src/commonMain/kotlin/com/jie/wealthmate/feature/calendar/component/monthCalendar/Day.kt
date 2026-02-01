@@ -2,41 +2,61 @@ package com.jie.wealthmate.feature.calendar.component.monthCalendar
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.TextAutoSize
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.lerp
+import androidx.compose.ui.unit.sp
 import com.jie.wealthmate.component.WMText
+import com.jie.wealthmate.feature.menu.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.theme.ColorBlue
 import com.jie.wealthmate.theme.ColorGray
+import com.jie.wealthmate.theme.ColorPrimary
+import com.jie.wealthmate.theme.ColorRed
+import com.jie.wealthmate.utils.default
 import com.jie.wealthmate.utils.firstDayOfMonth
+import com.jie.wealthmate.utils.formatWithCommas
 import com.jie.wealthmate.utils.lastDayOfMonth
+import com.jie.wealthmate.utils.today
+import com.jie.wealthmate.vo.HistoryVo
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.isoDayNumber
 import kotlinx.datetime.minus
 import kotlinx.datetime.plus
+import org.jetbrains.compose.resources.painterResource
+import wealthmate.composeapp.generated.resources.Res
+import wealthmate.composeapp.generated.resources.ic_push_pin
 import kotlin.math.ceil
 
 
 @Composable
 fun DayGrid(
-    today: LocalDate,
     selectedDate: LocalDate,
     selectedMonth: LocalDate,
+    historyItems: List<HistoryVo>,
     dayNormalHeight: Dp,
     dayMaxHeight: Dp,
     expansionProgress: Float,
@@ -102,19 +122,31 @@ fun DayGrid(
             userScrollEnabled = false
         ) {
             items(items.size) { index ->
+                val history = historyItems.filter { it.date == items[index].first }
+                val fixedItems = history.filter { it.category?.isFixed.default() }
+                val incomeAmount = history
+                    .filter { it.largeCategory == LargeCategoryEnum.INCOME }
+                    .sumOf { it.amount }
+                val expenseAmount = history
+                    .filter { it.largeCategory == LargeCategoryEnum.EXPENSES }
+                    .sumOf { it.amount }
+                    .minus(fixedItems.sumOf { it.amount })
+
                 val day = items[index]
                 val rowIndex = index / 7
+
                 DayItem(
                     day = day,
-                    today = today,
                     isSelected = day.first == selectedDate,
                     isInSelectedWeek = rowIndex == selectedRowIndex,
+                    incomeAmount = incomeAmount,
+                    expenseAmount = expenseAmount,
+                    fixedItems = fixedItems,
                     dayNormalHeight = dayNormalHeight / numRowsForCurrentMonth,
                     dayMaxHeight = dayMaxHeight / numRowsForCurrentMonth,
                     expansionProgress = expansionProgress,
                     collapseProgress = collapseProgress,
                     onClickDate = onClickDate
-
                 )
             }
         }
@@ -125,9 +157,11 @@ fun DayGrid(
 internal fun DayItem(
     modifier: Modifier = Modifier,
     day: Pair<LocalDate, MonthPeriodEnum>,
-    today: LocalDate,
     isSelected: Boolean,
     isInSelectedWeek: Boolean,
+    incomeAmount: Long,
+    expenseAmount: Long,
+    fixedItems: List<HistoryVo?>,
     dayNormalHeight: Dp,
     dayMaxHeight: Dp,
     expansionProgress: Float,
@@ -159,21 +193,132 @@ internal fun DayItem(
         else -> 1f
     }
 
-    Box(
+    Column(
         modifier = modifier
+            .alpha(alpha)
             .fillMaxWidth()
             .height(height)
-            .background(if (isSelected) ColorBlue.Blue_50 else ColorGray.White)
-            .clickable { onClickDate(day.first) },
-        contentAlignment = Alignment.Center
-    ) {
+            .background(if (isSelected) ColorPrimary.Primary_200 else ColorGray.White)
+            .clickable { onClickDate(day.first) }
+            .padding(2.dp),
+
+        ) {
+        val isToday = day.first == today
+        val dayColor = when {
+            isToday -> ColorGray.White
+            day.second == MonthPeriodEnum.LAST_MONTH || day.second == MonthPeriodEnum.NEXT_MONTH -> ColorGray.Gray_200
+            else -> WeekEnum.creator(day.first.dayOfWeek.isoDayNumber).color
+        }
+        val dayBackgroundColor = when {
+            isToday -> WeekEnum.creator(day.first.dayOfWeek.isoDayNumber).color
+            isSelected -> ColorPrimary.Primary_200
+            else -> ColorGray.White
+        }
 
         WMText(
-            modifier = Modifier.alpha(alpha),
+            modifier = Modifier
+                .padding(bottom = 2.dp)
+                .background(color = dayBackgroundColor, shape = CircleShape)
+                .align(Alignment.CenterHorizontally)
+                .width(24.dp),
             text = day.first.day.toString(),
-            style = Typography().bodyMedium.copy(color = WeekEnum.creator(day.first.dayOfWeek.isoDayNumber).color),
+            style = Typography().bodySmall.copy(
+                color = dayColor,
+                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium
+            ),
             textAlign = TextAlign.Center
         )
 
+        if (incomeAmount > 0) {
+            WMText(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(14.dp),
+                text = "+${formatWithCommas(incomeAmount.toString())}",
+                style = Typography().labelSmall.copy(color = ColorBlue.Blue_300),
+                textAlign = TextAlign.Center,
+                maxLines = 1,
+                autoSize = TextAutoSize.StepBased(
+                    minFontSize = 9.sp,
+                    maxFontSize = 11.sp,
+                    stepSize = 1.sp
+                )
+            )
+        }
+        if (expenseAmount > 0) {
+            WMText(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(14.dp),
+                text = "-${formatWithCommas(expenseAmount.toString())}",
+                style = Typography().labelSmall.copy(color = ColorRed.Red_300),
+                textAlign = TextAlign.Center,
+                maxLines = 1,
+                autoSize = TextAutoSize.StepBased(
+                    minFontSize = 8.sp,
+                    maxFontSize = 11.sp,
+                    stepSize = 1.sp
+                )
+            )
+        }
+
+        // 고정 아이템 영역
+        if (fixedItems.isNotEmpty()) {
+            BoxWithConstraints(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .alpha(alpha = alpha),
+            ) {
+                val itemHeight = 14.dp
+                val maxVisibleItems = (maxHeight / itemHeight).toInt()
+                val isOverflow = fixedItems.size > maxVisibleItems
+
+                Column {
+                    val itemsToShow =
+                        if (isOverflow) {
+                            fixedItems.take(
+                                (maxVisibleItems - 1).coerceAtLeast(minimumValue = 0)
+                            )
+                        } else {
+                            fixedItems
+                        }
+
+                    itemsToShow.forEach { item ->
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(height = itemHeight),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                painter = painterResource(resource = Res.drawable.ic_push_pin),
+                                contentDescription = null,
+                                tint = ColorRed.Red_300,
+                                modifier = Modifier.size(size = 12.dp)
+                            )
+
+                            WMText(
+                                text = item?.content.default(),
+                                style = Typography().labelSmall,
+                                maxLines = 1,
+                                modifier = Modifier.padding(start = 2.dp)
+                            )
+                        }
+                    }
+
+                    // 높이를 초과할 경우 "..." 표시
+                    if (isOverflow && maxVisibleItems > 0) {
+                        WMText(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(height = itemHeight),
+                            text = "...",
+                            style = Typography().labelSmall,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                }
+            }
+        }
     }
 }

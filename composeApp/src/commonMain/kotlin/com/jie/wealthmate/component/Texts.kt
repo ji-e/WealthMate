@@ -1,5 +1,6 @@
 package com.jie.wealthmate.component
 
+import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.material3.Text
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
@@ -46,6 +47,7 @@ fun WMText(
     overflow: TextOverflow = TextOverflow.Ellipsis,
     textAlign: TextAlign? = null,
     textDecoration: TextDecoration? = null,
+    autoSize: TextAutoSize? = null,
 ) {
     val lineHeight =
         if (style.lineHeight != TextUnit.Unspecified) style.lineHeight
@@ -60,5 +62,6 @@ fun WMText(
         textAlign = textAlign,
         textDecoration = textDecoration,
         fontFamily = wantedSansFontFamily(),
+        autoSize = autoSize
     )
 }

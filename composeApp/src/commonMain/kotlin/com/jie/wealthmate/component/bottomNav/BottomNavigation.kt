@@ -70,7 +70,7 @@ fun BottomNavigation(
                     colors = NavigationBarItemDefaults.colors().copy(
                         selectedIconColor = ColorGray.Gray_700,
                         selectedTextColor = ColorGray.Gray_700,
-                        selectedIndicatorColor = ColorPrimary.Primary_300,
+                        selectedIndicatorColor = ColorPrimary.Primary_200,
                         unselectedIconColor = ColorGray.Gray_300,
                         unselectedTextColor = ColorGray.Gray_300,
                     ),
