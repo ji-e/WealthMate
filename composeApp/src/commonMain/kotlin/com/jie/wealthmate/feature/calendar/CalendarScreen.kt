@@ -24,7 +24,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.dropShadow
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.shadow.Shadow
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
@@ -135,7 +139,7 @@ class CalendarScreen() : Screen {
             )
 
             if (isShowSelectedCalendarModalBottomSheet) {
-                ShowSelectedCalendarModalBottomSheet(
+                SelectedCalendarModalBottomSheet(
                     selectedMonth = uiState.selectedMonth,
                     onMonthChange = screenModel::updateSelectedMonth,
                     onDismissRequest = { isShowSelectedCalendarModalBottomSheet = false }
@@ -148,7 +152,7 @@ class CalendarScreen() : Screen {
      * 월 선택 ModalBottomSheet
      */
     @Composable
-    private fun ShowSelectedCalendarModalBottomSheet(
+    private fun SelectedCalendarModalBottomSheet(
         selectedMonth: LocalDate = today,
         onMonthChange: (LocalDate) -> Unit = {},
         onDismissRequest: () -> Unit = {},
@@ -169,7 +173,17 @@ class CalendarScreen() : Screen {
             }
 
             LazyColumn(
-                modifier = Modifier.height(240.dp),
+                modifier = Modifier.height(240.dp)
+                    .nestedScroll(object :
+                        NestedScrollConnection {
+                        override fun onPreScroll(
+                            available: Offset,
+                            source: NestedScrollSource,
+                        ): Offset {
+                            // 위로 스크롤하거나 아래로 스크롤할 때 시트가 움직이지 않도록 이벤트를 여기서 소비하지 않음
+                            return super.onPreScroll(available, source)
+                        }
+                    }),
                 state = listState
             ) {
                 items(monthItem.size) {

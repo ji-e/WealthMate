@@ -1,5 +1,6 @@
 package com.jie.wealthmate.component
 
+import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -15,6 +16,7 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -52,7 +54,17 @@ fun WMModalBottomSheet(
             )
         }
     ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                // 본문 영역의 포인터 입력을 가로채서 시트 전체의 드래그 동작을 방해함
+                // 드래그 제스처가 아래의 BottomSheetScaffold/ModalBottomSheet 감지기까지 도달하지 못하게 함
+                .pointerInput(Unit) {
+                    detectVerticalDragGestures { _, _ ->
+                        // 아무것도 하지 않음으로써 본문 드래그를 무효화 (추측: 내부 스크롤이 있다면 충돌 가능성 있음)
+                    }
+                },
+            horizontalAlignment = Alignment.CenterHorizontally) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()

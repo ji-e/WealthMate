@@ -29,7 +29,7 @@ fun WeekHeader() {
                 ),
                 modifier = Modifier
                     .weight(1f)
-                    .padding(vertical = 12.dp),
+                    .padding(top = 4.dp, bottom = 8.dp),
                 textAlign = TextAlign.Center
             )
         }

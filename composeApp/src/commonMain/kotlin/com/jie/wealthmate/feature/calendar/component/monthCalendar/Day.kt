@@ -11,9 +11,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
@@ -26,6 +28,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.lerp
+import androidx.compose.ui.unit.sp
 import com.jie.wealthmate.component.WMText
 import com.jie.wealthmate.feature.menu.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.theme.ColorBlue
@@ -192,11 +195,12 @@ internal fun DayItem(
 
     Column(
         modifier = modifier
+            .alpha(alpha)
             .fillMaxWidth()
             .height(height)
             .background(if (isSelected) ColorPrimary.Primary_200 else ColorGray.White)
             .clickable { onClickDate(day.first) }
-            .padding(horizontal = 3.dp, vertical = 2.dp),
+            .padding(2.dp),
 
         ) {
         val isToday = day.first == today
@@ -213,11 +217,10 @@ internal fun DayItem(
 
         WMText(
             modifier = Modifier
-                .alpha(alpha)
                 .padding(bottom = 2.dp)
                 .background(color = dayBackgroundColor, shape = CircleShape)
                 .align(Alignment.CenterHorizontally)
-                .padding(horizontal = 8.dp),
+                .width(24.dp),
             text = day.first.day.toString(),
             style = Typography().bodySmall.copy(
                 color = dayColor,
@@ -228,20 +231,34 @@ internal fun DayItem(
 
         if (incomeAmount > 0) {
             WMText(
-                modifier = Modifier.alpha(alpha).fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(14.dp),
                 text = "+${formatWithCommas(incomeAmount.toString())}",
                 style = Typography().labelSmall.copy(color = ColorBlue.Blue_300),
                 textAlign = TextAlign.Center,
-                maxLines = 1
+                maxLines = 1,
+                autoSize = TextAutoSize.StepBased(
+                    minFontSize = 9.sp,
+                    maxFontSize = 11.sp,
+                    stepSize = 1.sp
+                )
             )
         }
         if (expenseAmount > 0) {
             WMText(
-                modifier = Modifier.alpha(alpha).fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(14.dp),
                 text = "-${formatWithCommas(expenseAmount.toString())}",
                 style = Typography().labelSmall.copy(color = ColorRed.Red_300),
                 textAlign = TextAlign.Center,
-                maxLines = 1
+                maxLines = 1,
+                autoSize = TextAutoSize.StepBased(
+                    minFontSize = 8.sp,
+                    maxFontSize = 11.sp,
+                    stepSize = 1.sp
+                )
             )
         }
 

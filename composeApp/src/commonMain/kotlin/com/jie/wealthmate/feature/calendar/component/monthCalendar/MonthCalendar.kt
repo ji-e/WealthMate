@@ -124,7 +124,6 @@ fun MonthCalendar(
         modifier = modifier.fillMaxSize()
     ) {
         MonthCalendarHeader(
-            today = today,
             displaySelectedMonth = displaySelectedMonth,
             onTodayClick = onTodayClick,
             onSelectedMonthClick = onSelectedMonthClick,
@@ -143,7 +142,7 @@ fun MonthCalendar(
 
             val maximizedHeightPx = with(density) { maxHeight.toPx() }
             val minimizedHeightPx = dayHeightPx + dragBarHeightPx
-            val normalCalendarHeight = 360.dp
+            val normalCalendarHeight = 400.dp
             val normalCalendarHeightPx = with(density) { normalCalendarHeight.toPx() }
 
             val anchoredState = remember(maximizedHeightPx) {
@@ -256,7 +255,6 @@ fun MonthCalendar(
 
 @Composable
 private fun MonthCalendarHeader(
-    today: LocalDate,
     displaySelectedMonth: String,
     onTodayClick: () -> Unit,
     onSelectedMonthClick: () -> Unit,
@@ -264,7 +262,7 @@ private fun MonthCalendarHeader(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = 12.dp, end = 4.dp),
+            .padding(horizontal = 4.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         TextButton(
