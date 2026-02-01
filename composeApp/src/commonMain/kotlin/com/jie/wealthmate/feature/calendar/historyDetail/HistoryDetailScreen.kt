@@ -127,7 +127,7 @@ class HistoryDetailScreen(
 
                 // 날짜 선택
                 DateTextField(
-                    modifier = Modifier.padding(top = 24.dp),
+                    modifier = Modifier.padding(top = 4.dp),
                     selectedDate = uiState.date,
                     amount = uiState.amount,
                     isTrailingIconVisible = false,

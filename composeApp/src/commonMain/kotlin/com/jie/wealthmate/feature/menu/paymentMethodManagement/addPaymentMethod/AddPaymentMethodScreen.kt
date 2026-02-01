@@ -96,7 +96,7 @@ class AddPaymentMethodScreen(
                 WMTextField(
                     value = uiState.label,
                     onValueChange = screenModel::updatePaymentMethodLabel,
-                    modifier = Modifier.padding(top = 24.dp),
+                    modifier = Modifier.padding(top = 4.dp),
                     label = "결제수단 이름",
                     placeholder = "삼성카드",
                     isRequire = true,
