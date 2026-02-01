@@ -292,7 +292,7 @@ fun CategorySelectionRow(
             LazyRow(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(60.dp)
+                    .height(40.dp)
                     .padding(horizontal = 20.dp),
                 horizontalArrangement = Arrangement.spacedBy(4.dp),
                 verticalAlignment = Alignment.CenterVertically
