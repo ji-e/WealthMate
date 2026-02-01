@@ -13,8 +13,7 @@ data class HistoryEntity(
     val date: Long,
     val amount: Long,
     val repeatCycleId: String? = null,
-    val installment: Long? = null,
-    val totalInstallment: Long? = null,
+    val installmentId: String? = null,
     val categoryId: String? = null,
     val categoryTagId: String? = null,
     val paymentMethodId: String? = null,
@@ -43,4 +42,10 @@ data class HistoryWithDetails(
         entityColumn = "id"
     )
     val repeatCycle: RepeatCycleEntity?,
+
+    @Relation(
+        parentColumn = "installmentId",
+        entityColumn = "id"
+        )
+    val installment: InstallmentEntity?,
 )

@@ -169,13 +169,13 @@ class AddHistoryScreenModel(
                         largeCategory = uiState.selectedLargeCategory.name,
                         date = uiState.date.toEpochMilliseconds(),
                         amount = uiState.amount.text.formatRemoveCommas().toLong(),
-                        totalInstallment = uiState.totalInstallment?.toLong(),
                         categoryId = uiState.category?.id,
                         categoryTagId = uiState.categoryTag?.id,
                         paymentMethodId = uiState.paymentMethod?.id,
                         content = uiState.content.text,
                     ),
-                    repeatCycle = uiState.repeatCycle?.name
+                    repeatCycle = uiState.repeatCycle?.name,
+                    totalInstallment = uiState.totalInstallment?.toLong()
                 )
             }
         ) {

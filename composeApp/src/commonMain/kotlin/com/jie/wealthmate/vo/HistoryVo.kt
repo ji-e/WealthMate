@@ -5,6 +5,7 @@ import com.jie.wealthmate.feature.menu.categoryManagement.component.LargeCategor
 import com.jie.wealthmate.utils.default
 import com.jie.wealthmate.utils.toLocalDate
 import com.jie.wealthmate.vo.CategoryVo.Companion.mapperToVo
+import com.jie.wealthmate.vo.InstallmentVo.Companion.mapperToVo
 import com.jie.wealthmate.vo.PaymentMethodVo.Companion.mapperToVo
 import com.jie.wealthmate.vo.RepeatCycleVo.Companion.mapperToVo
 import kotlinx.datetime.LocalDate
@@ -14,9 +15,8 @@ data class HistoryVo(
     val largeCategory: LargeCategoryEnum,
     val date: LocalDate,
     val amount: Long,
+    val installment: InstallmentVo?,
     val repeatCycle: RepeatCycleVo?,
-    val installment: Long?,
-    val totalInstallment: Long?,
     val category: CategoryVo?,
     val categoryTag: CategoryTagVo?,
     val paymentMethod: PaymentMethodVo?,
@@ -28,9 +28,8 @@ data class HistoryVo(
             largeCategory = LargeCategoryEnum.creator(this?.history?.largeCategory),
             date = this?.history?.date.toLocalDate(),
             amount = this?.history?.amount.default(),
+            installment = this?.installment?.mapperToVo(),
             repeatCycle = this?.repeatCycle?.mapperToVo(),
-            installment = this?.history?.installment,
-            totalInstallment = this?.history?.totalInstallment,
             category = this?.category?.mapperToVo(),
             categoryTag = this?.category?.mapperToVo()?.tags?.find { it.id == this.history.categoryTagId },
             paymentMethod = this?.paymentMethod?.mapperToVo(),
