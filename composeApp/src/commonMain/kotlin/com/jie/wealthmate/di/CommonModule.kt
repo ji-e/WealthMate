@@ -17,6 +17,8 @@ import com.jie.wealthmate.repository.CategoryRepository
 import com.jie.wealthmate.repository.CategoryRepositoryImpl
 import com.jie.wealthmate.repository.HistoryRepository
 import com.jie.wealthmate.repository.HistoryRepositoryImpl
+import com.jie.wealthmate.repository.InstallmentRepository
+import com.jie.wealthmate.repository.InstallmentRepositoryImpl
 import com.jie.wealthmate.repository.PaymentMethodRepository
 import com.jie.wealthmate.repository.PaymentMethodRepositoryImpl
 import com.jie.wealthmate.repository.RepeatCycleRepository
@@ -29,10 +31,11 @@ val commonModule = module {
     single<CategoryRepository> { CategoryRepositoryImpl(get()) }
     single<PaymentMethodRepository> { PaymentMethodRepositoryImpl(get(), get()) }
     single<HistoryRepository> { HistoryRepositoryImpl(get()) }
+    single<InstallmentRepository> { InstallmentRepositoryImpl(get()) }
     single<RepeatCycleRepository> { RepeatCycleRepositoryImpl(get()) }
 
 
-    single { HistorySaveUseCase(get(), get()) }
+    single { HistorySaveUseCase(get(), get(), get()) }
 
 
     // 홈
