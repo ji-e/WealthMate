@@ -228,7 +228,7 @@ class HistoryDetailScreen(
                 // 결제수단/자산
                 PaymentMethodTextField(
                     modifier = Modifier.padding(top = 24.dp),
-                    selectedLargeCategory = uiState.selectedLargeCategory,
+                    selectedLargeCategory = uiState.largeCategory,
                     selectedPaymentMethod = uiState.paymentMethod,
                     placeholder = " 없음",
                     onPaymentMethodClick = { isShowPaymentMethodModalBottomSheet = true }
@@ -287,8 +287,7 @@ class HistoryDetailScreen(
         if (isShowCategorySelectModalBottomSheet) {
             CategorySelectModalBottomSheet(
                 categoryItems = uiState.categoryItems,
-                selectedLargeCategory = uiState.history?.largeCategory
-                    ?: LargeCategoryEnum.EXPENSES,
+                selectedLargeCategory = uiState.largeCategory,
                 selectedCategory = uiState.category,
                 selectedCategoryTag = uiState.categoryTag,
                 onConfirmClick = { category, categoryTag ->
