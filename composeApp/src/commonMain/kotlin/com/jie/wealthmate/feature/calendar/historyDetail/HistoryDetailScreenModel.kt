@@ -179,11 +179,13 @@ class HistoryDetailScreenModel(
 
     fun saveHistory() {
         val uiState = container.uiState.value
+        uiState.history?.id ?: return
+
         launchSafe(
             block = {
                 historyRepository.updateHistory(
                     HistoryEntity(
-                        id = uiState.history?.id.default(),
+                        id = uiState.history.id,
                         largeCategory = uiState.largeCategory.name,
                         date = uiState.date.toEpochMilliseconds(),
                         amount = uiState.amount.text.formatRemoveCommas().toLong(),
@@ -200,6 +202,20 @@ class HistoryDetailScreenModel(
             reduceState { state ->
                 state.copy(isDataChanged = false)
             }
+        }
+    }
+
+    fun removeHistory() {
+        val uiState = container.uiState.value
+        uiState.history?.id ?: return
+
+        launchSafe(
+            block = {
+                historyRepository.deleteHistory(uiState.history.id)
+            }
+        ) {
+            showSnackbar("${uiState.largeCategory.label} 내역이 삭제되었습니다.")
+            postSideEffect { HistoryDetailUiSideEffect.OnSuccess }
         }
     }
 

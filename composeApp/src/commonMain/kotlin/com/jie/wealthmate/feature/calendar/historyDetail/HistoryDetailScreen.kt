@@ -81,7 +81,7 @@ class HistoryDetailScreen(
 
         screenModel.collectSideEffect { sideEffect ->
             when (sideEffect) {
-                is HistoryDetailUiSideEffect.OnSuccessSave -> {
+                is HistoryDetailUiSideEffect.OnSuccess -> {
                     navigator.pop()
                 }
             }
@@ -99,7 +99,7 @@ class HistoryDetailScreen(
                         tint = ColorRed.Red_300,
                         action = {
                             showRemoveDialog() {
-//                                screenModel.removeHistory()
+                                screenModel.removeHistory()
                             }
                         }
                     )
@@ -125,16 +125,6 @@ class HistoryDetailScreen(
                     .padding(horizontal = 20.dp)
                     .verticalScroll(rememberScrollState())
             ) {
-//                // 카테고리
-//                WMText(
-//                    text = largeCategory.label,
-//                    style = Typography().labelMedium.copy(fontWeight = FontWeight.SemiBold),
-//                    modifier = Modifier
-//                        .clip(CircleShape)
-//                        .background(largeCategory.backgroundColor)
-//                        .padding(horizontal = 8.dp, vertical = 4.dp)
-//                )
-
                 // 날짜 선택
                 DateTextField(
                     modifier = Modifier.padding(top = 4.dp),
