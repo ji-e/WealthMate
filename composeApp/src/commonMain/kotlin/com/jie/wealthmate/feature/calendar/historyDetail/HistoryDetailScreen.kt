@@ -2,7 +2,6 @@
 
 package com.jie.wealthmate.feature.calendar.historyDetail
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,7 +10,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Typography
@@ -23,7 +21,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -47,6 +44,7 @@ import com.jie.wealthmate.feature.calendar.addHistory.component.PaymentMethodMod
 import com.jie.wealthmate.feature.calendar.addHistory.component.PaymentMethodTextField
 import com.jie.wealthmate.feature.calendar.addHistory.component.RepeatCycleModalBottomSheet
 import com.jie.wealthmate.feature.calendar.historyDetail.component.Category
+import com.jie.wealthmate.feature.calendar.historyDetail.component.CategorySelectModalBottomSheet
 import com.jie.wealthmate.feature.calendar.historyDetail.component.Installment
 import com.jie.wealthmate.feature.calendar.historyDetail.component.RepeatCycle
 import com.jie.wealthmate.feature.menu.categoryManagement.component.LargeCategoryEnum
@@ -70,6 +68,7 @@ class HistoryDetailScreen(
         var isShowDateSelectModalBottomSheet by remember { mutableStateOf(false) }
         var isShowRepeatCycleModalBottomSheet by remember { mutableStateOf(false) }
         var isShowInstallmentModalBottomSheet by remember { mutableStateOf(false) }
+        var isShowCategorySelectModalBottomSheet by remember { mutableStateOf(false) }
         var isShowPaymentMethodModalBottomSheet by remember { mutableStateOf(false) }
 
         fun onBack() {
@@ -222,7 +221,8 @@ class HistoryDetailScreen(
                 // 카테고리
                 Category(
                     category = uiState.category,
-                    categoryTag = uiState.categoryTag
+                    categoryTag = uiState.categoryTag,
+                    onCategoryClick = { isShowCategorySelectModalBottomSheet = true }
                 )
 
                 // 결제수단/자산
@@ -281,6 +281,21 @@ class HistoryDetailScreen(
                 installmentCount = uiState.installmentCount,
                 onConfirmClick = screenModel::updateInstallmentCount,
                 onDismissRequest = { isShowInstallmentModalBottomSheet = false }
+            )
+        }
+
+        if (isShowCategorySelectModalBottomSheet) {
+            CategorySelectModalBottomSheet(
+                categoryItems = uiState.categoryItems,
+                selectedLargeCategory = uiState.history?.largeCategory
+                    ?: LargeCategoryEnum.EXPENSES,
+                selectedCategory = uiState.category,
+                selectedCategoryTag = uiState.categoryTag,
+                onConfirmClick = { category, categoryTag ->
+                    screenModel.updateCategory(category)
+                    screenModel.updateCategoryTag(categoryTag)
+                },
+                onDismissRequest = { isShowCategorySelectModalBottomSheet = false }
             )
         }
 

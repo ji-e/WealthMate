@@ -3,6 +3,7 @@ package com.jie.wealthmate.feature.calendar.historyDetail
 import androidx.compose.ui.text.input.TextFieldValue
 import com.jie.wealthmate.base.BaseScreenModel
 import com.jie.wealthmate.feature.calendar.addHistory.component.RepeatCycleEnum
+import com.jie.wealthmate.feature.menu.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.repository.CategoryRepository
 import com.jie.wealthmate.repository.HistoryRepository
 import com.jie.wealthmate.repository.PaymentMethodRepository
@@ -65,7 +66,7 @@ class HistoryDetailScreenModel(
         }
     }
 
-    fun updateCategory(category: CategoryVo) {
+    fun updateCategory(category: CategoryVo?) {
         reduceState { state ->
             state.copy(
                 isDataChanged = true,
@@ -74,7 +75,7 @@ class HistoryDetailScreenModel(
         }
     }
 
-    fun updateCategoryTag(categoryTag: CategoryTagVo) {
+    fun updateCategoryTag(categoryTag: CategoryTagVo?) {
         reduceState { state ->
             state.copy(
                 isDataChanged = true,
@@ -119,8 +120,37 @@ class HistoryDetailScreenModel(
                     content = TextFieldValue(history.content.default()),
                 )
             }
+
+            getCategories(history.largeCategory)
             println(response)
         }
+    }
+
+    private fun getCategories(largeCategoryEnum: LargeCategoryEnum) {
+        categoryRepository.getCategoriesByLargeCategory(largeCategoryEnum.name)
+            .apiFlow { response ->
+                reduceState { state ->
+                    state.copy(
+                        categoryItems = response.map {
+                            CategoryVo(
+                                id = it.id,
+                                icon = it.icon,
+                                largeCategory = LargeCategoryEnum.creator(it.largeCategory),
+                                middleLabel = it.middleLabel,
+                                sort = it.sort,
+                                isFixed = it.isFixed,
+                                tags = it.tags.map { tag ->
+                                    CategoryTagVo(
+                                        id = tag.id,
+                                        label = tag.tagLabel
+                                    )
+                                }
+
+                            )
+                        }
+                    )
+                }
+            }
     }
 
     fun saveHistory() {

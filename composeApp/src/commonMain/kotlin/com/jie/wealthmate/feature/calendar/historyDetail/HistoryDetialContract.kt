@@ -27,7 +27,7 @@ data class HistoryDetailUiState(
     val categoryItems: List<CategoryVo> = emptyList(),
     val paymentMethodItems: List<PaymentMethodVo> = emptyList(),
 ) : BaseUiState {
-    val isSaveButtonEnable = amount.text.isNotBlank()
+    val isSaveButtonEnable = amount.text.isNotBlank() && isDataChanged
 }
 
 sealed class HistoryDetailUiSideEffect : UiSideEffect {

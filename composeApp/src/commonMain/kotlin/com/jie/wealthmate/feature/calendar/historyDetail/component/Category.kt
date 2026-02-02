@@ -1,10 +1,12 @@
 package com.jie.wealthmate.feature.calendar.historyDetail.component
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -17,7 +19,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.jie.wealthmate.component.WMText
@@ -34,6 +35,7 @@ fun Category(
     modifier: Modifier = Modifier,
     category: CategoryVo?,
     categoryTag: CategoryTagVo?,
+    onCategoryClick: () -> Unit,
 ) {
     Column(modifier = modifier) {
         WMText(
@@ -44,18 +46,25 @@ fun Category(
         Row(
             modifier = Modifier.fillMaxWidth()
                 .padding(top = 12.dp)
+                .height(60.dp)
                 .clip(RoundedCornerShape(8.dp))
                 .background(ColorGray.Gray_50)
-                .padding(12.dp),
+                .clickable { onCategoryClick() }
+                .padding(horizontal = 12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             if (category == null) {
-                WMText(
-                    text = "카테고리 없음",
-                    style = Typography().titleSmall.copy(color = ColorGray.Gray_300),
-                    modifier = Modifier.fillMaxWidth(),
-                    textAlign = TextAlign.Center
-                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(60.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    WMText(
+                        text = "카테고리 없음",
+                        style = Typography().titleSmall.copy(color = ColorGray.Gray_300),
+                    )
+                }
                 return@Row
             }
             Box(modifier = Modifier.width(60.dp)) {
