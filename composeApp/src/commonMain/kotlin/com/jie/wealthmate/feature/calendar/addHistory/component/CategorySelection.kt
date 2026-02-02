@@ -223,6 +223,7 @@ fun CategorySelectionAllTagColumn(
 @Composable
 fun CategorySelectionRow(
     modifier: Modifier = Modifier,
+    title: String? = "카테고리",
     categoryItems: List<CategoryVo>,
     selectedLargeCategory: LargeCategoryEnum,
     selectedCategory: CategoryVo?,
@@ -231,15 +232,17 @@ fun CategorySelectionRow(
     onCategoryTagClick: (CategoryTagVo) -> Unit,
 ) {
     Column(modifier = modifier) {
-        WMText(
-            text = "카테고리",
-            style = Typography().titleSmall.copy(fontWeight = FontWeight.SemiBold)
-        )
+        title?.let {
+            WMText(
+                text = it,
+                style = Typography().titleSmall.copy(fontWeight = FontWeight.SemiBold),
+                modifier = Modifier.padding(bottom = 12.dp)
+            )
+        }
 
         Column(
             modifier = Modifier.fillMaxWidth()
                 .heightIn(max = 200.dp)
-                .padding(top = 12.dp)
                 .clip(RoundedCornerShape(8.dp))
                 .background(ColorGray.Gray_50)
         ) {
@@ -254,8 +257,6 @@ fun CategorySelectionRow(
                 )
                 return
             }
-
-
 
             LazyRow(
                 contentPadding = PaddingValues(
