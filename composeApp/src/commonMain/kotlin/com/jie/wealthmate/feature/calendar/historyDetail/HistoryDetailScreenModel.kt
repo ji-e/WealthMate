@@ -28,6 +28,7 @@ class HistoryDetailScreenModel(
 
     fun updateInit(historyId: String) {
         getHistory(historyId)
+        getPaymentMethods()
     }
 
     fun updateDate(date: LocalDate) {
@@ -146,6 +147,26 @@ class HistoryDetailScreenModel(
                                     )
                                 }
 
+                            )
+                        }
+                    )
+                }
+            }
+    }
+
+    private fun getPaymentMethods() {
+        paymentMethodRepository.getPaymentMethods()
+            .apiFlow { response ->
+                println("response: $response")
+                reduceState { state ->
+                    state.copy(
+                        paymentMethodItems = response.map {
+                            PaymentMethodVo(
+                                id = it.paymentMethod.id,
+                                label = it.paymentMethod.label,
+                                groupId = it.group?.id,
+                                groupLabel = it.group?.label,
+                                sort = it.paymentMethod.sort
                             )
                         }
                     )
