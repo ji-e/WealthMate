@@ -15,7 +15,7 @@ import kotlinx.datetime.LocalDate
 data class HistoryDetailUiState(
     val isDataChanged: Boolean = false,
     val history: HistoryVo? = null,
-    val selectedLargeCategory: LargeCategoryEnum = LargeCategoryEnum.EXPENSES,
+    val largeCategory: LargeCategoryEnum = LargeCategoryEnum.EXPENSES,
     val date: LocalDate = today,
     val repeatCycle: RepeatCycleEnum? = null,
     val installmentCount: Int? = null,
@@ -24,10 +24,11 @@ data class HistoryDetailUiState(
     val category: CategoryVo? = null,
     val categoryTag: CategoryTagVo? = null,
     val paymentMethod: PaymentMethodVo? = null,
+    val isVisibility: Boolean = true,
     val categoryItems: List<CategoryVo> = emptyList(),
     val paymentMethodItems: List<PaymentMethodVo> = emptyList(),
 ) : BaseUiState {
-    val isSaveButtonEnable = amount.text.isNotBlank()
+    val isSaveButtonEnable = amount.text.isNotBlank() && isDataChanged
 }
 
 sealed class HistoryDetailUiSideEffect : UiSideEffect {

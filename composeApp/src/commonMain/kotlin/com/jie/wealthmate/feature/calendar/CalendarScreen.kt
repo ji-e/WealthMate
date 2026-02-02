@@ -1,19 +1,12 @@
 package com.jie.wealthmate.feature.calendar
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -25,37 +18,28 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.dropShadow
 import androidx.compose.ui.graphics.shadow.Shadow
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.jie.wealthmate.component.ButtonSize
-import com.jie.wealthmate.component.WMButton
 import com.jie.wealthmate.component.WMIconButton
-import com.jie.wealthmate.component.WMModalBottomSheet
-import com.jie.wealthmate.component.WMText
 import com.jie.wealthmate.component.calculateAdjustedToastPadding
 import com.jie.wealthmate.component.topbar.TopBarItem
 import com.jie.wealthmate.feature.calendar.addHistory.AddHistoryScreen
+import com.jie.wealthmate.feature.calendar.component.SelectedCalendarModalBottomSheet
 import com.jie.wealthmate.feature.calendar.component.listCalendar.ListCalendar
 import com.jie.wealthmate.feature.calendar.component.monthCalendar.MonthCalendar
 import com.jie.wealthmate.feature.calendar.historyDetail.HistoryDetailScreen
 import com.jie.wealthmate.theme.ColorGray
 import com.jie.wealthmate.theme.ColorPrimary
 import com.jie.wealthmate.theme.WMTheme
-import com.jie.wealthmate.utils.convertLocalDateToString
-import com.jie.wealthmate.utils.firstDayOfMonth
-import com.jie.wealthmate.utils.formatDateKorYM
 import com.jie.wealthmate.utils.today
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.plus
-import kotlinx.datetime.yearMonth
-import org.koin.compose.koinInject
 import wealthmate.composeapp.generated.resources.Res
 import wealthmate.composeapp.generated.resources.ic_add
 
@@ -76,7 +60,7 @@ class CalendarScreen() : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
-        val screenModel: CalendarScreenModel = koinInject()
+        val screenModel: CalendarScreenModel = koinScreenModel()
         val uiState = screenModel.container.uiState.collectAsState().value
 
         var isShowSelectedCalendarModalBottomSheet by remember { mutableStateOf(false) }
@@ -147,80 +131,14 @@ class CalendarScreen() : Screen {
                 tint = ColorGray.White,
                 onClick = { navigator.push(AddHistoryScreen()) }
             )
-
-            if (isShowSelectedCalendarModalBottomSheet) {
-                SelectedCalendarModalBottomSheet(
-                    selectedMonth = uiState.selectedMonth,
-                    onMonthChange = screenModel::updateSelectedMonth,
-                    onDismissRequest = { isShowSelectedCalendarModalBottomSheet = false }
-                )
-            }
         }
-    }
 
-    /**
-     * 월 선택 ModalBottomSheet
-     */
-    @Composable
-    private fun SelectedCalendarModalBottomSheet(
-        selectedMonth: LocalDate = today,
-        onMonthChange: (LocalDate) -> Unit = {},
-        onDismissRequest: () -> Unit = {},
-    ) {
-        val listState = rememberLazyListState()
-        var tempSelectedMonth by remember { mutableStateOf(selectedMonth) }
-
-        WMModalBottomSheet(
-            title = "월 선택",
-            onDismissRequest = { onDismissRequest() },
-        ) {
-
-            LaunchedEffect(Unit) {
-                val movePosition = monthItem.indexOf(tempSelectedMonth.firstDayOfMonth())
-                    .run { if (this <= 0) 0 else this - 1 }
-
-                listState.scrollToItem(movePosition)
-            }
-
-            LazyColumn(
-                modifier = Modifier.height(240.dp),
-                state = listState
-            ) {
-                items(monthItem.size) {
-                    val month = monthItem[it]
-                    val isSelected = month.yearMonth == tempSelectedMonth.yearMonth
-
-                    Box(
-                        modifier = Modifier
-                            .padding(horizontal = 20.dp)
-                            .fillMaxWidth()
-                            .height(44.dp)
-                            .clip(CircleShape)
-                            .background(if (isSelected) ColorPrimary.Primary_200 else ColorGray.White)
-                            .clickable { tempSelectedMonth = month },
-                        contentAlignment = Alignment.Center
-                    ) {
-                        WMText(
-                            text = month.convertLocalDateToString(formatDateKorYM),
-                            style = Typography().bodyLarge.copy(
-                                fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
-                                color = if (isSelected) ColorPrimary.Primary_700 else ColorGray.Gray_700,
-                                fontSize = if (isSelected) 18.sp else 16.sp
-                            ),
-                        )
-                    }
-                }
-            }
-            WMButton(
-                text = "확인",
-                buttonSize = ButtonSize.LARGE,
-                modifier = Modifier
-                    .padding(20.dp)
-                    .fillMaxWidth(),
-                onClick = {
-                    onMonthChange(tempSelectedMonth)
-                    onDismissRequest()
-                }
+        if (isShowSelectedCalendarModalBottomSheet) {
+            SelectedCalendarModalBottomSheet(
+                monthItem = monthItem,
+                selectedMonth = uiState.selectedMonth,
+                onMonthChange = screenModel::updateSelectedMonth,
+                onDismissRequest = { isShowSelectedCalendarModalBottomSheet = false }
             )
         }
     }
