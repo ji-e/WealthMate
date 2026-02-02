@@ -1,5 +1,6 @@
 package com.jie.wealthmate.feature.calendar.component.monthCalendar
 
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -19,6 +20,7 @@ import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -49,6 +51,7 @@ import kotlinx.datetime.plus
 import org.jetbrains.compose.resources.painterResource
 import wealthmate.composeapp.generated.resources.Res
 import wealthmate.composeapp.generated.resources.ic_push_pin
+import kotlin.math.abs
 import kotlin.math.ceil
 
 
@@ -113,6 +116,10 @@ fun DayGrid(
         if (selectedItemIndex < 0) 0 else selectedItemIndex / 7
     }
 
+    val animatedRowIndex by animateFloatAsState(
+        targetValue = selectedRowIndex.toFloat(),
+        label = "selectedRowIndexAnimation"
+    )
 
     if (items.isEmpty().not()) {
         LazyVerticalGrid(
@@ -138,7 +145,8 @@ fun DayGrid(
                 DayItem(
                     day = day,
                     isSelected = day.first == selectedDate,
-                    isInSelectedWeek = rowIndex == selectedRowIndex,
+                    rowIndex = rowIndex,
+                    animatedRowIndex = animatedRowIndex,
                     incomeAmount = incomeAmount,
                     expenseAmount = expenseAmount,
                     fixedItems = fixedItems,
@@ -158,7 +166,8 @@ internal fun DayItem(
     modifier: Modifier = Modifier,
     day: Pair<LocalDate, MonthPeriodEnum>,
     isSelected: Boolean,
-    isInSelectedWeek: Boolean,
+    rowIndex: Int,
+    animatedRowIndex: Float,
     incomeAmount: Long,
     expenseAmount: Long,
     fixedItems: List<HistoryVo?>,
@@ -168,11 +177,13 @@ internal fun DayItem(
     collapseProgress: Float,
     onClickDate: (LocalDate) -> Unit,
 ) {
+    val selectionFactor = (1f - abs(rowIndex - animatedRowIndex)).coerceIn(0f, 1f)
+
     // 확장/축소 진행률에 따라 높이와 투명도를 계산
     val height = when {
         // 1. 축소 중 (Normal -> Minimized)
         collapseProgress > 0f -> {
-            val minHeight = if (isInSelectedWeek) 72.dp else 0.dp
+            val minHeight = 72.dp * selectionFactor
             lerp(start = dayNormalHeight, stop = minHeight, fraction = collapseProgress)
         }
         // 2. 확장 중 (Normal -> Maximized)
@@ -186,8 +197,9 @@ internal fun DayItem(
     val alpha = when {
         // 축소 중에만 선택되지 않은 주의 투명도를 조절
         collapseProgress > 0f -> {
-            if (isInSelectedWeek) 1f
-            else (1 - collapseProgress).coerceIn(0f, 1f)
+            // 축소된 상태(collapseProgress=1)에서 selectionFactor에 따라 투명도 조절
+            // 확장된 상태(collapseProgress=0)에서는 모두 1f
+            1f - (collapseProgress * (1f - selectionFactor))
         }
 
         else -> 1f

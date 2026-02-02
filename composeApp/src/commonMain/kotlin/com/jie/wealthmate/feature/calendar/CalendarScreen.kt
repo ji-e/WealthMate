@@ -41,6 +41,7 @@ import com.jie.wealthmate.component.WMText
 import com.jie.wealthmate.component.calculateAdjustedToastPadding
 import com.jie.wealthmate.component.topbar.TopBarItem
 import com.jie.wealthmate.feature.calendar.addHistory.AddHistoryScreen
+import com.jie.wealthmate.feature.calendar.component.listCalendar.ListCalendar
 import com.jie.wealthmate.feature.calendar.component.monthCalendar.MonthCalendar
 import com.jie.wealthmate.feature.calendar.historyDetail.HistoryDetailScreen
 import com.jie.wealthmate.theme.ColorGray
@@ -49,7 +50,6 @@ import com.jie.wealthmate.theme.WMTheme
 import com.jie.wealthmate.utils.convertLocalDateToString
 import com.jie.wealthmate.utils.firstDayOfMonth
 import com.jie.wealthmate.utils.formatDateKorYM
-import com.jie.wealthmate.utils.formatWithCommas
 import com.jie.wealthmate.utils.today
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
@@ -110,22 +110,19 @@ class CalendarScreen() : Screen {
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
                     ) {
-                        // todo
-                        Column {
-                            uiState.histories.forEach {
-                                WMText(
-                                    text = "${it.content} ${formatWithCommas(it.amount.toString())}",
-                                    modifier = Modifier.clickable {
-                                        navigator.push(
-                                            HistoryDetailScreen(
-                                                largeCategory = it.largeCategory,
-                                                historyId = it.id
-                                            )
-                                        )
-                                    }
+                        ListCalendar(
+                            selectedDate = uiState.selectedDate,
+                            historyItems = uiState.histories,
+                            onDateSelected = screenModel::updateSelectedDate,
+                            onHistoryClick = {
+                                navigator.push(
+                                    HistoryDetailScreen(
+                                        largeCategory = it.largeCategory,
+                                        historyId = it.id
+                                    )
                                 )
-                            }
-                        }
+                            },
+                        )
                     }
                 }
             }

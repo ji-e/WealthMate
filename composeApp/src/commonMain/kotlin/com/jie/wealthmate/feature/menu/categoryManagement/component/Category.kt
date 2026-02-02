@@ -122,7 +122,7 @@ fun CategoryItem(
             ),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Box(modifier = Modifier.width(52.dp)) {
+        Box(modifier = Modifier.width(60.dp)) {
             Box(
                 modifier = Modifier
                     .clip(CircleShape)
@@ -141,9 +141,9 @@ fun CategoryItem(
                     contentDescription = null,
                     tint = ColorRed.Red_300,
                     modifier = Modifier
-                        .padding()
+                        .padding(start = 24.dp)
                         .size(24.dp)
-                        .align(Alignment.TopEnd)
+                        .align(Alignment.TopStart)
                 )
             }
         }
