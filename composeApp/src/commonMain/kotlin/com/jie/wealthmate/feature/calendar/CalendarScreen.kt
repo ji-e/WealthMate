@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.jie.wealthmate.component.ButtonSize
@@ -55,7 +56,6 @@ import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.plus
 import kotlinx.datetime.yearMonth
-import org.koin.compose.koinInject
 import wealthmate.composeapp.generated.resources.Res
 import wealthmate.composeapp.generated.resources.ic_add
 
@@ -76,7 +76,7 @@ class CalendarScreen() : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
-        val screenModel: CalendarScreenModel = koinInject()
+        val screenModel: CalendarScreenModel = koinScreenModel()
         val uiState = screenModel.container.uiState.collectAsState().value
 
         var isShowSelectedCalendarModalBottomSheet by remember { mutableStateOf(false) }
