@@ -20,6 +20,7 @@ import com.jie.wealthmate.feature.menu.categoryManagement.CategoryManagementScre
 import com.jie.wealthmate.feature.menu.component.MenuEnum
 import com.jie.wealthmate.feature.menu.component.MenuItem
 import com.jie.wealthmate.feature.menu.component.MenuTitleItem
+import com.jie.wealthmate.feature.menu.googleCloudSync.GoogleCloudSyncScreen
 import com.jie.wealthmate.feature.menu.paymentMethodManagement.PaymentMethodManagementScreen
 import com.jie.wealthmate.theme.WMTheme
 import org.koin.compose.koinInject
@@ -49,6 +50,10 @@ class MenuScreen(val calculateBottomPadding: Dp) : Screen {
 
                         MenuEnum.PAYMENT_METHOD -> {
                             navigator.push(PaymentMethodManagementScreen())
+                        }
+
+                        MenuEnum.GOOGLE_SYNC -> {
+                            navigator.push(GoogleCloudSyncScreen())
                         }
 
                         else -> Unit
