@@ -11,6 +11,8 @@ import com.jie.wealthmate.database.dao.RepeatCycleDao
 import com.jie.wealthmate.database.eneity.CategoryConverters
 import com.jie.wealthmate.repository.CategoryRepository
 import com.jie.wealthmate.repository.CategoryRepositoryImpl
+import com.jie.wealthmate.repository.DBRepository
+import com.jie.wealthmate.repository.DBRepositoryImpl
 import com.jie.wealthmate.repository.HistoryRepository
 import com.jie.wealthmate.repository.HistoryRepositoryImpl
 import com.jie.wealthmate.repository.InstallmentRepository
@@ -41,4 +43,5 @@ val databaseModule = module {
     single<RepeatCycleDao> { get<AppDatabase>().repeatCycleDao() }
     single<RepeatCycleRepository> { RepeatCycleRepositoryImpl(get()) }
 
+    single<DBRepository> { DBRepositoryImpl(get()) }
 }

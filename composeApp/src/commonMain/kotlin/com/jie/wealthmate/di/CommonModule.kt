@@ -16,6 +16,8 @@ import com.jie.wealthmate.feature.menu.paymentMethodManagement.modifyPaymentMeth
 import com.jie.wealthmate.feature.menu.paymentMethodManagement.paymentMethodGroup.PaymentMethodGroupScreenModel
 import com.jie.wealthmate.repository.CategoryRepository
 import com.jie.wealthmate.repository.CategoryRepositoryImpl
+import com.jie.wealthmate.repository.DBRepository
+import com.jie.wealthmate.repository.DBRepositoryImpl
 import com.jie.wealthmate.repository.HistoryRepository
 import com.jie.wealthmate.repository.HistoryRepositoryImpl
 import com.jie.wealthmate.repository.InstallmentRepository
@@ -29,6 +31,7 @@ import org.koin.dsl.module
 
 val commonModule = module {
 
+    single<DBRepository> { DBRepositoryImpl(get()) }
     single<CategoryRepository> { CategoryRepositoryImpl(get()) }
     single<PaymentMethodRepository> { PaymentMethodRepositoryImpl(get(), get()) }
     single<HistoryRepository> { HistoryRepositoryImpl(get()) }
@@ -61,6 +64,6 @@ val commonModule = module {
     factory { AddPaymentMethodScreenModel(get()) }
     factory { ModifyPaymentMethodScreenModel(get()) }
 
-    factory { GoogleCloudSyncScreenModel(get()) }
+    factory { GoogleCloudSyncScreenModel(get(), get(), get()) }
 
 }

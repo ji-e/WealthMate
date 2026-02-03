@@ -55,12 +55,11 @@ class GoogleCloudSyncScreen() : BaseScreen() {
                     println(googleUser)
                     // 드디어 여기서 유저 정보를 받습니다!
                     val token = googleUser?.accessToken
-//                    screenModel.getToken(googleUser?.serverAuthCode)
+                    screenModel.getToken(googleUser?.serverAuthCode)
                     if (token != null) {
                         accessToken = token
-//                        screenModel.updateToken(token)
+                        screenModel.updateToken(token)
                         println("성공! GDA용 액세스 토큰: $token")
-                        // TODO: 이 토큰을 들고 Ktor 업로드 함수를 호출하세요.
                     }
                 },
                 scopes = listOf("https://www.googleapis.com/auth/drive.appdata"),
@@ -70,14 +69,16 @@ class GoogleCloudSyncScreen() : BaseScreen() {
                     onClick = { this.onClick() } // UiContainerScope의 onClick 호출
                 )
             }
-//            WMButton(
-//                text = "백업",
-//                onClick = { screenModel.backUp() }
-//            )
-//            WMButton(
-//                text = "다운로드",
-//                onClick = { screenModel.download() }
-//            )
+            WMButton(
+                text = "sync",
+                onClick = { screenModel.onSyncClick() }
+            )
+
+            WMButton(
+                text = "sync2",
+                onClick = { screenModel.onSyncClick2() }
+            )
+
         }
     }
 

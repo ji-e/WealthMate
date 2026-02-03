@@ -177,6 +177,7 @@ abstract class BaseScreenModel<S : UiState> : ScreenModel, ContainerHost<S> {
                 val result = block()
                 onSuccess?.invoke(result)
             } catch (e: Exception) {
+                e.printStackTrace()
                 if (e is CancellationException) throw e
 
                 val finalMessage = errorMsg ?: e.message ?: "오류가 발생했습니다."
@@ -200,6 +201,7 @@ abstract class BaseScreenModel<S : UiState> : ScreenModel, ContainerHost<S> {
             successFunc(data)
             showLoading(false)
         }.catch { e ->
+            e.printStackTrace()
             if (errorFunc == null) {
                 val finalMessage = "오류가 발생했습니다."
                 showSnackbar(message = finalMessage)
