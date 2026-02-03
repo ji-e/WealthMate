@@ -31,6 +31,13 @@ enum class MenuEnum(
         label = "반복내역",
         title = "반복내역 관리",
         icon = null
+    ),
+
+    GOOGLE_SYNC(
+        route = "google_sync",
+        label = "구글 클라우드 동기화",
+        title = "구글 동기화",
+        icon = null
     )
 
     ;
@@ -42,5 +49,9 @@ enum class MenuEnum(
             ASSET,
 //            REPEAT_HISTORY,
         )
+        val syncMenu = listOf(
+            GOOGLE_SYNC,
+        )
+
     }
 }
