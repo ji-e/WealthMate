@@ -29,9 +29,10 @@ kotlin {
 
             implementation(libs.androidx.room.sqlite.wrapper)
 
+            implementation(libs.ktor.client.okhttp)
         }
         iosMain.dependencies {
-
+            implementation(libs.ktor.client.darwin)
         }
         commonMain.dependencies {
             implementation(libs.kotlinx.datetime)
@@ -48,6 +49,11 @@ kotlin {
             implementation(libs.androidx.sqlite.bundled)
 
             implementation(libs.uuid4)
+
+            implementation(libs.bundles.ktor.common)
+            implementation(libs.kmpAuth.google)
+            implementation(libs.kmpAuth.uihelper)
+            implementation(libs.okio)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
