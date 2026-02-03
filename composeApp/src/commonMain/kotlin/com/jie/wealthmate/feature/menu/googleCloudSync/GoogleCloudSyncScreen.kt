@@ -14,10 +14,15 @@ import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.jie.wealthmate.base.BaseScreen
+import com.jie.wealthmate.component.WMButton
 import com.jie.wealthmate.component.topbar.TopBarItem
 import com.jie.wealthmate.feature.menu.component.MenuEnum
+import com.mmk.kmpauth.google.GoogleAuthCredentials
+import com.mmk.kmpauth.google.GoogleAuthProvider
+import com.mmk.kmpauth.google.GoogleButtonUiContainer
 
 class GoogleCloudSyncScreen() : BaseScreen() {
+    var accessToken: String? = null
 
     @Composable
     override fun Content() {
@@ -41,6 +46,40 @@ class GoogleCloudSyncScreen() : BaseScreen() {
             modifier = Modifier.fillMaxSize()
         ) {
 
+            GoogleAuthProvider.create(
+                credentials = GoogleAuthCredentials(serverId = "1001016412934-av4h457eq1vtastir4hjdomf1bnd11hp.apps.googleusercontent.com")
+            )
+
+            GoogleButtonUiContainer(
+                onGoogleSignInResult = { googleUser ->
+                    println(googleUser)
+                    // 드디어 여기서 유저 정보를 받습니다!
+                    val token = googleUser?.accessToken
+//                    screenModel.getToken(googleUser?.serverAuthCode)
+                    if (token != null) {
+                        accessToken = token
+//                        screenModel.updateToken(token)
+                        println("성공! GDA용 액세스 토큰: $token")
+                        // TODO: 이 토큰을 들고 Ktor 업로드 함수를 호출하세요.
+                    }
+                },
+                scopes = listOf("https://www.googleapis.com/auth/drive.appdata"),
+            ) {
+                WMButton(
+                    text = "Google로 로그인",
+                    onClick = { this.onClick() } // UiContainerScope의 onClick 호출
+                )
+            }
+//            WMButton(
+//                text = "백업",
+//                onClick = { screenModel.backUp() }
+//            )
+//            WMButton(
+//                text = "다운로드",
+//                onClick = { screenModel.download() }
+//            )
         }
     }
+
+
 }
