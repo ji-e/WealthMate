@@ -9,6 +9,7 @@ import com.jie.wealthmate.feature.menu.MenuScreenModel
 import com.jie.wealthmate.feature.menu.categoryManagement.CategoryManagementScreenModel
 import com.jie.wealthmate.feature.menu.categoryManagement.addCategory.AddCategoryScreenModel
 import com.jie.wealthmate.feature.menu.categoryManagement.modifyCategory.ModifyCategoryScreenModel
+import com.jie.wealthmate.feature.menu.googleCloudSync.GoogleCloudSyncScreenModel
 import com.jie.wealthmate.feature.menu.paymentMethodManagement.PaymentMethodManagementScreenModel
 import com.jie.wealthmate.feature.menu.paymentMethodManagement.addPaymentMethod.AddPaymentMethodScreenModel
 import com.jie.wealthmate.feature.menu.paymentMethodManagement.modifyPaymentMethod.ModifyPaymentMethodScreenModel
@@ -59,5 +60,7 @@ val commonModule = module {
     factory { PaymentMethodGroupScreenModel(get()) }
     factory { AddPaymentMethodScreenModel(get()) }
     factory { ModifyPaymentMethodScreenModel(get()) }
+
+    factory { GoogleCloudSyncScreenModel(get()) }
 
 }
