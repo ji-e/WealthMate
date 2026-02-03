@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		11BFF5EA2F18C12F00508211 /* libsqlite3.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 11BFF5E92F18C12F00508211 /* libsqlite3.tbd */; };
+		11FBB4142F32634A007CA2D9 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = 11FBB4132F32634A007CA2D9 /* GoogleSignIn */; };
+		11FBB4162F32634A007CA2D9 /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 11FBB4152F32634A007CA2D9 /* GoogleSignInSwift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -46,7 +48,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				11FBB4162F32634A007CA2D9 /* GoogleSignInSwift in Frameworks */,
 				11BFF5EA2F18C12F00508211 /* libsqlite3.tbd in Frameworks */,
+				11FBB4142F32634A007CA2D9 /* GoogleSignIn in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -100,6 +104,8 @@
 			);
 			name = iosApp;
 			packageProductDependencies = (
+				11FBB4132F32634A007CA2D9 /* GoogleSignIn */,
+				11FBB4152F32634A007CA2D9 /* GoogleSignInSwift */,
 			);
 			productName = iosApp;
 			productReference = 4CB40FD3402549676886ED48 /* WealthMate.app */;
@@ -129,6 +135,9 @@
 			);
 			mainGroup = 6DCC92C2EE72B86C60557058;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				11FBB4122F32634A007CA2D9 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 573EE912C17606E116DD4638 /* Products */;
 			projectDirPath = "";
@@ -383,6 +392,30 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		11FBB4122F32634A007CA2D9 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/google/GoogleSignIn-iOS";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 9.1.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		11FBB4132F32634A007CA2D9 /* GoogleSignIn */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 11FBB4122F32634A007CA2D9 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignIn;
+		};
+		11FBB4152F32634A007CA2D9 /* GoogleSignInSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 11FBB4122F32634A007CA2D9 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignInSwift;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = FC3428560079E846254E689B /* Project object */;
 }
