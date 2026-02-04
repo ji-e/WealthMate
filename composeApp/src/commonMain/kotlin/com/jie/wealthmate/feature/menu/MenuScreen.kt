@@ -1,7 +1,9 @@
 package com.jie.wealthmate.feature.menu
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
@@ -20,6 +22,7 @@ import com.jie.wealthmate.feature.menu.categoryManagement.CategoryManagementScre
 import com.jie.wealthmate.feature.menu.component.MenuEnum
 import com.jie.wealthmate.feature.menu.component.MenuItem
 import com.jie.wealthmate.feature.menu.component.MenuTitleItem
+import com.jie.wealthmate.feature.menu.googleCloudShare.GoogleCloudShareScreen
 import com.jie.wealthmate.feature.menu.googleCloudSync.GoogleCloudSyncScreen
 import com.jie.wealthmate.feature.menu.paymentMethodManagement.PaymentMethodManagementScreen
 import com.jie.wealthmate.theme.WMTheme
@@ -56,6 +59,10 @@ class MenuScreen(val calculateBottomPadding: Dp) : Screen {
                             navigator.push(GoogleCloudSyncScreen())
                         }
 
+                        MenuEnum.GOOGLE_SHARE -> {
+                            navigator.push(GoogleCloudShareScreen())
+                        }
+
                         else -> Unit
                     }
                 }
@@ -82,6 +89,8 @@ class MenuScreen(val calculateBottomPadding: Dp) : Screen {
                         )
                     }
                 }
+
+                Spacer(modifier = Modifier.height(20.dp))
             }
         }
     }
