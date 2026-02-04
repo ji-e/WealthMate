@@ -7,10 +7,11 @@ import androidx.room.Query
 import androidx.room.Update
 import com.jie.wealthmate.database.eneity.RepeatCycleEntity
 import kotlinx.coroutines.flow.Flow
+import kotlin.time.Clock
 
 @Dao
 interface RepeatCycleDao {
-    @Query("SELECT * FROM repeat_cycle WHERE isActive = 1")
+    @Query("SELECT * FROM repeat_cycle WHERE isActive = 1 AND isDeleted = 0")
     fun getRepeatCycles(): Flow<List<RepeatCycleEntity>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -20,6 +21,18 @@ interface RepeatCycleDao {
     suspend fun update(repeatCycle: RepeatCycleEntity)
 
     // 반복 중단 시
-    @Query("UPDATE repeat_cycle SET isActive = 0 WHERE id = :id")
-    suspend fun deactivate(id: String)
+    @Query("UPDATE repeat_cycle SET isActive = 0, updatedAt = :updatedAt WHERE id = :id")
+    suspend fun deactivate(id: String, updatedAt: Long = Clock.System.now().toEpochMilliseconds())
+
+    /**
+     * 특정 시점 이후에 변경된 모든 반복 주기 조회 (삭제된 항목 포함)
+     */
+    @Query("SELECT * FROM repeat_cycle WHERE updatedAt > :lastSync")
+    suspend fun getChangesSince(lastSync: Long): List<RepeatCycleEntity>
+
+    /**
+     * 클라우드 데이터를 로컬에 병합 (ID가 같으면 덮어쓰기)
+     */
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun upsertAll(repeatCycles: List<RepeatCycleEntity>)
 }

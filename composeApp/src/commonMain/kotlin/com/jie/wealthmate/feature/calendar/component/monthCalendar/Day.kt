@@ -306,14 +306,19 @@ internal fun DayItem(
                                 painter = painterResource(resource = Res.drawable.ic_push_pin),
                                 contentDescription = null,
                                 tint = ColorRed.Red_300,
-                                modifier = Modifier.size(size = 12.dp)
+                                modifier = Modifier.size(size = 10.dp)
                             )
 
                             WMText(
                                 text = item?.content.default(),
                                 style = Typography().labelSmall,
                                 maxLines = 1,
-                                modifier = Modifier.padding(start = 2.dp)
+                                modifier = Modifier.padding(start = 2.dp),
+                                autoSize = TextAutoSize.StepBased(
+                                    minFontSize = 8.sp,
+                                    maxFontSize = 11.sp,
+                                    stepSize = 1.sp
+                                )
                             )
                         }
                     }

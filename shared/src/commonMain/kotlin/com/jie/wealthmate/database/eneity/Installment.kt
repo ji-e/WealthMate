@@ -2,9 +2,10 @@ package com.jie.wealthmate.database.eneity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import kotlinx.serialization.Serializable
 import kotlin.time.Clock
 
-
+@Serializable
 @Entity(tableName = "installments")
 data class InstallmentEntity(
     @PrimaryKey val id: String,

@@ -12,9 +12,16 @@ sealed class MenuItemData(
         items = MenuEnum.managementMenu
     )
 
+    object Sync : MenuItemData(
+        label = "동기화",
+        items = MenuEnum.syncMenu
+    )
+
+
     companion object Companion {
         val menuItems = listOf(
             Management,
+            Sync
         )
     }
 }

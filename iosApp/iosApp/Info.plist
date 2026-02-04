@@ -1,8 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
-<dict>
-	<key>CADisableMinimumFrameDurationOnPhone</key>
-	<true/>
-</dict>
+    <dict>
+        <key>CADisableMinimumFrameDurationOnPhone</key>
+        <true/>
+
+        <key>GIDServerClientID</key>
+        <string>1001016412934-av4h457eq1vtastir4hjdomf1bnd11hp.apps.googleusercontent.com</string>
+
+        <key>GIDClientID</key>
+        <string>1001016412934-lgg9bn2gb46gfn2n6lc5mcmnlnak558l.apps.googleusercontent.com</string>
+
+        <key>CFBundleURLTypes</key>
+        <array>
+            <dict>
+                <key>CFBundleTypeRole</key>
+                <string>Editor</string>
+                <key>CFBundleURLSchemes</key>
+                <array>
+                    <string>com.googleusercontent.apps.1001016412934-lgg9bn2gb46gfn2n6lc5mcmnlnak558l</string>
+                </array>
+            </dict>
+        </array>
+    </dict>
 </plist>

@@ -3,7 +3,7 @@
 package com.jie.wealthmate.repository
 
 import com.benasher44.uuid.uuid4
-import com.jie.wealthmate.database.dao.HistoryDao
+import com.jie.wealthmate.database.DatabaseProvider
 import com.jie.wealthmate.database.eneity.HistoryEntity
 import com.jie.wealthmate.database.eneity.HistoryWithDetails
 import com.jie.wealthmate.utils.default
@@ -13,9 +13,10 @@ import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
 
-class HistoryRepositoryImpl(private val dao: HistoryDao) : HistoryRepository {
+class HistoryRepositoryImpl(private val databaseProvider: DatabaseProvider) : HistoryRepository {
     private val repoName = "HistoryRepository"
     private fun generateId(): String = uuid4().toString()
+    private val dao get() = databaseProvider.database.historyDao()
 
     /**
      * 모든 내역 조회 (Flow)

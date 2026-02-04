@@ -56,6 +56,9 @@ kotlin {
             implementation(libs.koin.compose)
 
             implementation(libs.compottie)
+
+            implementation(libs.kmpAuth.google)
+            implementation(libs.kmpAuth.uihelper)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

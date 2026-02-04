@@ -1,5 +1,6 @@
 package com.jie.wealthmate.database
 
+import androidx.room.AutoMigration
 import androidx.room.ConstructedBy
 import androidx.room.Database
 import androidx.room.RoomDatabase

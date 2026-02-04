@@ -56,4 +56,15 @@ interface PaymentMethodDao {
     @Query("SELECT * FROM payment_method WHERE groupId = :groupId AND isDeleted = 0")
     fun getMethodsByGroupId(groupId: String): Flow<List<PaymentMethodEntity>>
 
+    /**
+     * 특정 시점 이후에 변경된 모든 결제 수단 조회 (삭제된 항목 포함)
+     */
+    @Query("SELECT * FROM payment_method WHERE updatedAt > :lastSync")
+    suspend fun getChangesSince(lastSync: Long): List<PaymentMethodEntity>
+
+    /**
+     * 클라우드 데이터를 로컬에 병합 (ID가 같으면 덮어쓰기)
+     */
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun upsertAll(paymentMethods: List<PaymentMethodEntity>)
 }

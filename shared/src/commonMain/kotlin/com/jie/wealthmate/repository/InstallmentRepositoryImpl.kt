@@ -3,15 +3,17 @@
 package com.jie.wealthmate.repository
 
 import com.benasher44.uuid.uuid4
-import com.jie.wealthmate.database.dao.InstallmentDao
+import com.jie.wealthmate.database.DatabaseProvider
 import com.jie.wealthmate.database.eneity.InstallmentEntity
 import kotlinx.coroutines.flow.Flow
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
-class InstallmentRepositoryImpl(private val dao: InstallmentDao) : InstallmentRepository {
+class InstallmentRepositoryImpl(private val databaseProvider: DatabaseProvider) :
+    InstallmentRepository {
     private val repoName = "InstallmentRepository"
     private fun generateId(): String = uuid4().toString()
+    private val dao get() = databaseProvider.database.installmentDao()
 
     override suspend fun insertInstallment(installment: InstallmentEntity) = loggedCall(
         repositoryName = repoName,
