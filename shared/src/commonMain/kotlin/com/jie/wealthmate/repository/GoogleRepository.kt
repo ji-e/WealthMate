@@ -3,14 +3,17 @@ package com.jie.wealthmate.repository
 import com.jie.wealthmate.BACK_UP_DB_NAME
 
 
-interface DBRepository {
+interface GoogleRepository {
     suspend fun fetchAccessToken(authCode: String): String?
 
-    suspend fun syncDatabaseToDrive(
+    suspend fun uploadDatabase(
         accessToken: String,
         dbBytes: ByteArray,
         fileName: String = BACK_UP_DB_NAME,
     )
 
-    suspend fun checkAndDownloadBackup(accessToken: String)
+    suspend fun downloadDatabase(
+        accessToken: String,
+        fileName: String = BACK_UP_DB_NAME,
+    ): ByteArray
 }

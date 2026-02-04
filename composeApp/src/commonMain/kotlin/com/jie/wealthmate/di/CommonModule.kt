@@ -1,5 +1,6 @@
 package com.jie.wealthmate.di
 
+import com.jie.wealthmate.database.DatabaseSyncManager
 import com.jie.wealthmate.feature.asset.AssetScreenModel
 import com.jie.wealthmate.feature.calendar.CalendarScreenModel
 import com.jie.wealthmate.feature.calendar.addHistory.AddHistoryScreenModel
@@ -16,8 +17,8 @@ import com.jie.wealthmate.feature.menu.paymentMethodManagement.modifyPaymentMeth
 import com.jie.wealthmate.feature.menu.paymentMethodManagement.paymentMethodGroup.PaymentMethodGroupScreenModel
 import com.jie.wealthmate.repository.CategoryRepository
 import com.jie.wealthmate.repository.CategoryRepositoryImpl
-import com.jie.wealthmate.repository.DBRepository
-import com.jie.wealthmate.repository.DBRepositoryImpl
+import com.jie.wealthmate.repository.GoogleRepository
+import com.jie.wealthmate.repository.GoogleRepositoryImpl
 import com.jie.wealthmate.repository.HistoryRepository
 import com.jie.wealthmate.repository.HistoryRepositoryImpl
 import com.jie.wealthmate.repository.InstallmentRepository
@@ -30,8 +31,9 @@ import com.jie.wealthmate.usecase.HistorySaveUseCase
 import org.koin.dsl.module
 
 val commonModule = module {
+    single { DatabaseSyncManager(get(), get()) }
 
-    single<DBRepository> { DBRepositoryImpl(get()) }
+    single<GoogleRepository> { GoogleRepositoryImpl(get()) }
     single<CategoryRepository> { CategoryRepositoryImpl(get()) }
     single<PaymentMethodRepository> { PaymentMethodRepositoryImpl(get(), get()) }
     single<HistoryRepository> { HistoryRepositoryImpl(get()) }
@@ -64,6 +66,6 @@ val commonModule = module {
     factory { AddPaymentMethodScreenModel(get()) }
     factory { ModifyPaymentMethodScreenModel(get()) }
 
-    factory { GoogleCloudSyncScreenModel(get(), get(), get()) }
+    factory { GoogleCloudSyncScreenModel(get(), get()) }
 
 }

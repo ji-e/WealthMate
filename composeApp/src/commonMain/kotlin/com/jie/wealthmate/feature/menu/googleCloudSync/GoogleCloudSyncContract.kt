@@ -3,5 +3,5 @@ package com.jie.wealthmate.feature.menu.googleCloudSync
 import com.jie.wealthmate.base.BaseUiState
 
 data class GoogleCloudSyncUiState(
-    val token: String? = "ya29.a0AUMWg_IQqKyX5ni93B3qH8PzXujGBcsrTXWhVXCN5cH5ctlVAopKMfCNyLuX2R16D7430IpAYANhF1qyFRApCDtV5NpRTAzkROGAGmaeNHLZ_NV0UdrIsWtWz9GDbntij8J1Lzct5K-NW39SrqD6Q7mE3eOOPDGaKtYz7sUMcFkkDotBcKx35eeGpA4No_y981FcZcgaCgYKAS0SARYSFQHGX2Mi1jGGLiJ-yfZIzIasbMBu2A0206",
+    val token: String? = "ya29.a0AUMWg_LtawsCcIQLQ1pPGqrOOasI9JIqscHeZfuG_UdFA0S_snpMl9FH5IVlnXKCOtYxatZkHrvFO_Mv-iktQ1GfOgLM6nIJtItzh-jG1ZFHugNLeL1XUoK76t39Pm8odmPq33Aha3PUXqAaKEMnIL9HJFH9eDAbSOasYd3BlfRQGZZKjcwxI22h58PPm1mH7pBt58AaCgYKAXMSARYSFQHGX2MifumRslCQMh8yr-1_fgeQBw0206",
 ) : BaseUiState
