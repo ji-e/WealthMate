@@ -44,5 +44,5 @@ val databaseModule = module {
     single<RepeatCycleDao> { get<DatabaseProvider>().database.repeatCycleDao() }
     single<RepeatCycleRepository> { RepeatCycleRepositoryImpl(get()) }
 
-    single<GoogleRepository> { GoogleRepositoryImpl(get()) }
+    single<GoogleRepository> { GoogleRepositoryImpl(get(), get()) }
 }

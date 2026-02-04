@@ -44,6 +44,9 @@ kotlin {
             implementation(libs.androidx.lifecycle.runtimeCompose)
             implementation(projects.shared)
 
+            implementation(libs.bundles.ktor.common)
+            implementation(libs.kotlinx.serialization.json)
+
             implementation(libs.kotlinx.datetime)
             implementation(libs.kotlinx.atomicfu)
 

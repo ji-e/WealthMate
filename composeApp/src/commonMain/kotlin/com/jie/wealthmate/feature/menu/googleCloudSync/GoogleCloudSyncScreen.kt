@@ -22,7 +22,6 @@ import com.mmk.kmpauth.google.GoogleAuthProvider
 import com.mmk.kmpauth.google.GoogleButtonUiContainer
 
 class GoogleCloudSyncScreen() : BaseScreen() {
-    var accessToken: String? = null
 
     @Composable
     override fun Content() {
@@ -52,6 +51,7 @@ class GoogleCloudSyncScreen() : BaseScreen() {
 
             GoogleButtonUiContainer(
                 onGoogleSignInResult = { googleUser ->
+                    println("googleUser::: ${googleUser?.serverAuthCode}")
                     screenModel.getToken(googleUser?.serverAuthCode)
                 },
                 scopes = listOf("https://www.googleapis.com/auth/drive.appdata"),

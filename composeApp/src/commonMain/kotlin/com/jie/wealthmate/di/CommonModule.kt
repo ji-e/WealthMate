@@ -15,6 +15,9 @@ import com.jie.wealthmate.feature.menu.paymentMethodManagement.PaymentMethodMana
 import com.jie.wealthmate.feature.menu.paymentMethodManagement.addPaymentMethod.AddPaymentMethodScreenModel
 import com.jie.wealthmate.feature.menu.paymentMethodManagement.modifyPaymentMethod.ModifyPaymentMethodScreenModel
 import com.jie.wealthmate.feature.menu.paymentMethodManagement.paymentMethodGroup.PaymentMethodGroupScreenModel
+import com.jie.wealthmate.network.HttpClientFactory
+import com.jie.wealthmate.repository.AuthRepository
+import com.jie.wealthmate.repository.AuthRepositoryImpl
 import com.jie.wealthmate.repository.CategoryRepository
 import com.jie.wealthmate.repository.CategoryRepositoryImpl
 import com.jie.wealthmate.repository.GoogleRepository
@@ -33,9 +36,12 @@ import org.koin.dsl.module
 val commonModule = module {
     single { DatabaseSyncManager(get(), get()) }
 
-    single<GoogleRepository> { GoogleRepositoryImpl(get()) }
+    single { HttpClientFactory(get()).create() }
+
+    single<AuthRepository> { AuthRepositoryImpl(get())}
+    single<GoogleRepository> { GoogleRepositoryImpl(get(), get()) }
     single<CategoryRepository> { CategoryRepositoryImpl(get()) }
-    single<PaymentMethodRepository> { PaymentMethodRepositoryImpl( get()) }
+    single<PaymentMethodRepository> { PaymentMethodRepositoryImpl(get()) }
     single<HistoryRepository> { HistoryRepositoryImpl(get()) }
     single<InstallmentRepository> { InstallmentRepositoryImpl(get()) }
     single<RepeatCycleRepository> { RepeatCycleRepositoryImpl(get()) }
@@ -66,6 +72,6 @@ val commonModule = module {
     factory { AddPaymentMethodScreenModel(get()) }
     factory { ModifyPaymentMethodScreenModel(get()) }
 
-    factory { GoogleCloudSyncScreenModel(get(), get()) }
+    factory { GoogleCloudSyncScreenModel(get(),get()) }
 
 }

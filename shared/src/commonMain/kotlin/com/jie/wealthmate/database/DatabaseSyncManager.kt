@@ -26,9 +26,7 @@ class DatabaseSyncManager(
     /**
      * 로컬의 데이터를 JSON으로 변환하여 Google Drive에 업로드합니다.
      */
-    suspend fun syncToCloud(
-        accessToken: String
-    ): Result<Unit> = withContext(context = Dispatchers.IO) {
+    suspend fun syncToCloud(): Result<Unit> = withContext(context = Dispatchers.IO) {
         return@withContext try {
             val db = databaseProvider.database
 
@@ -49,7 +47,6 @@ class DatabaseSyncManager(
 
             // Google Drive 업로드
             googleRepository.uploadDatabase(
-                accessToken = accessToken,
                 dbBytes = bytes,
                 fileName = syncFileName
             )
@@ -63,15 +60,10 @@ class DatabaseSyncManager(
     /**
      * Google Drive에서 JSON 데이터를 다운로드하여 로컬 DB와 병합합니다.
      */
-    suspend fun syncFromCloud(
-        accessToken: String
-    ): Result<Unit> = withContext(context = Dispatchers.IO) {
+    suspend fun syncFromCloud(): Result<Unit> = withContext(context = Dispatchers.IO) {
         return@withContext try {
             // 1. 클라우드에서 데이터 다운로드
-            val bytes = googleRepository.downloadDatabase(
-                accessToken = accessToken,
-                fileName = syncFileName
-            )
+            val bytes = googleRepository.downloadDatabase(syncFileName)
 
             val jsonString = bytes.decodeToString()
             val payload = json.decodeFromString(deserializer = SyncPayload.serializer(), string = jsonString)
