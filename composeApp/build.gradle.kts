@@ -59,6 +59,7 @@ kotlin {
 
             implementation(libs.kmpAuth.google)
             implementation(libs.kmpAuth.uihelper)
+            implementation(libs.multiplatform.settings)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

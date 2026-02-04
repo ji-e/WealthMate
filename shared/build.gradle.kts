@@ -30,6 +30,8 @@ kotlin {
             implementation(libs.androidx.room.sqlite.wrapper)
 
             implementation(libs.ktor.client.okhttp)
+
+            implementation(libs.androidx.security.crypto)
         }
         iosMain.dependencies {
             implementation(libs.ktor.client.darwin)
@@ -54,6 +56,8 @@ kotlin {
             implementation(libs.kmpAuth.google)
             implementation(libs.kmpAuth.uihelper)
             implementation(libs.okio)
+
+            implementation(libs.multiplatform.settings)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
