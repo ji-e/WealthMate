@@ -25,7 +25,7 @@ fun MenuTitleItem(
             color = ColorPrimary.Primary_700,
         ),
         modifier = Modifier
-            .padding(top = 12.dp, bottom = 4.dp)
+            .padding(bottom = 4.dp)
             .padding(horizontal = 20.dp)
     )
 }
@@ -38,7 +38,7 @@ fun MenuItem(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(48.dp)
+            .height(40.dp)
             .clickable { onClickMenu() }
             .padding(horizontal = 20.dp),
         contentAlignment = Alignment.CenterStart
