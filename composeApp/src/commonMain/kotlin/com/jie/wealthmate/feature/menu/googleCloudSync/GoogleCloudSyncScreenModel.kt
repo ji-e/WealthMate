@@ -9,12 +9,20 @@ class GoogleCloudSyncScreenModel(
     private val syncManager: DatabaseSyncManager,
 ) : BaseScreenModel<GoogleCloudSyncUiState>() {
 
+
     override val initialState: GoogleCloudSyncUiState
         get() = GoogleCloudSyncUiState()
 
     init {
 //        syncFromCloudOnStart()
     }
+//    init {
+//        viewModelScope.launch {
+//            databaseProvider.onDatabaseReplaced.collect {
+//                loadInitialData() // 데이터 다시 로드
+//            }
+//        }
+//    }
 
 
     fun upload() {
@@ -84,6 +92,5 @@ class GoogleCloudSyncScreenModel(
             }
         ) {
         }
-
     }
 }

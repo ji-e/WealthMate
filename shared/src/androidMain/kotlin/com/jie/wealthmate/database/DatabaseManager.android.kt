@@ -15,6 +15,7 @@ import java.io.FileOutputStream
 actual class DatabaseManager(
     private val context: Context,
     private val database: AppDatabase,
+    private val databaseProvider: DatabaseProvider
 ) {
     companion object {
         private const val TAG = "DatabaseManager"
@@ -131,7 +132,7 @@ actual class DatabaseManager(
             }
 
             // 5. 무결성 검사
-            val isValid = verifyDatabaseIntegrity(databaseName = databaseName)
+            val isValid = verifyDatabaseIntegrity()
             if (isValid.not()) {
                 throw Exception("Restored database integrity check failed")
             }
@@ -145,7 +146,8 @@ actual class DatabaseManager(
 
             // 7. 데이터베이스 다시 열기
             Log.d(TAG, "Reopening database...")
-            database.openHelper.writableDatabase
+            databaseProvider.refreshDatabase()
+//            database.openHelper.writableDatabase
 
             Log.d(TAG, "✅ saveDatabaseBytes 성공")
             true
@@ -183,7 +185,7 @@ actual class DatabaseManager(
         }
     }
 
-    private fun verifyDatabaseIntegrity(databaseName: String): Boolean {
+    private fun verifyDatabaseIntegrity(): Boolean {
         return try {
             val db: SupportSQLiteDatabase = database.openHelper.writableDatabase
             db.query("PRAGMA integrity_check").use { cursor ->

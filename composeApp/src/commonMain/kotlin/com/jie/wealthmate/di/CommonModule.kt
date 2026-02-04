@@ -35,7 +35,7 @@ val commonModule = module {
 
     single<GoogleRepository> { GoogleRepositoryImpl(get()) }
     single<CategoryRepository> { CategoryRepositoryImpl(get()) }
-    single<PaymentMethodRepository> { PaymentMethodRepositoryImpl(get(), get()) }
+    single<PaymentMethodRepository> { PaymentMethodRepositoryImpl( get()) }
     single<HistoryRepository> { HistoryRepositoryImpl(get()) }
     single<InstallmentRepository> { InstallmentRepositoryImpl(get()) }
     single<RepeatCycleRepository> { RepeatCycleRepositoryImpl(get()) }

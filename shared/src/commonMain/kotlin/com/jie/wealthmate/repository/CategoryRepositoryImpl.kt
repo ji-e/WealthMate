@@ -3,16 +3,17 @@
 package com.jie.wealthmate.repository
 
 import com.benasher44.uuid.uuid4
-import com.jie.wealthmate.database.dao.CategoryDao
+import com.jie.wealthmate.database.DatabaseProvider
 import com.jie.wealthmate.database.eneity.CategoryEntity
 import com.jie.wealthmate.database.eneity.CategoryTagEntity
 import kotlinx.coroutines.flow.Flow
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
-class CategoryRepositoryImpl(private val dao: CategoryDao) : CategoryRepository {
+class CategoryRepositoryImpl(private val databaseProvider: DatabaseProvider) : CategoryRepository {
     private val repoName = "CategoryRepository"
     private fun generateId(): String = uuid4().toString()
+    private val dao get() = databaseProvider.database.categoryDao()
 
     /**
      * 카테고리 추가

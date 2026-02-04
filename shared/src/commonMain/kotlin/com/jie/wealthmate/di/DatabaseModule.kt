@@ -1,7 +1,7 @@
 package com.jie.wealthmate.di
 
 import com.jie.wealthmate.database.AppDatabase
-import com.jie.wealthmate.database.DatabaseBuilder
+import com.jie.wealthmate.database.DatabaseProvider
 import com.jie.wealthmate.database.dao.CategoryDao
 import com.jie.wealthmate.database.dao.HistoryDao
 import com.jie.wealthmate.database.dao.InstallmentDao
@@ -24,23 +24,24 @@ import com.jie.wealthmate.repository.RepeatCycleRepositoryImpl
 import org.koin.dsl.module
 
 val databaseModule = module {
-    single<AppDatabase> { get<DatabaseBuilder>().build() }
+    single { DatabaseProvider(get()) }
+    single<AppDatabase> { get<DatabaseProvider>().database }
 
     single<CategoryConverters> { CategoryConverters() }
-    single<CategoryDao> { get<AppDatabase>().categoryDao() }
+    single<CategoryDao> { get<DatabaseProvider>().database.categoryDao() }
     single<CategoryRepository> { CategoryRepositoryImpl(get()) }
 
-    single<PaymentMethodDao> { get<AppDatabase>().paymentMethodDao() }
-    single<PaymentMethodGroupDao> { get<AppDatabase>().paymentMethodGroupDao() }
-    single<PaymentMethodRepository> { PaymentMethodRepositoryImpl(get(), get()) }
+    single<PaymentMethodDao> { get<DatabaseProvider>().database.paymentMethodDao() }
+    single<PaymentMethodGroupDao> { get<DatabaseProvider>().database.paymentMethodGroupDao() }
+    single<PaymentMethodRepository> { PaymentMethodRepositoryImpl(get()) }
 
-    single<HistoryDao> { get<AppDatabase>().historyDao() }
+    single<HistoryDao> { get<DatabaseProvider>().database.historyDao() }
     single<HistoryRepository> { HistoryRepositoryImpl(get()) }
 
-    single<InstallmentDao> { get<AppDatabase>().installmentDao() }
+    single<InstallmentDao> { get<DatabaseProvider>().database.installmentDao() }
     single<InstallmentRepository> { InstallmentRepositoryImpl(get()) }
 
-    single<RepeatCycleDao> { get<AppDatabase>().repeatCycleDao() }
+    single<RepeatCycleDao> { get<DatabaseProvider>().database.repeatCycleDao() }
     single<RepeatCycleRepository> { RepeatCycleRepositoryImpl(get()) }
 
     single<GoogleRepository> { GoogleRepositoryImpl(get()) }

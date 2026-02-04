@@ -3,8 +3,7 @@
 package com.jie.wealthmate.repository
 
 import com.benasher44.uuid.uuid4
-import com.jie.wealthmate.database.dao.PaymentMethodDao
-import com.jie.wealthmate.database.dao.PaymentMethodGroupDao
+import com.jie.wealthmate.database.DatabaseProvider
 import com.jie.wealthmate.database.eneity.PaymentMethodEntity
 import com.jie.wealthmate.database.eneity.PaymentMethodGroupEntity
 import com.jie.wealthmate.database.eneity.PaymentMethodWithGroupEntity
@@ -13,11 +12,12 @@ import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
 class PaymentMethodRepositoryImpl(
-    private val paymentMethodDao: PaymentMethodDao,
-    private val paymentMethodGroupDao: PaymentMethodGroupDao,
+    private val databaseProvider: DatabaseProvider,
 ) : PaymentMethodRepository {
     private val repoName = "PaymentMethodRepository"
     private fun generateId(): String = uuid4().toString()
+    private val paymentMethodDao get() = databaseProvider.database.paymentMethodDao()
+    private val paymentMethodGroupDao get() = databaseProvider.database.paymentMethodGroupDao()
 
     override suspend fun insertPaymentMethod(
         paymentMethodLabel: String,

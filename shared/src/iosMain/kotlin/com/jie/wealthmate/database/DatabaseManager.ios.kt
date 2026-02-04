@@ -26,6 +26,7 @@ import kotlinx.coroutines.withContext
 @OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
 actual class DatabaseManager(
     private val database: AppDatabase,
+    private val databaseProvider: DatabaseProvider
 ) {
     private val tag = "DatabaseManager"
 
@@ -130,6 +131,10 @@ actual class DatabaseManager(
                 // 3. 이전 세션의 WAL/SHM 파일 제거
                 fileManager.removeItemAtPath(path = "$dbPath-wal", error = null)
                 fileManager.removeItemAtPath(path = "$dbPath-shm", error = null)
+
+                // 4. 중요: iOS에서도 데이터베이스 인스턴스 갱신 호출
+                println("[$tag] iOS Database Refreshing...")
+                databaseProvider.refreshDatabase()
 
                 true
             } catch (e: Exception) {

@@ -7,5 +7,5 @@ import org.koin.dsl.module
 
 actual val platformModule = module {
     single<DatabaseBuilder> { DatabaseBuilder(androidContext()) }
-    single { DatabaseManager(androidContext(), get()) }
+    single { DatabaseManager(androidContext(), get(), get()) }
 }
