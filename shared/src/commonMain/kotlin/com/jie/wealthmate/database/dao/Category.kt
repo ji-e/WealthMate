@@ -10,9 +10,7 @@ import androidx.room.Update
 import com.jie.wealthmate.database.eneity.CategoryEntity
 import kotlinx.coroutines.flow.Flow
 import kotlin.time.Clock
-import kotlin.time.ExperimentalTime
 
-@OptIn(ExperimentalTime::class)
 @Dao
 interface CategoryDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -61,4 +59,16 @@ interface CategoryDao {
     // 중분류로 조회
     @Query("SELECT * FROM categories WHERE middleLabel = :middleLabel AND isDeleted = 0 ORDER BY sort ASC")
     fun getByMiddleLabel(middleLabel: String): Flow<List<CategoryEntity>>
+
+    /**
+     * 특정 시점 이후에 변경된 모든 카테고리 조회 (삭제된 항목 포함)
+     */
+    @Query("SELECT * FROM categories WHERE updatedAt > :lastSync")
+    suspend fun getChangesSince(lastSync: Long): List<CategoryEntity>
+
+    /**
+     * 클라우드 데이터를 로컬에 병합 (ID가 같으면 덮어쓰기)
+     */
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun upsertAll(categories: List<CategoryEntity>)
 }

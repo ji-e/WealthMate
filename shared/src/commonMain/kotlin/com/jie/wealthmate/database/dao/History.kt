@@ -101,4 +101,16 @@ interface HistoryDao {
         currentTimestamp: Long,
         timestamp: Long = Clock.System.now().toEpochMilliseconds()
     )
+
+    /**
+     * 특정 시점 이후에 변경된 모든 내역 조회 (삭제된 항목 포함)
+     */
+    @Query("SELECT * FROM histories WHERE updatedAt > :lastSync")
+    suspend fun getChangesSince(lastSync: Long): List<HistoryEntity>
+
+    /**
+     * 클라우드 데이터를 로컬에 병합 (ID가 같으면 덮어쓰기)
+     */
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun upsertAll(histories: List<HistoryEntity>)
 }

@@ -7,6 +7,7 @@ import androidx.room.PrimaryKey
 import androidx.room.ProvidedTypeConverter
 import androidx.room.TypeConverter
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
@@ -26,6 +27,7 @@ class CategoryConverters {
     }
 }
 
+@Serializable
 @Entity(tableName = "categories")
 data class CategoryEntity(
     @PrimaryKey val id: String,
