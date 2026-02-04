@@ -35,8 +35,14 @@ enum class MenuEnum(
 
     GOOGLE_SYNC(
         route = "google_sync",
-        label = "구글 클라우드 동기화",
-        title = "구글 동기화",
+        label = "동기화",
+        title = "동기화",
+        icon = null
+    ),
+    GOOGLE_SHARE(
+        route = "share",
+        label = "공유",
+        title = "공유",
         icon = null
     )
 
@@ -51,6 +57,7 @@ enum class MenuEnum(
         )
         val syncMenu = listOf(
             GOOGLE_SYNC,
+            GOOGLE_SHARE
         )
 
     }

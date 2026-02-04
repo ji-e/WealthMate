@@ -13,7 +13,7 @@ sealed class MenuItemData(
     )
 
     object Sync : MenuItemData(
-        label = "동기화",
+        label = "데이터",
         items = MenuEnum.syncMenu
     )
 
