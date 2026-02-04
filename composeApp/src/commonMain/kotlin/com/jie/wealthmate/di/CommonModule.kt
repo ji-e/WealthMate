@@ -10,6 +10,7 @@ import com.jie.wealthmate.feature.menu.MenuScreenModel
 import com.jie.wealthmate.feature.menu.categoryManagement.CategoryManagementScreenModel
 import com.jie.wealthmate.feature.menu.categoryManagement.addCategory.AddCategoryScreenModel
 import com.jie.wealthmate.feature.menu.categoryManagement.modifyCategory.ModifyCategoryScreenModel
+import com.jie.wealthmate.feature.menu.googleCloudShare.GoogleCloudShareScreenModel
 import com.jie.wealthmate.feature.menu.googleCloudSync.GoogleCloudSyncScreenModel
 import com.jie.wealthmate.feature.menu.paymentMethodManagement.PaymentMethodManagementScreenModel
 import com.jie.wealthmate.feature.menu.paymentMethodManagement.addPaymentMethod.AddPaymentMethodScreenModel
@@ -38,7 +39,7 @@ val commonModule = module {
 
     single { HttpClientFactory(get()).create() }
 
-    single<AuthRepository> { AuthRepositoryImpl(get())}
+    single<AuthRepository> { AuthRepositoryImpl(get()) }
     single<GoogleRepository> { GoogleRepositoryImpl(get(), get()) }
     single<CategoryRepository> { CategoryRepositoryImpl(get()) }
     single<PaymentMethodRepository> { PaymentMethodRepositoryImpl(get()) }
@@ -72,6 +73,7 @@ val commonModule = module {
     factory { AddPaymentMethodScreenModel(get()) }
     factory { ModifyPaymentMethodScreenModel(get()) }
 
-    factory { GoogleCloudSyncScreenModel(get(),get()) }
+    factory { GoogleCloudSyncScreenModel(get(), get()) }
+    factory { GoogleCloudShareScreenModel(get()) }
 
 }
