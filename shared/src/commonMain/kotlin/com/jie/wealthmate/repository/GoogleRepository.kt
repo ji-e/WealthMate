@@ -1,19 +1,18 @@
 package com.jie.wealthmate.repository
 
 import com.jie.wealthmate.BACK_UP_DB_NAME
+import com.jie.wealthmate.entity.GoogleAuthEntity
 
 
 interface GoogleRepository {
-    suspend fun fetchAccessToken(authCode: String): String?
+    suspend fun fetchGoogleAuth(authCode: String): GoogleAuthEntity?
 
     suspend fun uploadDatabase(
-        accessToken: String,
         dbBytes: ByteArray,
         fileName: String = BACK_UP_DB_NAME,
     )
 
     suspend fun downloadDatabase(
-        accessToken: String,
         fileName: String = BACK_UP_DB_NAME,
     ): ByteArray
 }
