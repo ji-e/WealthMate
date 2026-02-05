@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.jie.wealthmate.component.WMText
+import com.jie.wealthmate.theme.ColorGray
 import com.jie.wealthmate.theme.ColorPrimary
 
 @Composable
@@ -33,19 +34,23 @@ fun MenuTitleItem(
 @Composable
 fun MenuItem(
     menu: MenuEnum,
+    isEnabled: Boolean = true,
     onClickMenu: () -> Unit = {},
 ) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .height(44.dp)
-            .clickable { onClickMenu() }
+            .clickable(isEnabled) { onClickMenu() }
             .padding(horizontal = 20.dp),
         contentAlignment = Alignment.CenterStart
     ) {
         WMText(
             text = menu.label,
-            style = Typography().titleMedium.copy(fontWeight = FontWeight.Medium)
+            style = Typography().titleMedium.copy(
+                color = if (isEnabled) ColorGray.Gray_700 else ColorGray.Gray_300,
+                fontWeight = FontWeight.Medium
+            )
         )
     }
 }

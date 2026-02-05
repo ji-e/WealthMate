@@ -87,15 +87,16 @@ class MenuScreen(val calculateBottomPadding: Dp) : Screen {
         ) {
             items(uiState.menuEnums.size) { index ->
                 val menu = uiState.menuEnums[index]
+                
                 MenuTitleItem(menu.label)
-                // todo temp UI
-                Napier.e(menu.toString())
+
                 if (menu == MenuItemData.Sync) {
-                    val label = uiState.userName.ifEmpty { "계정 연결" }
+                    var label = uiState.userName.ifEmpty { "계정 연결" }
 
                     GoogleButtonUiContainer(
                         onGoogleSignInResult = { googleUser ->
                             println("googleUser::: $googleUser")
+                            label = googleUser?.email.default()
                             screenModel.getToken(
                                 authCode = googleUser?.serverAuthCode,
                                 email = googleUser?.email.default()
@@ -130,6 +131,7 @@ class MenuScreen(val calculateBottomPadding: Dp) : Screen {
                         val menuContent = menu.items[index]
                         MenuItem(
                             menu = menuContent,
+                            isEnabled = (menu == MenuItemData.Sync && uiState.userName.isEmpty()).not(),
                             onClickMenu = {
                                 screenModel.onMenuClick(menuContent)
                             }
