@@ -30,4 +30,9 @@ interface GoogleRepository {
 
     // 3단계: 게스트용 - 공유 폴더 연결 확인 및 파일 목록 가져오기
     suspend fun connectToSharedFolder(folderId: String): GoogleDriveFileEntity?
+
+    // 4단계: 공유 폴더 전용 기능
+    suspend fun uploadToSharedFolder(folderId: String, fileName: String, dbBytes: ByteArray)
+    suspend fun getFilesFromSharedFolder(folderId: String): GoogleDriveFileEntity?
+    suspend fun downloadFileById(fileId: String): ByteArray
 }

@@ -67,6 +67,16 @@ class GoogleCloudShareScreen() : BaseScreen() {
                 onClick = screenModel::connectToSharedFolder
             )
 
+            WMButton(
+                text = "upload",
+                onClick = { screenModel.upload() }
+            )
+
+            WMButton(
+                text = "download",
+                onClick = { screenModel.download() }
+            )
+
 
             // db 시각적 표현
             // 현재 구글 드라이브 앱 데이터 폴더에 저장된 DB 파일의 개수를 보여주는 로직입니다.

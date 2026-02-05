@@ -232,6 +232,107 @@ class GoogleRepositoryImpl(
         }
     }
 
+    override suspend fun uploadToSharedFolder(folderId: String, fileName: String, dbBytes: ByteArray) {
+        try {
+            // 공유 폴더 내에서 파일명으로 검색
+            val existingFileId = findFileInFolder(folderId, fileName)
+
+            if (existingFileId != null) {
+                // 기존 파일 업데이트
+                updateFile(existingFileId, dbBytes)
+            } else {
+                // 새 파일 생성 (부모 폴더 지정)
+                createFileInFolder(folderId, fileName, dbBytes)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            throw Exception("공유 폴더 업로드 실패: ${e.message}")
+        }
+    }
+
+    override suspend fun getFilesFromSharedFolder(folderId: String): GoogleDriveFileEntity? {
+        return try {
+            val response: HttpResponse = client.get("https://www.googleapis.com/drive/v3/files") {
+                parameter("q", "'$folderId' in parents and trashed=false")
+                parameter("fields", "files(id, name, createdTime, size)")
+            }
+
+            if (response.status.value == 200) {
+                response.body<GoogleDriveFileEntity>()
+            } else {
+                null
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
+
+    override suspend fun downloadFileById(fileId: String): ByteArray {
+        return try {
+            downloadFile(fileId)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            throw Exception("파일 다운로드 실패: ${e.message}")
+        }
+    }
+
+    /**
+     * 폴더 내에서 파일명으로 검색
+     */
+    private suspend fun findFileInFolder(folderId: String, fileName: String): String? {
+        val response: HttpResponse = client.get("https://www.googleapis.com/drive/v3/files") {
+            parameter("q", "name='$fileName' and '$folderId' in parents and trashed=false")
+            parameter("fields", "files(id, name)")
+        }
+
+        return if (response.status.value == 200) {
+            val fileList = response.body<GoogleDriveFileEntity>()
+            fileList.files.firstOrNull()?.id
+        } else {
+            null
+        }
+    }
+
+    /**
+     * 특정 폴더 내에 새 파일 생성
+     */
+    private suspend fun createFileInFolder(
+        folderId: String,
+        fileName: String,
+        fileBytes: ByteArray,
+    ) {
+        val metadata = """
+            {
+                "name": "$fileName",
+                "parents": ["$folderId"]
+            }
+        """.trimIndent()
+
+        val boundary = "boundary_${Clock.System.now().toEpochMilliseconds()}"
+        val contentType = ContentType.parse("multipart/related; boundary=$boundary")
+
+        val bodyPrefix = buildString {
+            append("--$boundary\r\n")
+            append("Content-Type: application/json; charset=UTF-8\r\n")
+            append("\r\n")
+            append(metadata)
+            append("\r\n")
+            append("--$boundary\r\n")
+            append("Content-Type: application/octet-stream\r\n")
+            append("\r\n")
+        }
+
+        val bodyBytes = bodyPrefix.toByteArray() + fileBytes + "\r\n--$boundary--\r\n".toByteArray()
+
+        client.post("https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart") {
+            headers {
+                append(HttpHeaders.ContentType, contentType.toString())
+            }
+            setBody(bodyBytes)
+        }
+    }
+
     /**
      * 폴더명으로 Google Drive 폴더 검색
      */

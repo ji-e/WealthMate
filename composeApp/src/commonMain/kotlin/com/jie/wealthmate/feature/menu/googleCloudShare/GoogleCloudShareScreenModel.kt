@@ -2,10 +2,13 @@ package com.jie.wealthmate.feature.menu.googleCloudShare
 
 import androidx.compose.ui.text.input.TextFieldValue
 import com.jie.wealthmate.base.BaseScreenModel
+import com.jie.wealthmate.database.DatabaseSyncManager
 import com.jie.wealthmate.repository.GoogleRepository
+import io.github.aakira.napier.Napier
 
 class GoogleCloudShareScreenModel(
     private val googleRepository: GoogleRepository,
+    private val syncManager: DatabaseSyncManager,
 ) : BaseScreenModel<GoogleCloudShareUiState>() {
 
     override val initialState: GoogleCloudShareUiState
@@ -29,19 +32,14 @@ class GoogleCloudShareScreenModel(
 
     /**
      * 1단계: 공유 시작 (호스트 사용자 A)
-     * 사용자 A가 가계부 데이터를 공유할 '공간'을 만드는 단계입니다.
      */
     fun startSharing() {
         launchSafe(
             block = {
-                // [공유 폴더 생성]
-                // 앱이 사용자 A의 구글 드라이브에 특정 이름의 폴더를 생성합니다.
                 val folderName = "Wealth_Mate_Shared"
                 val folderId = googleRepository.getOrCreateSharedFolder(folderName)
                     ?: throw Exception("공유 폴더 생성 실패")
 
-                // [상대방 초대 및 권한 부여]
-                // Google Drive Permission API를 호출하여 사용자 B에게 '편집자(writer)' 권한을 부여합니다.
                 val isPermissionGranted =
                     googleRepository.grantPermission(folderId, container.uiState.value.email.text)
                 if (!isPermissionGranted) {
@@ -62,7 +60,6 @@ class GoogleCloudShareScreenModel(
 
     /**
      * 3단계: 게스트(B)의 구현: 폴더 연결
-     * 사용자 B는 A에게 받은 sharedFolderId를 앱에 입력하여 공유 폴더에 연결합니다.
      */
     fun connectToSharedFolder() {
         val folderId = container.uiState.value.code.text
@@ -70,7 +67,6 @@ class GoogleCloudShareScreenModel(
 
         launchSafe(
             block = {
-                // 폴더 존재 확인 및 권한 체크 후 파일 목록 조회
                 googleRepository.connectToSharedFolder(folderId)
             }
         ) { response ->
@@ -79,6 +75,53 @@ class GoogleCloudShareScreenModel(
                     sharedFolderId = folderId,
                     dbFiles = response
                 )
+            }
+        }
+    }
+
+    /**
+     * 4단계: 공유 폴더 데이터 업로드 (내 기기 데이터 전송)
+     * 파일명 규칙: sync_user_{device_id}.json
+     */
+    fun uploadMyDataToSharedFolder(deviceId: String) {
+        val folderId = container.uiState.value.sharedFolderId ?: return
+        val fileName = "sync_user_$deviceId.json"
+
+        launchSafe(
+            block = {
+                syncManager.syncToSharedFolder(folderId, deviceId)
+            }
+        ) {
+            Napier.d("내 데이터를 공유 폴더에 성공적으로 업로드했습니다.")
+            fetchSharedFolderFiles() // 업로드 후 목록 갱신
+        }
+    }
+
+    /**
+     * 4단계: 공유 폴더로부터 데이터 동기화 (상대방 데이터 가져오기)
+     */
+    fun syncFromSharedFolder(myDeviceId: String) {
+        val folderId = container.uiState.value.sharedFolderId ?: return
+
+        launchSafe(
+            block = {
+               syncManager.syncFromSharedFolder(folderId, myDeviceId)
+            }
+        ) { results ->
+            Napier.d("상대방 데이터를 공유 폴더에서 성공적으로 다운로드했습니다.")
+
+        }
+    }
+
+    private fun fetchSharedFolderFiles() {
+        val folderId = container.uiState.value.sharedFolderId ?: return
+        launchSafe(
+            block = {
+                googleRepository.getFilesFromSharedFolder(folderId)
+            }
+        ) { response ->
+            reduceState { state ->
+                state.copy(dbFiles = response)
             }
         }
     }
