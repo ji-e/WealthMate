@@ -46,13 +46,16 @@ class GoogleCloudSyncScreenModel(
         ) {}
     }
 
-    fun getToken(authCode: String?) {
+    fun getToken(authCode: String?, email: String) {
         println(authCode)
         authCode ?: return
 
         launchSafe(
             block = {
-                googleRepository.fetchGoogleAuth(authCode = authCode)
+                googleRepository.fetchGoogleAuth(
+                    authCode = authCode,
+                    email = email
+                )
             }
         ) {}
     }

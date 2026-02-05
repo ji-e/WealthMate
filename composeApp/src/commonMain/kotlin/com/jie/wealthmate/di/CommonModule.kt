@@ -35,7 +35,7 @@ import com.jie.wealthmate.usecase.HistorySaveUseCase
 import org.koin.dsl.module
 
 val commonModule = module {
-    single { DatabaseSyncManager(get(), get()) }
+    single { DatabaseSyncManager(get(), get(), get()) }
 
     single { HttpClientFactory(get()).create() }
 
@@ -64,7 +64,7 @@ val commonModule = module {
     factory { AssetScreenModel() }
 
     // 메뉴
-    factory { MenuScreenModel() }
+    factory { MenuScreenModel(get(), get()) }
     factory { AddCategoryScreenModel(get()) }
     factory { ModifyCategoryScreenModel(get()) }
     factory { CategoryManagementScreenModel(get()) }
@@ -74,6 +74,6 @@ val commonModule = module {
     factory { ModifyPaymentMethodScreenModel(get()) }
 
     factory { GoogleCloudSyncScreenModel(get(), get()) }
-    factory { GoogleCloudShareScreenModel(get()) }
+    factory { GoogleCloudShareScreenModel(get(), get()) }
 
 }

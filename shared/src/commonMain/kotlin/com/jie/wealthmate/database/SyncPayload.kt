@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class SyncPayload(
-    val lastSyncTime: Long,
+    val lastSyncTime: Long = 0L,
     val histories: List<HistoryEntity> = emptyList(),
     val categories: List<CategoryEntity> = emptyList(),
     val installments: List<InstallmentEntity> = emptyList(),

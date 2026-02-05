@@ -1,5 +1,6 @@
 package com.jie.wealthmate.repository
 
+import io.github.aakira.napier.Napier
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlin.time.Clock
@@ -17,7 +18,7 @@ object RepositoryLogger {
         params: Map<String, Any?>
     ) {
         val paramsStr = params.entries.joinToString(", ") { "${it.key}=${it.value}" }
-        println("[$TAG] 🔵 REQUEST -> $repositoryName.$methodName($paramsStr)")
+        Napier.d("[$TAG] 🔵 REQUEST -> $repositoryName.$methodName($paramsStr)")
     }
 
     fun logResponse(
@@ -32,7 +33,7 @@ object RepositoryLogger {
             null -> "null"
             else -> result.toString().take(100)
         }
-        println("[$TAG] 🟢 RESPONSE <- $repositoryName.$methodName: $resultStr (${executionTime}ms)")
+        Napier.d("[$TAG] 🟢 RESPONSE <- $repositoryName.$methodName: $resultStr (${executionTime}ms)")
     }
 
     fun logError(
@@ -40,7 +41,7 @@ object RepositoryLogger {
         methodName: String,
         error: Throwable
     ) {
-        println("[$TAG] 🔴 ERROR <- $repositoryName.$methodName: ${error.message}")
+        Napier.e("[$TAG] 🔴 ERROR <- $repositoryName.$methodName: ${error.message}")
     }
 }
 

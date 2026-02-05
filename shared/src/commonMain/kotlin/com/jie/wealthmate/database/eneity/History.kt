@@ -4,13 +4,14 @@ import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.Relation
+import com.benasher44.uuid.uuid4
 import kotlinx.serialization.Serializable
 import kotlin.time.Clock
 
 @Serializable
 @Entity(tableName = "histories")
 data class HistoryEntity(
-    @PrimaryKey val id: String = "",
+    @PrimaryKey val id: String = uuid4().toString(),
     val largeCategory: String,
     val date: Long,
     val amount: Long,

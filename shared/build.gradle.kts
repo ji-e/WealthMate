@@ -58,6 +58,8 @@ kotlin {
             implementation(libs.okio)
 
             implementation(libs.multiplatform.settings)
+
+            implementation(libs.napier)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
