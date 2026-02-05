@@ -25,6 +25,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.font.FontWeight
@@ -46,6 +47,7 @@ fun WMTextField(
     textFieldModifier: Modifier = Modifier,
     maxLength: Int = Int.MAX_VALUE,
     maxLines: Int = 1,
+    readOnlyColor: Color = ColorGray.Gray_700,
     readOnly: Boolean = false,
     enabled: Boolean = true,
     label: String? = null,
@@ -89,6 +91,7 @@ fun WMTextField(
         },
         maxLength = maxLength,
         maxLines = maxLines,
+        readOnlyColor = readOnlyColor,
         readOnly = readOnly,
         enabled = enabled,
         label = label,
@@ -116,6 +119,7 @@ fun WMTextField(
     textFieldModifier: Modifier = Modifier,
     maxLength: Int = Int.MAX_VALUE,
     maxLines: Int = 1,
+    readOnlyColor: Color = ColorGray.Gray_700,
     readOnly: Boolean = false,
     enabled: Boolean = true,
     label: String? = null,
@@ -212,9 +216,15 @@ fun WMTextField(
                 keyboardOptions = keyboardOptions,
                 keyboardActions = keyboardActions,
                 interactionSource = interactionSource,
-                textStyle = Typography().bodyLarge.copy(
-                    color = if (enabled.not()) disabledColor else defaultColor,
-                ),
+                textStyle = Typography().bodyLarge
+                    .copy(
+                        color =
+                            when {
+                                readOnly -> readOnlyColor
+                                enabled.not() -> disabledColor
+                                else -> defaultColor
+                            },
+                    ),
                 cursorBrush = SolidColor(if (isError) errorColor else ColorPrimary.Primary_500),
                 decorationBox = { innerTextField ->
                     TextFieldDefaults.DecorationBox(
