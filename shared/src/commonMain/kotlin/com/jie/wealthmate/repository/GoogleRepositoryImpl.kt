@@ -1,9 +1,9 @@
-@file:OptIn(ExperimentalTime::class)
-
 package com.jie.wealthmate.repository
 
-import GoogleDriveFileEntity
+import com.jie.wealthmate.entity.DriveFileEntity
 import com.jie.wealthmate.entity.GoogleAuthEntity
+import com.jie.wealthmate.entity.GoogleDriveFileEntity
+import com.jie.wealthmate.entity.GoogleDrivePermissionEntity
 import io.github.aakira.napier.Napier
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -23,16 +23,15 @@ import io.ktor.http.Parameters
 import io.ktor.http.contentType
 import io.ktor.utils.io.core.toByteArray
 import kotlin.time.Clock
-import kotlin.time.ExperimentalTime
 
 
 class GoogleRepositoryImpl(
     private val client: HttpClient,
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
 ) : GoogleRepository {
 
     // 구글 토큰 엔드포인트에서 Access Token 교환 및 저장
-    override suspend fun fetchGoogleAuth(authCode: String, email:String): GoogleAuthEntity? {
+    override suspend fun fetchGoogleAuth(authCode: String, email: String): GoogleAuthEntity? {
         try {
             val response: HttpResponse = client.post("https://oauth2.googleapis.com/token") {
                 contentType(ContentType.Application.FormUrlEncoded)
@@ -51,8 +50,8 @@ class GoogleRepositoryImpl(
                 val authEntity = response.body<GoogleAuthEntity>()
                 // 토큰 저장
                 authRepository.saveAuthData(
-                    accessToken =  authEntity.accessToken,
-                    refreshToken =  authEntity.refreshToken,
+                    accessToken = authEntity.accessToken,
+                    refreshToken = authEntity.refreshToken,
                     email = email
                 )
                 authEntity
@@ -110,7 +109,7 @@ class GoogleRepositoryImpl(
     override suspend fun getFileList(): GoogleDriveFileEntity? {
         return try {
             val sharedFolderId = authRepository.getSharedFolderId()
-            
+
             val response: HttpResponse = client.get("https://www.googleapis.com/drive/v3/files") {
                 if (sharedFolderId != null) {
                     // 공유 폴더 내 파일 조회
@@ -176,12 +175,13 @@ class GoogleRepositoryImpl(
                 초대 코드: $fileId
             """.trimIndent()
 
-            val response: HttpResponse = client.post("https://www.googleapis.com/drive/v3/files/$fileId/permissions") {
-                parameter("sendNotificationEmail", true)
-                parameter("emailMessage", emailMessage)
-                contentType(ContentType.Application.Json)
-                setBody(permissionRequest)
-            }
+            val response: HttpResponse =
+                client.post("https://www.googleapis.com/drive/v3/files/$fileId/permissions") {
+                    parameter("sendNotificationEmail", true)
+                    parameter("emailMessage", emailMessage)
+                    contentType(ContentType.Application.Json)
+                    setBody(permissionRequest)
+                }
 
             response.status.value == 200
         } catch (e: Exception) {
@@ -209,31 +209,70 @@ class GoogleRepositoryImpl(
         // 3. 드라이브에도 없다면 새로 생성
         Napier.d("새로운 공유 폴더 생성 중: $folderName")
         val newFolderId = createSharedFolder(folderName)
-        
+
         // 4. 생성된 ID를 로컬에 영구 저장
         if (newFolderId != null) {
             authRepository.saveSharedFolderId(newFolderId)
         }
-        
+
         return newFolderId
+    }
+
+    /**
+     * 특정 파일이나 폴더의 메타데이터를 조회합니다.
+     */
+    override suspend fun getFileMetadata(fileId: String): DriveFileEntity? {
+        return try {
+            val response: HttpResponse =
+                client.get("https://www.googleapis.com/drive/v3/files/$fileId") {
+                    parameter(
+                        "fields",
+                        "id, name, capabilities(canEdit), owners(displayName, emailAddress, photoLink)"
+                    )
+                }
+
+            if (response.status.value == 200) {
+                response.body<DriveFileEntity>()
+            } else {
+                null
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
+
+    override suspend fun getFilePermissions(fileId: String): GoogleDrivePermissionEntity? {
+        return try {
+            val response: HttpResponse =
+                client.get("https://www.googleapis.com/drive/v3/files/$fileId/permissions") {
+                    parameter("fields", "permissions(id, type, role, emailAddress, displayName)")
+                }
+
+            if (response.status.value == 200) {
+                response.body<GoogleDrivePermissionEntity>()
+            } else {
+                Napier.e("Failed to get permissions: ${response.bodyAsText()}")
+                null
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
     }
 
     override suspend fun connectToSharedFolder(folderId: String): GoogleDriveFileEntity? {
         return try {
             // 1. 연결 확인: 폴더 메타데이터 가져오기 (권한 체크 포함)
-            val folderResponse: HttpResponse = client.get("https://www.googleapis.com/drive/v3/files/$folderId") {
-                parameter("fields", "id, name, capabilities(canEdit)")
-            }
-
-            if (folderResponse.status.value != 200) {
-                throw Exception("폴더를 찾을 수 없거나 접근 권한이 없습니다.")
-            }
+            val folderMetadata = getFileMetadata(folderId)
+                ?: throw Exception("폴더를 찾을 수 없거나 접근 권한이 없습니다.")
 
             // 2. 데이터 조회: 해당 폴더 내의 파일 목록 불러오기
-            val filesResponse: HttpResponse = client.get("https://www.googleapis.com/drive/v3/files") {
-                parameter("q", "'$folderId' in parents and trashed=false")
-                parameter("fields", "files(id, name, createdTime, size)")
-            }
+            val filesResponse: HttpResponse =
+                client.get("https://www.googleapis.com/drive/v3/files") {
+                    parameter("q", "'$folderId' in parents and trashed=false")
+                    parameter("fields", "files(id, name, createdTime, size)")
+                }
 
             if (filesResponse.status.value == 200) {
                 // 연결 성공 시 로컬에 폴더 ID 저장
@@ -248,7 +287,11 @@ class GoogleRepositoryImpl(
         }
     }
 
-    override suspend fun uploadToSharedFolder(folderId: String, fileName: String, dbBytes: ByteArray) {
+    override suspend fun uploadToSharedFolder(
+        folderId: String,
+        fileName: String,
+        dbBytes: ByteArray,
+    ) {
         try {
             // 공유 폴더 내에서 파일명으로 검색
             val existingFileId = findFileInFolder(folderId, fileName)
@@ -352,10 +395,13 @@ class GoogleRepositoryImpl(
     /**
      * 폴더명으로 Google Drive 폴더 검색
      */
-    private suspend fun findFolderByName(folderName: String): String? {
+    override suspend fun findFolderByName(folderName: String): String? {
         return try {
             val response: HttpResponse = client.get("https://www.googleapis.com/drive/v3/files") {
-                parameter("q", "name='$folderName' and mimeType='application/vnd.google-apps.folder' and trashed=false")
+                parameter(
+                    "q",
+                    "name='$folderName' and mimeType='application/vnd.google-apps.folder' and trashed=false"
+                )
                 parameter("fields", "files(id, name)")
             }
 
@@ -456,7 +502,8 @@ class GoogleRepositoryImpl(
     }
 
     companion object {
-        const val CLIENT_ID = "1001016412934-av4h457eq1vtastir4hjdomf1bnd11hp.apps.googleusercontent.com"
+        const val CLIENT_ID =
+            "1001016412934-av4h457eq1vtastir4hjdomf1bnd11hp.apps.googleusercontent.com"
         const val CLIENT_SECRET = "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"
     }
 }

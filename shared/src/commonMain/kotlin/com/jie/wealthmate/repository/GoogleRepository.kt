@@ -2,7 +2,9 @@ package com.jie.wealthmate.repository
 
 import com.jie.wealthmate.BACK_UP_DB_NAME
 import com.jie.wealthmate.entity.GoogleAuthEntity
-import GoogleDriveFileEntity
+import com.jie.wealthmate.entity.GoogleDriveFileEntity
+import com.jie.wealthmate.entity.DriveFileEntity
+import com.jie.wealthmate.entity.GoogleDrivePermissionEntity
 
 
 interface GoogleRepository {
@@ -35,4 +37,11 @@ interface GoogleRepository {
     suspend fun uploadToSharedFolder(folderId: String, fileName: String, dbBytes: ByteArray)
     suspend fun getFilesFromSharedFolder(folderId: String): GoogleDriveFileEntity?
     suspend fun downloadFileById(fileId: String): ByteArray
+    suspend fun findFolderByName(folderName: String): String?
+
+    // 파일/폴더 메타데이터 조회
+    suspend fun getFileMetadata(fileId: String): DriveFileEntity?
+
+    // 파일/폴더 권한 목록 조회
+    suspend fun getFilePermissions(fileId: String): GoogleDrivePermissionEntity?
 }
