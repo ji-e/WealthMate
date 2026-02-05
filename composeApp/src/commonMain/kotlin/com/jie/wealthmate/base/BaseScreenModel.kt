@@ -3,6 +3,7 @@ package com.jie.wealthmate.base
 import cafe.adriel.voyager.core.model.ScreenModel
 import com.jie.wealthmate.MainUiManager
 import com.jie.wealthmate.component.topbar.TopBarItem
+import io.github.aakira.napier.Napier
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -175,6 +176,8 @@ abstract class BaseScreenModel<S : UiState> : ScreenModel, ContainerHost<S> {
 
             try {
                 val result = block()
+                Napier.d("response::: $result")
+
                 onSuccess?.invoke(result)
             } catch (e: Exception) {
                 e.printStackTrace()
