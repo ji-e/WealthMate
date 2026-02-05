@@ -65,7 +65,6 @@ class GoogleCloudSyncScreen() : BaseScreen() {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(vertical = 20.dp)
                 .verticalScroll(rememberScrollState())
         ) {
             val infoContents = listOf(
@@ -78,7 +77,7 @@ class GoogleCloudSyncScreen() : BaseScreen() {
                 text = "기기를 변경하거나 앱을 재설치했을 때 데이터를 안전하게 보관하고 불러올 수 있습니다.",
                 style = Typography().titleMedium.copy(fontWeight = FontWeight.SemiBold),
                 modifier = Modifier
-                    .padding(bottom = 8.dp)
+                    .padding(top = 4.dp, bottom = 8.dp)
                     .padding(horizontal = 20.dp)
             )
 
@@ -175,7 +174,7 @@ class GoogleCloudSyncScreen() : BaseScreen() {
                     )
                 )
 
-                WMText(text = "복구 시 현재 기기의 데이터는 사라지고 백업 시점의 데이터로 덮어씌워집니다")
+                WMText(text = "복구 시 현재 기기의 데이터는 사라지고 백업 시점의 데이터로 덮어씌워집니다.")
             }
         }
     }

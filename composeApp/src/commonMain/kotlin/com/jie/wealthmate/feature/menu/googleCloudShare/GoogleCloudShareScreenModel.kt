@@ -16,7 +16,9 @@ class GoogleCloudShareScreenModel(
 ) : BaseScreenModel<GoogleCloudShareUiState>() {
 
     override val initialState: GoogleCloudShareUiState
-        get() = GoogleCloudShareUiState()
+        get() = GoogleCloudShareUiState(
+            isLoggedIn = authRepository.isLoggedIn()
+        )
 
     init {
         if (authRepository.isLoggedIn()) {
@@ -67,6 +69,26 @@ class GoogleCloudShareScreenModel(
                 state.copy(
                     googleDrivePermissionVo = googleDrivePermissionVo,
                     isOwner = googleDrivePermissionVo.permissions.find { it.emailAddress == state.userName }?.role == "owner"
+                )
+            }
+        }
+    }
+
+    fun getToken(authCode: String?, email: String) {
+        authCode ?: return
+
+        launchSafe(
+            block = {
+                googleRepository.fetchGoogleAuth(
+                    authCode = authCode,
+                    email = email
+                )
+            }
+        ) { response ->
+            reduceState { state ->
+                state.copy(
+                    isLoggedIn = response?.accessToken != null,
+                    userName = email
                 )
             }
         }

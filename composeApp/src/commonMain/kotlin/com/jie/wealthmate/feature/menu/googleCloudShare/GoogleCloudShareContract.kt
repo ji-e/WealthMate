@@ -6,7 +6,7 @@ import com.jie.wealthmate.entity.GoogleDriveFileEntity
 import com.jie.wealthmate.vo.GoogleDrivePermissionVo
 
 data class GoogleCloudShareUiState(
-    val token: String? = null,
+    val isLoggedIn: Boolean = false,
     val isOwner: Boolean = false,
     val userName: String = "",
     val sharedFolderId: String = "",
@@ -14,6 +14,5 @@ data class GoogleCloudShareUiState(
     val code: TextFieldValue = TextFieldValue(),
     val dbFiles: GoogleDriveFileEntity? = null,
     val googleDrivePermissionVo: GoogleDrivePermissionVo? = null,
-//    val sharedFolderId: String? = null,
     val inviteCode: String? = null,
 ) : BaseUiState

@@ -2,20 +2,31 @@
 
 package com.jie.wealthmate.feature.menu.googleCloudShare
 
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.annotation.InternalVoyagerApi
 import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.jie.wealthmate.base.BaseScreen
+import com.jie.wealthmate.component.WMText
 import com.jie.wealthmate.component.textField.WMTextField
 import com.jie.wealthmate.component.topbar.TopBarItem
 import com.jie.wealthmate.feature.menu.component.MenuEnum
@@ -23,6 +34,10 @@ import com.jie.wealthmate.feature.menu.googleCloudShare.component.Owner
 import com.jie.wealthmate.feature.menu.googleCloudShare.component.SharedMemberList
 import com.jie.wealthmate.theme.ColorGray
 import com.jie.wealthmate.utils.default
+import com.mmk.kmpauth.google.GoogleButtonUiContainer
+import org.jetbrains.compose.resources.painterResource
+import wealthmate.composeapp.generated.resources.Res
+import wealthmate.composeapp.generated.resources.android_light_sq_na
 
 class GoogleCloudShareScreen() : BaseScreen() {
 
@@ -46,32 +61,93 @@ class GoogleCloudShareScreen() : BaseScreen() {
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
-            WMTextField(
-                label = "연결된 계정",
-                value = uiState.userName,
-                onValueChange = {},
-                readOnlyColor = ColorGray.Gray_400,
-                readOnly = true,
+            WMText(
+                text = "구글 드라이브를 통해 가족, 연인과 함께\n가계부를 공유해 보세요.",
+                style = Typography().titleMedium.copy(fontWeight = FontWeight.SemiBold),
                 modifier = Modifier
-                    .padding(top = 4.dp)
+                    .padding(top = 4.dp, bottom = 8.dp)
                     .padding(horizontal = 20.dp)
             )
 
-            if (uiState.isOwner) {
-                Owner(
-                    sharedFolderId = uiState.sharedFolderId,
-                    email = uiState.email,
-                    updateEmail = screenModel::updateEmail,
-                    onInviteClick = screenModel::inviteMember,
-                    showSnackbar = screenModel::showSnackbar,
-                )
-            }
-
-            SharedMemberList(
-                permissionsItems = uiState.googleDrivePermissionVo?.permissions.default(),
-                isOwner = uiState.isOwner,
-                onRemoveClick = {}
+            WMText(
+                text = "사용자의 데이터를 서버에 저장하지 않고 본인의 구글 드라이브에만 보관합니다.",
+                modifier = Modifier.padding(horizontal = 20.dp)
             )
+
+            if (uiState.isLoggedIn) {
+                WMTextField(
+                    label = "연결된 계정",
+                    value = uiState.userName,
+                    onValueChange = {},
+                    readOnlyColor = ColorGray.Gray_400,
+                    readOnly = true,
+                    modifier = Modifier
+                        .padding(top = 32.dp)
+                        .padding(horizontal = 20.dp)
+                )
+
+                if (uiState.isOwner) {
+                    Owner(
+                        sharedFolderId = uiState.sharedFolderId,
+                        email = uiState.email,
+                        updateEmail = screenModel::updateEmail,
+                        onInviteClick = screenModel::inviteMember,
+                        showSnackbar = screenModel::showSnackbar,
+                    )
+                }
+
+                if (uiState.sharedFolderId.isNotEmpty()) {
+                    SharedMemberList(
+                        permissionsItems = uiState.googleDrivePermissionVo?.permissions.default(),
+                        isOwner = uiState.isOwner,
+                        onRemoveClick = {},
+                        emptyContent = {
+                            EmptyListView(
+                                modifier = Modifier.fillMaxSize().padding(20.dp),
+                                contentText = "공유된 멤버가 없습니다.",
+                            )
+                        }
+                    )
+                }
+            } else {
+                GoogleButtonUiContainer(
+                    onGoogleSignInResult = { googleUser ->
+                        screenModel.getToken(
+                            authCode = googleUser?.serverAuthCode,
+                            email = googleUser?.email.default()
+                        )
+                    },
+                    scopes = listOf(
+                        "https://www.googleapis.com/auth/drive.appdata",
+                        "https://www.googleapis.com/auth/drive.file",
+                        "https://www.googleapis.com/auth/drive.metadata.readonly" // 메타데이터 읽기
+                    ),
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .padding(horizontal = 20.dp)
+                            .padding(top = 32.dp)
+                            .clip(CircleShape)
+                            .clickable { this@GoogleButtonUiContainer.onClick() }
+                            .border(
+                                width = 1.dp,
+                                color = Color(0xFF747775),
+                                shape = CircleShape
+                            )
+                            .padding(end = 12.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Image(
+                            painter = painterResource(Res.drawable.android_light_sq_na),
+                            contentDescription = "구글 계정으로 로그인하기"
+                        )
+                        WMText(
+                            text = "구글 계정으로 로그인하기",
+                            style = Typography().labelLarge
+                        )
+                    }
+                }
+            }
 
 
 //

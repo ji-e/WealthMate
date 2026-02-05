@@ -35,6 +35,7 @@ fun SharedMemberList(
     permissionsItems: List<DrivePermission>,
     isOwner: Boolean,
     onRemoveClick: (String) -> Unit,
+    emptyContent: @Composable () -> Unit,
 ) {
     val backgroundColors = ColorGroup.getColorList()
 
@@ -46,9 +47,15 @@ fun SharedMemberList(
             .padding(horizontal = 20.dp)
     )
 
+    if (permissionsItems.isEmpty()) {
+        emptyContent()
+        return
+    }
+
     LazyColumn(
         modifier = Modifier.padding(top = 12.dp),
     ) {
+
 
         items(
             count = permissionsItems.size,
