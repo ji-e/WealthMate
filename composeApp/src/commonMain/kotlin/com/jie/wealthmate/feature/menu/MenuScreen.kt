@@ -102,8 +102,8 @@ class MenuScreen(val calculateBottomPadding: Dp) : Screen {
                             )
                         },
                         scopes = listOf(
-                            "https://www.googleapis.com/auth/drive.appdata", // 전체 Drive 접근
-                            "https://www.googleapis.com/auth/drive.file", // 앱이 생성한 파일
+                            "https://www.googleapis.com/auth/drive.appdata",
+                            "https://www.googleapis.com/auth/drive.file",
                             "https://www.googleapis.com/auth/drive.metadata.readonly" // 메타데이터 읽기
                         ),
                     ) {
@@ -111,7 +111,7 @@ class MenuScreen(val calculateBottomPadding: Dp) : Screen {
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(44.dp)
-                                .clickable(uiState.userName.isEmpty()) {
+                                .clickable {
                                     this.onClick()
                                 }
                                 .padding(horizontal = 20.dp),

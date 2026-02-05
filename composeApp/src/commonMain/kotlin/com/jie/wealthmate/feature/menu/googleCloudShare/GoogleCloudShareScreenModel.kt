@@ -3,11 +3,15 @@ package com.jie.wealthmate.feature.menu.googleCloudShare
 import androidx.compose.ui.text.input.TextFieldValue
 import com.jie.wealthmate.base.BaseScreenModel
 import com.jie.wealthmate.database.DatabaseSyncManager
+import com.jie.wealthmate.repository.AuthRepository
 import com.jie.wealthmate.repository.GoogleRepository
+import com.jie.wealthmate.utils.default
+import com.jie.wealthmate.vo.GoogleDrivePermissionVo.Companion.mapperToVo
 import io.github.aakira.napier.Napier
 
 class GoogleCloudShareScreenModel(
     private val googleRepository: GoogleRepository,
+    private val authRepository: AuthRepository,
     private val syncManager: DatabaseSyncManager,
 ) : BaseScreenModel<GoogleCloudShareUiState>() {
 
@@ -15,17 +19,53 @@ class GoogleCloudShareScreenModel(
         get() = GoogleCloudShareUiState()
 
     init {
-        fetchDbFiles()
+        getUserName()
+        getSharedFolderId()
     }
 
-    private fun fetchDbFiles() {
+    private fun getUserName() {
+        if (authRepository.isLoggedIn()) {
+            reduceState { state ->
+                state.copy(
+                    userName = authRepository.getUserName().default()
+                )
+            }
+        }
+    }
+
+    private fun getSharedFolderId() {
         launchSafe(
             block = {
-                googleRepository.getFileList()
+                googleRepository.findFolderByName("Wealth_Mate_Shared")
             }
         ) { response ->
+
+            val sharedFolderId =
+                authRepository.getSharedFolderId().default().ifEmpty { response.default() }
+
+            fetchFilePermissions(sharedFolderId)
+
             reduceState { state ->
-                state.copy(dbFiles = response)
+                state.copy(
+                    sharedFolderId = sharedFolderId
+                )
+            }
+        }
+    }
+
+    private fun fetchFilePermissions(sharedFolderId: String) {
+        launchSafe(
+            block = {
+                googleRepository.getFilePermissions(sharedFolderId)
+            }
+        ) { response ->
+            val googleDrivePermissionVo = response.mapperToVo()
+
+            reduceState { state ->
+                state.copy(
+                    googleDrivePermissionVo = googleDrivePermissionVo,
+                    isOwner = googleDrivePermissionVo.permissions.find { it.emailAddress == state.userName }?.role == "owner"
+                )
             }
         }
     }
@@ -103,7 +143,7 @@ class GoogleCloudShareScreenModel(
 
         launchSafe(
             block = {
-               syncManager.syncFromSharedFolder()
+                syncManager.syncFromSharedFolder()
             }
         ) { results ->
             Napier.d("상대방 데이터를 공유 폴더에서 성공적으로 다운로드했습니다.")

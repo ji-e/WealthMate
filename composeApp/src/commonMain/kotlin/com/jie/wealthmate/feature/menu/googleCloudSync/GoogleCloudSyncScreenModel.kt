@@ -22,30 +22,22 @@ class GoogleCloudSyncScreenModel(
     }
 
     private fun getUserName() {
-        launchSafe(
-            block = {
-                authRepository.getUserName()
-            }
-        ) {
+        if (authRepository.isLoggedIn()) {
             reduceState { state ->
                 state.copy(
-                    userName = it.default()
+                    userName = authRepository.getUserName().default()
                 )
             }
         }
     }
 
     private fun getLastSyncTime() {
-        launchSafe(
-            block = {
-                authRepository.getLastSyncTime()
-            }
-        ) { response ->
-            reduceState { state ->
-                state.copy(
-                    lastSyncDate = if (response > 0) response.toLocalDate().toString() else "없음"
-                )
-            }
+        val lastSyncTime = authRepository.getLastSyncTime()
+
+        reduceState { state ->
+            state.copy(
+                lastSyncDate = if (lastSyncTime > 0) lastSyncTime.toLocalDate().toString() else "없음"
+            )
         }
     }
 
