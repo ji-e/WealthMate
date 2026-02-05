@@ -64,7 +64,7 @@ val commonModule = module {
     factory { AssetScreenModel() }
 
     // 메뉴
-    factory { MenuScreenModel(get()) }
+    factory { MenuScreenModel(get(), get()) }
     factory { AddCategoryScreenModel(get()) }
     factory { ModifyCategoryScreenModel(get()) }
     factory { CategoryManagementScreenModel(get()) }

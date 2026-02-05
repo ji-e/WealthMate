@@ -41,10 +41,10 @@ class GoogleCloudSyncScreen() : BaseScreen() {
                 ),
             )
         }
-
-        GoogleAuthProvider.create(
-            credentials = GoogleAuthCredentials(serverId = "1001016412934-av4h457eq1vtastir4hjdomf1bnd11hp.apps.googleusercontent.com")
-        )
+//
+//        GoogleAuthProvider.create(
+//            credentials = GoogleAuthCredentials(serverId = "1001016412934-av4h457eq1vtastir4hjdomf1bnd11hp.apps.googleusercontent.com")
+//        )
 
         Column(
             modifier = Modifier.fillMaxSize()
