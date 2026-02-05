@@ -29,6 +29,7 @@ kotlin {
             implementation(libs.androidx.activity.compose)
             implementation(libs.koin.android)
             implementation(libs.androidx.compose.ui.tooling.preview)
+            implementation(libs.androidx.security.crypto)
         }
         iosMain.dependencies {
 
@@ -63,6 +64,8 @@ kotlin {
             implementation(libs.kmpAuth.google)
             implementation(libs.kmpAuth.uihelper)
             implementation(libs.multiplatform.settings)
+
+            implementation(libs.napier)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
