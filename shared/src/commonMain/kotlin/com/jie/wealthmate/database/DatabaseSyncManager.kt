@@ -1,20 +1,21 @@
 package com.jie.wealthmate.database
 
+import com.jie.wealthmate.repository.AuthRepository
 import com.jie.wealthmate.repository.GoogleRepository
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
+import io.github.aakira.napier.Napier
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.withContext
-import kotlin.time.Clock
+import kotlinx.datetime.Clock
+import kotlinx.serialization.json.Json
 
 /**
- * 증분 동기화(Incremental Sync)를 관리하는 매니저입니다.
- * DB 파일을 통째로 올리는 대신, 각 레코드의 UUID와 updatedAt을 기준으로 JSON 병합을 수행합니다.
+ * 가계부 데이터 동기화를 관리하는 매니저입니다.
  */
 class DatabaseSyncManager(
     private val databaseProvider: DatabaseProvider,
-    private val googleRepository: GoogleRepository
+    private val googleRepository: GoogleRepository,
+    private val authRepository: AuthRepository,
 ) {
     private val json = Json {
         ignoreUnknownKeys = true
@@ -24,18 +25,14 @@ class DatabaseSyncManager(
     private val syncFileName = "wealthmate_sync_data.json"
 
     /**
-     * 로컬의 데이터를 JSON으로 변환하여 Google Drive에 업로드합니다. (개인 백업용)
+     * 개인 백업용 업로드 (증분 방식)
      */
     suspend fun syncToCloud(): Result<Unit> = withContext(context = Dispatchers.IO) {
         return@withContext try {
-            val bytes = createSyncPayloadBytes()
-
-            // Google Drive 업로드 (App Data Folder)
-            googleRepository.uploadDatabase(
-                dbBytes = bytes,
-                fileName = syncFileName
-            )
-
+            val bytes = createSyncPayloadBytes(isCloudSync = true)
+            googleRepository.uploadDatabase(dbBytes = bytes, fileName = syncFileName)
+            
+            authRepository.saveLastSyncTime(kotlin.time.Clock.System.now().toEpochMilliseconds())
             Result.success(value = Unit)
         } catch (e: Exception) {
             Result.failure(exception = e)
@@ -43,16 +40,15 @@ class DatabaseSyncManager(
     }
 
     /**
-     * Google Drive에서 JSON 데이터를 다운로드하여 로컬 DB와 병합합니다. (개인 백업용)
+     * 개인 백업 다운로드
      */
     suspend fun syncFromCloud(): Result<Unit> = withContext(context = Dispatchers.IO) {
         return@withContext try {
             val bytes = googleRepository.downloadDatabase(syncFileName)
             val jsonString = bytes.decodeToString()
-            val payload = json.decodeFromString(deserializer = SyncPayload.serializer(), string = jsonString)
+            val payload = json.decodeFromString(SyncPayload.serializer(), jsonString)
 
             mergePayload(payload)
-
             Result.success(value = Unit)
         } catch (e: Exception) {
             Result.failure(exception = e)
@@ -60,12 +56,14 @@ class DatabaseSyncManager(
     }
 
     /**
-     * [공유 폴더] 내 데이터를 JSON으로 변환하여 업로드합니다.
-     * 파일명 규칙: sync_user_{deviceId}.json
+     * [공유 폴더] 업로드 (증분 방식)
      */
-    suspend fun syncToSharedFolder(folderId: String, deviceId: String): Result<Unit> = withContext(Dispatchers.IO) {
+    suspend fun syncToSharedFolder(): Result<Unit> = withContext(Dispatchers.IO) {
+        val folderId = authRepository.getSharedFolderId() ?: return@withContext Result.failure(Exception("공유 폴더 ID가 없습니다."))
+        val deviceId = authRepository.getDeviceId()
         return@withContext try {
-            val bytes = createSyncPayloadBytes()
+            // 공유 폴더 전용 마지막 동기화 시간 사용
+            val bytes = createSyncPayloadBytes(isCloudSync = false)
             val fileName = "sync_user_$deviceId.json"
 
             googleRepository.uploadToSharedFolder(
@@ -74,6 +72,8 @@ class DatabaseSyncManager(
                 dbBytes = bytes
             )
 
+            // 공유 전용 동기화 시간 갱신
+            authRepository.saveLastSharedSyncTime(kotlin.time.Clock.System.now().toEpochMilliseconds())
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)
@@ -81,25 +81,34 @@ class DatabaseSyncManager(
     }
 
     /**
-     * [공유 폴더] 내의 모든 상대방 데이터를 다운로드하여 로컬 DB와 병합합니다.
+     * [공유 폴더] 다운로드 및 병합
      */
-    suspend fun syncFromSharedFolder(folderId: String, myDeviceId: String): Result<Unit> = withContext(Dispatchers.IO) {
+    suspend fun syncFromSharedFolder(): Result<Unit> = withContext(Dispatchers.IO) {
+        val folderId = authRepository.getSharedFolderId() ?: return@withContext Result.failure(Exception("공유 폴더 ID가 없습니다."))
+        val myDeviceId = authRepository.getDeviceId()
         return@withContext try {
-            // 1. 공유 폴더 내의 파일 목록 가져오기
             val fileList = googleRepository.getFilesFromSharedFolder(folderId)
-
-            // 2. 내 파일이 아닌 상대방의 파일들만 필터링
-            val otherFiles = fileList?.files?.filter { 
+            val otherFiles = fileList?.files?.filter {
                 it.name.startsWith("sync_user_") && !it.name.contains(myDeviceId)
             } ?: emptyList()
 
-            // 3. 각 파일을 다운로드하여 병합
+            if (otherFiles.isEmpty()) {
+                return@withContext Result.success(Unit)
+            }
+
             otherFiles.forEach { file ->
                 val bytes = googleRepository.downloadFileById(file.id)
                 val jsonString = bytes.decodeToString()
+                
+                // 역직렬화 및 병합
                 val payload = json.decodeFromString(SyncPayload.serializer(), jsonString)
                 
-                mergePayload(payload)
+                if (payload.histories.isNotEmpty()) {
+                    mergePayload(payload)
+                    Napier.d("병합 완료: ${file.name} 로부터 ${payload.histories.size}건 수신")
+                } else {
+                    Napier.d("파일 발견: ${file.name}, 하지만 포함된 데이터가 0건입니다.")
+                }
             }
 
             Result.success(Unit)
@@ -109,33 +118,40 @@ class DatabaseSyncManager(
     }
 
     /**
-     * 현재 로컬 DB의 데이터를 추출하여 직렬화된 ByteArray를 생성합니다.
+     * 페이로드 생성
+     * @param isCloudSync true면 개인 클라우드용(lastSyncTime), false면 공유 폴더용(lastSharedSyncTime)
      */
-    private suspend fun createSyncPayloadBytes(): ByteArray {
+    private suspend fun createSyncPayloadBytes(isCloudSync: Boolean): ByteArray {
         val db = databaseProvider.database
+        val lastSync = if (isCloudSync) authRepository.getLastSyncTime() else authRepository.getLastSharedSyncTime()
+        val now = kotlin.time.Clock.System.now().toEpochMilliseconds()
+        
         val payload = SyncPayload(
-            lastSyncTime = Clock.System.now().toEpochMilliseconds(),
-            histories = db.historyDao().getChangesSince(lastSync = 0L),
-            categories = db.categoryDao().getChangesSince(lastSync = 0L),
-            installments = db.installmentDao().getChangesSince(lastSync = 0L),
-            repeatCycles = db.repeatCycleDao().getChangesSince(lastSync = 0L),
-            paymentMethods = db.paymentMethodDao().getChangesSince(lastSync = 0L),
-            paymentMethodGroups = db.paymentMethodGroupDao().getChangesSince(lastSync = 0L)
+            lastSyncTime = now,
+            histories = db.historyDao().getChangesSince(lastSync = lastSync),
+            categories = db.categoryDao().getChangesSince(lastSync = lastSync),
+            installments = db.installmentDao().getChangesSince(lastSync = lastSync),
+            repeatCycles = db.repeatCycleDao().getChangesSince(lastSync = lastSync),
+            paymentMethods = db.paymentMethodDao().getChangesSince(lastSync = lastSync),
+            paymentMethodGroups = db.paymentMethodGroupDao().getChangesSince(lastSync = lastSync)
         )
-        return json.encodeToString(SyncPayload.serializer(), payload).encodeToByteArray()
+        
+        val jsonString = json.encodeToString(SyncPayload.serializer(), payload)
+        Napier.d("업로드 페이로드 생성 (${if(isCloudSync) "Cloud" else "Shared"}): histories=${payload.histories.size}건")
+        
+        return jsonString.encodeToByteArray()
     }
 
-    /**
-     * 전달받은 페이로드를 로컬 DB에 Upsert 방식으로 병합합니다.
-     */
     private suspend fun mergePayload(payload: SyncPayload) {
         val db = databaseProvider.database
-        // 외래 키 제약 조건을 고려하여 순차적 실행
-        payload.categories.let { db.categoryDao().upsertAll(it) }
-        payload.paymentMethodGroups.let { db.paymentMethodGroupDao().upsertAll(it) }
-        payload.paymentMethods.let { db.paymentMethodDao().upsertAll(it) }
-        payload.repeatCycles.let { db.repeatCycleDao().upsertAll(it) }
-        payload.installments.let { db.installmentDao().upsertAll(it) }
-        payload.histories.let { db.historyDao().upsertAll(it) }
+        // 1. 카테고리 등 기초 데이터 우선 병합 (외래 키 고려)
+        if (payload.categories.isNotEmpty()) db.categoryDao().upsertAll(payload.categories)
+        if (payload.paymentMethodGroups.isNotEmpty()) db.paymentMethodGroupDao().upsertAll(payload.paymentMethodGroups)
+        if (payload.paymentMethods.isNotEmpty()) db.paymentMethodDao().upsertAll(payload.paymentMethods)
+        if (payload.repeatCycles.isNotEmpty()) db.repeatCycleDao().upsertAll(payload.repeatCycles)
+        if (payload.installments.isNotEmpty()) db.installmentDao().upsertAll(payload.installments)
+        
+        // 2. 가계부 내역 병합
+        if (payload.histories.isNotEmpty()) db.historyDao().upsertAll(payload.histories)
     }
 }

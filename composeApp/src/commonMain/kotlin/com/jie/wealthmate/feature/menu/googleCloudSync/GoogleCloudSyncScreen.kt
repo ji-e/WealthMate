@@ -54,7 +54,11 @@ class GoogleCloudSyncScreen() : BaseScreen() {
                     println("googleUser::: ${googleUser?.serverAuthCode}")
                     screenModel.getToken(googleUser?.serverAuthCode)
                 },
-                scopes = listOf("https://www.googleapis.com/auth/drive.file"),
+                scopes = listOf(
+                    "https://www.googleapis.com/auth/drive.appdata", // 전체 Drive 접근
+                    "https://www.googleapis.com/auth/drive.file", // 앱이 생성한 파일
+                    "https://www.googleapis.com/auth/drive.metadata.readonly" // 메타데이터 읽기
+                ),
             ) {
                 WMButton(
                     text = "Google로 로그인",

@@ -6,6 +6,7 @@ import cafe.adriel.voyager.navigator.Navigator
 import com.jie.wealthmate.feature.menu.googleCloudSync.GoogleCloudSyncScreenModel
 import com.jie.wealthmate.repository.AuthRepository
 import com.jie.wealthmate.theme.WMTheme
+import io.github.aakira.napier.Napier
 import org.koin.compose.koinInject
 
 @Composable
@@ -14,7 +15,7 @@ fun App() {
     val authRepository: AuthRepository = koinInject()
     val googleCloudSyncScreenModel = koinInject<GoogleCloudSyncScreenModel>()
 
-
+    Napier.e  ("token::: ${authRepository.getAccessToken()}")
     if (authRepository.isLoggedIn()) {
         googleCloudSyncScreenModel.syncFromCloudOnStart()
     }

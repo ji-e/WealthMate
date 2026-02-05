@@ -35,7 +35,7 @@ import com.jie.wealthmate.usecase.HistorySaveUseCase
 import org.koin.dsl.module
 
 val commonModule = module {
-    single { DatabaseSyncManager(get(), get()) }
+    single { DatabaseSyncManager(get(), get(), get()) }
 
     single { HttpClientFactory(get()).create() }
 

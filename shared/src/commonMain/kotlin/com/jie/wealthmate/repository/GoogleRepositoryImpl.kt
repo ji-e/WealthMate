@@ -99,10 +99,22 @@ class GoogleRepositoryImpl(
         }
     }
 
+    /**
+     * 공유 폴더 또는 개인 백업 폴더의 파일 목록을 가져옵니다.
+     * 로컬에 저장된 공유 폴더 ID가 있다면 공유 폴더를, 없다면 AppDataFolder를 조회합니다.
+     */
     override suspend fun getFileList(): GoogleDriveFileEntity? {
         return try {
+            val sharedFolderId = authRepository.getSharedFolderId()
+            
             val response: HttpResponse = client.get("https://www.googleapis.com/drive/v3/files") {
-                parameter("spaces", "appDataFolder")
+                if (sharedFolderId != null) {
+                    // 공유 폴더 내 파일 조회
+                    parameter("q", "'$sharedFolderId' in parents and trashed = false")
+                } else {
+                    // 개인 앱 데이터 폴더 조회
+                    parameter("spaces", "appDataFolder")
+                }
                 parameter("fields", "files(id, name, createdTime, size)")
             }
 

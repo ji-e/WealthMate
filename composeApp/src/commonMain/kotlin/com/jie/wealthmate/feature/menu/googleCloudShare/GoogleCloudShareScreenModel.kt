@@ -63,6 +63,7 @@ class GoogleCloudShareScreenModel(
      */
     fun connectToSharedFolder() {
         val folderId = container.uiState.value.code.text
+        Napier.e("folderId::: $folderId")
         if (folderId.isBlank()) return
 
         launchSafe(
@@ -83,13 +84,11 @@ class GoogleCloudShareScreenModel(
      * 4단계: 공유 폴더 데이터 업로드 (내 기기 데이터 전송)
      * 파일명 규칙: sync_user_{device_id}.json
      */
-    fun uploadMyDataToSharedFolder(deviceId: String) {
-        val folderId = container.uiState.value.sharedFolderId ?: return
-        val fileName = "sync_user_$deviceId.json"
+    fun uploadMyDataToSharedFolder() {
 
         launchSafe(
             block = {
-                syncManager.syncToSharedFolder(folderId, deviceId)
+                syncManager.syncToSharedFolder()
             }
         ) {
             Napier.d("내 데이터를 공유 폴더에 성공적으로 업로드했습니다.")
@@ -100,12 +99,11 @@ class GoogleCloudShareScreenModel(
     /**
      * 4단계: 공유 폴더로부터 데이터 동기화 (상대방 데이터 가져오기)
      */
-    fun syncFromSharedFolder(myDeviceId: String) {
-        val folderId = container.uiState.value.sharedFolderId ?: return
+    fun syncFromSharedFolder() {
 
         launchSafe(
             block = {
-               syncManager.syncFromSharedFolder(folderId, myDeviceId)
+               syncManager.syncFromSharedFolder()
             }
         ) { results ->
             Napier.d("상대방 데이터를 공유 폴더에서 성공적으로 다운로드했습니다.")
