@@ -61,6 +61,10 @@ object ColorRed {
     )
 }
 
+object ColorYellow {
+    val Yellow_300 = Color(0xFFFBBF24)
+}
+
 object ColorBlue {
     val Blue_300 = Color(0xFF227EFF)
     val Blue_200 = Color(0xFF87B9FF)
