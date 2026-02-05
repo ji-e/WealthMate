@@ -19,8 +19,10 @@ class GoogleCloudShareScreenModel(
         get() = GoogleCloudShareUiState()
 
     init {
-        getUserName()
-        getSharedFolderId()
+        if (authRepository.isLoggedIn()) {
+            getUserName()
+            getSharedFolderId()
+        }
     }
 
     private fun getUserName() {
@@ -73,7 +75,7 @@ class GoogleCloudShareScreenModel(
     /**
      * 1단계: 공유 시작 (호스트 사용자 A)
      */
-    fun startSharing() {
+    fun inviteMember() {
         launchSafe(
             block = {
                 val folderName = "Wealth_Mate_Shared"
@@ -140,14 +142,12 @@ class GoogleCloudShareScreenModel(
      * 4단계: 공유 폴더로부터 데이터 동기화 (상대방 데이터 가져오기)
      */
     fun syncFromSharedFolder() {
-
         launchSafe(
             block = {
                 syncManager.syncFromSharedFolder()
             }
-        ) { results ->
+        ) {
             Napier.d("상대방 데이터를 공유 폴더에서 성공적으로 다운로드했습니다.")
-
         }
     }
 
