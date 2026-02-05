@@ -17,15 +17,18 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.jie.wealthmate.base.collectSideEffect
+import com.jie.wealthmate.component.WMText
 import com.jie.wealthmate.component.topbar.TopBarItem
 import com.jie.wealthmate.feature.menu.categoryManagement.CategoryManagementScreen
 import com.jie.wealthmate.feature.menu.component.MenuEnum
 import com.jie.wealthmate.feature.menu.component.MenuItem
+import com.jie.wealthmate.feature.menu.component.MenuItemData
 import com.jie.wealthmate.feature.menu.component.MenuTitleItem
 import com.jie.wealthmate.feature.menu.googleCloudShare.GoogleCloudShareScreen
 import com.jie.wealthmate.feature.menu.googleCloudSync.GoogleCloudSyncScreen
 import com.jie.wealthmate.feature.menu.paymentMethodManagement.PaymentMethodManagementScreen
 import com.jie.wealthmate.theme.WMTheme
+import io.github.aakira.napier.Napier
 import org.koin.compose.koinInject
 
 class MenuScreen(val calculateBottomPadding: Dp) : Screen {
@@ -77,6 +80,16 @@ class MenuScreen(val calculateBottomPadding: Dp) : Screen {
             items(uiState.menuEnums.size) { index ->
                 val menu = uiState.menuEnums[index]
                 MenuTitleItem(menu.label)
+                // todo temp UI
+                Napier.e(menu.toString())
+                if (menu == MenuItemData.Sync) {
+                    if (uiState.userName.isNullOrEmpty().not()) {
+                        WMText(
+                            text = uiState.userName,
+                            modifier = Modifier.padding(horizontal = 20.dp)
+                        )
+                    }
+                }
 
                 Column() {
                     repeat(menu.items.size) { index ->

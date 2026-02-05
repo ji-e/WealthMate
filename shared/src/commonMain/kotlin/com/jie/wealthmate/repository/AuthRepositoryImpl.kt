@@ -2,9 +2,9 @@
 
 package com.jie.wealthmate.repository
 
+import com.benasher44.uuid.uuid4
 import com.russhwolf.settings.Settings
 import kotlin.time.ExperimentalTime
-import com.benasher44.uuid.uuid4
 
 class AuthRepositoryImpl(
     private val settings: Settings,
@@ -27,9 +27,11 @@ class AuthRepositoryImpl(
     }
 
     // 1. 토큰 저장
-    override fun saveAuthData(accessToken: String, refreshToken: String?) {
+    override fun saveAuthData(accessToken: String, refreshToken: String?, email: String?) {
         settings.putString(KEY_ACCESS_TOKEN, accessToken)
         refreshToken?.let { settings.putString(KEY_REFRESH_TOKEN, it) }
+        email?.let { settings.putString(KEY_USER_NAME, it) }
+
     }
 
     // 2. 토큰 가져오기
@@ -54,6 +56,9 @@ class AuthRepositoryImpl(
 
     override fun getRefreshToken() = settings.getStringOrNull(KEY_REFRESH_TOKEN)
 
+    override fun getUserName() = settings.getStringOrNull(KEY_USER_NAME)
+
+
     override fun saveSharedFolderId(folderId: String) {
         settings.putString(KEY_SHARED_FOLDER_ID, folderId)
     }
@@ -61,7 +66,7 @@ class AuthRepositoryImpl(
     override fun getSharedFolderId() = settings.getStringOrNull(KEY_SHARED_FOLDER_ID)
 
     /**
-     * 기기 고유 ID를 가져옵니다. 
+     * 기기 고유 ID를 가져옵니다.
      * 앱 최초 실행 시 UUID를 생성하여 Settings에 저장하고, 이후에는 저장된 값을 반환합니다.
      */
     override fun getDeviceId(): String {

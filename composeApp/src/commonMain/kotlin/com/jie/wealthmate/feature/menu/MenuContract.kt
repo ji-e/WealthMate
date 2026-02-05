@@ -7,6 +7,7 @@ import com.jie.wealthmate.feature.menu.component.MenuItemData
 
 data class MenuUiState(
     val menuEnums: List<MenuItemData> = emptyList(),
+    val userName: String? = null,
 ) : BaseUiState
 
 sealed class MenuUiSideEffect : UiSideEffect {

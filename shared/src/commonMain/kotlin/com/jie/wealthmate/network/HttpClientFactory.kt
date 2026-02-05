@@ -65,7 +65,10 @@ class HttpClientFactory(
 
                             if (response.status.value == 200) {
                                 val newAuth = response.body<GoogleAuthEntity>()
-                                authRepository.saveAuthData(newAuth.accessToken, newAuth.refreshToken ?: refreshToken)
+                                authRepository.saveAuthData(
+                                    accessToken = newAuth.accessToken,
+                                    refreshToken = newAuth.refreshToken ?: refreshToken,
+                                )
                                 BearerTokens(newAuth.accessToken, newAuth.refreshToken ?: refreshToken)
                             } else {
                                 authRepository.clearAuthData()

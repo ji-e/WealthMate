@@ -38,7 +38,7 @@ fun MenuItem(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(40.dp)
+            .height(44.dp)
             .clickable { onClickMenu() }
             .padding(horizontal = 20.dp),
         contentAlignment = Alignment.CenterStart

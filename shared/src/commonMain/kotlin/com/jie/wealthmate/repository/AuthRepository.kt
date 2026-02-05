@@ -5,7 +5,7 @@ interface AuthRepository {
     fun clearAuthData()
     fun isLoggedIn(): Boolean
     fun getAccessToken(): String?
-    fun saveAuthData(accessToken: String, refreshToken: String?)
+    fun saveAuthData(accessToken: String, refreshToken: String?, email: String? = null)
     fun getRefreshToken(): String?
 
     // 공유 폴더 ID 관리
@@ -22,4 +22,5 @@ interface AuthRepository {
     // 마지막 공유 폴더 동기화 시간 관리
     fun saveLastSharedSyncTime(time: Long)
     fun getLastSharedSyncTime(): Long
+    fun getUserName(): String?
 }

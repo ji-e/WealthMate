@@ -6,7 +6,7 @@ import GoogleDriveFileEntity
 
 
 interface GoogleRepository {
-    suspend fun fetchGoogleAuth(authCode: String): GoogleAuthEntity?
+    suspend fun fetchGoogleAuth(authCode: String, email: String): GoogleAuthEntity?
 
     suspend fun uploadDatabase(
         dbBytes: ByteArray,

@@ -32,7 +32,7 @@ class GoogleRepositoryImpl(
 ) : GoogleRepository {
 
     // 구글 토큰 엔드포인트에서 Access Token 교환 및 저장
-    override suspend fun fetchGoogleAuth(authCode: String): GoogleAuthEntity? {
+    override suspend fun fetchGoogleAuth(authCode: String, email:String): GoogleAuthEntity? {
         try {
             val response: HttpResponse = client.post("https://oauth2.googleapis.com/token") {
                 contentType(ContentType.Application.FormUrlEncoded)
@@ -50,7 +50,11 @@ class GoogleRepositoryImpl(
             return if (response.status.value == 200) {
                 val authEntity = response.body<GoogleAuthEntity>()
                 // 토큰 저장
-                authRepository.saveAuthData(authEntity.accessToken, authEntity.refreshToken)
+                authRepository.saveAuthData(
+                    accessToken =  authEntity.accessToken,
+                    refreshToken =  authEntity.refreshToken,
+                    email = email
+                )
                 authEntity
             } else {
                 println("Fetch auth failed: ${response.bodyAsText()}")

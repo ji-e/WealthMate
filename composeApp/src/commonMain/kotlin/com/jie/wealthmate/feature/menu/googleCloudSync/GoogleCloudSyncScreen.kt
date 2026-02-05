@@ -17,6 +17,7 @@ import com.jie.wealthmate.base.BaseScreen
 import com.jie.wealthmate.component.WMButton
 import com.jie.wealthmate.component.topbar.TopBarItem
 import com.jie.wealthmate.feature.menu.component.MenuEnum
+import com.jie.wealthmate.utils.default
 import com.mmk.kmpauth.google.GoogleAuthCredentials
 import com.mmk.kmpauth.google.GoogleAuthProvider
 import com.mmk.kmpauth.google.GoogleButtonUiContainer
@@ -52,7 +53,10 @@ class GoogleCloudSyncScreen() : BaseScreen() {
             GoogleButtonUiContainer(
                 onGoogleSignInResult = { googleUser ->
                     println("googleUser::: ${googleUser?.serverAuthCode}")
-                    screenModel.getToken(googleUser?.serverAuthCode)
+                    screenModel.getToken(
+                        authCode = googleUser?.serverAuthCode,
+                        email = googleUser?.email.default()
+                    )
                 },
                 scopes = listOf(
                     "https://www.googleapis.com/auth/drive.appdata", // 전체 Drive 접근
