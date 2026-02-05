@@ -24,25 +24,20 @@ class MenuScreenModel(
     }
 
     init {
-        getUserName()
+        if (authRepository.isLoggedIn()) {
+            getUserName()
+        }
     }
 
     private fun getUserName() {
-        launchSafe(
-            block = {
-                authRepository.getUserName()
-            }
-        ) {
-            reduceState { state ->
-                state.copy(
-                    userName = it.default()
-                )
-            }
+        reduceState { state ->
+            state.copy(
+                userName = authRepository.getUserName().default()
+            )
         }
     }
 
     fun getToken(authCode: String?, email: String) {
-        println(authCode)
         authCode ?: return
 
         launchSafe(
