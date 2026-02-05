@@ -153,8 +153,16 @@ class GoogleRepositoryImpl(
                 }
             """.trimIndent()
 
+            val emailMessage = """
+                가계부 공유 초대를 받았습니다. 
+                앱의 '공유 연결' 화면에서 아래 초대 코드를 입력해 주세요:
+                
+                초대 코드: $fileId
+            """.trimIndent()
+
             val response: HttpResponse = client.post("https://www.googleapis.com/drive/v3/files/$fileId/permissions") {
                 parameter("sendNotificationEmail", true)
+                parameter("emailMessage", emailMessage)
                 contentType(ContentType.Application.Json)
                 setBody(permissionRequest)
             }
@@ -170,20 +178,50 @@ class GoogleRepositoryImpl(
         // 1. 로컬에 저장된 ID가 있는지 확인
         val savedId = authRepository.getSharedFolderId()
         if (savedId != null) {
-            Napier.d("기존 공유 폴더 ID 사용: $savedId")
+            Napier.d("기존 공유 폴더 ID 사용 (로컬 저장소): $savedId")
             return savedId
         }
 
-        // 2. 없다면 새로 생성
-        Napier.d("새로운 공유 폴더 생성 중...")
+        // 2. 로컬에 없다면 구글 드라이브에서 동일한 이름의 폴더 검색 (앱 재설치 등의 경우 대비)
+        val existingFolderId = findFolderByName(folderName)
+        if (existingFolderId != null) {
+            Napier.d("기존 공유 폴더 발견 (구글 드라이브 검색): $existingFolderId")
+            authRepository.saveSharedFolderId(existingFolderId)
+            return existingFolderId
+        }
+
+        // 3. 드라이브에도 없다면 새로 생성
+        Napier.d("새로운 공유 폴더 생성 중: $folderName")
         val newFolderId = createSharedFolder(folderName)
         
-        // 3. 생성된 ID를 로컬에 영구 저장
+        // 4. 생성된 ID를 로컬에 영구 저장
         if (newFolderId != null) {
             authRepository.saveSharedFolderId(newFolderId)
         }
         
         return newFolderId
+    }
+
+    /**
+     * 폴더명으로 Google Drive 폴더 검색
+     */
+    private suspend fun findFolderByName(folderName: String): String? {
+        return try {
+            val response: HttpResponse = client.get("https://www.googleapis.com/drive/v3/files") {
+                parameter("q", "name='$folderName' and mimeType='application/vnd.google-apps.folder' and trashed=false")
+                parameter("fields", "files(id, name)")
+            }
+
+            if (response.status.value == 200) {
+                val fileList = response.body<GoogleDriveFileEntity>()
+                fileList.files.firstOrNull()?.id
+            } else {
+                null
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
     }
 
     /**
