@@ -202,6 +202,36 @@ class GoogleRepositoryImpl(
         return newFolderId
     }
 
+    override suspend fun connectToSharedFolder(folderId: String): GoogleDriveFileEntity? {
+        return try {
+            // 1. 연결 확인: 폴더 메타데이터 가져오기 (권한 체크 포함)
+            val folderResponse: HttpResponse = client.get("https://www.googleapis.com/drive/v3/files/$folderId") {
+                parameter("fields", "id, name, capabilities(canEdit)")
+            }
+
+            if (folderResponse.status.value != 200) {
+                throw Exception("폴더를 찾을 수 없거나 접근 권한이 없습니다.")
+            }
+
+            // 2. 데이터 조회: 해당 폴더 내의 파일 목록 불러오기
+            val filesResponse: HttpResponse = client.get("https://www.googleapis.com/drive/v3/files") {
+                parameter("q", "'$folderId' in parents and trashed=false")
+                parameter("fields", "files(id, name, createdTime, size)")
+            }
+
+            if (filesResponse.status.value == 200) {
+                // 연결 성공 시 로컬에 폴더 ID 저장
+                authRepository.saveSharedFolderId(folderId)
+                filesResponse.body<GoogleDriveFileEntity>()
+            } else {
+                null
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            throw e
+        }
+    }
+
     /**
      * 폴더명으로 Google Drive 폴더 검색
      */

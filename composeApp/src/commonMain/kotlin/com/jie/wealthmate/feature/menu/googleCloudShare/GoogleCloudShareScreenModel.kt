@@ -37,7 +37,7 @@ class GoogleCloudShareScreenModel(
                 // [공유 폴더 생성]
                 // 앱이 사용자 A의 구글 드라이브에 특정 이름의 폴더를 생성합니다.
                 val folderName = "Wealth_Mate_Shared"
-                val folderId = googleRepository.createSharedFolder(folderName)
+                val folderId = googleRepository.getOrCreateSharedFolder(folderName)
                     ?: throw Exception("공유 폴더 생성 실패")
 
                 // [상대방 초대 및 권한 부여]
@@ -60,9 +60,38 @@ class GoogleCloudShareScreenModel(
         }
     }
 
+    /**
+     * 3단계: 게스트(B)의 구현: 폴더 연결
+     * 사용자 B는 A에게 받은 sharedFolderId를 앱에 입력하여 공유 폴더에 연결합니다.
+     */
+    fun connectToSharedFolder() {
+        val folderId = container.uiState.value.code.text
+        if (folderId.isBlank()) return
+
+        launchSafe(
+            block = {
+                // 폴더 존재 확인 및 권한 체크 후 파일 목록 조회
+                googleRepository.connectToSharedFolder(folderId)
+            }
+        ) { response ->
+            reduceState { state ->
+                state.copy(
+                    sharedFolderId = folderId,
+                    dbFiles = response
+                )
+            }
+        }
+    }
+
     fun updateEmail(email: TextFieldValue) {
         reduceState { state ->
             state.copy(email = email)
+        }
+    }
+
+    fun updateCode(code: TextFieldValue) {
+        reduceState { state ->
+            state.copy(code = code)
         }
     }
 }

@@ -55,6 +55,19 @@ class GoogleCloudShareScreen() : BaseScreen() {
                 text = "공유",
                 onClick = screenModel::startSharing
             )
+
+            WMTextField(
+                label = "초대 받은 코드",
+                value = uiState.code,
+                onValueChange = screenModel::updateCode,
+            )
+
+            WMButton(
+                text = "초대 코드로 연결",
+                onClick = screenModel::connectToSharedFolder
+            )
+
+
             // db 시각적 표현
             // 현재 구글 드라이브 앱 데이터 폴더에 저장된 DB 파일의 개수를 보여주는 로직입니다.
             // val dbCount = uiState.dbFiles?.files?.size ?: 0
