@@ -14,6 +14,7 @@ class AuthRepositoryImpl(
         private const val KEY_ACCESS_TOKEN = "access_token"
         private const val KEY_REFRESH_TOKEN = "refresh_token"
         private const val KEY_USER_NAME = "user_name"
+        private const val KEY_SHARED_FOLDER_ID = "shared_folder_id"
     }
 
 
@@ -49,6 +50,12 @@ class AuthRepositoryImpl(
     }
 
     override fun getRefreshToken() = settings.getStringOrNull(KEY_REFRESH_TOKEN)
+
+    override fun saveSharedFolderId(folderId: String) {
+        settings.putString(KEY_SHARED_FOLDER_ID, folderId)
+    }
+
+    override fun getSharedFolderId() = settings.getStringOrNull(KEY_SHARED_FOLDER_ID)
 
 }
 

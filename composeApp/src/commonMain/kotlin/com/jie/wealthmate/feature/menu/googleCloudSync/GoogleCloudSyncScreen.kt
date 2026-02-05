@@ -54,7 +54,7 @@ class GoogleCloudSyncScreen() : BaseScreen() {
                     println("googleUser::: ${googleUser?.serverAuthCode}")
                     screenModel.getToken(googleUser?.serverAuthCode)
                 },
-                scopes = listOf("https://www.googleapis.com/auth/drive.appdata"),
+                scopes = listOf("https://www.googleapis.com/auth/drive.file"),
             ) {
                 WMButton(
                     text = "Google로 로그인",

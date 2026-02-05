@@ -4,6 +4,7 @@ package com.jie.wealthmate.repository
 
 import GoogleDriveFileEntity
 import com.jie.wealthmate.entity.GoogleAuthEntity
+import io.github.aakira.napier.Napier
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.forms.FormDataContent
@@ -96,6 +97,93 @@ class GoogleRepositoryImpl(
             e.printStackTrace()
             throw Exception("데이터베이스 다운로드 실패: ${e.message}")
         }
+    }
+
+    override suspend fun getFileList(): GoogleDriveFileEntity? {
+        return try {
+            val response: HttpResponse = client.get("https://www.googleapis.com/drive/v3/files") {
+                parameter("spaces", "appDataFolder")
+                parameter("fields", "files(id, name, createdTime, size)")
+            }
+
+            if (response.status.value == 200) {
+                response.body<GoogleDriveFileEntity>()
+            } else {
+                null
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
+
+    override suspend fun createSharedFolder(folderName: String): String? {
+        return try {
+            val metadata = """
+                {
+                    "name": "$folderName",
+                    "mimeType": "application/vnd.google-apps.folder"
+                }
+            """.trimIndent()
+
+            val response: HttpResponse = client.post("https://www.googleapis.com/drive/v3/files") {
+                contentType(ContentType.Application.Json)
+                setBody(metadata)
+            }
+
+            if (response.status.value == 200) {
+                val file = response.body<Map<String, String>>()
+                file["id"]
+            } else {
+                null
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
+
+    override suspend fun grantPermission(fileId: String, email: String): Boolean {
+        return try {
+            val permissionRequest = """
+                {
+                    "role": "writer",
+                    "type": "user",
+                    "emailAddress": "$email"
+                }
+            """.trimIndent()
+
+            val response: HttpResponse = client.post("https://www.googleapis.com/drive/v3/files/$fileId/permissions") {
+                parameter("sendNotificationEmail", true)
+                contentType(ContentType.Application.Json)
+                setBody(permissionRequest)
+            }
+
+            response.status.value == 200
+        } catch (e: Exception) {
+            e.printStackTrace()
+            false
+        }
+    }
+
+    override suspend fun getOrCreateSharedFolder(folderName: String): String? {
+        // 1. 로컬에 저장된 ID가 있는지 확인
+        val savedId = authRepository.getSharedFolderId()
+        if (savedId != null) {
+            Napier.d("기존 공유 폴더 ID 사용: $savedId")
+            return savedId
+        }
+
+        // 2. 없다면 새로 생성
+        Napier.d("새로운 공유 폴더 생성 중...")
+        val newFolderId = createSharedFolder(folderName)
+        
+        // 3. 생성된 ID를 로컬에 영구 저장
+        if (newFolderId != null) {
+            authRepository.saveSharedFolderId(newFolderId)
+        }
+        
+        return newFolderId
     }
 
     /**
