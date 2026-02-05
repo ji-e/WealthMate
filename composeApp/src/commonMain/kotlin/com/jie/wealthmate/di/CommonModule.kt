@@ -73,7 +73,7 @@ val commonModule = module {
     factory { AddPaymentMethodScreenModel(get()) }
     factory { ModifyPaymentMethodScreenModel(get()) }
 
-    factory { GoogleCloudSyncScreenModel(get(), get()) }
+    factory { GoogleCloudSyncScreenModel(get(), get(), get()) }
     factory { GoogleCloudShareScreenModel(get(), get()) }
 
 }
