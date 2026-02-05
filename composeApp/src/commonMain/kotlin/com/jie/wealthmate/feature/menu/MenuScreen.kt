@@ -36,7 +36,6 @@ import com.jie.wealthmate.feature.menu.paymentMethodManagement.PaymentMethodMana
 import com.jie.wealthmate.theme.WMTheme
 import com.jie.wealthmate.utils.default
 import com.mmk.kmpauth.google.GoogleButtonUiContainer
-import io.github.aakira.napier.Napier
 import org.koin.compose.koinInject
 
 class MenuScreen(val calculateBottomPadding: Dp) : Screen {
@@ -87,7 +86,7 @@ class MenuScreen(val calculateBottomPadding: Dp) : Screen {
         ) {
             items(uiState.menuEnums.size) { index ->
                 val menu = uiState.menuEnums[index]
-                
+
                 MenuTitleItem(menu.label)
 
                 if (menu == MenuItemData.Sync) {
@@ -131,7 +130,6 @@ class MenuScreen(val calculateBottomPadding: Dp) : Screen {
                         val menuContent = menu.items[index]
                         MenuItem(
                             menu = menuContent,
-                            isEnabled = (menu == MenuItemData.Sync && uiState.userName.isEmpty()).not(),
                             onClickMenu = {
                                 screenModel.onMenuClick(menuContent)
                             }

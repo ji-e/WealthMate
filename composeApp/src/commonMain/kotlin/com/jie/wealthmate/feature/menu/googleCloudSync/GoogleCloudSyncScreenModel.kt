@@ -2,15 +2,52 @@ package com.jie.wealthmate.feature.menu.googleCloudSync
 
 import com.jie.wealthmate.base.BaseScreenModel
 import com.jie.wealthmate.database.DatabaseSyncManager
+import com.jie.wealthmate.repository.AuthRepository
 import com.jie.wealthmate.repository.GoogleRepository
+import com.jie.wealthmate.utils.default
+import com.jie.wealthmate.utils.toLocalDate
 
 class GoogleCloudSyncScreenModel(
     private val googleRepository: GoogleRepository,
+    private val authRepository: AuthRepository,
     private val syncManager: DatabaseSyncManager,
 ) : BaseScreenModel<GoogleCloudSyncUiState>() {
 
     override val initialState: GoogleCloudSyncUiState
         get() = GoogleCloudSyncUiState()
+
+    init {
+        getUserName()
+        getLastSyncTime()
+    }
+
+    private fun getUserName() {
+        launchSafe(
+            block = {
+                authRepository.getUserName()
+            }
+        ) {
+            reduceState { state ->
+                state.copy(
+                    userName = it.default()
+                )
+            }
+        }
+    }
+
+    private fun getLastSyncTime() {
+        launchSafe(
+            block = {
+                authRepository.getLastSyncTime()
+            }
+        ) { response ->
+            reduceState { state ->
+                state.copy(
+                    lastSyncDate = if (response > 0) response.toLocalDate().toString() else "없음"
+                )
+            }
+        }
+    }
 
     /**
      * 로컬 데이터를 클라우드에 증분 동기화 방식으로 업로드합니다.
@@ -42,20 +79,6 @@ class GoogleCloudSyncScreenModel(
                     .onFailure { error ->
                         showSnackbar(message = error.message ?: "다운로드 실패")
                     }
-            }
-        ) {}
-    }
-
-    fun getToken(authCode: String?, email: String) {
-        println(authCode)
-        authCode ?: return
-
-        launchSafe(
-            block = {
-                googleRepository.fetchGoogleAuth(
-                    authCode = authCode,
-                    email = email
-                )
             }
         ) {}
     }

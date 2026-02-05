@@ -35,8 +35,8 @@ enum class MenuEnum(
 
     GOOGLE_SYNC(
         route = "google_sync",
-        label = "동기화",
-        title = "동기화",
+        label = "백업 및 복구",
+        title = "백업 및 복구",
         icon = null
     ),
     GOOGLE_SHARE(
