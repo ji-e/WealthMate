@@ -1,6 +1,6 @@
 @file:OptIn(InternalVoyagerApi::class)
 
-package com.jie.wealthmate.feature.menu.categoryManagement.modifyCategory
+package com.jie.wealthmate.feature.menu.management.categoryManagement.modifyCategory
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -42,10 +42,10 @@ import com.jie.wealthmate.component.WMCheckBox
 import com.jie.wealthmate.component.WMModalBottomSheet
 import com.jie.wealthmate.component.textField.WMTextField
 import com.jie.wealthmate.component.topbar.TopBarItem
-import com.jie.wealthmate.feature.menu.categoryManagement.addCategory.component.CategoryIcon
-import com.jie.wealthmate.feature.menu.categoryManagement.addCategory.component.CategoryIconModalBottomSheet
-import com.jie.wealthmate.feature.menu.categoryManagement.addCategory.component.CategoryTag
-import com.jie.wealthmate.feature.menu.categoryManagement.component.LargeCategoryEnum
+import com.jie.wealthmate.feature.menu.management.categoryManagement.addCategory.component.CategoryIcon
+import com.jie.wealthmate.feature.menu.management.categoryManagement.addCategory.component.CategoryIconModalBottomSheet
+import com.jie.wealthmate.feature.menu.management.categoryManagement.addCategory.component.CategoryTag
+import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.theme.ColorRed
 import com.jie.wealthmate.theme.WMTheme
 import com.jie.wealthmate.utils.default

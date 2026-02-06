@@ -1,4 +1,4 @@
-package com.jie.wealthmate.feature.menu.categoryManagement.addCategory.component
+package com.jie.wealthmate.feature.menu.management.categoryManagement.addCategory.component
 
 import androidx.compose.runtime.Composable
 import com.jie.wealthmate.component.CategoryIconEnum

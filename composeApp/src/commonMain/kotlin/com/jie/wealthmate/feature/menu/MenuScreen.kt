@@ -25,7 +25,7 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import com.jie.wealthmate.base.collectSideEffect
 import com.jie.wealthmate.component.WMText
 import com.jie.wealthmate.component.topbar.TopBarItem
-import com.jie.wealthmate.feature.menu.categoryManagement.CategoryManagementScreen
+import com.jie.wealthmate.feature.menu.management.categoryManagement.CategoryManagementScreen
 import com.jie.wealthmate.feature.menu.component.MenuEnum
 import com.jie.wealthmate.feature.menu.component.MenuItem
 import com.jie.wealthmate.feature.menu.component.MenuItemData

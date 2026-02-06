@@ -51,7 +51,7 @@ import com.jie.wealthmate.feature.calendar.addHistory.component.LargeCategorySel
 import com.jie.wealthmate.feature.calendar.addHistory.component.PaymentMethodModalBottomSheet
 import com.jie.wealthmate.feature.calendar.addHistory.component.PaymentMethodTextField
 import com.jie.wealthmate.feature.calendar.addHistory.component.RepeatCycleModalBottomSheet
-import com.jie.wealthmate.feature.menu.categoryManagement.component.LargeCategoryEnum
+import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.theme.WMTheme
 import org.koin.compose.koinInject
 

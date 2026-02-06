@@ -3,7 +3,7 @@ package com.jie.wealthmate.feature.calendar.addHistory.component
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.jie.wealthmate.component.textField.WMTextField
-import com.jie.wealthmate.feature.menu.categoryManagement.component.LargeCategoryEnum
+import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.utils.default
 import com.jie.wealthmate.vo.PaymentMethodVo
 

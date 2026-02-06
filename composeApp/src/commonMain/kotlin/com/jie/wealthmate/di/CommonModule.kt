@@ -7,9 +7,9 @@ import com.jie.wealthmate.feature.calendar.addHistory.AddHistoryScreenModel
 import com.jie.wealthmate.feature.calendar.historyDetail.HistoryDetailScreenModel
 import com.jie.wealthmate.feature.home.HomeScreenModel
 import com.jie.wealthmate.feature.menu.MenuScreenModel
-import com.jie.wealthmate.feature.menu.categoryManagement.CategoryManagementScreenModel
-import com.jie.wealthmate.feature.menu.categoryManagement.addCategory.AddCategoryScreenModel
-import com.jie.wealthmate.feature.menu.categoryManagement.modifyCategory.ModifyCategoryScreenModel
+import com.jie.wealthmate.feature.menu.management.categoryManagement.CategoryManagementScreenModel
+import com.jie.wealthmate.feature.menu.management.categoryManagement.addCategory.AddCategoryScreenModel
+import com.jie.wealthmate.feature.menu.management.categoryManagement.modifyCategory.ModifyCategoryScreenModel
 import com.jie.wealthmate.feature.menu.googleCloudShare.GoogleCloudShareScreenModel
 import com.jie.wealthmate.feature.menu.googleCloudSync.GoogleCloudSyncScreenModel
 import com.jie.wealthmate.feature.menu.management.paymentMethodManagement.PaymentMethodManagementScreenModel

@@ -26,7 +26,7 @@ import androidx.compose.ui.unit.sp
 import com.jie.wealthmate.component.WMModalBottomSheet
 import com.jie.wealthmate.component.WMText
 import com.jie.wealthmate.component.textField.WMTextField
-import com.jie.wealthmate.feature.menu.categoryManagement.component.LargeCategoryEnum
+import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.theme.ColorGray
 import com.jie.wealthmate.theme.ColorPrimary
 import com.jie.wealthmate.theme.ColorRed

@@ -36,7 +36,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.jie.wealthmate.component.WMText
-import com.jie.wealthmate.feature.menu.categoryManagement.component.LargeCategoryEnum
+import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.theme.ColorGray
 import com.jie.wealthmate.theme.ColorPrimary
 import com.jie.wealthmate.theme.ColorRed
@@ -301,10 +301,10 @@ fun CategorySelectionRow(
                 if (selectedLargeCategory != selectedCategory?.largeCategory) return@LazyRow
 
                 items(
-                    count = selectedCategory?.tags?.size.default(),
-                    key = { index -> selectedCategory?.tags?.get(index)?.id.default() }
+                    count = selectedCategory.tags.size,
+                    key = { index -> selectedCategory.tags[index].id.default() }
                 ) {
-                    val tag = selectedCategory?.tags?.get(it) ?: return@items
+                    val tag = selectedCategory.tags[it]
                     val isSelectedTag = selectedCategoryTag?.id == tag.id
 
                     Box(

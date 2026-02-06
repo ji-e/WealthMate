@@ -2,7 +2,7 @@ package com.jie.wealthmate.vo
 
 import com.jie.wealthmate.database.eneity.RepeatCycleEntity
 import com.jie.wealthmate.feature.calendar.addHistory.component.RepeatCycleEnum
-import com.jie.wealthmate.feature.menu.categoryManagement.component.LargeCategoryEnum
+import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.utils.default
 import com.jie.wealthmate.utils.toLocalDate
 import kotlinx.datetime.LocalDate

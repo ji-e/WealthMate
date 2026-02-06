@@ -1,8 +1,8 @@
-package com.jie.wealthmate.feature.menu.categoryManagement
+package com.jie.wealthmate.feature.menu.management.categoryManagement
 
 import com.jie.wealthmate.base.BaseScreenModel
-import com.jie.wealthmate.feature.menu.categoryManagement.component.CategoryItemData
-import com.jie.wealthmate.feature.menu.categoryManagement.component.LargeCategoryEnum
+import com.jie.wealthmate.feature.menu.management.categoryManagement.component.CategoryItemData
+import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.repository.CategoryRepository
 
 class CategoryManagementScreenModel(

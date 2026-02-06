@@ -1,10 +1,10 @@
-package com.jie.wealthmate.feature.menu.categoryManagement.addCategory
+package com.jie.wealthmate.feature.menu.management.categoryManagement.addCategory
 
 import androidx.compose.ui.text.input.TextFieldValue
 import com.jie.wealthmate.base.BaseScreenModel
 import com.jie.wealthmate.component.CategoryIconEnum
-import com.jie.wealthmate.feature.menu.categoryManagement.component.CategoryItemData
-import com.jie.wealthmate.feature.menu.categoryManagement.component.LargeCategoryEnum
+import com.jie.wealthmate.feature.menu.management.categoryManagement.component.CategoryItemData
+import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.repository.CategoryRepository
 import com.jie.wealthmate.vo.CategoryTagVo
 

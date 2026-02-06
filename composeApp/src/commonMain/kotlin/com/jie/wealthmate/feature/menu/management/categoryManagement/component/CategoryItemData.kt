@@ -1,4 +1,4 @@
-package com.jie.wealthmate.feature.menu.categoryManagement.component
+package com.jie.wealthmate.feature.menu.management.categoryManagement.component
 
 import androidx.compose.ui.graphics.Color
 import com.jie.wealthmate.theme.ColorBlue

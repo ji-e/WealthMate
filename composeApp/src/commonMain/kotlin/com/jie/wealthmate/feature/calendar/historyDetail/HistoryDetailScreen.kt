@@ -47,7 +47,7 @@ import com.jie.wealthmate.feature.calendar.historyDetail.component.Category
 import com.jie.wealthmate.feature.calendar.historyDetail.component.CategorySelectModalBottomSheet
 import com.jie.wealthmate.feature.calendar.historyDetail.component.Installment
 import com.jie.wealthmate.feature.calendar.historyDetail.component.RepeatCycle
-import com.jie.wealthmate.feature.menu.categoryManagement.component.LargeCategoryEnum
+import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.theme.ColorRed
 import org.koin.compose.koinInject
 import wealthmate.composeapp.generated.resources.Res

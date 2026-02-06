@@ -1,4 +1,4 @@
-package com.jie.wealthmate.feature.menu.categoryManagement.addCategory.component
+package com.jie.wealthmate.feature.menu.management.categoryManagement.addCategory.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -32,7 +32,7 @@ import androidx.compose.ui.unit.sp
 import com.jie.wealthmate.component.CategoryIconEnum
 import com.jie.wealthmate.component.WMIconButton
 import com.jie.wealthmate.component.WMText
-import com.jie.wealthmate.feature.menu.categoryManagement.component.LargeCategoryEnum
+import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.theme.ColorGray
 import com.jie.wealthmate.theme.ColorPrimary
 import kotlinx.coroutines.launch

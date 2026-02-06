@@ -4,7 +4,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import com.jie.wealthmate.base.BaseScreenModel
 import com.jie.wealthmate.database.eneity.HistoryEntity
 import com.jie.wealthmate.feature.calendar.addHistory.component.RepeatCycleEnum
-import com.jie.wealthmate.feature.menu.categoryManagement.component.LargeCategoryEnum
+import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.repository.CategoryRepository
 import com.jie.wealthmate.repository.HistoryRepository
 import com.jie.wealthmate.repository.PaymentMethodRepository

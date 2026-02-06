@@ -1,6 +1,6 @@
 @file:OptIn(InternalVoyagerApi::class)
 
-package com.jie.wealthmate.feature.menu.categoryManagement.addCategory
+package com.jie.wealthmate.feature.menu.management.categoryManagement.addCategory
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -32,10 +32,10 @@ import com.jie.wealthmate.component.WMButton
 import com.jie.wealthmate.component.WMCheckBox
 import com.jie.wealthmate.component.textField.WMTextField
 import com.jie.wealthmate.component.topbar.TopBarItem
-import com.jie.wealthmate.feature.menu.categoryManagement.addCategory.component.CategoryIcon
-import com.jie.wealthmate.feature.menu.categoryManagement.addCategory.component.CategoryIconModalBottomSheet
-import com.jie.wealthmate.feature.menu.categoryManagement.addCategory.component.CategoryTag
-import com.jie.wealthmate.feature.menu.categoryManagement.component.LargeCategoryEnum
+import com.jie.wealthmate.feature.menu.management.categoryManagement.addCategory.component.CategoryIcon
+import com.jie.wealthmate.feature.menu.management.categoryManagement.addCategory.component.CategoryIconModalBottomSheet
+import com.jie.wealthmate.feature.menu.management.categoryManagement.addCategory.component.CategoryTag
+import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.theme.WMTheme
 import org.koin.compose.koinInject
 

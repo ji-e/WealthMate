@@ -20,7 +20,7 @@ import com.jie.wealthmate.component.HeadLineText
 import com.jie.wealthmate.component.InfoText
 import com.jie.wealthmate.component.textField.WMTextField
 import com.jie.wealthmate.component.topbar.TopBarItem
-import com.jie.wealthmate.feature.menu.categoryManagement.component.GoogleLoginButton
+import com.jie.wealthmate.feature.menu.component.GoogleLoginButton
 import com.jie.wealthmate.feature.menu.component.MenuEnum
 import com.jie.wealthmate.feature.menu.googleCloudShare.component.Guest
 import com.jie.wealthmate.feature.menu.googleCloudShare.component.Owner

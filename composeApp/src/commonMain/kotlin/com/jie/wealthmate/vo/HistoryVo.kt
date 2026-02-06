@@ -1,7 +1,7 @@
 package com.jie.wealthmate.vo
 
 import com.jie.wealthmate.database.eneity.HistoryWithDetails
-import com.jie.wealthmate.feature.menu.categoryManagement.component.LargeCategoryEnum
+import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.utils.default
 import com.jie.wealthmate.utils.toLocalDate
 import com.jie.wealthmate.vo.CategoryVo.Companion.mapperToVo

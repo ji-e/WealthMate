@@ -1,4 +1,4 @@
-package com.jie.wealthmate.feature.menu.categoryManagement.component
+package com.jie.wealthmate.feature.menu.component
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border

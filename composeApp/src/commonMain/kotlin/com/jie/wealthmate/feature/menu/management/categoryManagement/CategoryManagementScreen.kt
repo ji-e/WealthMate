@@ -1,6 +1,6 @@
 @file:OptIn(InternalVoyagerApi::class)
 
-package com.jie.wealthmate.feature.menu.categoryManagement
+package com.jie.wealthmate.feature.menu.management.categoryManagement
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -30,12 +30,13 @@ import com.jie.wealthmate.component.ButtonSize
 import com.jie.wealthmate.component.WMFloatingButton
 import com.jie.wealthmate.component.reorderable.rememberReorderableLazyListState
 import com.jie.wealthmate.component.topbar.TopBarItem
-import com.jie.wealthmate.feature.menu.categoryManagement.addCategory.AddCategoryScreen
-import com.jie.wealthmate.feature.menu.categoryManagement.component.Category
-import com.jie.wealthmate.feature.menu.categoryManagement.component.CategoryTap
-import com.jie.wealthmate.feature.menu.categoryManagement.component.LargeCategoryEnum
-import com.jie.wealthmate.feature.menu.categoryManagement.modifyCategory.ModifyCategoryScreen
+import com.jie.wealthmate.feature.menu.management.categoryManagement.addCategory.AddCategoryScreen
+import com.jie.wealthmate.feature.menu.management.categoryManagement.component.Category
+import com.jie.wealthmate.feature.menu.management.categoryManagement.component.CategoryTap
+import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
+import com.jie.wealthmate.feature.menu.management.categoryManagement.modifyCategory.ModifyCategoryScreen
 import com.jie.wealthmate.feature.menu.component.MenuEnum
+import com.jie.wealthmate.feature.menu.management.categoryManagement.component.Category
 import com.jie.wealthmate.theme.ColorGray
 import com.jie.wealthmate.theme.WMTheme
 import kotlinx.coroutines.launch
