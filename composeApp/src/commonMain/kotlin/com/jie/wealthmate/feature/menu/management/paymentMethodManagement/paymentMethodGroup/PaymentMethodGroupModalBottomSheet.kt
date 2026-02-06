@@ -1,4 +1,4 @@
-package com.jie.wealthmate.feature.menu.paymentMethodManagement.paymentMethodGroup
+package com.jie.wealthmate.feature.menu.management.paymentMethodManagement.paymentMethodGroup
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -27,9 +27,9 @@ import com.jie.wealthmate.component.WMIconButton
 import com.jie.wealthmate.component.WMModalBottomSheet
 import com.jie.wealthmate.component.WMShadowDivider
 import com.jie.wealthmate.component.textField.WMTextField
-import com.jie.wealthmate.feature.menu.paymentMethodManagement.addPaymentMethod.AddPaymentMethodScreenModel
-import com.jie.wealthmate.feature.menu.paymentMethodManagement.addPaymentMethod.component.PaymentMethodGroupItemData
-import com.jie.wealthmate.feature.menu.paymentMethodManagement.addPaymentMethod.component.PaymentMethodGroupList
+import com.jie.wealthmate.feature.menu.management.paymentMethodManagement.addPaymentMethod.AddPaymentMethodScreenModel
+import com.jie.wealthmate.feature.menu.management.paymentMethodManagement.addPaymentMethod.component.PaymentMethodGroupItemData
+import com.jie.wealthmate.feature.menu.management.paymentMethodManagement.addPaymentMethod.component.PaymentMethodGroupList
 import com.jie.wealthmate.theme.ColorRed
 import com.jie.wealthmate.utils.default
 import org.koin.compose.koinInject

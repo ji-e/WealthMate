@@ -1,6 +1,6 @@
 @file:OptIn(InternalVoyagerApi::class)
 
-package com.jie.wealthmate.feature.menu.paymentMethodManagement.modifyPaymentMethod
+package com.jie.wealthmate.feature.menu.management.paymentMethodManagement.modifyPaymentMethod
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -27,7 +27,7 @@ import com.jie.wealthmate.component.WMButton
 import com.jie.wealthmate.component.textField.WMTextField
 import com.jie.wealthmate.component.topbar.TopBarItem
 import com.jie.wealthmate.feature.menu.component.MenuEnum
-import com.jie.wealthmate.feature.menu.paymentMethodManagement.paymentMethodGroup.PaymentMethodGroupModalBottomSheet
+import com.jie.wealthmate.feature.menu.management.paymentMethodManagement.paymentMethodGroup.PaymentMethodGroupModalBottomSheet
 import com.jie.wealthmate.theme.ColorRed
 import com.jie.wealthmate.utils.default
 import org.koin.compose.koinInject

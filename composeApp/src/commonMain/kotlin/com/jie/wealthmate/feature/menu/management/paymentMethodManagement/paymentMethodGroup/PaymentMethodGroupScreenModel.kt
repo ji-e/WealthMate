@@ -1,4 +1,4 @@
-package com.jie.wealthmate.feature.menu.paymentMethodManagement.paymentMethodGroup
+package com.jie.wealthmate.feature.menu.management.paymentMethodManagement.paymentMethodGroup
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -6,8 +6,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.input.TextFieldValue
 import com.jie.wealthmate.base.BaseScreenModel
 import com.jie.wealthmate.base.BaseUiState
-import com.jie.wealthmate.feature.menu.paymentMethodManagement.addPaymentMethod.AddPaymentMethodUiState
-import com.jie.wealthmate.feature.menu.paymentMethodManagement.addPaymentMethod.component.PaymentMethodGroupItemData
+import com.jie.wealthmate.feature.menu.management.paymentMethodManagement.addPaymentMethod.AddPaymentMethodUiState
+import com.jie.wealthmate.feature.menu.management.paymentMethodManagement.addPaymentMethod.component.PaymentMethodGroupItemData
 import com.jie.wealthmate.repository.PaymentMethodRepository
 import com.jie.wealthmate.utils.default
 import kotlinx.coroutines.delay

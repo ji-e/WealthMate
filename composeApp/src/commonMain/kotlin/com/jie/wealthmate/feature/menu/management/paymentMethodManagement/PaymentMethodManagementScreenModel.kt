@@ -1,7 +1,7 @@
-package com.jie.wealthmate.feature.menu.paymentMethodManagement
+package com.jie.wealthmate.feature.menu.management.paymentMethodManagement
 
 import com.jie.wealthmate.base.BaseScreenModel
-import com.jie.wealthmate.feature.menu.paymentMethodManagement.component.PaymentMethodItemData
+import com.jie.wealthmate.feature.menu.management.paymentMethodManagement.component.PaymentMethodItemData
 import com.jie.wealthmate.repository.PaymentMethodRepository
 
 class PaymentMethodManagementScreenModel(

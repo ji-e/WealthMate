@@ -1,4 +1,4 @@
-package com.jie.wealthmate.feature.menu.paymentMethodManagement.addPaymentMethod.component
+package com.jie.wealthmate.feature.menu.management.paymentMethodManagement.addPaymentMethod.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable

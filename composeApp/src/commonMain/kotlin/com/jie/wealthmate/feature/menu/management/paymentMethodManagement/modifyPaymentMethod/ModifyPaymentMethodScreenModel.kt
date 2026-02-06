@@ -1,10 +1,10 @@
-package com.jie.wealthmate.feature.menu.paymentMethodManagement.modifyPaymentMethod
+package com.jie.wealthmate.feature.menu.management.paymentMethodManagement.modifyPaymentMethod
 
 import androidx.compose.ui.text.input.TextFieldValue
 import com.jie.wealthmate.base.BaseScreenModel
 import com.jie.wealthmate.database.eneity.PaymentMethodEntity
 import com.jie.wealthmate.database.eneity.PaymentMethodWithGroupEntity
-import com.jie.wealthmate.feature.menu.paymentMethodManagement.addPaymentMethod.component.PaymentMethodGroupItemData
+import com.jie.wealthmate.feature.menu.management.paymentMethodManagement.addPaymentMethod.component.PaymentMethodGroupItemData
 import com.jie.wealthmate.repository.PaymentMethodRepository
 import com.jie.wealthmate.utils.default
 

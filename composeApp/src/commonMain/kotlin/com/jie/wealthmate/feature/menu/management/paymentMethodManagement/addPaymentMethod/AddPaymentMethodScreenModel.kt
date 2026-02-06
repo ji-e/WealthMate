@@ -1,9 +1,9 @@
-package com.jie.wealthmate.feature.menu.paymentMethodManagement.addPaymentMethod
+package com.jie.wealthmate.feature.menu.management.paymentMethodManagement.addPaymentMethod
 
 import androidx.compose.ui.text.input.TextFieldValue
 import com.jie.wealthmate.base.BaseScreenModel
-import com.jie.wealthmate.feature.menu.paymentMethodManagement.addPaymentMethod.component.PaymentMethodGroupItemData
-import com.jie.wealthmate.feature.menu.paymentMethodManagement.component.PaymentMethodItemData
+import com.jie.wealthmate.feature.menu.management.paymentMethodManagement.addPaymentMethod.component.PaymentMethodGroupItemData
+import com.jie.wealthmate.feature.menu.management.paymentMethodManagement.component.PaymentMethodItemData
 import com.jie.wealthmate.repository.PaymentMethodRepository
 
 class AddPaymentMethodScreenModel(
