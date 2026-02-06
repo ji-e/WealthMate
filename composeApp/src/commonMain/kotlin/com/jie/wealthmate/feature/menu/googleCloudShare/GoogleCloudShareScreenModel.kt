@@ -16,11 +16,17 @@ class GoogleCloudShareScreenModel(
 ) : BaseScreenModel<GoogleCloudShareUiState>() {
 
     override val initialState: GoogleCloudShareUiState
-        get() = GoogleCloudShareUiState()
+        get() = GoogleCloudShareUiState(
+            isLoggedIn = authRepository.isLoggedIn()
+        )
 
     init {
-        getUserName()
-        getSharedFolderId()
+        if (authRepository.isLoggedIn()) {
+            getUserName()
+            if (authRepository.getSharedFolderId().isNullOrEmpty().not()) {
+                getSharedFolderId()
+            }
+        }
     }
 
     private fun getUserName() {
@@ -64,115 +70,126 @@ class GoogleCloudShareScreenModel(
             reduceState { state ->
                 state.copy(
                     googleDrivePermissionVo = googleDrivePermissionVo,
-                    isOwner = googleDrivePermissionVo.permissions.find { it.emailAddress == state.userName }?.role == "owner"
+                    isOwnerMode = googleDrivePermissionVo.permissions.find { it.emailAddress == state.userName }?.role == "owner"
                 )
             }
         }
     }
 
-    /**
-     * 1단계: 공유 시작 (호스트 사용자 A)
-     */
-    fun startSharing() {
+    fun getToken(authCode: String?, email: String) {
+        authCode ?: return
+
         launchSafe(
             block = {
-                val folderName = "Wealth_Mate_Shared"
-                val folderId = googleRepository.getOrCreateSharedFolder(folderName)
-                    ?: throw Exception("공유 폴더 생성 실패")
+                googleRepository.fetchGoogleAuth(
+                    authCode = authCode,
+                    email = email
+                )
+            }
+        ) { response ->
+            reduceState { state ->
+                state.copy(
+                    isLoggedIn = response?.accessToken != null,
+                    userName = email
+                )
+            }
+        }
+    }
 
-                val isPermissionGranted =
-                    googleRepository.grantPermission(folderId, container.uiState.value.email.text)
-                if (!isPermissionGranted) {
-                    throw Exception("상대방 권한 부여 실패")
+    fun createShareFolder() {
+        launchSafe(
+            block = {
+                val sharedFolderId = googleRepository.getOrCreateSharedFolder("Wealth_Mate_Shared")
+                    ?: throw Exception("잠시 후 다시 시도해 주세요.")
+
+                fetchFilePermissions(sharedFolderId)
+                reduceState { state ->
+                    state.copy(
+                        sharedFolderId = sharedFolderId,
+                        isOwnerMode = true
+                    )
                 }
-
-                folderId
             }
-        ) { response ->
-            reduceState { state ->
-                state.copy(
-                    sharedFolderId = response,
-                    inviteCode = response
-                )
-            }
+        ) {
+            uploadMyDataToSharedFolder()
         }
     }
 
-    /**
-     * 3단계: 게스트(B)의 구현: 폴더 연결
-     */
-    fun connectToSharedFolder() {
-        val folderId = container.uiState.value.code.text
-        Napier.e("folderId::: $folderId")
-        if (folderId.isBlank()) return
-
-        launchSafe(
-            block = {
-                googleRepository.connectToSharedFolder(folderId)
-            }
-        ) { response ->
-            reduceState { state ->
-                state.copy(
-                    sharedFolderId = folderId,
-                    dbFiles = response
-                )
-            }
-        }
-    }
-
-    /**
-     * 4단계: 공유 폴더 데이터 업로드 (내 기기 데이터 전송)
-     * 파일명 규칙: sync_user_{device_id}.json
-     */
     fun uploadMyDataToSharedFolder() {
-
         launchSafe(
             block = {
                 syncManager.syncToSharedFolder()
             }
         ) {
             Napier.d("내 데이터를 공유 폴더에 성공적으로 업로드했습니다.")
-            fetchSharedFolderFiles() // 업로드 후 목록 갱신
         }
     }
 
-    /**
-     * 4단계: 공유 폴더로부터 데이터 동기화 (상대방 데이터 가져오기)
-     */
-    fun syncFromSharedFolder() {
+    fun inviteMember() {
+        val uiState = container.uiState.value
+        launchSafe(
+            block = {
+                val isPermissionGranted =
+                    googleRepository.grantPermission(
+                        fileId = uiState.sharedFolderId,
+                        email = container.uiState.value.inviteEmail.text
+                    )
+                if (!isPermissionGranted) {
+                    throw Exception("잠시 후 다시 시도해 주세요.")
+                }
+            }
+        ) {
+            fetchFilePermissions(uiState.sharedFolderId)
+            reduceState { state ->
+                state.copy(
+                    inviteEmail = TextFieldValue("")
+                )
+            }
+        }
+    }
 
+    fun connectToSharedFolder() {
+        val folderId = container.uiState.value.inviteCode.text
+
+        launchSafe(
+            block = {
+                googleRepository.connectToSharedFolder(folderId)
+            }
+        ) {
+            reduceState { state ->
+                state.copy(
+                    sharedFolderId = folderId
+                )
+            }
+            syncFromSharedFolder()
+        }
+    }
+
+    fun syncFromSharedFolder() {
         launchSafe(
             block = {
                 syncManager.syncFromSharedFolder()
             }
-        ) { results ->
+        ) {
             Napier.d("상대방 데이터를 공유 폴더에서 성공적으로 다운로드했습니다.")
-
         }
     }
 
-    private fun fetchSharedFolderFiles() {
-        val folderId = container.uiState.value.sharedFolderId ?: return
-        launchSafe(
-            block = {
-                googleRepository.getFilesFromSharedFolder(folderId)
-            }
-        ) { response ->
-            reduceState { state ->
-                state.copy(dbFiles = response)
-            }
+    fun updateIsGuestMode(isGuestMode: Boolean) {
+        reduceState { state ->
+            state.copy(isGuestMode = isGuestMode)
         }
     }
 
     fun updateEmail(email: TextFieldValue) {
         reduceState { state ->
-            state.copy(email = email)
+            state.copy(inviteEmail = email)
         }
     }
 
-    fun updateCode(code: TextFieldValue) {
+    fun updateInviteCode(inviteCode: TextFieldValue) {
         reduceState { state ->
-            state.copy(code = code)
+            state.copy(inviteCode = inviteCode)
         }
     }
 }
