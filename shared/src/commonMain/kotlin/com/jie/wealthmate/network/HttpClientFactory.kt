@@ -22,6 +22,7 @@ import io.ktor.http.Parameters
 import io.ktor.http.contentType
 import io.ktor.http.encodedPath
 import io.ktor.serialization.kotlinx.json.json
+import kotlinx.coroutines.IO
 import kotlinx.serialization.json.Json
 
 class HttpClientFactory(
@@ -106,14 +107,19 @@ class HttpClientFactory(
 
                             // 2. 리프레시 토큰이 없거나 실패한 경우 Silent Sign-In 시도
                             Napier.d("Attempting silent sign-in...")
-                            val silentAuth = authRepository.silentSignIn()
+                            // Dispatchers.IO를 사용하여 메인 스레드가 아닌 곳에서 실행되도록 강제함
+                            val silentAuth = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+                                authRepository.silentSignIn()
+                            }
+
                             if (silentAuth != null) {
-                                Napier.d("Silent sign-in successful")
+                                Napier.d("Silent sign-in successful:: $silentAuth")
                                 return@refreshTokens BearerTokens(
                                     silentAuth.accessToken,
                                     silentAuth.refreshToken ?: refreshToken ?: ""
                                 )
                             }
+
 
                             // 3. 모든 시도가 실패하면 로그아웃 처리
                             Napier.e("All token refresh attempts failed. Clearing auth data.")

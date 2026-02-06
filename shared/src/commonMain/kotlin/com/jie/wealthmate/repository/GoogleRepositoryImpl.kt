@@ -503,7 +503,7 @@ class GoogleRepositoryImpl(
 
     companion object {
         const val CLIENT_ID =
-            "1001016412934-av4h457eq1vtastir4hjdomf1bnd11hp.apps.googleusercontent.com"
-        const val CLIENT_SECRET = "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"
+            "808791516955-mvuausum2tbonst3bf4kqna8t99tkkk6.apps.googleusercontent.com"
+        const val CLIENT_SECRET = "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"
     }
 }

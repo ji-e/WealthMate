@@ -34,6 +34,7 @@ actual suspend fun platformSilentSignIn(): GoogleAuthEntity? {
             .requestServerAuthCode(GoogleRepositoryImpl.CLIENT_ID)
             .requestScopes(Scope("https://www.googleapis.com/auth/drive.appdata"))
             .requestScopes(Scope("https://www.googleapis.com/auth/drive.file"))
+            .requestScopes(Scope("https://www.googleapis.com/auth/drive.metadata.readonly"))
             .build()
 
         val client = GoogleSignIn.getClient(koinContext, gso)
