@@ -19,6 +19,7 @@ struct iOSApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
 
     init() {
+        MainViewControllerKt.debugBuild()
         KoinInitializerKt.doInitKoin()
         FirebaseApp.configure()
 
