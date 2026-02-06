@@ -32,12 +32,16 @@ import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.jie.wealthmate.base.BaseScreen
+import com.jie.wealthmate.component.HeadLineText
+import com.jie.wealthmate.component.InfoText
 import com.jie.wealthmate.component.WMText
 import com.jie.wealthmate.component.textField.WMTextField
 import com.jie.wealthmate.component.topbar.TopBarItem
+import com.jie.wealthmate.feature.menu.categoryManagement.component.GoogleLoginButton
 import com.jie.wealthmate.feature.menu.component.MenuEnum
 import com.jie.wealthmate.theme.ColorGray
 import com.jie.wealthmate.theme.ColorRed
+import com.jie.wealthmate.utils.default
 import org.jetbrains.compose.resources.painterResource
 import wealthmate.composeapp.generated.resources.Res
 import wealthmate.composeapp.generated.resources.ic_keyboard_arrow_right
@@ -73,108 +77,118 @@ class GoogleCloudSyncScreen() : BaseScreen() {
                 "Wi-Fi 환경에서 이용하시는 것을 권장합니다."
             )
 
-            WMText(
-                text = "기기를 변경하거나 앱을 재설치했을 때 데이터를 안전하게 보관하고 불러올 수 있습니다.",
-                style = Typography().titleMedium.copy(fontWeight = FontWeight.SemiBold),
+            HeadLineText(
+                text = "기기를 변경하거나 앱을 재설치했을 때\n데이터를 안전하게 보관하고 불러올 수 있습니다.",
                 modifier = Modifier
                     .padding(top = 4.dp, bottom = 8.dp)
-                    .padding(horizontal = 20.dp)
+                    .padding(horizontal = 28.dp)
             )
 
             infoContents.forEach {
                 Row(
-                    modifier = Modifier
-                        .padding(bottom = 4.dp)
-                        .padding(horizontal = 20.dp),
+                    modifier = Modifier.padding(horizontal = 28.dp),
                     horizontalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
-                    WMText(text = "•")
-                    WMText(text = it)
+                    InfoText(text = "•")
+                    InfoText(text = it)
                 }
             }
 
-            WMTextField(
-                label = "연결된 계정",
-                value = uiState.userName,
-                onValueChange = {},
-                readOnlyColor = ColorGray.Gray_400,
-                readOnly = true,
-                modifier = Modifier
-                    .padding(top = 32.dp)
-                    .padding(horizontal = 20.dp)
-            )
-
-            WMTextField(
-                label = "마지막 백업 날짜",
-                value = uiState.lastSyncDate,
-                onValueChange = {},
-                readOnlyColor = ColorGray.Gray_400,
-                readOnly = true,
-                modifier = Modifier
-                    .padding(top = 4.dp)
-                    .padding(horizontal = 20.dp)
-            )
-
-            Row(
-                modifier = Modifier
-                    .clip(CircleShape)
-                    .clickable { screenModel.upload() }
-                    .wrapContentWidth()
-                    .padding(vertical = 12.dp, horizontal = 20.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-
-                WMText(
-                    text = "구글 드라이브로 백업 하기",
-                    style = Typography().titleMedium.copy(fontWeight = FontWeight.SemiBold),
-                    modifier = Modifier.padding(end = 4.dp)
-
+            if (uiState.isLoggedIn) {
+                WMTextField(
+                    label = "연결된 계정",
+                    value = uiState.userName,
+                    onValueChange = {},
+                    readOnlyColor = ColorGray.Gray_400,
+                    readOnly = true,
+                    modifier = Modifier
+                        .padding(top = 32.dp)
+                        .padding(horizontal = 20.dp)
                 )
-                Icon(
-                    painter = painterResource(Res.drawable.ic_keyboard_arrow_right),
-                    contentDescription = "구글 드라이브로 백업 하기",
-                    modifier = Modifier.size(24.dp)
-                )
-            }
-            Row(
-                modifier = Modifier
-                    .clip(CircleShape)
-                    .clickable { screenModel.download() }
-                    .wrapContentWidth()
-                    .padding(vertical = 12.dp, horizontal = 20.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
 
-                WMText(
-                    text = "구글 드라이브에서 복원 하기",
-                    style = Typography().titleMedium.copy(fontWeight = FontWeight.SemiBold),
-                    modifier = Modifier.padding(end = 4.dp)
+                WMTextField(
+                    label = "마지막 백업 날짜",
+                    value = uiState.lastSyncDate,
+                    onValueChange = {},
+                    readOnlyColor = ColorGray.Gray_400,
+                    readOnly = true,
+                    modifier = Modifier
+                        .padding(top = 4.dp)
+                        .padding(horizontal = 20.dp)
                 )
-                Icon(
-                    painter = painterResource(Res.drawable.ic_keyboard_arrow_right),
-                    contentDescription = "구글 드라이브에서 복원 하기",
-                    modifier = Modifier.size(24.dp)
-                )
-            }
 
-            Column(
-                modifier = Modifier
-                    .padding(horizontal = 20.dp)
-                    .background(color = ColorGray.Gray_50, shape = RoundedCornerShape(8.dp))
-                    .fillMaxWidth()
-                    .padding(12.dp),
-                verticalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
+                Row(
+                    modifier = Modifier
+                        .clip(CircleShape)
+                        .clickable { screenModel.upload() }
+                        .wrapContentWidth()
+                        .padding(vertical = 12.dp, horizontal = 20.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
 
-                WMText(
-                    text = "※ 주의",
-                    style = Typography().titleSmall.copy(
-                        color = ColorRed.Red_300,
-                        fontWeight = FontWeight.SemiBold
+                    WMText(
+                        text = "구글 드라이브로 백업 하기",
+                        style = Typography().titleMedium.copy(fontWeight = FontWeight.SemiBold),
+                        modifier = Modifier.padding(end = 4.dp)
+
                     )
-                )
+                    Icon(
+                        painter = painterResource(Res.drawable.ic_keyboard_arrow_right),
+                        contentDescription = "구글 드라이브로 백업 하기",
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
+                Row(
+                    modifier = Modifier
+                        .clip(CircleShape)
+                        .clickable { screenModel.download() }
+                        .wrapContentWidth()
+                        .padding(vertical = 12.dp, horizontal = 20.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
 
-                WMText(text = "복구 시 현재 기기의 데이터는 사라지고 백업 시점의 데이터로 덮어씌워집니다.")
+                    WMText(
+                        text = "구글 드라이브에서 복원 하기",
+                        style = Typography().titleMedium.copy(fontWeight = FontWeight.SemiBold),
+                        modifier = Modifier.padding(end = 4.dp)
+                    )
+                    Icon(
+                        painter = painterResource(Res.drawable.ic_keyboard_arrow_right),
+                        contentDescription = "구글 드라이브에서 복원 하기",
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
+
+                Column(
+                    modifier = Modifier
+                        .padding(horizontal = 20.dp)
+                        .background(color = ColorGray.Gray_50, shape = RoundedCornerShape(8.dp))
+                        .fillMaxWidth()
+                        .padding(12.dp),
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+
+                    WMText(
+                        text = "※ 주의",
+                        style = Typography().titleSmall.copy(
+                            color = ColorRed.Red_300,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                    )
+
+                    WMText(text = "복구 시 현재 기기의 데이터는 사라지고 백업 시점의 데이터로 덮어씌워집니다.")
+                }
+            } else {
+                GoogleLoginButton(
+                    modifier = Modifier
+                        .padding(horizontal = 28.dp)
+                        .padding(top = 32.dp)
+                ) { googleUser ->
+                    screenModel.getToken(
+                        authCode = googleUser.serverAuthCode,
+                        email = googleUser.email.default()
+                    )
+                }
             }
         }
     }
