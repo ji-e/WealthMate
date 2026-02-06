@@ -33,7 +33,7 @@ class GoogleCloudSyncScreenModel(
         }
     }
 
-    private fun getLastSyncTime() {
+    fun getLastSyncTime() {
         val lastSyncTime = authRepository.getLastSyncTime()
 
         reduceState { state ->
