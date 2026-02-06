@@ -22,6 +22,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.jie.wealthmate.component.WMText
 import com.jie.wealthmate.component.textField.WMTextField
@@ -32,7 +33,6 @@ import com.jie.wealthmate.theme.WMTheme
 import com.jie.wealthmate.vo.CategoryTagVo
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import wealthmate.composeapp.generated.resources.Res
 import wealthmate.composeapp.generated.resources.ic_close_circle2
 
@@ -65,14 +65,14 @@ fun CategoryTag(
             maxLength = 15,
             label = "상세 태그 이름",
             placeholder = largeCategory.tempTagLabel,
-            enabled = tagLabelItems.size <= 10,
+            enabled = tagLabelItems.size < 10,
             isCount = true,
             keyboardActions = KeyboardActions(
                 onDone = { onChipAdd(tagLabel) }
             ),
             supportingContent = {
                 CategoryTagItem(
-                    modifier = Modifier.padding(top = 4.dp),
+                    modifier = Modifier.padding(top = 8.dp),
                     trailingIcon = trailingIcon,
                     chipItems = tagLabelItems,
                     onChipClick = onChipClick

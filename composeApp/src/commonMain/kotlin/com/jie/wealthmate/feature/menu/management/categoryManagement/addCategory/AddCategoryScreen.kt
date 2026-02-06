@@ -11,7 +11,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -19,7 +18,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.annotation.InternalVoyagerApi
 import cafe.adriel.voyager.navigator.LocalNavigator
@@ -32,11 +30,11 @@ import com.jie.wealthmate.component.WMButton
 import com.jie.wealthmate.component.WMCheckBox
 import com.jie.wealthmate.component.textField.WMTextField
 import com.jie.wealthmate.component.topbar.TopBarItem
+import com.jie.wealthmate.component.topbar.WMTobBar
 import com.jie.wealthmate.feature.menu.management.categoryManagement.addCategory.component.CategoryIcon
 import com.jie.wealthmate.feature.menu.management.categoryManagement.addCategory.component.CategoryIconModalBottomSheet
 import com.jie.wealthmate.feature.menu.management.categoryManagement.addCategory.component.CategoryTag
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
-import com.jie.wealthmate.theme.WMTheme
 import org.koin.compose.koinInject
 
 class AddCategoryScreen(
@@ -51,6 +49,8 @@ class AddCategoryScreen(
         val screenModel: AddCategoryScreenModel = koinInject()
         val uiState by screenModel.container.uiState.collectAsState()
 
+        var isShowCategoryIconModalBottomSheet by remember { mutableStateOf(false) }
+
         val onBack: () -> Unit = remember(uiState.isDataChanged) {
             {
                 showSaveBackDialog(
@@ -64,17 +64,6 @@ class AddCategoryScreen(
             enabled = true,
             onBack = onBack
         )
-
-        if (navigator.lastItem is AddCategoryScreen) {
-            SideEffect {
-                screenModel.updateTopBar(
-                    title = TopBarItem.Title("${largeCategory.label} 카테고리 추가"),
-                    readingItem = TopBarItem.ReadingItem().copy(
-                        action = { onBack() }
-                    ),
-                )
-            }
-        }
 
         LaunchedEffect(Unit) {
             screenModel.updateInit(
@@ -93,8 +82,10 @@ class AddCategoryScreen(
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
-            var isShowCategoryIconModalBottomSheet by remember { mutableStateOf(false) }
-
+            WMTobBar(
+                title = TopBarItem.Title("${largeCategory.label} 카테고리 추가"),
+                readingItem = TopBarItem.ReadingItem().copy(action = { onBack() }),
+            )
             Column(
                 modifier = Modifier
                     .weight(1f)
@@ -116,7 +107,7 @@ class AddCategoryScreen(
                     onValueChange = screenModel::updateCategoryLabel,
                     modifier = Modifier
                         .padding(top = 32.dp)
-                        .padding(horizontal = 20.dp),
+                        .padding(horizontal = 28.dp),
                     maxLength = 15,
                     label = "카테고리 이름",
                     placeholder = largeCategory.tempMiddleCategoryLabel,
@@ -127,8 +118,8 @@ class AddCategoryScreen(
                 // 카테고리 태그
                 CategoryTag(
                     modifier = Modifier
-                        .padding(top = 20.dp)
-                        .padding(horizontal = 20.dp),
+                        .padding(top = 4.dp)
+                        .padding(horizontal = 28.dp),
                     largeCategory = largeCategory,
                     tagLabel = uiState.tagLabel,
                     tagLabelItems = uiState.tagLabelItems,
@@ -145,7 +136,7 @@ class AddCategoryScreen(
                 label = "고정 카테고리",
                 checked = uiState.isFixed,
                 modifier = Modifier
-                    .padding(start = 6.dp)
+                    .padding(start = 14.dp)
                     .padding(vertical = 8.dp)
                     .align(Alignment.Start),
                 onCheckedChange = screenModel::updateIsFixed,
@@ -156,7 +147,7 @@ class AddCategoryScreen(
                 text = "저장",
                 buttonSize = ButtonSize.LARGE,
                 modifier = Modifier
-                    .padding(horizontal = 20.dp)
+                    .padding(horizontal = 28.dp)
                     .padding(bottom = 20.dp)
                     .fillMaxWidth(),
                 enabled = uiState.label.text.isNotBlank(),
@@ -171,14 +162,6 @@ class AddCategoryScreen(
                     onDismissRequest = { isShowCategoryIconModalBottomSheet = false }
                 )
             }
-        }
-    }
-
-    @Composable
-    @Preview(showBackground = true)
-    private fun AddCategoryScreenPreview() {
-        WMTheme {
-            AddCategoryScreen(largeCategory = LargeCategoryEnum.INCOME)
         }
     }
 }

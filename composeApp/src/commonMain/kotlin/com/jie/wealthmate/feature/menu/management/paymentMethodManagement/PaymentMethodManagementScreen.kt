@@ -116,37 +116,35 @@ class PaymentMethodManagementScreen() : BaseScreen() {
                     modifier = Modifier.fillMaxSize().padding(20.dp),
                     contentText = "결제수단을 추가해주세요.",
                 )
-
-                return
-            }
-
-            PaymentMethod(
-                listState = listState,
-                paymentMethodItems = uiState.paymentMethodItems,
-                isDragging = isDragging,
-                onIsDraggingChange = { isDragging = it },
-                onItemClick = {
-                    goToModifyPaymentMethod(
-                        navigator = navigator,
-                        paymentMethodId = it.id
-                    )
-                }
-            )
-
-            // Drag and Drop 저장 버튼
-            if (isDragging) {
-                WMFloatingButton(
-                    text = "저장",
-                    buttonSize = ButtonSize.LARGE,
-                    modifier = Modifier
-                        .padding(horizontal = 20.dp)
-                        .padding(bottom = 20.dp)
-                        .fillMaxWidth(),
-                    onClick = {
-                        screenModel.savePaymentMethodSort()
-                        isDragging = false
+            } else {
+                PaymentMethod(
+                    listState = listState,
+                    paymentMethodItems = uiState.paymentMethodItems,
+                    isDragging = isDragging,
+                    onIsDraggingChange = { isDragging = it },
+                    onItemClick = {
+                        goToModifyPaymentMethod(
+                            navigator = navigator,
+                            paymentMethodId = it.id
+                        )
                     }
                 )
+
+                // Drag and Drop 저장 버튼
+                if (isDragging) {
+                    WMFloatingButton(
+                        text = "저장",
+                        buttonSize = ButtonSize.LARGE,
+                        modifier = Modifier
+                            .padding(horizontal = 20.dp)
+                            .padding(bottom = 20.dp)
+                            .fillMaxWidth(),
+                        onClick = {
+                            screenModel.savePaymentMethodSort()
+                            isDragging = false
+                        }
+                    )
+                }
             }
         }
     }

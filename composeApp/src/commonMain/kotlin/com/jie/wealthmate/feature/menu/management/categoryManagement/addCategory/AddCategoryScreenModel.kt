@@ -46,6 +46,17 @@ class AddCategoryScreenModel(
     }
 
     fun updateCategoryTagLabel(textFieldValue: TextFieldValue) {
+        val currentState = container.uiState.value
+        // 1. 단순 텍스트가 같다면 업데이트 무시
+        if (currentState.tagLabel.text == textFieldValue.text) return
+
+        // 2. IME Ghost Update 방지:
+        // 현재 상태는 비어있는데(방금 추가됨), 들어온 값이 이미 추가된 태그 목록에 있다면 무시
+        if (currentState.tagLabel.text.isEmpty() && textFieldValue.text.isNotEmpty()) {
+            val isAlreadyAdded = currentState.tagLabelItems.any { it.label == textFieldValue.text }
+            if (isAlreadyAdded) return
+        }
+
         reduceState { state ->
             state.copy(
                 tagLabel = textFieldValue
@@ -54,29 +65,31 @@ class AddCategoryScreenModel(
     }
 
     fun addCategoryTagLabel(tagLabel: TextFieldValue?) {
+        tagLabel ?: return reduceState {
+            it.copy(
+                tagLabel = TextFieldValue()
+            )
+        }
+
+        tagLabel.text.ifBlank {
+            showSnackbar("상세 태그 이름을 입력해 주세요.")
+            return
+        }
+
+        val categoryTag = CategoryTagVo(label = tagLabel.text)
+        val isExisted = container.uiState.value.tagLabelItems.any { it.label == categoryTag.label }
+
+        if (isExisted) {
+            showSnackbar("이미 존재하는 태그 입니다.")
+            return
+        }
+
         reduceState { state ->
-            if (tagLabel == null) {
-                return@reduceState state.copy(tagLabel = TextFieldValue(""))
-            }
-
-            if (tagLabel.text.isBlank()) {
-                showSnackbar("상세 태그 이름을 입력해 주세요.")
-                return@reduceState state
-            }
-
-            val categoryTag = CategoryTagVo(label = tagLabel.text)
-            val isExisted = state.tagLabelItems.any { it.label == categoryTag.label }
-
-            if (isExisted) {
-                showSnackbar("이미 존재하는 태그 입니다.")
-                state
-            } else {
-                state.copy(
-                    isDataChanged = true,
-                    tagLabel = TextFieldValue(""),
-                    tagLabelItems = state.tagLabelItems.toMutableList().apply { add(categoryTag) }
-                )
-            }
+            state.copy(
+                isDataChanged = true,
+                tagLabel = TextFieldValue(),
+                tagLabelItems = state.tagLabelItems + categoryTag
+            )
         }
     }
 
@@ -84,7 +97,7 @@ class AddCategoryScreenModel(
         reduceState { state ->
             state.copy(
                 isDataChanged = true,
-                tagLabelItems = state.tagLabelItems.toMutableList().apply { remove(tag) }
+                tagLabelItems = state.tagLabelItems - tag
             )
         }
     }

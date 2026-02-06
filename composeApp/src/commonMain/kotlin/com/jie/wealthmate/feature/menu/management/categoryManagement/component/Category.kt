@@ -159,11 +159,13 @@ fun CategoryItem(
                 style = typography.titleMedium.copy(fontWeight = FontWeight.Medium),
                 maxLines = 1,
             )
-            WMText(
-                text = tagText,
-                style = typography.bodySmall.copy(color = ColorGray.Gray_500),
-                maxLines = 1,
-            )
+            if (tagText.isNotEmpty()) {
+                WMText(
+                    text = tagText,
+                    style = typography.bodySmall.copy(color = ColorGray.Gray_500),
+                    maxLines = 1,
+                )
+            }
         }
 
         Icon(

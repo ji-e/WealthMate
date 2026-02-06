@@ -28,6 +28,7 @@ import com.jie.wealthmate.component.ButtonSize
 import com.jie.wealthmate.component.WMFloatingButton
 import com.jie.wealthmate.component.reorderable.rememberReorderableLazyListState
 import com.jie.wealthmate.component.topbar.TopBarItem
+import com.jie.wealthmate.component.topbar.WMTobBar
 import com.jie.wealthmate.feature.menu.component.MenuEnum
 import com.jie.wealthmate.feature.menu.management.categoryManagement.addCategory.AddCategoryScreen
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.Category
@@ -84,16 +85,23 @@ class CategoryManagementScreen : BaseScreen() {
             }
         }
 
-        BackHandler(enabled = true, onBack = onBack)
+        BackHandler(
+            enabled = true,
+            onBack = onBack
+        )
 
-        LaunchedEffect(isDragging, isAddItemEnabled, uiState.currentLargeCategory) {
+        LaunchedEffect(pagerState.currentPage) {
+            screenModel.changeTab(largeCategoryItems[pagerState.currentPage])
+        }
+
+        Column {
             if (isDragging) {
-                screenModel.updateTopBar(
+                WMTobBar(
                     title = TopBarItem.Title("${MenuEnum.CATEGORY.label} 순서 변경"),
                     readingItem = TopBarItem.ReadingItem().copy(action = { onBack() })
                 )
             } else {
-                screenModel.updateTopBar(
+                WMTobBar(
                     title = TopBarItem.Title(MenuEnum.CATEGORY.title),
                     readingItem = TopBarItem.ReadingItem().copy(action = { navigator.pop() }),
                     trailingItem = listOf(
@@ -108,13 +116,7 @@ class CategoryManagementScreen : BaseScreen() {
                     )
                 )
             }
-        }
 
-        LaunchedEffect(pagerState.currentPage) {
-            screenModel.changeTab(largeCategoryItems[pagerState.currentPage])
-        }
-
-        Column {
             CategoryTab(
                 pagerState = pagerState,
                 onTapClick = {

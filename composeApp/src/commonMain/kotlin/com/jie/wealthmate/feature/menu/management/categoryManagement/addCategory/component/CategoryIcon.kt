@@ -60,7 +60,7 @@ fun CategoryIcon(
 
             WMText(
                 text = selectedCategoryIcon.text,
-                style = Typography().bodyLarge.copy(fontSize = 60.sp)
+                style = Typography().displayLarge
             )
         }
         Box(

@@ -1,13 +1,13 @@
 package com.jie.wealthmate.feature.menu
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -19,6 +19,7 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import com.jie.wealthmate.base.collectSideEffect
 import com.jie.wealthmate.component.WMMenuButton
 import com.jie.wealthmate.component.topbar.TopBarItem
+import com.jie.wealthmate.component.topbar.WMTobBar
 import com.jie.wealthmate.feature.menu.component.MenuEnum
 import com.jie.wealthmate.feature.menu.component.MenuItem
 import com.jie.wealthmate.feature.menu.component.MenuItemData
@@ -38,14 +39,6 @@ class MenuScreen(val calculateBottomPadding: Dp) : Screen {
         val navigator = LocalNavigator.currentOrThrow
         val screenModel: MenuScreenModel = koinInject()
         val uiState = screenModel.container.uiState.collectAsState().value
-
-        if (navigator.lastItem is MenuScreen) {
-            SideEffect {
-                screenModel.updateTopBar(
-                    title = TopBarItem.Title("전체 메뉴")
-                )
-            }
-        }
 
         screenModel.collectSideEffect { effect ->
             when (effect) {
@@ -72,63 +65,67 @@ class MenuScreen(val calculateBottomPadding: Dp) : Screen {
                 }
             }
         }
+        Column {
+            WMTobBar(
+                title = TopBarItem.Title("전체 메뉴"),
+                readingItem = null
+            )
 
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(bottom = calculateBottomPadding),
-        ) {
-            item {
-                Spacer(modifier = Modifier.padding(top = 8.dp))
-            }
-            items(uiState.menuEnums.size) { index ->
-                val menu = uiState.menuEnums[index]
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(bottom = calculateBottomPadding),
+                contentPadding = PaddingValues(top = 8.dp, bottom = 20.dp)
+            ) {
+                items(uiState.menuEnums.size) { index ->
+                    val menu = uiState.menuEnums[index]
 
-                MenuTitleItem(menu.label)
+                    MenuTitleItem(menu.label)
 
-                if (menu == MenuItemData.Sync) {
-                    val isLoggedIn = uiState.userName.isNotEmpty()
-                    var label = if (isLoggedIn) "계정 연결 해제" else "계정 연결"
+                    if (menu == MenuItemData.Sync) {
+                        val isLoggedIn = uiState.userName.isNotEmpty()
+                        var label = if (isLoggedIn) "계정 연결 해제" else "계정 연결"
 
-                    GoogleButtonUiContainer(
-                        onGoogleSignInResult = { googleUser ->
-                            println("googleUser::: $googleUser")
-                            label = googleUser?.email.default()
+                        GoogleButtonUiContainer(
+                            onGoogleSignInResult = { googleUser ->
+                                println("googleUser::: $googleUser")
+                                label = googleUser?.email.default()
 
-                            screenModel.updateUser(
-                                accessToken = googleUser?.accessToken.default(),
-                                email = googleUser?.email.default()
+                                screenModel.updateUser(
+                                    accessToken = googleUser?.accessToken.default(),
+                                    email = googleUser?.email.default()
+                                )
+                            },
+                            scopes = listOf(
+                                "https://www.googleapis.com/auth/drive.appdata",
+                                "https://www.googleapis.com/auth/drive.file",
+                                "https://www.googleapis.com/auth/drive.metadata.readonly"
+                            ),
+                        ) {
+                            WMMenuButton(
+                                label = label,
+                                onClick = {
+                                    if (isLoggedIn) screenModel.logout()
+                                    else this.onClick()
+                                }
                             )
-                        },
-                        scopes = listOf(
-                            "https://www.googleapis.com/auth/drive.appdata",
-                            "https://www.googleapis.com/auth/drive.file",
-                            "https://www.googleapis.com/auth/drive.metadata.readonly"
-                        ),
-                    ) {
-                        WMMenuButton(
-                            label = label,
-                            onClick = {
-                                if (isLoggedIn) screenModel.logout()
-                                else this.onClick()
-                            }
-                        )
+                        }
                     }
-                }
 
-                Column() {
-                    repeat(menu.items.size) { index ->
-                        val menuContent = menu.items[index]
-                        MenuItem(
-                            menu = menuContent,
-                            onClickMenu = {
-                                screenModel.onMenuClick(menuContent)
-                            }
-                        )
+                    Column() {
+                        repeat(menu.items.size) { index ->
+                            val menuContent = menu.items[index]
+                            MenuItem(
+                                menu = menuContent,
+                                onClickMenu = {
+                                    screenModel.onMenuClick(menuContent)
+                                }
+                            )
+                        }
                     }
-                }
 
-                Spacer(modifier = Modifier.height(28.dp))
+                    Spacer(modifier = Modifier.height(28.dp))
+                }
             }
         }
     }

@@ -11,8 +11,8 @@ data class AddCategoryUiState(
     val isDataChanged: Boolean = false,
     val largeCategory: LargeCategoryEnum = LargeCategoryEnum.INCOME,
     val categoryIcon: CategoryIconEnum = CategoryIconEnum.defaultCategoryIcon,
-    val label: TextFieldValue = TextFieldValue(""),
-    val tagLabel: TextFieldValue = TextFieldValue(""),
+    val label: TextFieldValue = TextFieldValue(),
+    val tagLabel: TextFieldValue = TextFieldValue(),
     val tagLabelItems: List<CategoryTagVo> = emptyList(),
     val isFixed: Boolean = false,
 ) : BaseUiState
