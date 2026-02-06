@@ -18,8 +18,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.jie.wealthmate.component.LabelText
 import com.jie.wealthmate.component.WMText
 import com.jie.wealthmate.theme.ColorGroup
 import com.jie.wealthmate.theme.ColorYellow
@@ -39,12 +39,11 @@ fun SharedMemberList(
 ) {
     val backgroundColors = ColorGroup.getColorList()
 
-    WMText(
+    LabelText(
         text = "공유 멤버 목록",
-        style = androidx.compose.material3.Typography().titleSmall.copy(fontWeight = FontWeight.SemiBold),
         modifier = Modifier
             .padding(top = 4.dp)
-            .padding(horizontal = 20.dp)
+            .padding(horizontal = 28.dp)
     )
 
     if (permissionsItems.isEmpty()) {
@@ -83,7 +82,7 @@ fun SharedMemberItem(
         modifier = Modifier
             .height(40.dp)
             .fillMaxWidth()
-            .padding(horizontal = 20.dp),
+            .padding(horizontal = 28.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {

@@ -23,7 +23,9 @@ class GoogleCloudShareScreenModel(
     init {
         if (authRepository.isLoggedIn()) {
             getUserName()
-            getSharedFolderId()
+            if (authRepository.getSharedFolderId().isNullOrEmpty().not()) {
+                getSharedFolderId()
+            }
         }
     }
 

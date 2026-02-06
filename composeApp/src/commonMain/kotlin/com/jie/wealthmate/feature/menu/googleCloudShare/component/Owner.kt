@@ -1,5 +1,6 @@
 package com.jie.wealthmate.feature.menu.googleCloudShare.component
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.HorizontalDivider
@@ -16,56 +17,52 @@ import com.jie.wealthmate.theme.ColorGray
 
 @Composable
 fun Owner(
+    modifier: Modifier = Modifier,
     sharedFolderId: String,
     email: TextFieldValue,
     updateEmail: (TextFieldValue) -> Unit,
     onInviteClick: () -> Unit,
     showSnackbar: (String) -> Unit,
-){
+) {
     val clipboardManager = LocalClipboardManager.current
 
-    WMTextField(
-        label = "나의 초대 코드",
-        value = sharedFolderId,
-        onValueChange = {},
-        readOnlyColor = ColorGray.Gray_400,
-        readOnly = true,
-        modifier = Modifier
-            .padding(top = 4.dp)
-            .padding(horizontal = 20.dp),
-        onReadOnlyClick = {
-            if (sharedFolderId.isNotEmpty()) {
-                clipboardManager.setText(AnnotatedString(sharedFolderId))
-                showSnackbar("초대 코드가 복사되었습니다.")
+    Column(
+        modifier = modifier.fillMaxWidth()
+    ) {
+        WMTextField(
+            label = "나의 초대 코드",
+            value = sharedFolderId,
+            onValueChange = {},
+            readOnlyColor = ColorGray.Gray_400,
+            readOnly = true,
+            onReadOnlyClick = {
+                if (sharedFolderId.isNotEmpty()) {
+                    clipboardManager.setText(AnnotatedString(sharedFolderId))
+                    showSnackbar("초대 코드가 복사되었습니다.")
+                }
             }
-        }
-    )
+        )
 
-    WMTextField(
-        label = "초대 할 이메일",
-        value = email,
-        onValueChange =updateEmail,
-        modifier = Modifier
-            .padding(top = 4.dp)
-            .padding(horizontal = 20.dp),
-        placeholder = "초대 할 구글 이메일을 입력해 주세요."
-    )
+        WMTextField(
+            label = "초대 할 이메일",
+            value = email,
+            onValueChange = updateEmail,
+            modifier = Modifier.padding(top = 4.dp),
+            placeholder = "초대 할 구글 이메일을 입력해 주세요."
+        )
 
-    WMButton(
-        text = "초대하기",
-        onClick = onInviteClick,
-        enabled = email.text.isNotBlank(),
-        buttonSize = ButtonSize.LARGE,
-        modifier = Modifier
-            .padding(horizontal = 20.dp)
-            .fillMaxWidth()
-    )
+        WMButton(
+            text = "초대하기",
+            onClick = onInviteClick,
+            enabled = email.text.isNotBlank(),
+            buttonSize = ButtonSize.LARGE,
+            modifier = Modifier.fillMaxWidth()
+        )
 
 
-    HorizontalDivider(
-        modifier = Modifier
-            .padding(top = 32.dp, bottom = 28.dp)
-            .padding(horizontal = 20.dp),
-        color = ColorGray.Gray_100
-    )
+        HorizontalDivider(
+            modifier = Modifier.padding(top = 32.dp, bottom = 28.dp),
+            color = ColorGray.Gray_100
+        )
+    }
 }

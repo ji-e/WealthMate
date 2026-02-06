@@ -19,18 +19,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.annotation.InternalVoyagerApi
 import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.jie.wealthmate.base.BaseScreen
+import com.jie.wealthmate.component.HeadLineText
+import com.jie.wealthmate.component.InfoText
 import com.jie.wealthmate.component.WMText
 import com.jie.wealthmate.component.textField.WMTextField
 import com.jie.wealthmate.component.topbar.TopBarItem
 import com.jie.wealthmate.feature.menu.component.MenuEnum
 import com.jie.wealthmate.feature.menu.googleCloudShare.component.Owner
+import com.jie.wealthmate.feature.menu.googleCloudShare.component.ShareMethod
 import com.jie.wealthmate.feature.menu.googleCloudShare.component.SharedMemberList
 import com.jie.wealthmate.theme.ColorGray
 import com.jie.wealthmate.utils.default
@@ -61,17 +63,16 @@ class GoogleCloudShareScreen() : BaseScreen() {
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
-            WMText(
+            HeadLineText(
                 text = "구글 드라이브를 통해 가족, 연인과 함께\n가계부를 공유해 보세요.",
-                style = Typography().titleMedium.copy(fontWeight = FontWeight.SemiBold),
                 modifier = Modifier
-                    .padding(top = 4.dp, bottom = 8.dp)
-                    .padding(horizontal = 20.dp)
+                    .padding(top = 20.dp, bottom = 8.dp)
+                    .padding(horizontal = 28.dp)
             )
 
-            WMText(
+            InfoText(
                 text = "사용자의 데이터를 서버에 저장하지 않고 본인의 구글 드라이브에만 보관합니다.",
-                modifier = Modifier.padding(horizontal = 20.dp)
+                modifier = Modifier.padding(horizontal = 28.dp)
             )
 
             if (uiState.isLoggedIn) {
@@ -83,11 +84,14 @@ class GoogleCloudShareScreen() : BaseScreen() {
                     readOnly = true,
                     modifier = Modifier
                         .padding(top = 32.dp)
-                        .padding(horizontal = 20.dp)
+                        .padding(horizontal = 28.dp)
                 )
 
                 if (uiState.isOwner) {
                     Owner(
+                        modifier = Modifier
+                            .padding(top = 4.dp)
+                            .padding(horizontal = 28.dp),
                         sharedFolderId = uiState.sharedFolderId,
                         email = uiState.email,
                         updateEmail = screenModel::updateEmail,
@@ -96,14 +100,21 @@ class GoogleCloudShareScreen() : BaseScreen() {
                     )
                 }
 
-                if (uiState.sharedFolderId.isNotEmpty()) {
+                if (uiState.sharedFolderId.isEmpty()) {
+                    ShareMethod(
+                        modifier = Modifier
+                            .padding(top = 12.dp)
+                            .padding(horizontal = 28.dp)
+                    )
+                } else {
                     SharedMemberList(
                         permissionsItems = uiState.googleDrivePermissionVo?.permissions.default(),
                         isOwner = uiState.isOwner,
                         onRemoveClick = {},
                         emptyContent = {
                             EmptyListView(
-                                modifier = Modifier.fillMaxSize().padding(20.dp),
+                                modifier = Modifier.fillMaxSize()
+                                    .padding(vertical = 20.dp, horizontal = 28.dp),
                                 contentText = "공유된 멤버가 없습니다.",
                             )
                         }
@@ -125,7 +136,7 @@ class GoogleCloudShareScreen() : BaseScreen() {
                 ) {
                     Row(
                         modifier = Modifier
-                            .padding(horizontal = 20.dp)
+                            .padding(horizontal = 28.dp)
                             .padding(top = 32.dp)
                             .clip(CircleShape)
                             .clickable { this@GoogleButtonUiContainer.onClick() }
