@@ -6,6 +6,8 @@ import com.benasher44.uuid.uuid4
 import com.jie.wealthmate.entity.GoogleAuthEntity
 import com.russhwolf.settings.Settings
 import io.github.aakira.napier.Napier
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlin.time.ExperimentalTime
 
 // 플랫폼별로 다르게 동작할 silentSignIn의 실제 구현부
@@ -26,7 +28,6 @@ class AuthRepositoryImpl(
     }
 
     override fun saveAuthData(accessToken: String, refreshToken: String?, email: String?) {
-        Napier.d("Saving auth data: accessToken=$accessToken, refreshToken=$refreshToken, email=$email")
         settings.putString(KEY_ACCESS_TOKEN, accessToken)
         refreshToken?.let { settings.putString(KEY_REFRESH_TOKEN, it) }
         email?.let { settings.putString(KEY_USER_NAME, it) }
@@ -76,12 +77,11 @@ class AuthRepositoryImpl(
 
     override fun getLastSharedSyncTime(): Long = settings.getLong(KEY_LAST_SHARED_SYNC_TIME, 0L)
 
-    override suspend fun silentSignIn(): GoogleAuthEntity? {
-        return try {
+    override suspend fun silentSignIn(): GoogleAuthEntity? = withContext(Dispatchers.Default) {
+        try {
             Napier.d("Attempting silent sign-in via platform implementation...")
             val result = platformSilentSignIn()
             if (result != null) {
-                // 성공 시 새로운 토큰 저장
                 saveAuthData(
                     accessToken = result.accessToken,
                     refreshToken = result.refreshToken ?: getRefreshToken()
