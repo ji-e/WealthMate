@@ -1,14 +1,13 @@
 package com.jie.wealthmate.feature.menu.management.categoryManagement.modifyCategory.component
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -16,9 +15,11 @@ import androidx.compose.ui.unit.dp
 import com.jie.wealthmate.component.ButtonSize
 import com.jie.wealthmate.component.ButtonStyle
 import com.jie.wealthmate.component.WMButton
+import com.jie.wealthmate.component.WMIconButton
 import com.jie.wealthmate.component.WMModalBottomSheet
 import com.jie.wealthmate.component.textField.WMTextField
-import com.jie.wealthmate.theme.ColorRed
+import wealthmate.composeapp.generated.resources.Res
+import wealthmate.composeapp.generated.resources.ic_delete
 
 
 @Composable
@@ -44,50 +45,43 @@ fun CategoryTagLabelModalBottomSheet(
         onDismissRequest = onDismissRequest,
     ) {
         Column(
-            modifier = Modifier
-                .padding(horizontal = 20.dp)
-                .padding(bottom = 20.dp)
+            modifier = Modifier.padding(bottom = 20.dp)
         ) {
-            WMTextField(
-                value = tagLabel,
-                onValueChange = onTagLabelChange,
-                maxLength = 15,
-                label = "상세 태그 이름",
-                placeholder = selectedTagLabel,
-                supportingText = "15자 이내로 입력해 주세요.",
-                isCount = true,
-                textFieldModifier = Modifier.focusRequester(focusRequester)
-            )
+
 
             Row(
-                modifier = Modifier
-                    .padding(top = 20.dp)
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(4.dp)
+                modifier = Modifier.padding(start = 28.dp, end = 12.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                WMButton(
-                    text = "삭제",
-                    buttonStyle = ButtonStyle.TONAL,
-                    buttonSize = ButtonSize.LARGE,
-                    colors = ButtonDefaults.filledTonalButtonColors(
-                        containerColor = ColorRed.Red_50,
-                        contentColor = ColorRed.Red_300
-                    ),
-                    modifier = Modifier.weight(1f),
+                WMTextField(
+                    value = tagLabel,
+                    onValueChange = onTagLabelChange,
+                    maxLength = 15,
+                    label = "상세 태그 이름",
+                    placeholder = selectedTagLabel,
+                    isCount = true,
+                    textFieldModifier = Modifier.focusRequester(focusRequester),
+                    modifier = Modifier.weight(1f)
+                )
+
+                WMIconButton(
+                    iconRes = Res.drawable.ic_delete,
                     onClick = {
                         onRemoveClick()
                         onDismissRequest()
-                    },
-                )
-
-                WMButton(
-                    text = "수정",
-                    buttonStyle = ButtonStyle.FILLED,
-                    buttonSize = ButtonSize.LARGE,
-                    modifier = Modifier.weight(4f),
-                    onClick = { onModifyClick() }
+                    }
                 )
             }
+            WMButton(
+                text = "수정",
+                buttonStyle = ButtonStyle.FILLED,
+                buttonSize = ButtonSize.LARGE,
+                modifier = Modifier
+                    .padding(top = 4.dp)
+                    .padding(horizontal = 28.dp)
+                    .fillMaxWidth(),
+                onClick = { onModifyClick() }
+            )
         }
     }
 }

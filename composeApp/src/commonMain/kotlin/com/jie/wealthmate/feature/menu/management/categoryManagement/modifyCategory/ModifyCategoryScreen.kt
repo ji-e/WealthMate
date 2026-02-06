@@ -42,7 +42,6 @@ import com.jie.wealthmate.feature.menu.management.categoryManagement.addCategory
 import com.jie.wealthmate.feature.menu.management.categoryManagement.addCategory.component.CategoryTag
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.feature.menu.management.categoryManagement.modifyCategory.component.CategoryTagLabelModalBottomSheet
-import com.jie.wealthmate.theme.ColorRed
 import com.jie.wealthmate.theme.WMTheme
 import com.jie.wealthmate.utils.default
 import org.koin.compose.koinInject
@@ -112,7 +111,6 @@ class ModifyCategoryScreen(
                 trailingItem = listOf(
                     TopBarItem.TrailingItem(
                         iconRes = Res.drawable.ic_delete,
-                        tint = ColorRed.Red_300,
                         action = {
                             showRemoveDialog() {
                                 screenModel.removeCategory()
