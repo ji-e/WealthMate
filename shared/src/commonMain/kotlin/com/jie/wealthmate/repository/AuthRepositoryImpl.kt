@@ -26,6 +26,7 @@ class AuthRepositoryImpl(
     }
 
     override fun saveAuthData(accessToken: String, refreshToken: String?, email: String?) {
+        Napier.d("Saving auth data: accessToken=$accessToken, refreshToken=$refreshToken, email=$email")
         settings.putString(KEY_ACCESS_TOKEN, accessToken)
         refreshToken?.let { settings.putString(KEY_REFRESH_TOKEN, it) }
         email?.let { settings.putString(KEY_USER_NAME, it) }
@@ -33,17 +34,24 @@ class AuthRepositoryImpl(
 
     override fun getAccessToken(): String? = settings.getStringOrNull(KEY_ACCESS_TOKEN)
 
-    override fun isLoggedIn(): Boolean = getAccessToken() != null
+    override fun isLoggedIn(): Boolean = getAccessToken().isNullOrEmpty().not()
 
     override fun clearAuthData() {
         settings.remove(KEY_ACCESS_TOKEN)
         settings.remove(KEY_REFRESH_TOKEN)
         settings.remove(KEY_USER_NAME)
+        settings.remove(KEY_SHARED_FOLDER_ID)
+        settings.remove(KEY_LAST_SYNC_TIME)
+        settings.remove(KEY_LAST_SHARED_SYNC_TIME)
+        settings.remove(KEY_DEVICE_ID)
     }
 
     override fun getRefreshToken() = settings.getStringOrNull(KEY_REFRESH_TOKEN)
     override fun getUserName() = settings.getStringOrNull(KEY_USER_NAME)
-    override fun saveSharedFolderId(folderId: String) { settings.putString(KEY_SHARED_FOLDER_ID, folderId) }
+    override fun saveSharedFolderId(folderId: String) {
+        settings.putString(KEY_SHARED_FOLDER_ID, folderId)
+    }
+
     override fun getSharedFolderId() = settings.getStringOrNull(KEY_SHARED_FOLDER_ID)
 
     override fun getDeviceId(): String {
@@ -57,9 +65,15 @@ class AuthRepositoryImpl(
         }
     }
 
-    override fun saveLastSyncTime(time: Long) { settings.putLong(KEY_LAST_SYNC_TIME, time) }
+    override fun saveLastSyncTime(time: Long) {
+        settings.putLong(KEY_LAST_SYNC_TIME, time)
+    }
+
     override fun getLastSyncTime(): Long = settings.getLong(KEY_LAST_SYNC_TIME, 0L)
-    override fun saveLastSharedSyncTime(time: Long) { settings.putLong(KEY_LAST_SHARED_SYNC_TIME, time) }
+    override fun saveLastSharedSyncTime(time: Long) {
+        settings.putLong(KEY_LAST_SHARED_SYNC_TIME, time)
+    }
+
     override fun getLastSharedSyncTime(): Long = settings.getLong(KEY_LAST_SHARED_SYNC_TIME, 0L)
 
     override suspend fun silentSignIn(): GoogleAuthEntity? {

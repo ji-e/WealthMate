@@ -90,7 +90,8 @@ class MenuScreen(val calculateBottomPadding: Dp) : Screen {
                 MenuTitleItem(menu.label)
 
                 if (menu == MenuItemData.Sync) {
-                    var label = uiState.userName.ifEmpty { "계정 연결" }
+                    val isLoggedIn = uiState.userName.isNotEmpty()
+                    var label = if (isLoggedIn) "계정 연결 해제" else "계정 연결"
 
                     GoogleButtonUiContainer(
                         onGoogleSignInResult = { googleUser ->
@@ -99,7 +100,7 @@ class MenuScreen(val calculateBottomPadding: Dp) : Screen {
 
                             screenModel.updateUser(
                                 accessToken = googleUser?.accessToken.default(),
-                                email =googleUser?.email.default()
+                                email = googleUser?.email.default()
                             )
                         },
                         scopes = listOf(
@@ -113,7 +114,8 @@ class MenuScreen(val calculateBottomPadding: Dp) : Screen {
                                 .fillMaxWidth()
                                 .height(44.dp)
                                 .clickable {
-                                    this.onClick()
+                                    if (isLoggedIn) screenModel.logout()
+                                    else this.onClick()
                                 }
                                 .padding(horizontal = 20.dp),
                             contentAlignment = Alignment.CenterStart

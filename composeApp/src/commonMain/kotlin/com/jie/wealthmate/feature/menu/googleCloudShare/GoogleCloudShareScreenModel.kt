@@ -77,9 +77,7 @@ class GoogleCloudShareScreenModel(
     }
 
     fun updateUser(accessToken: String?, email: String) {
-        fun updateUser(accessToken: String?, email: String) {
-            authRepository.saveAuthData(accessToken.default(), null, email)
-        }
+        authRepository.saveAuthData(accessToken.default(), null, email)
 
         reduceState { state ->
             state.copy(
