@@ -1,6 +1,6 @@
 @file:OptIn(InternalVoyagerApi::class)
 
-package com.jie.wealthmate.feature.menu.googleCloudShare
+package com.jie.wealthmate.feature.menu.data.googleCloudShare
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -22,10 +22,10 @@ import com.jie.wealthmate.component.textField.WMTextField
 import com.jie.wealthmate.component.topbar.TopBarItem
 import com.jie.wealthmate.feature.menu.component.GoogleLoginButton
 import com.jie.wealthmate.feature.menu.component.MenuEnum
-import com.jie.wealthmate.feature.menu.googleCloudShare.component.Guest
-import com.jie.wealthmate.feature.menu.googleCloudShare.component.Owner
-import com.jie.wealthmate.feature.menu.googleCloudShare.component.ShareMethod
-import com.jie.wealthmate.feature.menu.googleCloudShare.component.SharedMemberList
+import com.jie.wealthmate.feature.menu.data.googleCloudShare.component.Guest
+import com.jie.wealthmate.feature.menu.data.googleCloudShare.component.Owner
+import com.jie.wealthmate.feature.menu.data.googleCloudShare.component.ShareMethod
+import com.jie.wealthmate.feature.menu.data.googleCloudShare.component.SharedMemberList
 import com.jie.wealthmate.theme.ColorGray
 import com.jie.wealthmate.utils.default
 

@@ -10,8 +10,8 @@ import com.jie.wealthmate.feature.menu.MenuScreenModel
 import com.jie.wealthmate.feature.menu.management.categoryManagement.CategoryManagementScreenModel
 import com.jie.wealthmate.feature.menu.management.categoryManagement.addCategory.AddCategoryScreenModel
 import com.jie.wealthmate.feature.menu.management.categoryManagement.modifyCategory.ModifyCategoryScreenModel
-import com.jie.wealthmate.feature.menu.googleCloudShare.GoogleCloudShareScreenModel
-import com.jie.wealthmate.feature.menu.googleCloudSync.GoogleCloudSyncScreenModel
+import com.jie.wealthmate.feature.menu.data.googleCloudShare.GoogleCloudShareScreenModel
+import com.jie.wealthmate.feature.menu.data.googleCloudSync.GoogleCloudSyncScreenModel
 import com.jie.wealthmate.feature.menu.management.paymentMethodManagement.PaymentMethodManagementScreenModel
 import com.jie.wealthmate.feature.menu.management.paymentMethodManagement.addPaymentMethod.AddPaymentMethodScreenModel
 import com.jie.wealthmate.feature.menu.management.paymentMethodManagement.modifyPaymentMethod.ModifyPaymentMethodScreenModel

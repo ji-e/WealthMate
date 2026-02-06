@@ -1,4 +1,4 @@
-package com.jie.wealthmate.feature.menu.googleCloudShare.component
+package com.jie.wealthmate.feature.menu.data.googleCloudShare.component
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth

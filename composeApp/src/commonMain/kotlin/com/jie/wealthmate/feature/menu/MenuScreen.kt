@@ -30,8 +30,8 @@ import com.jie.wealthmate.feature.menu.component.MenuEnum
 import com.jie.wealthmate.feature.menu.component.MenuItem
 import com.jie.wealthmate.feature.menu.component.MenuItemData
 import com.jie.wealthmate.feature.menu.component.MenuTitleItem
-import com.jie.wealthmate.feature.menu.googleCloudShare.GoogleCloudShareScreen
-import com.jie.wealthmate.feature.menu.googleCloudSync.GoogleCloudSyncScreen
+import com.jie.wealthmate.feature.menu.data.googleCloudShare.GoogleCloudShareScreen
+import com.jie.wealthmate.feature.menu.data.googleCloudSync.GoogleCloudSyncScreen
 import com.jie.wealthmate.feature.menu.management.paymentMethodManagement.PaymentMethodManagementScreen
 import com.jie.wealthmate.theme.WMTheme
 import com.jie.wealthmate.utils.default

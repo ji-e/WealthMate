@@ -1,4 +1,4 @@
-package com.jie.wealthmate.feature.menu.googleCloudShare
+package com.jie.wealthmate.feature.menu.data.googleCloudShare
 
 import androidx.compose.ui.text.input.TextFieldValue
 import com.jie.wealthmate.base.BaseScreenModel

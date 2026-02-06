@@ -1,4 +1,4 @@
-package com.jie.wealthmate.feature.menu.googleCloudShare.component
+package com.jie.wealthmate.feature.menu.data.googleCloudShare.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -97,7 +97,7 @@ fun SharedMemberItem(
         ) {
             WMText(
                 text = item.displayName.default().take(1),
-                style = androidx.compose.material3.Typography().titleMedium,
+                style = Typography().titleMedium,
             )
         }
 

@@ -49,7 +49,7 @@ fun BackupAndRestore(
             )
             WMText(
                 text = "백업하기",
-                style = androidx.compose.material3.Typography().titleMedium
+                style = Typography().titleMedium
             )
         }
         Column(

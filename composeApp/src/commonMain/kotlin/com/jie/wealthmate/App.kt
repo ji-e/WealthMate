@@ -3,7 +3,7 @@ package com.jie.wealthmate
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import cafe.adriel.voyager.navigator.Navigator
-import com.jie.wealthmate.feature.menu.googleCloudSync.GoogleCloudSyncScreenModel
+import com.jie.wealthmate.feature.menu.data.googleCloudSync.GoogleCloudSyncScreenModel
 import com.jie.wealthmate.repository.AuthRepository
 import com.jie.wealthmate.theme.WMTheme
 import com.mmk.kmpauth.google.GoogleAuthCredentials
