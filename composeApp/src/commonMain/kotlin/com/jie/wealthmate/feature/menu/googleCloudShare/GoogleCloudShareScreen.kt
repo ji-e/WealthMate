@@ -94,7 +94,7 @@ class GoogleCloudShareScreen() : BaseScreen() {
                             .padding(top = 4.dp)
                             .padding(horizontal = 28.dp),
                         sharedFolderId = uiState.sharedFolderId,
-                        email = uiState.email,
+                        email = uiState.inviteEmail,
                         updateEmail = screenModel::updateEmail,
                         onInviteClick = screenModel::inviteMember,
                         showSnackbar = screenModel::showSnackbar,
@@ -112,7 +112,7 @@ class GoogleCloudShareScreen() : BaseScreen() {
                     )
                 }
 
-                if (uiState.isGuestMode.not() && uiState.isOwnerMode.not()) {
+                if (uiState.isInitMode) {
                     ShareMethod(
                         modifier = Modifier
                             .padding(top = 12.dp)
@@ -124,6 +124,7 @@ class GoogleCloudShareScreen() : BaseScreen() {
 
                 if (uiState.sharedFolderId.isNotEmpty()) {
                     SharedMemberList(
+                        modifier = Modifier.padding(top = 4.dp),
                         permissionsItems = uiState.googleDrivePermissionVo?.permissions.default(),
                         isOwner = uiState.isOwnerMode,
                         onRemoveClick = {},
@@ -175,29 +176,6 @@ class GoogleCloudShareScreen() : BaseScreen() {
                     }
                 }
             }
-
-
-//
-//            WMTextField(
-//                label = "초대 받은 코드",
-//                value = uiState.code,
-//                onValueChange = screenModel::updateCode,
-//            )
-//
-//            WMButton(
-//                text = "초대 코드로 연결",
-//                onClick = screenModel::connectToSharedFolder
-//            )
-//
-//            WMButton(
-//                text = "upload",
-//                onClick = { screenModel.uploadMyDataToSharedFolder() }
-//            )
-//
-//            WMButton(
-//                text = "download",
-//                onClick = { screenModel.syncFromSharedFolder() }
-//            )
         }
     }
 }

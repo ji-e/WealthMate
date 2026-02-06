@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -32,6 +33,7 @@ import wealthmate.composeapp.generated.resources.ic_star
 
 @Composable
 fun SharedMemberList(
+    modifier: Modifier = Modifier,
     permissionsItems: List<DrivePermission>,
     isOwner: Boolean,
     onRemoveClick: (String) -> Unit,
@@ -39,34 +41,34 @@ fun SharedMemberList(
 ) {
     val backgroundColors = ColorGroup.getColorList()
 
-    LabelText(
-        text = "공유 멤버 목록",
-        modifier = Modifier
-            .padding(top = 4.dp)
-            .padding(horizontal = 28.dp)
-    )
+    Column(modifier = modifier) {
+        LabelText(
+            text = "공유 멤버 목록",
+            modifier = Modifier
+                .padding(top = 4.dp)
+                .padding(horizontal = 28.dp)
+        )
 
-    if (permissionsItems.isEmpty()) {
-        emptyContent()
-        return
-    }
+        if (permissionsItems.isEmpty()) {
+            emptyContent()
+            return
+        }
 
-    LazyColumn(
-        modifier = Modifier.padding(top = 12.dp),
-    ) {
-
-
-        items(
-            count = permissionsItems.size,
-            key = { index -> permissionsItems[index].id })
-        {
-            val item = permissionsItems[it]
-            SharedMemberItem(
-                item = item,
-                isOwner = isOwner,
-                backgroundColor = backgroundColors[it % 10].second,
-                onRemoveClick = { onRemoveClick(item.id) },
-            )
+        LazyColumn(
+            modifier = Modifier.padding(top = 12.dp),
+        ) {
+            items(
+                count = permissionsItems.size,
+                key = { index -> permissionsItems[index].id })
+            {
+                val item = permissionsItems[it]
+                SharedMemberItem(
+                    item = item,
+                    isOwner = isOwner,
+                    backgroundColor = backgroundColors[it % 10].second,
+                    onRemoveClick = { onRemoveClick(item.id) },
+                )
+            }
         }
     }
 }
