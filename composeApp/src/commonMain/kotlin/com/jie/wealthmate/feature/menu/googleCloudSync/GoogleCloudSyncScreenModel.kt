@@ -14,30 +14,52 @@ class GoogleCloudSyncScreenModel(
 ) : BaseScreenModel<GoogleCloudSyncUiState>() {
 
     override val initialState: GoogleCloudSyncUiState
-        get() = GoogleCloudSyncUiState()
+        get() = GoogleCloudSyncUiState(
+            isLoggedIn = authRepository.isLoggedIn()
+        )
 
     init {
-        getUserName()
-        getLastSyncTime()
-    }
-
-    private fun getUserName() {
         if (authRepository.isLoggedIn()) {
-            reduceState { state ->
-                state.copy(
-                    userName = authRepository.getUserName().default()
-                )
-            }
+            getUserName()
+            getLastSyncTime()
         }
     }
 
-    private fun getLastSyncTime() {
+    private fun getUserName() {
+        reduceState { state ->
+            state.copy(
+                userName = authRepository.getUserName().default()
+            )
+        }
+    }
+
+    fun getLastSyncTime() {
         val lastSyncTime = authRepository.getLastSyncTime()
 
         reduceState { state ->
             state.copy(
                 lastSyncDate = if (lastSyncTime > 0) lastSyncTime.toLocalDate().toString() else "없음"
             )
+        }
+    }
+
+    fun getToken(authCode: String?, email: String) {
+        authCode ?: return
+
+        launchSafe(
+            block = {
+                googleRepository.fetchGoogleAuth(
+                    authCode = authCode,
+                    email = email
+                )
+            }
+        ) { response ->
+            reduceState { state ->
+                state.copy(
+                    isLoggedIn = response?.accessToken != null,
+                    userName = email
+                )
+            }
         }
     }
 
