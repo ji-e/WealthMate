@@ -24,14 +24,18 @@ class DatabaseSyncManager(
 
     private val syncFileName = "wealthmate_sync_data.json"
 
+    // --- 개인 클라우드 백업 (Personal Cloud) ---
+
     /**
      * 개인 백업용 업로드 (증분 방식)
+     * 마지막 동기화 시점 이후의 변경사항만 업로드합니다.
      */
     suspend fun syncToCloud(): Result<Unit> = withContext(context = Dispatchers.IO) {
         return@withContext try {
-            val bytes = createSyncPayloadBytes(isCloudSync = true)
+            val lastSync = authRepository.getLastSyncTime()
+            val bytes = createSyncPayloadBytes(lastSyncTime = lastSync)
             googleRepository.uploadDatabase(dbBytes = bytes, fileName = syncFileName)
-            
+
             authRepository.saveLastSyncTime(kotlin.time.Clock.System.now().toEpochMilliseconds())
             Result.success(value = Unit)
         } catch (e: Exception) {
@@ -40,7 +44,23 @@ class DatabaseSyncManager(
     }
 
     /**
-     * 개인 백업 다운로드
+     * 개인 백업용 업로드 (전체 방식)
+     * 로컬의 모든 데이터를 클라우드에 업로드합니다.
+     */
+    suspend fun syncFullToCloud(): Result<Unit> = withContext(context = Dispatchers.IO) {
+        return@withContext try {
+            val bytes = createSyncPayloadBytes(lastSyncTime = 0L) // 0L은 전체 데이터 추출
+            googleRepository.uploadDatabase(dbBytes = bytes, fileName = syncFileName)
+
+            authRepository.saveLastSyncTime(kotlin.time.Clock.System.now().toEpochMilliseconds())
+            Result.success(value = Unit)
+        } catch (e: Exception) {
+            Result.failure(exception = e)
+        }
+    }
+
+    /**
+     * 개인 백업 다운로드 (병합)
      */
     suspend fun syncFromCloud(): Result<Unit> = withContext(context = Dispatchers.IO) {
         return@withContext try {
@@ -55,24 +75,42 @@ class DatabaseSyncManager(
         }
     }
 
+    // --- 공유 폴더 동기화 (Shared Folder) ---
+
     /**
      * [공유 폴더] 업로드 (증분 방식)
+     * 다른 사용자들에게 변경된 내역만 전달할 때 사용합니다.
      */
     suspend fun syncToSharedFolder(): Result<Unit> = withContext(Dispatchers.IO) {
         val folderId = authRepository.getSharedFolderId() ?: return@withContext Result.failure(Exception("공유 폴더 ID가 없습니다."))
         val deviceId = authRepository.getDeviceId()
         return@withContext try {
-            // 공유 폴더 전용 마지막 동기화 시간 사용
-            val bytes = createSyncPayloadBytes(isCloudSync = false)
+            val lastSharedSync = authRepository.getLastSharedSyncTime()
+            val bytes = createSyncPayloadBytes(lastSyncTime = lastSharedSync)
             val fileName = "sync_user_$deviceId.json"
 
-            googleRepository.uploadToSharedFolder(
-                folderId = folderId,
-                fileName = fileName,
-                dbBytes = bytes
-            )
+            googleRepository.uploadToSharedFolder(folderId = folderId, fileName = fileName, dbBytes = bytes)
 
-            // 공유 전용 동기화 시간 갱신
+            authRepository.saveLastSharedSyncTime(kotlin.time.Clock.System.now().toEpochMilliseconds())
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    /**
+     * [공유 폴더] 업로드 (전체 방식)
+     * 새로운 멤버가 들어왔을 때나, 데이터를 완전히 맞추고 싶을 때 사용합니다.
+     */
+    suspend fun syncFullToSharedFolder(): Result<Unit> = withContext(Dispatchers.IO) {
+        val folderId = authRepository.getSharedFolderId() ?: return@withContext Result.failure(Exception("공유 폴더 ID가 없습니다."))
+        val deviceId = authRepository.getDeviceId()
+        return@withContext try {
+            val bytes = createSyncPayloadBytes(lastSyncTime = 0L) // 전체 데이터 추출
+            val fileName = "sync_user_$deviceId.json"
+
+            googleRepository.uploadToSharedFolder(folderId = folderId, fileName = fileName, dbBytes = bytes)
+
             authRepository.saveLastSharedSyncTime(kotlin.time.Clock.System.now().toEpochMilliseconds())
             Result.success(Unit)
         } catch (e: Exception) {
@@ -99,15 +137,11 @@ class DatabaseSyncManager(
             otherFiles.forEach { file ->
                 val bytes = googleRepository.downloadFileById(file.id)
                 val jsonString = bytes.decodeToString()
-                
-                // 역직렬화 및 병합
                 val payload = json.decodeFromString(SyncPayload.serializer(), jsonString)
-                
-                if (payload.histories.isNotEmpty()) {
+
+                if (payload.histories.isNotEmpty() || payload.categories.isNotEmpty()) {
                     mergePayload(payload)
-                    Napier.d("병합 완료: ${file.name} 로부터 ${payload.histories.size}건 수신")
-                } else {
-                    Napier.d("파일 발견: ${file.name}, 하지만 포함된 데이터가 0건입니다.")
+                    Napier.d("병합 완료: ${file.name} 로부터 데이터 수신")
                 }
             }
 
@@ -117,41 +151,39 @@ class DatabaseSyncManager(
         }
     }
 
+    // --- 내부 헬퍼 함수 ---
+
     /**
-     * 페이로드 생성
-     * @param isCloudSync true면 개인 클라우드용(lastSyncTime), false면 공유 폴더용(lastSharedSyncTime)
+     * 동기화용 데이터 페이로드 생성
+     * @param lastSyncTime 이 시간 이후의 데이터만 추출합니다. 0L이면 전체 데이터를 추출합니다.
      */
-    private suspend fun createSyncPayloadBytes(isCloudSync: Boolean): ByteArray {
+    private suspend fun createSyncPayloadBytes(lastSyncTime: Long): ByteArray {
         val db = databaseProvider.database
-        val lastSync = if (isCloudSync) authRepository.getLastSyncTime() else authRepository.getLastSharedSyncTime()
         val now = kotlin.time.Clock.System.now().toEpochMilliseconds()
-        
+
         val payload = SyncPayload(
             lastSyncTime = now,
-            histories = db.historyDao().getChangesSince(lastSync = lastSync),
-            categories = db.categoryDao().getChangesSince(lastSync = lastSync),
-            installments = db.installmentDao().getChangesSince(lastSync = lastSync),
-            repeatCycles = db.repeatCycleDao().getChangesSince(lastSync = lastSync),
-            paymentMethods = db.paymentMethodDao().getChangesSince(lastSync = lastSync),
-            paymentMethodGroups = db.paymentMethodGroupDao().getChangesSince(lastSync = lastSync)
+            histories = db.historyDao().getChangesSince(lastSync = lastSyncTime),
+            categories = db.categoryDao().getChangesSince(lastSync = lastSyncTime),
+            installments = db.installmentDao().getChangesSince(lastSync = lastSyncTime),
+            repeatCycles = db.repeatCycleDao().getChangesSince(lastSync = lastSyncTime),
+            paymentMethods = db.paymentMethodDao().getChangesSince(lastSync = lastSyncTime),
+            paymentMethodGroups = db.paymentMethodGroupDao().getChangesSince(lastSync = lastSyncTime)
         )
-        
+
         val jsonString = json.encodeToString(SyncPayload.serializer(), payload)
-        Napier.d("업로드 페이로드 생성 (${if(isCloudSync) "Cloud" else "Shared"}): histories=${payload.histories.size}건")
-        
+        Napier.d("페이로드 생성 (시점: $lastSyncTime): histories=${payload.histories.size}건")
+
         return jsonString.encodeToByteArray()
     }
 
     private suspend fun mergePayload(payload: SyncPayload) {
         val db = databaseProvider.database
-        // 1. 카테고리 등 기초 데이터 우선 병합 (외래 키 고려)
         if (payload.categories.isNotEmpty()) db.categoryDao().upsertAll(payload.categories)
         if (payload.paymentMethodGroups.isNotEmpty()) db.paymentMethodGroupDao().upsertAll(payload.paymentMethodGroups)
         if (payload.paymentMethods.isNotEmpty()) db.paymentMethodDao().upsertAll(payload.paymentMethods)
         if (payload.repeatCycles.isNotEmpty()) db.repeatCycleDao().upsertAll(payload.repeatCycles)
         if (payload.installments.isNotEmpty()) db.installmentDao().upsertAll(payload.installments)
-        
-        // 2. 가계부 내역 병합
         if (payload.histories.isNotEmpty()) db.historyDao().upsertAll(payload.histories)
     }
 }

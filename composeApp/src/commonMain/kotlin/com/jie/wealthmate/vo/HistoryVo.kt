@@ -21,6 +21,8 @@ data class HistoryVo(
     val categoryTag: CategoryTagVo?,
     val paymentMethod: PaymentMethodVo?,
     val content: String?,
+    val isVisibility: Boolean,
+    val userId: String?,
 ) {
     companion object {
         fun HistoryWithDetails?.mapperToVo() = HistoryVo(
@@ -34,6 +36,8 @@ data class HistoryVo(
             categoryTag = this?.category?.mapperToVo()?.tags?.find { it.id == this.history.categoryTagId },
             paymentMethod = this?.paymentMethod?.mapperToVo(),
             content = this?.history?.content,
+            isVisibility = this?.history?.isVisibility ?: true,
+            userId = this?.history?.userId
         )
     }
 }

@@ -3,8 +3,13 @@
 package com.jie.wealthmate.repository
 
 import com.benasher44.uuid.uuid4
+import com.jie.wealthmate.entity.GoogleAuthEntity
 import com.russhwolf.settings.Settings
+import io.github.aakira.napier.Napier
 import kotlin.time.ExperimentalTime
+
+// 플랫폼별로 다르게 동작할 silentSignIn의 실제 구현부
+expect suspend fun platformSilentSignIn(): GoogleAuthEntity?
 
 class AuthRepositoryImpl(
     private val settings: Settings,
@@ -20,34 +25,16 @@ class AuthRepositoryImpl(
         private const val KEY_LAST_SHARED_SYNC_TIME = "last_shared_sync_time"
     }
 
-
-    fun clear() {
-        settings.remove(KEY_ACCESS_TOKEN)
-        settings.remove(KEY_REFRESH_TOKEN)
-    }
-
-    // 1. 토큰 저장
     override fun saveAuthData(accessToken: String, refreshToken: String?, email: String?) {
         settings.putString(KEY_ACCESS_TOKEN, accessToken)
         refreshToken?.let { settings.putString(KEY_REFRESH_TOKEN, it) }
         email?.let { settings.putString(KEY_USER_NAME, it) }
-
     }
 
-    // 2. 토큰 가져오기
-    override fun getAccessToken(): String? {
-        val token = settings.getStringOrNull(KEY_ACCESS_TOKEN)
-        println("token::: $token")
-        return token
-    }
+    override fun getAccessToken(): String? = settings.getStringOrNull(KEY_ACCESS_TOKEN)
 
+    override fun isLoggedIn(): Boolean = getAccessToken() != null
 
-    // 3. 로그인 여부 확인
-    override fun isLoggedIn(): Boolean {
-        return getAccessToken() != null
-    }
-
-    // 4. 로그아웃 (토큰 삭제)
     override fun clearAuthData() {
         settings.remove(KEY_ACCESS_TOKEN)
         settings.remove(KEY_REFRESH_TOKEN)
@@ -55,20 +42,10 @@ class AuthRepositoryImpl(
     }
 
     override fun getRefreshToken() = settings.getStringOrNull(KEY_REFRESH_TOKEN)
-
     override fun getUserName() = settings.getStringOrNull(KEY_USER_NAME)
-
-
-    override fun saveSharedFolderId(folderId: String) {
-        settings.putString(KEY_SHARED_FOLDER_ID, folderId)
-    }
-
+    override fun saveSharedFolderId(folderId: String) { settings.putString(KEY_SHARED_FOLDER_ID, folderId) }
     override fun getSharedFolderId() = settings.getStringOrNull(KEY_SHARED_FOLDER_ID)
 
-    /**
-     * 기기 고유 ID를 가져옵니다.
-     * 앱 최초 실행 시 UUID를 생성하여 Settings에 저장하고, 이후에는 저장된 값을 반환합니다.
-     */
     override fun getDeviceId(): String {
         val savedDeviceId = settings.getStringOrNull(KEY_DEVICE_ID)
         return if (savedDeviceId != null) {
@@ -80,20 +57,26 @@ class AuthRepositoryImpl(
         }
     }
 
-    override fun saveLastSyncTime(time: Long) {
-        settings.putLong(KEY_LAST_SYNC_TIME, time)
-    }
+    override fun saveLastSyncTime(time: Long) { settings.putLong(KEY_LAST_SYNC_TIME, time) }
+    override fun getLastSyncTime(): Long = settings.getLong(KEY_LAST_SYNC_TIME, 0L)
+    override fun saveLastSharedSyncTime(time: Long) { settings.putLong(KEY_LAST_SHARED_SYNC_TIME, time) }
+    override fun getLastSharedSyncTime(): Long = settings.getLong(KEY_LAST_SHARED_SYNC_TIME, 0L)
 
-    override fun getLastSyncTime(): Long {
-        return settings.getLong(KEY_LAST_SYNC_TIME, 0L)
+    override suspend fun silentSignIn(): GoogleAuthEntity? {
+        return try {
+            Napier.d("Attempting silent sign-in via platform implementation...")
+            val result = platformSilentSignIn()
+            if (result != null) {
+                // 성공 시 새로운 토큰 저장
+                saveAuthData(
+                    accessToken = result.accessToken,
+                    refreshToken = result.refreshToken ?: getRefreshToken()
+                )
+            }
+            result
+        } catch (e: Exception) {
+            Napier.e("Silent sign-in failed", e)
+            null
+        }
     }
-
-    override fun saveLastSharedSyncTime(time: Long) {
-        settings.putLong(KEY_LAST_SHARED_SYNC_TIME, time)
-    }
-
-    override fun getLastSharedSyncTime(): Long {
-        return settings.getLong(KEY_LAST_SHARED_SYNC_TIME, 0L)
-    }
-
 }

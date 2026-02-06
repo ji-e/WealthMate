@@ -64,11 +64,7 @@ class HttpClientFactory(
 
                     refreshTokens {
                         val refreshToken = authRepository.getRefreshToken()
-                        if (refreshToken == null) {
-                            Napier.e("Refresh token is null, cannot refresh")
-                            return@refreshTokens null
-                        }
-
+                        
                         Napier.d("Attempting to refresh token...")
                         try {
                             val refreshClient = HttpClient {
@@ -77,47 +73,59 @@ class HttpClientFactory(
                                 }
                             }
 
-                            val response =
-                                refreshClient.post("https://oauth2.googleapis.com/token") {
-                                    contentType(ContentType.Application.FormUrlEncoded)
-                                    setBody(FormDataContent(Parameters.build {
-                                        append("grant_type", "refresh_token")
-                                        append("refresh_token", refreshToken)
-                                        append("client_id", GoogleRepositoryImpl.CLIENT_ID)
-                                        append("client_secret", GoogleRepositoryImpl.CLIENT_SECRET)
-                                    }))
+                            // 1. 리프레시 토큰으로 먼저 시도
+                            if (refreshToken != null) {
+                                val response =
+                                    refreshClient.post("https://oauth2.googleapis.com/token") {
+                                        contentType(ContentType.Application.FormUrlEncoded)
+                                        setBody(FormDataContent(Parameters.build {
+                                            append("grant_type", "refresh_token")
+                                            append("refresh_token", refreshToken)
+                                            append("client_id", GoogleRepositoryImpl.CLIENT_ID)
+                                            append("client_secret", GoogleRepositoryImpl.CLIENT_SECRET)
+                                        }))
+                                    }
+
+                                if (response.status.value == 200) {
+                                    val newAuth = response.body<GoogleAuthEntity>()
+                                    Napier.d("Token refresh successful via Refresh Token")
+
+                                    val newAccessToken = newAuth.accessToken
+                                    val newRefreshToken = newAuth.refreshToken ?: refreshToken
+
+                                    authRepository.saveAuthData(
+                                        accessToken = newAccessToken,
+                                        refreshToken = newRefreshToken,
+                                    )
+                                    return@refreshTokens BearerTokens(newAccessToken, newRefreshToken)
+                                } else {
+                                    val errorBody = response.bodyAsText()
+                                    Napier.e("Token refresh failed via Refresh Token: $errorBody")
                                 }
-
-                            if (response.status.value == 200) {
-                                val newAuth = response.body<GoogleAuthEntity>()
-                                Napier.d("Token refresh successful")
-
-                                val newAccessToken = newAuth.accessToken
-                                val newRefreshToken = newAuth.refreshToken ?: refreshToken
-
-                                authRepository.saveAuthData(
-                                    accessToken = newAccessToken,
-                                    refreshToken = newRefreshToken,
-                                )
-                                BearerTokens(newAccessToken, newRefreshToken)
-                            } else {
-                                val errorBody = response.bodyAsText()
-                                Napier.e("Token refresh failed with status ${response.status}: $errorBody")
-                                // 여기서 바로 clearAuthData를 호출하면 무한 루프나 원치 않는 로그아웃이 발생할 수 있으므로 신중해야 합니다.
-                                // 400이나 401 에러인 경우 리프레시 토큰 자체가 무효화된 것일 수 있습니다.
-                                if (response.status.value in 400..401) {
-                                    authRepository.clearAuthData()
-                                }
-                                null
                             }
+
+                            // 2. 리프레시 토큰이 없거나 실패한 경우 Silent Sign-In 시도
+                            Napier.d("Attempting silent sign-in...")
+                            val silentAuth = authRepository.silentSignIn()
+                            if (silentAuth != null) {
+                                Napier.d("Silent sign-in successful")
+                                return@refreshTokens BearerTokens(
+                                    silentAuth.accessToken,
+                                    silentAuth.refreshToken ?: refreshToken ?: ""
+                                )
+                            }
+
+                            // 3. 모든 시도가 실패하면 로그아웃 처리
+                            Napier.e("All token refresh attempts failed. Clearing auth data.")
+                            authRepository.clearAuthData()
+                            null
                         } catch (e: Exception) {
-                            Napier.e("Exception during token refresh", e)
+                            Napier.e("Exception during token refresh process", e)
                             null
                         }
                     }
 
                     sendWithoutRequest { request ->
-                        // googleapis.com 호스트를 포함하되, 토큰 갱신 엔드포인트는 제외 (무한 루프 및 인증 오류 방지)
                         val isGoogleApi = request.url.host.contains("googleapis.com")
                         val isTokenEndpoint = request.url.encodedPath.contains("/token")
                         isGoogleApi && !isTokenEndpoint

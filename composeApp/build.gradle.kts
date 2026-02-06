@@ -21,6 +21,8 @@ kotlin {
             baseName = "ComposeApp"
             isStatic = true
             linkerOpts.add("-lsqlite3")
+            // shared 모듈의 클래스들을 Swift에 노출
+            export(projects.shared)
         }
     }
     
@@ -44,7 +46,7 @@ kotlin {
             implementation(libs.compose.components.resources)
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
-            implementation(projects.shared)
+            api(projects.shared) // implementation 대신 api 사용
 
             implementation(libs.bundles.ktor.common)
             implementation(libs.kotlinx.serialization.json)

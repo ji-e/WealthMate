@@ -22,6 +22,7 @@ data class HistoryEntity(
     val paymentMethodId: String? = null,
     val content: String? = null,
     val isVisibility: Boolean = true,
+    val userId: String? = null,
     val updatedAt: Long = Clock.System.now().toEpochMilliseconds(),
     val isDeleted: Boolean = false,
 )

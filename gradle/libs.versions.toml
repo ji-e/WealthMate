@@ -16,6 +16,7 @@ composeHotReload = "1.0.0"
 composeMultiplatform = "1.10.0"
 composeMaterial3 = "1.9.0"
 
+googlePlayServicesAuth = "21.5.0"
 junit = "4.13.2"
 kotlin = "2.3.0"
 kotlinx-coroutines = "1.10.2"
@@ -53,6 +54,7 @@ google-services = "4.4.4"
 
 
 [libraries]
+google-play-services-auth = { module = "com.google.android.gms:play-services-auth", version.ref = "googlePlayServicesAuth" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 kotlin-testJunit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }
 junit = { module = "junit:junit", version.ref = "junit" }
