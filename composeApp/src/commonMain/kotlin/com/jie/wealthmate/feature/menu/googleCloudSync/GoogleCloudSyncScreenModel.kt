@@ -43,23 +43,16 @@ class GoogleCloudSyncScreenModel(
         }
     }
 
-    fun getToken(authCode: String?, email: String) {
-        authCode ?: return
+    fun updateUser(accessToken: String?, email: String) {
+        fun updateUser(accessToken: String?, email: String) {
+            authRepository.saveAuthData(accessToken.default(), null, email)
+        }
 
-        launchSafe(
-            block = {
-                googleRepository.fetchGoogleAuth(
-                    authCode = authCode,
-                    email = email
-                )
-            }
-        ) { response ->
-            reduceState { state ->
-                state.copy(
-                    isLoggedIn = response?.accessToken != null,
-                    userName = email
-                )
-            }
+        reduceState { state ->
+            state.copy(
+                isLoggedIn = accessToken != null,
+                userName = email
+            )
         }
     }
 
@@ -69,7 +62,7 @@ class GoogleCloudSyncScreenModel(
     fun upload() {
         launchSafe(
             block = {
-                syncManager.syncToCloud()
+                syncManager.syncFullToCloud()
                     .onSuccess {
                         showSnackbar(message = "클라우드에 저장되었습니다")
                     }

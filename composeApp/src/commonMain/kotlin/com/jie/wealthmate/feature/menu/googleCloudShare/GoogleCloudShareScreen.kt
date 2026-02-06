@@ -130,8 +130,8 @@ class GoogleCloudShareScreen() : BaseScreen() {
                         .padding(horizontal = 28.dp)
                         .padding(top = 32.dp)
                 ) { googleUser ->
-                    screenModel.getToken(
-                        authCode = googleUser.serverAuthCode,
+                    screenModel.updateUser(
+                        accessToken = googleUser.accessToken,
                         email = googleUser.email.default()
                     )
                 }

@@ -96,9 +96,10 @@ class MenuScreen(val calculateBottomPadding: Dp) : Screen {
                         onGoogleSignInResult = { googleUser ->
                             println("googleUser::: $googleUser")
                             label = googleUser?.email.default()
-                            screenModel.getToken(
-                                authCode = googleUser?.serverAuthCode,
-                                email = googleUser?.email.default()
+
+                            screenModel.updateUser(
+                                accessToken = googleUser?.accessToken.default(),
+                                email =googleUser?.email.default()
                             )
                         },
                         scopes = listOf(

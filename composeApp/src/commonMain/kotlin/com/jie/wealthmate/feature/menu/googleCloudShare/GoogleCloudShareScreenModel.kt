@@ -76,25 +76,19 @@ class GoogleCloudShareScreenModel(
         }
     }
 
-    fun getToken(authCode: String?, email: String) {
-        authCode ?: return
+    fun updateUser(accessToken: String?, email: String) {
+        fun updateUser(accessToken: String?, email: String) {
+            authRepository.saveAuthData(accessToken.default(), null, email)
+        }
 
-        launchSafe(
-            block = {
-                googleRepository.fetchGoogleAuth(
-                    authCode = authCode,
-                    email = email
-                )
-            }
-        ) { response ->
-            reduceState { state ->
-                state.copy(
-                    isLoggedIn = response?.accessToken != null,
-                    userName = email
-                )
-            }
+        reduceState { state ->
+            state.copy(
+                isLoggedIn = accessToken != null,
+                userName = email
+            )
         }
     }
+
 
     fun createShareFolder() {
         launchSafe(
@@ -118,7 +112,7 @@ class GoogleCloudShareScreenModel(
     fun uploadMyDataToSharedFolder() {
         launchSafe(
             block = {
-                syncManager.syncToSharedFolder()
+                syncManager.syncFullToSharedFolder()
             }
         ) {
             Napier.d("내 데이터를 공유 폴더에 성공적으로 업로드했습니다.")

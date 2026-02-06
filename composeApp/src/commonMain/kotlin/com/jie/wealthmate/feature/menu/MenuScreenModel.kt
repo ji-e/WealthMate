@@ -37,17 +37,14 @@ class MenuScreenModel(
         }
     }
 
-    fun getToken(authCode: String?, email: String) {
-        authCode ?: return
+    fun updateUser(accessToken: String?, email: String) {
+        authRepository.saveAuthData(accessToken.default(), null, email)
 
-        launchSafe(
-            block = {
-                googleRepository.fetchGoogleAuth(
-                    authCode = authCode,
-                    email = email
-                )
-            }
-        ) {}
+        reduceState { state ->
+            state.copy(
+                userName = email
+            )
+        }
     }
 
 }
