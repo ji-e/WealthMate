@@ -140,7 +140,7 @@ class MenuScreen(val calculateBottomPadding: Dp) : Screen {
                     }
                 }
 
-                Spacer(modifier = Modifier.height(20.dp))
+                Spacer(modifier = Modifier.height(28.dp))
             }
         }
     }
