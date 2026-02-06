@@ -53,13 +53,14 @@ kotlin {
             implementation(libs.uuid4)
 
             implementation(libs.bundles.ktor.common)
-            implementation(libs.kmpAuth.google)
-            implementation(libs.kmpAuth.uihelper)
+            implementation(libs.bundles.kmpAuth.common)
             implementation(libs.okio)
 
             implementation(libs.multiplatform.settings)
 
             implementation(libs.napier)
+
+            implementation(libs.bundles.firebase.common)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "808791516955",
+    "project_id": "wealthmate-4192e",
+    "storage_bucket": "wealthmate-4192e.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:808791516955:android:d83347a009c298eb1715be",
+        "android_client_info": {
+          "package_name": "com.jie.wealthmate"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBU5zhJP5x_c9d1yxbYNnpz0TxwH-ZjlEs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

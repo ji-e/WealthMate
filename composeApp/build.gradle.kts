@@ -7,6 +7,7 @@ plugins {
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.composeHotReload)
     alias(libs.plugins.kotlinx.atomicfu)
+    alias(libs.plugins.google.services)
 }
 
 kotlin {
@@ -61,11 +62,12 @@ kotlin {
 
             implementation(libs.compottie)
 
-            implementation(libs.kmpAuth.google)
-            implementation(libs.kmpAuth.uihelper)
+            implementation(libs.bundles.kmpAuth.common)
             implementation(libs.multiplatform.settings)
 
             implementation(libs.napier)
+
+            implementation(libs.bundles.firebase.common)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

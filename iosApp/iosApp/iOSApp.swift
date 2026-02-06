@@ -1,6 +1,7 @@
 import SwiftUI
 import ComposeApp
 import GoogleSignIn
+import Firebase
 
 // 1. 반드시 클래스 선언이 struct iOSApp 밖에 있어야 합니다.
 class AppDelegate: NSObject, UIApplicationDelegate {
@@ -21,6 +22,7 @@ struct iOSApp: App {
         // 1단계에서 만든 KoinInitializerKt 파일을 통해 initKoin() 함수를 호출합니다.
         // Kotlin의 top-level 함수는 {파일이름}Kt 클래스의 static 메소드로 변환됩니다.
         KoinInitializerKt.doInitKoin()
+        FirebaseApp.configure()
     }
 
     var body: some Scene {
