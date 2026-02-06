@@ -7,10 +7,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.sp
+import com.jie.wealthmate.theme.ColorGray
 import com.jie.wealthmate.theme.wantedSansFontFamily
 
 @Composable
@@ -63,5 +66,46 @@ fun WMText(
         textDecoration = textDecoration,
         fontFamily = wantedSansFontFamily(),
         autoSize = autoSize
+    )
+}
+
+
+@Composable
+fun HeadLineText(
+    modifier: Modifier = Modifier,
+    text: String,
+) {
+    WMText(
+        text = text,
+        style = Typography().titleMedium.copy(
+            fontSize = 20.sp,
+            fontWeight = FontWeight.SemiBold,
+            lineHeight = 32.sp
+        ),
+        modifier = modifier
+    )
+}
+
+@Composable
+fun InfoText(
+    modifier: Modifier = Modifier,
+    text: String,
+) {
+    WMText(
+        text = text,
+        style = Typography().bodyMedium.copy(color = ColorGray.Gray_500),
+        modifier = modifier
+    )
+}
+
+@Composable
+fun LabelText(
+    modifier: Modifier = Modifier,
+    text: String,
+) {
+    WMText(
+        text = text,
+        style = Typography().titleSmall.copy(fontWeight = FontWeight.SemiBold),
+        modifier = modifier
     )
 }
