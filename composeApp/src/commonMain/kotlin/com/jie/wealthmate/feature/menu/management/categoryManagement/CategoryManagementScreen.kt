@@ -35,6 +35,7 @@ import com.jie.wealthmate.feature.menu.management.categoryManagement.component.C
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.feature.menu.management.categoryManagement.modifyCategory.ModifyCategoryScreen
 import com.jie.wealthmate.theme.ColorGray
+import com.jie.wealthmate.utils.default
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 import wealthmate.composeapp.generated.resources.Res
@@ -67,7 +68,7 @@ class CategoryManagementScreen : BaseScreen() {
         }
 
         val isAddItemEnabled by remember {
-            derivedStateOf { uiState.currentCategoryItems.size < 15 }
+            derivedStateOf { uiState.currentCategoryItems?.size.default() < 15 }
         }
 
         val onBack: () -> Unit = remember(isDragging) {
@@ -131,7 +132,7 @@ class CategoryManagementScreen : BaseScreen() {
                 beyondViewportPageCount = 1
             ) { pageIndex ->
                 val categoryType = largeCategoryItems[pageIndex]
-                val items = uiState.categoryMap[categoryType] ?: emptyList()
+                val items = uiState.categoryMap[categoryType] ?: return@HorizontalPager
                 val currentListState = listStates[categoryType]!!
 
                 if (items.isEmpty()) {

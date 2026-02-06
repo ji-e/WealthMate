@@ -8,6 +8,6 @@ data class CategoryManagementUiState(
     val categoryMap: Map<LargeCategoryEnum, List<CategoryVo>> = emptyMap(),
     val currentLargeCategory: LargeCategoryEnum = LargeCategoryEnum.EXPENSES
 ) : BaseUiState {
-    val currentCategoryItems: List<CategoryVo>
-        get() = categoryMap[currentLargeCategory] ?: emptyList()
+    val currentCategoryItems: List<CategoryVo>?
+        get() = categoryMap[currentLargeCategory]
 }
