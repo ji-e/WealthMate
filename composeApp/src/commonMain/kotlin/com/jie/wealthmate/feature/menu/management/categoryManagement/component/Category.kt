@@ -17,8 +17,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Typography
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -61,7 +62,6 @@ fun ColumnScope.Category(
             .reorderable(listState),
         contentPadding = PaddingValues(vertical = 20.dp)
     ) {
-
         items(
             count = categoryItems.size,
             key = { index -> categoryItems[index].id }
@@ -70,19 +70,19 @@ fun ColumnScope.Category(
             ReorderableItem(
                 state = listState,
                 key = category.id,
-            ) {
-                if (isDragging.not()) {
-                    onIsDraggingChange(it)
+            ) { dragging ->
+                if (isDragging.not() && dragging) {
+                    onIsDraggingChange(true)
                 }
 
-                if (it) {
+                if (dragging) {
                     hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
                 }
 
                 CategoryItem(
                     data = category,
                     modifier = Modifier.then(
-                        if (it) {
+                        if (dragging) {
                             Modifier
                                 .padding(horizontal = 20.dp)
                                 .dropShadow(
@@ -96,9 +96,7 @@ fun ColumnScope.Category(
                                 )
                                 .clip(RoundedCornerShape(4.dp))
                         } else {
-                            Modifier.clickable(isDragging.not()) {
-                                onItemClick(category)
-                            }
+                            Modifier.clickable(enabled = !isDragging) { onItemClick(category) }
                         }
                     ),
                     onDragHandle = Modifier.detectReorderAfterLongPress(listState),
@@ -114,6 +112,9 @@ fun CategoryItem(
     modifier: Modifier = Modifier,
     onDragHandle: Modifier = Modifier,
 ) {
+    val typography = MaterialTheme.typography
+    val tagText = remember(data.tags) { data.tags.joinToString { it.label } }
+
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -133,7 +134,7 @@ fun CategoryItem(
             ) {
                 WMText(
                     text = data.icon,
-                    style = Typography().titleLarge
+                    style = typography.titleLarge
                 )
             }
             if (data.isFixed) {
@@ -148,7 +149,6 @@ fun CategoryItem(
             }
         }
 
-
         Column(
             modifier = Modifier
                 .weight(1f)
@@ -156,12 +156,12 @@ fun CategoryItem(
         ) {
             WMText(
                 text = data.middleLabel,
-                style = Typography().titleMedium.copy(fontWeight = FontWeight.Medium),
+                style = typography.titleMedium.copy(fontWeight = FontWeight.Medium),
                 maxLines = 1,
             )
             WMText(
-                text = data.tags.joinToString { it.label },
-                style = Typography().bodySmall.copy(color = ColorGray.Gray_500),
+                text = tagText,
+                style = typography.bodySmall.copy(color = ColorGray.Gray_500),
                 maxLines = 1,
             )
         }
@@ -173,5 +173,4 @@ fun CategoryItem(
             modifier = onDragHandle.size(28.dp)
         )
     }
-
 }

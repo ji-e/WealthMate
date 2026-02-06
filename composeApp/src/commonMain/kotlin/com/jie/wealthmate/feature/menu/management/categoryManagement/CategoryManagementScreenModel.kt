@@ -16,17 +16,29 @@ class CategoryManagementScreenModel(
         categoryRepository.getCategoriesByLargeCategory(largeCategoryEnum.name)
             .apiFlow { response ->
                 reduceState { state ->
+                    val newMap = state.categoryMap.toMutableMap()
+                    newMap[largeCategoryEnum] = response.map { it.mapperToVo() }
                     state.copy(
-                        categoryItems = response.map { it.mapperToVo() }
+                        categoryMap = newMap,
+                        currentLargeCategory = largeCategoryEnum
                     )
                 }
             }
     }
 
+    fun changeTab(largeCategoryEnum: LargeCategoryEnum) {
+        reduceState { state ->
+            state.copy(currentLargeCategory = largeCategoryEnum)
+        }
+        if (container.uiState.value.categoryMap[largeCategoryEnum] == null) {
+            getCategories(largeCategoryEnum)
+        }
+    }
+
     fun saveCategorySort() {
         launchSafe(
             block = {
-                val categoryItems = container.uiState.value.categoryItems
+                val categoryItems = container.uiState.value.currentCategoryItems
                 categoryRepository.updateCategoriesSort(
                     categoryItems.mapIndexed { index, item -> item.id to index.toLong() }
                 )
@@ -38,9 +50,14 @@ class CategoryManagementScreenModel(
     }
 
     fun handleReorderCategoryItems(from: Int, to: Int) = reduceState { state ->
-        val categoryItems = state.categoryItems.toMutableList()
-        state.copy(
-            categoryItems = categoryItems.apply { add(to, removeAt(from)) },
-        )
+        val currentItems = state.currentCategoryItems.toMutableList()
+        if (from !in currentItems.indices || to !in currentItems.indices) return@reduceState state
+        
+        currentItems.add(to, currentItems.removeAt(from))
+        
+        val newMap = state.categoryMap.toMutableMap()
+        newMap[state.currentLargeCategory] = currentItems
+        
+        state.copy(categoryMap = newMap)
     }
 }
