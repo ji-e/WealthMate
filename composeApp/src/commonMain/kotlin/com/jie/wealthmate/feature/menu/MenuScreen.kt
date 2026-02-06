@@ -19,7 +19,7 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import com.jie.wealthmate.base.collectSideEffect
 import com.jie.wealthmate.component.WMMenuButton
 import com.jie.wealthmate.component.topbar.TopBarItem
-import com.jie.wealthmate.component.topbar.WMTobBar
+import com.jie.wealthmate.component.topbar.WMTopBar
 import com.jie.wealthmate.feature.menu.component.MenuEnum
 import com.jie.wealthmate.feature.menu.component.MenuItem
 import com.jie.wealthmate.feature.menu.component.MenuItemData
@@ -66,7 +66,7 @@ class MenuScreen(val calculateBottomPadding: Dp) : Screen {
             }
         }
         Column {
-            WMTobBar(
+            WMTopBar(
                 title = TopBarItem.Title("전체 메뉴"),
                 readingItem = null
             )

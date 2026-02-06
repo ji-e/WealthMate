@@ -30,7 +30,7 @@ import com.jie.wealthmate.component.WMButton
 import com.jie.wealthmate.component.WMCheckBox
 import com.jie.wealthmate.component.textField.WMTextField
 import com.jie.wealthmate.component.topbar.TopBarItem
-import com.jie.wealthmate.component.topbar.WMTobBar
+import com.jie.wealthmate.component.topbar.WMTopBar
 import com.jie.wealthmate.feature.menu.management.categoryManagement.addCategory.component.CategoryIcon
 import com.jie.wealthmate.feature.menu.management.categoryManagement.addCategory.component.CategoryIconModalBottomSheet
 import com.jie.wealthmate.feature.menu.management.categoryManagement.addCategory.component.CategoryTag
@@ -82,7 +82,7 @@ class AddCategoryScreen(
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
-            WMTobBar(
+            WMTopBar(
                 title = TopBarItem.Title("${largeCategory.label} 카테고리 추가"),
                 readingItem = TopBarItem.ReadingItem().copy(action = { onBack() }),
             )

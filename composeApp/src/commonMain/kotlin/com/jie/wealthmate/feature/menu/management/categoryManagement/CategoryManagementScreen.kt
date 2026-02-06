@@ -28,7 +28,7 @@ import com.jie.wealthmate.component.ButtonSize
 import com.jie.wealthmate.component.WMFloatingButton
 import com.jie.wealthmate.component.reorderable.rememberReorderableLazyListState
 import com.jie.wealthmate.component.topbar.TopBarItem
-import com.jie.wealthmate.component.topbar.WMTobBar
+import com.jie.wealthmate.component.topbar.WMTopBar
 import com.jie.wealthmate.feature.menu.component.MenuEnum
 import com.jie.wealthmate.feature.menu.management.categoryManagement.addCategory.AddCategoryScreen
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.Category
@@ -96,12 +96,12 @@ class CategoryManagementScreen : BaseScreen() {
 
         Column {
             if (isDragging) {
-                WMTobBar(
+                WMTopBar(
                     title = TopBarItem.Title("${MenuEnum.CATEGORY.label} 순서 변경"),
                     readingItem = TopBarItem.ReadingItem().copy(action = { onBack() })
                 )
             } else {
-                WMTobBar(
+                WMTopBar(
                     title = TopBarItem.Title(MenuEnum.CATEGORY.title),
                     readingItem = TopBarItem.ReadingItem().copy(action = { navigator.pop() }),
                     trailingItem = listOf(

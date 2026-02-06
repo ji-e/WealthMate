@@ -2,19 +2,15 @@
 
 package com.jie.wealthmate.feature.menu.management.categoryManagement.modifyCategory
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -35,17 +31,17 @@ import cafe.adriel.voyager.navigator.internal.BackHandler
 import com.jie.wealthmate.base.BaseScreen
 import com.jie.wealthmate.base.collectSideEffect
 import com.jie.wealthmate.component.ButtonSize
-import com.jie.wealthmate.component.ButtonStyle
 import com.jie.wealthmate.component.CategoryIconEnum
 import com.jie.wealthmate.component.WMButton
 import com.jie.wealthmate.component.WMCheckBox
-import com.jie.wealthmate.component.WMModalBottomSheet
 import com.jie.wealthmate.component.textField.WMTextField
 import com.jie.wealthmate.component.topbar.TopBarItem
+import com.jie.wealthmate.component.topbar.WMTopBar
 import com.jie.wealthmate.feature.menu.management.categoryManagement.addCategory.component.CategoryIcon
 import com.jie.wealthmate.feature.menu.management.categoryManagement.addCategory.component.CategoryIconModalBottomSheet
 import com.jie.wealthmate.feature.menu.management.categoryManagement.addCategory.component.CategoryTag
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
+import com.jie.wealthmate.feature.menu.management.categoryManagement.modifyCategory.component.CategoryTagLabelModalBottomSheet
 import com.jie.wealthmate.theme.ColorRed
 import com.jie.wealthmate.theme.WMTheme
 import com.jie.wealthmate.utils.default
@@ -87,28 +83,6 @@ class ModifyCategoryScreen(
             onBack = onBack
         )
 
-        if (navigator.lastItem is ModifyCategoryScreen) {
-            SideEffect {
-                screenModel.updateTopBar(
-                    title = TopBarItem.Title("${largeCategory.label} 카테고리 수정"),
-                    readingItem = TopBarItem.ReadingItem().copy(
-                        action = { onBack() }
-                    ),
-                    trailingItem = listOf(
-                        TopBarItem.TrailingItem(
-                            iconRes = Res.drawable.ic_delete,
-                            tint = ColorRed.Red_300,
-                            action = {
-                                showRemoveDialog() {
-                                    screenModel.removeCategory()
-                                }
-                            }
-                        )
-                    )
-                )
-            }
-        }
-
         LaunchedEffect(Unit) {
             screenModel.updateInit(
                 largeCategoryEnum = largeCategory,
@@ -130,6 +104,24 @@ class ModifyCategoryScreen(
         }
 
         Column(modifier = Modifier.fillMaxSize()) {
+            WMTopBar(
+                title = TopBarItem.Title("${largeCategory.label} 카테고리 수정"),
+                readingItem = TopBarItem.ReadingItem().copy(
+                    action = { onBack() }
+                ),
+                trailingItem = listOf(
+                    TopBarItem.TrailingItem(
+                        iconRes = Res.drawable.ic_delete,
+                        tint = ColorRed.Red_300,
+                        action = {
+                            showRemoveDialog() {
+                                screenModel.removeCategory()
+                            }
+                        }
+                    )
+                )
+            )
+
             Column(
                 modifier = Modifier
                     .weight(1f)
@@ -154,7 +146,7 @@ class ModifyCategoryScreen(
                     onValueChange = screenModel::updateCategoryLabel,
                     modifier = Modifier
                         .padding(top = 32.dp)
-                        .padding(horizontal = 20.dp),
+                        .padding(horizontal = 28.dp),
                     textFieldModifier = Modifier.focusRequester(remember { FocusRequester() })
                         .onFocusChanged { focusState ->
                             isKeyboardOpen = focusState.isFocused
@@ -169,8 +161,8 @@ class ModifyCategoryScreen(
                 // 카테고리 태그
                 CategoryTag(
                     modifier = Modifier
-                        .padding(top = 20.dp)
-                        .padding(horizontal = 20.dp),
+                        .padding(top = 4.dp)
+                        .padding(horizontal = 28.dp),
                     textFieldModifier = Modifier.focusRequester(remember { FocusRequester() })
                         .onFocusChanged { focusState ->
                             isKeyboardOpen = focusState.isFocused
@@ -194,7 +186,7 @@ class ModifyCategoryScreen(
                 label = "고정 카테고리",
                 checked = uiState.isFixed,
                 modifier = Modifier
-                    .padding(start = 6.dp)
+                    .padding(start = 14.dp)
                     .padding(vertical = 8.dp)
                     .align(Alignment.Start),
                 onCheckedChange = screenModel::updateIsFixed,
@@ -205,7 +197,7 @@ class ModifyCategoryScreen(
                 text = "수정",
                 buttonSize = ButtonSize.LARGE,
                 modifier = Modifier
-                    .padding(horizontal = 20.dp)
+                    .padding(horizontal = 28.dp)
                     .padding(bottom = 20.dp)
                     .fillMaxWidth(),
                 enabled = uiState.isDataChanged,
@@ -247,65 +239,15 @@ class ModifyCategoryScreen(
         onModifyClick: () -> Unit = {},
         onDismissRequest: () -> Unit = {},
     ) {
-        val focusRequester = remember { FocusRequester() }
-
-        LaunchedEffect(Unit) {
-            if (isKeyboardOpen) {
-                focusRequester.requestFocus()
-            }
-        }
-
-        WMModalBottomSheet(
-            title = "$selectedTagLabel 상세 태그 수정",
-            onDismissRequest = onDismissRequest,
-        ) {
-            Column(
-                modifier = Modifier
-                    .padding(horizontal = 20.dp)
-                    .padding(bottom = 20.dp)
-            ) {
-                WMTextField(
-                    value = tagLabel,
-                    onValueChange = onTagLabelChange,
-                    maxLength = 15,
-                    label = "상세 태그 이름",
-                    placeholder = selectedTagLabel,
-                    supportingText = "15자 이내로 입력해 주세요.",
-                    isCount = true,
-                    textFieldModifier = Modifier.focusRequester(focusRequester)
-                )
-
-                Row(
-                    modifier = Modifier
-                        .padding(top = 20.dp)
-                        .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(4.dp)
-                ) {
-                    WMButton(
-                        text = "삭제",
-                        buttonStyle = ButtonStyle.TONAL,
-                        buttonSize = ButtonSize.LARGE,
-                        colors = ButtonDefaults.filledTonalButtonColors(
-                            containerColor = ColorRed.Red_50,
-                            contentColor = ColorRed.Red_300
-                        ),
-                        modifier = Modifier.weight(1f),
-                        onClick = {
-                            onRemoveClick()
-                            onDismissRequest()
-                        },
-                    )
-
-                    WMButton(
-                        text = "수정",
-                        buttonStyle = ButtonStyle.FILLED,
-                        buttonSize = ButtonSize.LARGE,
-                        modifier = Modifier.weight(4f),
-                        onClick = { onModifyClick() }
-                    )
-                }
-            }
-        }
+        CategoryTagLabelModalBottomSheet(
+            isKeyboardOpen = isKeyboardOpen,
+            tagLabel = tagLabel,
+            selectedTagLabel = selectedTagLabel,
+            onTagLabelChange = onTagLabelChange,
+            onRemoveClick = onRemoveClick,
+            onModifyClick = onModifyClick,
+            onDismissRequest = onDismissRequest
+        )
     }
 
     /**
