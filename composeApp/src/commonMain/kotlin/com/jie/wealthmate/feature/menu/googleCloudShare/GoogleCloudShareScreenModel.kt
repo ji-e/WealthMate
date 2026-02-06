@@ -70,7 +70,7 @@ class GoogleCloudShareScreenModel(
             reduceState { state ->
                 state.copy(
                     googleDrivePermissionVo = googleDrivePermissionVo,
-                    isOwner = googleDrivePermissionVo.permissions.find { it.emailAddress == state.userName }?.role == "owner"
+                    isOwnerMode = googleDrivePermissionVo.permissions.find { it.emailAddress == state.userName }?.role == "owner"
                 )
             }
         }
@@ -96,10 +96,29 @@ class GoogleCloudShareScreenModel(
         }
     }
 
+    fun createShareFolder() {
+        launchSafe(
+            block = {
+                val sharedFolderId = googleRepository.createSharedFolder("Wealth_Mate_Shared")
+                    ?: throw Exception("잠시 후 다시 시도해 주세요.")
+
+                fetchFilePermissions(sharedFolderId)
+                reduceState { state ->
+                    state.copy(
+                        sharedFolderId = sharedFolderId,
+                        isOwnerMode = true
+                    )
+                }
+            }
+        )
+    }
+
     /**
      * 1단계: 공유 시작 (호스트 사용자 A)
      */
     fun inviteMember() {
+        // todo
+        return
         launchSafe(
             block = {
                 val folderName = "Wealth_Mate_Shared"
@@ -118,7 +137,7 @@ class GoogleCloudShareScreenModel(
             reduceState { state ->
                 state.copy(
                     sharedFolderId = response,
-                    inviteCode = response
+                    inviteCode = TextFieldValue(response)
                 )
             }
         }
@@ -128,22 +147,13 @@ class GoogleCloudShareScreenModel(
      * 3단계: 게스트(B)의 구현: 폴더 연결
      */
     fun connectToSharedFolder() {
-        val folderId = container.uiState.value.code.text
-        Napier.e("folderId::: $folderId")
-        if (folderId.isBlank()) return
+        val folderId = container.uiState.value.inviteCode.text
 
         launchSafe(
             block = {
                 googleRepository.connectToSharedFolder(folderId)
             }
-        ) { response ->
-            reduceState { state ->
-                state.copy(
-                    sharedFolderId = folderId,
-                    dbFiles = response
-                )
-            }
-        }
+        )
     }
 
     /**
@@ -176,7 +186,7 @@ class GoogleCloudShareScreenModel(
     }
 
     private fun fetchSharedFolderFiles() {
-        val folderId = container.uiState.value.sharedFolderId ?: return
+        val folderId = container.uiState.value.sharedFolderId
         launchSafe(
             block = {
                 googleRepository.getFilesFromSharedFolder(folderId)
@@ -188,15 +198,21 @@ class GoogleCloudShareScreenModel(
         }
     }
 
+    fun updateIsGuestMode(isGuestMode: Boolean) {
+        reduceState { state ->
+            state.copy(isGuestMode = isGuestMode)
+        }
+    }
+
     fun updateEmail(email: TextFieldValue) {
         reduceState { state ->
             state.copy(email = email)
         }
     }
 
-    fun updateCode(code: TextFieldValue) {
+    fun updateInviteCode(inviteCode: TextFieldValue) {
         reduceState { state ->
-            state.copy(code = code)
+            state.copy(inviteCode = inviteCode)
         }
     }
 }

@@ -1,6 +1,7 @@
 package com.jie.wealthmate.feature.menu.googleCloudShare.component
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -23,7 +24,9 @@ import wealthmate.composeapp.generated.resources.ic_email
 
 @Composable
 fun ShareMethod(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onCreateShareFolderClick: () -> Unit,
+    onInviteClick: () -> Unit,
 ) {
     Row(
         modifier = modifier,
@@ -34,6 +37,7 @@ fun ShareMethod(
                 .weight(1f)
                 .clip(RoundedCornerShape(8.dp))
                 .background(ColorGray.Gray_50)
+                .clickable { onCreateShareFolderClick() }
                 .padding(vertical = 20.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -53,6 +57,7 @@ fun ShareMethod(
                 .weight(1f)
                 .clip(RoundedCornerShape(8.dp))
                 .background(ColorGray.Gray_50)
+                .clickable { onInviteClick() }
                 .padding(vertical = 20.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {

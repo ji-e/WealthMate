@@ -31,6 +31,7 @@ import com.jie.wealthmate.component.WMText
 import com.jie.wealthmate.component.textField.WMTextField
 import com.jie.wealthmate.component.topbar.TopBarItem
 import com.jie.wealthmate.feature.menu.component.MenuEnum
+import com.jie.wealthmate.feature.menu.googleCloudShare.component.Guest
 import com.jie.wealthmate.feature.menu.googleCloudShare.component.Owner
 import com.jie.wealthmate.feature.menu.googleCloudShare.component.ShareMethod
 import com.jie.wealthmate.feature.menu.googleCloudShare.component.SharedMemberList
@@ -87,7 +88,7 @@ class GoogleCloudShareScreen() : BaseScreen() {
                         .padding(horizontal = 28.dp)
                 )
 
-                if (uiState.isOwner) {
+                if (uiState.isOwnerMode) {
                     Owner(
                         modifier = Modifier
                             .padding(top = 4.dp)
@@ -100,16 +101,31 @@ class GoogleCloudShareScreen() : BaseScreen() {
                     )
                 }
 
-                if (uiState.sharedFolderId.isEmpty()) {
+                if (uiState.isGuestMode) {
+                    Guest(
+                        modifier = Modifier
+                            .padding(top = 4.dp)
+                            .padding(horizontal = 28.dp),
+                        inviteCode = uiState.inviteCode,
+                        onInviteCodeChange = screenModel::updateInviteCode,
+                        onInviteClick = screenModel::connectToSharedFolder,
+                    )
+                }
+
+                if (uiState.isGuestMode.not() && uiState.isOwnerMode.not()) {
                     ShareMethod(
                         modifier = Modifier
                             .padding(top = 12.dp)
-                            .padding(horizontal = 28.dp)
+                            .padding(horizontal = 28.dp),
+                        onCreateShareFolderClick = screenModel::createShareFolder,
+                        onInviteClick = { screenModel.updateIsGuestMode(true) }
                     )
-                } else {
+                }
+
+                if (uiState.sharedFolderId.isNotEmpty()) {
                     SharedMemberList(
                         permissionsItems = uiState.googleDrivePermissionVo?.permissions.default(),
-                        isOwner = uiState.isOwner,
+                        isOwner = uiState.isOwnerMode,
                         onRemoveClick = {},
                         emptyContent = {
                             EmptyListView(
