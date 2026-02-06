@@ -3,16 +3,17 @@ package com.jie.wealthmate.feature.menu.management.categoryManagement.addCategor
 import androidx.compose.ui.text.input.TextFieldValue
 import com.jie.wealthmate.base.BaseScreenModel
 import com.jie.wealthmate.component.CategoryIconEnum
-import com.jie.wealthmate.feature.menu.management.categoryManagement.component.CategoryItemData
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.repository.CategoryRepository
 import com.jie.wealthmate.vo.CategoryTagVo
+import com.jie.wealthmate.vo.CategoryVo
+import com.jie.wealthmate.vo.CategoryVo.Companion.mapperToVo
 
 class AddCategoryScreenModel(
     private val categoryRepository: CategoryRepository,
 ) : BaseScreenModel<AddCategoryUiState>() {
 
-    private var categoryItems: List<CategoryItemData> = emptyList()
+    private var categoryItems: List<CategoryVo> = emptyList()
 
     override val initialState: AddCategoryUiState
         get() = AddCategoryUiState()
@@ -100,7 +101,7 @@ class AddCategoryScreenModel(
     fun saveCategory() {
         val uiState = container.uiState.value
 
-        if (categoryItems.any { it.label == uiState.label.text }) {
+        if (categoryItems.any { it.middleLabel == uiState.label.text }) {
             showSnackbar("이미 존재하는 카테고리입니다.")
             return
         }
@@ -125,16 +126,7 @@ class AddCategoryScreenModel(
     fun getCategories(largeCategoryEnum: LargeCategoryEnum) {
         categoryRepository.getCategoriesByLargeCategory(largeCategoryEnum.name)
             .apiFlow { response ->
-                categoryItems = response.map {
-                    CategoryItemData(
-                        id = it.id,
-                        icon = it.icon,
-                        label = it.middleLabel,
-                        sort = it.sort,
-                        isFixed = it.isFixed,
-                        largeCategory = LargeCategoryEnum.creator(it.largeCategory)
-                    )
-                }
+                categoryItems = response.map { it.mapperToVo() }
             }
     }
 }

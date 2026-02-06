@@ -5,11 +5,12 @@ import com.jie.wealthmate.base.BaseScreenModel
 import com.jie.wealthmate.component.CategoryIconEnum
 import com.jie.wealthmate.database.eneity.CategoryEntity
 import com.jie.wealthmate.database.eneity.CategoryTagEntity
-import com.jie.wealthmate.feature.menu.management.categoryManagement.component.CategoryItemData
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.repository.CategoryRepository
 import com.jie.wealthmate.utils.default
 import com.jie.wealthmate.vo.CategoryTagVo
+import com.jie.wealthmate.vo.CategoryVo
+import com.jie.wealthmate.vo.CategoryVo.Companion.mapperToVo
 
 class ModifyCategoryScreenModel(
     private val categoryRepository: CategoryRepository,
@@ -17,7 +18,7 @@ class ModifyCategoryScreenModel(
     override val initialState: ModifyCategoryUiState
         get() = ModifyCategoryUiState()
 
-    private var categoryItems: List<CategoryItemData> = emptyList()
+    private var categoryItems: List<CategoryVo> = emptyList()
     private var categoryId: String = ""
 
     fun updateInit(largeCategoryEnum: LargeCategoryEnum, categoryId: String) {
@@ -196,7 +197,8 @@ class ModifyCategoryScreenModel(
 
     fun saveCategory() {
         val uiState = container.uiState.value
-        val isExisted = categoryItems.any { it.id != categoryId && it.label == uiState.label.text }
+        val isExisted =
+            categoryItems.any { it.id != categoryId && it.middleLabel == uiState.label.text }
 
         if (isExisted) {
             showSnackbar("이미 존재하는 카테고리 입니다.")
@@ -231,16 +233,7 @@ class ModifyCategoryScreenModel(
     fun getCategories(largeCategoryEnum: LargeCategoryEnum) {
         categoryRepository.getCategoriesByLargeCategory(largeCategoryEnum.name)
             .apiFlow { response ->
-                categoryItems = response.map {
-                    CategoryItemData(
-                        id = it.id,
-                        icon = it.icon,
-                        label = it.middleLabel,
-                        sort = it.sort,
-                        isFixed = it.isFixed,
-                        largeCategory = LargeCategoryEnum.creator(it.largeCategory)
-                    )
-                }
+                categoryItems = response.map { it.mapperToVo() }
             }
     }
 }

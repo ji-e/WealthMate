@@ -1,9 +1,9 @@
 package com.jie.wealthmate.feature.menu.management.categoryManagement
 
 import com.jie.wealthmate.base.BaseScreenModel
-import com.jie.wealthmate.feature.menu.management.categoryManagement.component.CategoryItemData
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.repository.CategoryRepository
+import com.jie.wealthmate.vo.CategoryVo.Companion.mapperToVo
 
 class CategoryManagementScreenModel(
     private val categoryRepository: CategoryRepository,
@@ -17,16 +17,7 @@ class CategoryManagementScreenModel(
             .apiFlow { response ->
                 reduceState { state ->
                     state.copy(
-                        categoryItems = response.map {
-                            CategoryItemData(
-                                id = it.id,
-                                icon = it.icon,
-                                label = it.middleLabel,
-                                sort = it.sort,
-                                isFixed = it.isFixed,
-                                largeCategory = LargeCategoryEnum.creator(it.largeCategory)
-                            )
-                        }
+                        categoryItems = response.map { it.mapperToVo() }
                     )
                 }
             }

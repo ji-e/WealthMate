@@ -10,7 +10,6 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -30,13 +29,12 @@ import com.jie.wealthmate.component.ButtonSize
 import com.jie.wealthmate.component.WMFloatingButton
 import com.jie.wealthmate.component.reorderable.rememberReorderableLazyListState
 import com.jie.wealthmate.component.topbar.TopBarItem
+import com.jie.wealthmate.feature.menu.component.MenuEnum
 import com.jie.wealthmate.feature.menu.management.categoryManagement.addCategory.AddCategoryScreen
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.Category
-import com.jie.wealthmate.feature.menu.management.categoryManagement.component.CategoryTap
+import com.jie.wealthmate.feature.menu.management.categoryManagement.component.CategoryTab
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.feature.menu.management.categoryManagement.modifyCategory.ModifyCategoryScreen
-import com.jie.wealthmate.feature.menu.component.MenuEnum
-import com.jie.wealthmate.feature.menu.management.categoryManagement.component.Category
 import com.jie.wealthmate.theme.ColorGray
 import com.jie.wealthmate.theme.WMTheme
 import kotlinx.coroutines.launch
@@ -79,38 +77,36 @@ class CategoryManagementScreen() : BaseScreen() {
             onBack = onBack
         )
 
-        if (navigator.lastItem is CategoryManagementScreen) {
-            SideEffect {
-                if (isDragging) {
-                    screenModel.updateTopBar(
-                        title = TopBarItem.Title("${MenuEnum.CATEGORY.label} 순서 변경"),
-                        readingItem = TopBarItem.ReadingItem().copy(
-                            action = { onBack() }
-                        )
+        LaunchedEffect(isDragging, uiState.categoryItems) {
+            if (isDragging) {
+                screenModel.updateTopBar(
+                    title = TopBarItem.Title("${MenuEnum.CATEGORY.label} 순서 변경"),
+                    readingItem = TopBarItem.ReadingItem().copy(
+                        action = { onBack() }
                     )
-                } else {
-                    val isAddItemEnabled = uiState.categoryItems.size < 10
-                    screenModel.updateTopBar(
-                        title = TopBarItem.Title(MenuEnum.CATEGORY.title),
-                        readingItem = TopBarItem.ReadingItem().copy(
-                            action = { navigator.pop() }
-                        ),
-                        trailingItem = listOf(
-                            TopBarItem.TrailingItem(
-                                iconRes = Res.drawable.ic_add,
-                                tint = if (isAddItemEnabled) ColorGray.Gray_700 else ColorGray.Gray_100,
-                                action = {
-                                    if (isAddItemEnabled.not()) return@TrailingItem
-                                    navigator.push(
-                                        AddCategoryScreen(
-                                            largeCategory = largeCategoryItems[pagerState.currentPage],
-                                        )
+                )
+            } else {
+                val isAddItemEnabled = uiState.categoryItems.size < 15
+                screenModel.updateTopBar(
+                    title = TopBarItem.Title(MenuEnum.CATEGORY.title),
+                    readingItem = TopBarItem.ReadingItem().copy(
+                        action = { navigator.pop() }
+                    ),
+                    trailingItem = listOf(
+                        TopBarItem.TrailingItem(
+                            iconRes = Res.drawable.ic_add,
+                            tint = if (isAddItemEnabled) ColorGray.Gray_700 else ColorGray.Gray_100,
+                            action = {
+                                if (isAddItemEnabled.not()) return@TrailingItem
+                                navigator.push(
+                                    AddCategoryScreen(
+                                        largeCategory = largeCategoryItems[pagerState.currentPage],
                                     )
-                                }
-                            )
+                                )
+                            }
                         )
                     )
-                }
+                )
             }
         }
 
@@ -119,7 +115,7 @@ class CategoryManagementScreen() : BaseScreen() {
         }
 
         Column {
-            CategoryTap(
+            CategoryTab(
                 pagerState = pagerState,
                 onTapClick = {
                     if (isDragging) {
@@ -168,7 +164,7 @@ class CategoryManagementScreen() : BaseScreen() {
                     text = "저장",
                     buttonSize = ButtonSize.LARGE,
                     modifier = Modifier
-                        .padding(horizontal = 20.dp)
+                        .padding(horizontal = 28.dp)
                         .padding(bottom = 20.dp)
                         .fillMaxWidth(),
                     onClick = {

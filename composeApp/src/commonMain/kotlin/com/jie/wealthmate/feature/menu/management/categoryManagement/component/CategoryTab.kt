@@ -13,7 +13,7 @@ import com.jie.wealthmate.component.WMText
 import com.jie.wealthmate.theme.ColorGray
 
 @Composable
-fun CategoryTap(
+fun CategoryTab(
     modifier: Modifier = Modifier,
     pagerState: PagerState,
     onTapClick: (Int) -> Unit = {},

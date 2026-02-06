@@ -3,10 +3,13 @@ package com.jie.wealthmate.feature.menu.management.categoryManagement.component
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -24,11 +27,8 @@ import androidx.compose.ui.graphics.shadow.Shadow
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.jie.wealthmate.component.CategoryIconEnum
 import com.jie.wealthmate.component.WMText
 import com.jie.wealthmate.component.reorderable.ReorderableItem
 import com.jie.wealthmate.component.reorderable.ReorderableLazyListState
@@ -37,7 +37,7 @@ import com.jie.wealthmate.component.reorderable.reorderable
 import com.jie.wealthmate.theme.ColorGray
 import com.jie.wealthmate.theme.ColorPrimary
 import com.jie.wealthmate.theme.ColorRed
-import com.jie.wealthmate.theme.WMTheme
+import com.jie.wealthmate.vo.CategoryVo
 import org.jetbrains.compose.resources.painterResource
 import wealthmate.composeapp.generated.resources.Res
 import wealthmate.composeapp.generated.resources.ic_drag_handle
@@ -47,10 +47,10 @@ import wealthmate.composeapp.generated.resources.ic_push_pin
 fun ColumnScope.Category(
     modifier: Modifier = Modifier,
     listState: ReorderableLazyListState,
-    categoryItems: List<CategoryItemData>,
+    categoryItems: List<CategoryVo>,
     isDragging: Boolean = false,
     onIsDraggingChange: (Boolean) -> Unit = {},
-    onItemClick: (CategoryItemData) -> Unit = {},
+    onItemClick: (CategoryVo) -> Unit = {},
 ) {
     val hapticFeedback = LocalHapticFeedback.current
 
@@ -59,7 +59,9 @@ fun ColumnScope.Category(
         modifier = modifier
             .fillMaxSize()
             .reorderable(listState),
+        contentPadding = PaddingValues(vertical = 20.dp)
     ) {
+
         items(
             count = categoryItems.size,
             key = { index -> categoryItems[index].id }
@@ -82,7 +84,7 @@ fun ColumnScope.Category(
                     modifier = Modifier.then(
                         if (it) {
                             Modifier
-                                .padding(horizontal = 12.dp)
+                                .padding(horizontal = 20.dp)
                                 .dropShadow(
                                     shape = RoundedCornerShape(4.dp),
                                     shadow = Shadow(
@@ -108,23 +110,22 @@ fun ColumnScope.Category(
 
 @Composable
 fun CategoryItem(
-    data: CategoryItemData,
+    data: CategoryVo,
     modifier: Modifier = Modifier,
     onDragHandle: Modifier = Modifier,
 ) {
     Row(
         modifier = modifier
             .fillMaxWidth()
+            .height(56.dp)
             .background(ColorGray.White)
-            .padding(
-                vertical = 14.dp,
-                horizontal = 20.dp
-            ),
+            .padding(start = 20.dp, end = 28.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Box(modifier = Modifier.width(60.dp)) {
             Box(
                 modifier = Modifier
+                    .padding(start = 8.dp)
                     .clip(CircleShape)
                     .background(data.largeCategory.backgroundColor)
                     .size(40.dp),
@@ -132,7 +133,7 @@ fun CategoryItem(
             ) {
                 WMText(
                     text = data.icon,
-                    style = Typography().bodyLarge.copy(fontSize = 28.sp)
+                    style = Typography().titleLarge
                 )
             }
             if (data.isFixed) {
@@ -141,7 +142,6 @@ fun CategoryItem(
                     contentDescription = null,
                     tint = ColorRed.Red_300,
                     modifier = Modifier
-                        .padding(start = 24.dp)
                         .size(24.dp)
                         .align(Alignment.TopStart)
                 )
@@ -149,14 +149,22 @@ fun CategoryItem(
         }
 
 
-        WMText(
-            text = data.label,
-            style = Typography().bodyLarge.copy(fontSize = 18.sp, fontWeight = FontWeight.Medium),
+        Column(
             modifier = Modifier
                 .weight(1f)
-                .padding(end = 12.dp),
-            maxLines = 1,
-        )
+                .padding(end = 12.dp)
+        ) {
+            WMText(
+                text = data.middleLabel,
+                style = Typography().titleMedium.copy(fontWeight = FontWeight.Medium),
+                maxLines = 1,
+            )
+            WMText(
+                text = data.tags.joinToString { it.label },
+                style = Typography().bodySmall.copy(color = ColorGray.Gray_500),
+                maxLines = 1,
+            )
+        }
 
         Icon(
             painter = painterResource(Res.drawable.ic_drag_handle),
@@ -166,20 +174,4 @@ fun CategoryItem(
         )
     }
 
-}
-
-@Composable
-@Preview(showBackground = true)
-private fun CategoryItemPreview() {
-    WMTheme {
-        CategoryItem(
-            CategoryItemData(
-                id = "0",
-                icon = CategoryIconEnum.CATEGORY_U1F9D0.text,
-                label = "급여",
-                sort = 1,
-                largeCategory = LargeCategoryEnum.EXPENSES
-            )
-        )
-    }
 }

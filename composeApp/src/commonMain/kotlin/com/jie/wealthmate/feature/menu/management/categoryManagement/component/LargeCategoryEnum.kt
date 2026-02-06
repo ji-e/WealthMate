@@ -5,16 +5,6 @@ import com.jie.wealthmate.theme.ColorBlue
 import com.jie.wealthmate.theme.ColorPrimary
 import com.jie.wealthmate.theme.ColorRed
 
-data class CategoryItemData(
-    val id: String,
-    val icon: String,
-    val label: String,
-    val sort: Long,
-    val isFixed: Boolean = false,
-    val largeCategory: LargeCategoryEnum,
-)
-
-
 enum class LargeCategoryEnum(
     val label: String,
     val backgroundColor: Color,
