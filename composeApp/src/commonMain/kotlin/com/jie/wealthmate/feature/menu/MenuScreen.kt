@@ -1,21 +1,15 @@
 package com.jie.wealthmate.feature.menu
 
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -23,15 +17,15 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.jie.wealthmate.base.collectSideEffect
-import com.jie.wealthmate.component.WMText
+import com.jie.wealthmate.component.WMMenuButton
 import com.jie.wealthmate.component.topbar.TopBarItem
-import com.jie.wealthmate.feature.menu.management.categoryManagement.CategoryManagementScreen
 import com.jie.wealthmate.feature.menu.component.MenuEnum
 import com.jie.wealthmate.feature.menu.component.MenuItem
 import com.jie.wealthmate.feature.menu.component.MenuItemData
 import com.jie.wealthmate.feature.menu.component.MenuTitleItem
 import com.jie.wealthmate.feature.menu.data.googleCloudShare.GoogleCloudShareScreen
 import com.jie.wealthmate.feature.menu.data.googleCloudSync.GoogleCloudSyncScreen
+import com.jie.wealthmate.feature.menu.management.categoryManagement.CategoryManagementScreen
 import com.jie.wealthmate.feature.menu.management.paymentMethodManagement.PaymentMethodManagementScreen
 import com.jie.wealthmate.theme.WMTheme
 import com.jie.wealthmate.utils.default
@@ -84,6 +78,9 @@ class MenuScreen(val calculateBottomPadding: Dp) : Screen {
                 .fillMaxSize()
                 .padding(bottom = calculateBottomPadding),
         ) {
+            item {
+                Spacer(modifier = Modifier.padding(top = 8.dp))
+            }
             items(uiState.menuEnums.size) { index ->
                 val menu = uiState.menuEnums[index]
 
@@ -106,25 +103,16 @@ class MenuScreen(val calculateBottomPadding: Dp) : Screen {
                         scopes = listOf(
                             "https://www.googleapis.com/auth/drive.appdata",
                             "https://www.googleapis.com/auth/drive.file",
-                            "https://www.googleapis.com/auth/drive.metadata.readonly" // 메타데이터 읽기
+                            "https://www.googleapis.com/auth/drive.metadata.readonly"
                         ),
                     ) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(44.dp)
-                                .clickable {
-                                    if (isLoggedIn) screenModel.logout()
-                                    else this.onClick()
-                                }
-                                .padding(horizontal = 20.dp),
-                            contentAlignment = Alignment.CenterStart
-                        ) {
-                            WMText(
-                                text = label,
-                                style = Typography().titleMedium.copy(fontWeight = FontWeight.Medium)
-                            )
-                        }
+                        WMMenuButton(
+                            label = label,
+                            onClick = {
+                                if (isLoggedIn) screenModel.logout()
+                                else this.onClick()
+                            }
+                        )
                     }
                 }
 

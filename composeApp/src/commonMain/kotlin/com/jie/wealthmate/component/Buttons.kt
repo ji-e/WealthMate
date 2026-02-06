@@ -240,7 +240,7 @@ fun WMMenuButton(
             .fillMaxWidth()
             .height(48.dp)
             .clickable { onClick() }
-            .padding(horizontal = 20.dp),
+            .padding(horizontal = 28.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         WMText(
@@ -252,7 +252,7 @@ fun WMMenuButton(
         Icon(
             painter = painterResource(Res.drawable.ic_keyboard_arrow_right),
             contentDescription = label,
-            modifier = Modifier.size(24.dp)
+            modifier = Modifier.size(28.dp)
         )
     }
 }
