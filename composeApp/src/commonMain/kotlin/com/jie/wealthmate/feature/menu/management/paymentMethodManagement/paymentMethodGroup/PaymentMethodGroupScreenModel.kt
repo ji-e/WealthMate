@@ -64,8 +64,6 @@ class PaymentMethodGroupScreenModel(
             }
         ) {
             getPaymentMethodGroups()
-            delay(300)
-            showSnackbar("결제수단 그룹이 추가되었습니다.")
         }
     }
 
@@ -76,8 +74,6 @@ class PaymentMethodGroupScreenModel(
             }
         ) {
             getPaymentMethodGroups()
-            delay(300)
-            showSnackbar("결제수단 그룹이 삭제되었습니다.")
         }
     }
 
@@ -104,8 +100,6 @@ class PaymentMethodGroupScreenModel(
             }
         ) {
             getPaymentMethodGroups()
-            delay(300)
-            showSnackbar("결제수단 그룹이 수정되었습니다.")
         }
     }
 

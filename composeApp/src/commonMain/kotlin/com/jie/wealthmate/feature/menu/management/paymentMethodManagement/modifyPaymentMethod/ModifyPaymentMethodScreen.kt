@@ -140,6 +140,7 @@ class ModifyPaymentMethodScreen(
                         onConfirmClick()
                     }
                 },
+                onGroupLabelChange = screenModel::updatePaymentMethodGroup,
                 onSuccessRemove = { screenModel.updatePaymentMethodGroup(null) },
                 onDismissRequest = { isShowPaymentMethodModalBottomSheet = false }
             )

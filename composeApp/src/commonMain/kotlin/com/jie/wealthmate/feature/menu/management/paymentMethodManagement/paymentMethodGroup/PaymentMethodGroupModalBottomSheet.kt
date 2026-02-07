@@ -42,6 +42,7 @@ fun PaymentMethodGroupModalBottomSheet(
     selectedPaymentMethodGroup: PaymentMethodGroupItemData? = null,
     onSelectClick: (PaymentMethodGroupItemData?) -> Unit,
     onRemoveClick: (onConfirmClick: () -> Unit) -> Unit,
+    onGroupLabelChange: (PaymentMethodGroupItemData?) -> Unit,
     onSuccessRemove: () -> Unit = {},
     onDismissRequest: () -> Unit,
 ) {
@@ -57,17 +58,23 @@ fun PaymentMethodGroupModalBottomSheet(
     val listState = rememberLazyListState()
 
     LaunchedEffect(paymentMethodGroupItems) {
-        tempSelectedPaymentMethodGroup = when {
-            isAdd -> paymentMethodGroupItems.find { it.label == addGroupLabel.text }
-            isRemoved -> {
-                if (selectedPaymentMethodGroup == tempSelectedPaymentMethodGroup) {
-                    onSuccessRemove()
+        tempSelectedPaymentMethodGroup =
+            when {
+                isAdd -> {
+                    paymentMethodGroupItems.find { it.label == addGroupLabel.text }
                 }
-                selectedPaymentMethodGroup
-            }
 
-            else -> tempSelectedPaymentMethodGroup
-        }
+                isRemoved -> {
+                    if (selectedPaymentMethodGroup == tempSelectedPaymentMethodGroup) {
+                        onSuccessRemove()
+                        null
+                    } else {
+                        selectedPaymentMethodGroup
+                    }
+                }
+
+                else -> tempSelectedPaymentMethodGroup
+            }
 
         val index = paymentMethodGroupItems.indexOf(tempSelectedPaymentMethodGroup)
         val movePosition = if (index <= 0) 0 else index - 1
@@ -81,7 +88,7 @@ fun PaymentMethodGroupModalBottomSheet(
 
     WMModalBottomSheet(
         title = "결제수단 그룹",
-        trailingItem = {
+        readingItem = {
             if (isModify.not() && paymentMethodGroupItems.size < 10) {
                 WMIconButton(
                     iconRes = Res.drawable.ic_add,
@@ -101,8 +108,9 @@ fun PaymentMethodGroupModalBottomSheet(
         ) {
             PaymentMethodGroupList(
                 modifier = Modifier
-                    .padding(horizontal = 20.dp)
-                    .height(160.dp),
+                    .padding(horizontal = 28.dp)
+                    .padding(bottom = 20.dp)
+                    .height(200.dp),
                 listState = listState,
                 paymentMethodGroupItems = paymentMethodGroupItems,
                 tempSelectedPaymentMethodGroup = tempSelectedPaymentMethodGroup,
@@ -120,8 +128,8 @@ fun PaymentMethodGroupModalBottomSheet(
 
                 Row(
                     modifier = Modifier
-                        .padding(horizontal = 20.dp)
-                        .padding(top = 20.dp),
+                        .padding(start = 28.dp, end = 12.dp)
+                        .padding(top = 32.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     WMTextField(
@@ -133,7 +141,6 @@ fun PaymentMethodGroupModalBottomSheet(
                         maxLength = 15,
                         label = "결제수단 그룹 이름 수정",
                         placeholder = tempSelectedPaymentMethodGroup?.label.default(),
-                        supportingText = "15자 이내로 입력해 주세요.",
                         isCount = true,
                         modifier = Modifier.weight(1f)
                     )
@@ -141,7 +148,6 @@ fun PaymentMethodGroupModalBottomSheet(
                     WMIconButton(
                         iconRes = Res.drawable.ic_delete_outline,
                         onClick = {
-                            isModify = false
                             onRemoveClick {
                                 screenModel.removePaymentMethodGroup(tempSelectedPaymentMethodGroup)
                                 isRemoved = true
@@ -156,24 +162,23 @@ fun PaymentMethodGroupModalBottomSheet(
 
                 WMTextField(
                     modifier = Modifier
-                        .padding(horizontal = 20.dp)
-                        .padding(top = 20.dp),
+                        .padding(horizontal = 28.dp)
+                        .padding(top = 32.dp),
                     value = addGroupLabel,
                     onValueChange = { addGroupLabel = it },
                     maxLength = 15,
                     label = "결제수단 그룹 추가",
                     placeholder = "포인트",
-                    supportingText = "15자 이내로 입력해 주세요.",
                     isCount = true,
                 )
             }
             // 버튼 영역 통합 및 최적화
             Row(
                 modifier = Modifier
-                    .padding(horizontal = 20.dp)
-                    .padding(top = 20.dp)
+                    .padding(horizontal = 28.dp)
+                    .padding(top = 4.dp)
                     .fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(4.dp)
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 when {
                     isModify -> {
@@ -185,6 +190,9 @@ fun PaymentMethodGroupModalBottomSheet(
                                 screenModel.updatePaymentMethodGroup(
                                     tempSelectedPaymentMethodGroup
                                 )
+                                if (tempSelectedPaymentMethodGroup?.id == selectedPaymentMethodGroup?.id) {
+                                    onGroupLabelChange(tempSelectedPaymentMethodGroup)
+                                }
                                 isModify = false
                             }
                         )
@@ -200,8 +208,12 @@ fun PaymentMethodGroupModalBottomSheet(
                     }
 
                     else -> {
+                        val isSecondaryVisible =
+                            tempSelectedPaymentMethodGroup?.id != AddPaymentMethodScreenModel.GROUP_ID_NONE &&
+                                    tempSelectedPaymentMethodGroup?.id.isNullOrEmpty().not()
+
                         ActionButtons(
-                            isSecondaryVisible = tempSelectedPaymentMethodGroup != null && tempSelectedPaymentMethodGroup?.id != AddPaymentMethodScreenModel.GROUP_ID_NONE,
+                            isSecondaryVisible = isSecondaryVisible,
                             secondaryText = "수정",
                             onSecondaryClick = { isModify = true },
                             primaryText = "선택",
@@ -238,7 +250,7 @@ fun RowScope.ActionButtons(
         text = primaryText,
         buttonStyle = ButtonStyle.FILLED,
         buttonSize = ButtonSize.LARGE,
-        modifier = Modifier.weight(4f),
+        modifier = Modifier.weight(3f),
         onClick = onPrimaryClick
     )
 }
