@@ -35,7 +35,7 @@ fun CategorySelectModalBottomSheet(
         onDismissRequest = onDismissRequest
     ) {
         CategorySelectionRow(
-            modifier = Modifier.padding(horizontal = 20.dp),
+            modifier = Modifier.padding(horizontal = 28.dp),
             title = null,
             categoryItems = categoryItems,
             selectedLargeCategory = selectedLargeCategory,
@@ -50,6 +50,7 @@ fun CategorySelectModalBottomSheet(
             buttonStyle = ButtonStyle.FILLED,
             buttonSize = ButtonSize.LARGE,
             modifier = Modifier
+                .padding(horizontal = 28.dp)
                 .padding(top = 20.dp)
                 .fillMaxWidth(),
             onClick = {
