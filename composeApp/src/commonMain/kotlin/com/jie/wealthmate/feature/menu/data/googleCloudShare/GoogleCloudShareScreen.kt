@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -15,11 +14,13 @@ import cafe.adriel.voyager.core.annotation.InternalVoyagerApi
 import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import cafe.adriel.voyager.navigator.internal.BackHandler
 import com.jie.wealthmate.base.BaseScreen
 import com.jie.wealthmate.component.HeadLineText
 import com.jie.wealthmate.component.InfoText
 import com.jie.wealthmate.component.textField.WMTextField
 import com.jie.wealthmate.component.topbar.TopBarItem
+import com.jie.wealthmate.component.topbar.WMTopBar
 import com.jie.wealthmate.feature.menu.component.GoogleLoginButton
 import com.jie.wealthmate.feature.menu.component.MenuEnum
 import com.jie.wealthmate.feature.menu.data.googleCloudShare.component.Guest
@@ -39,18 +40,27 @@ class GoogleCloudShareScreen() : BaseScreen() {
         val screenModel: GoogleCloudShareScreenModel = koinScreenModel()
         val uiState by screenModel.container.uiState.collectAsState()
 
-        LaunchedEffect(Unit) {
-            screenModel.updateTopBar(
-                title = TopBarItem.Title(MenuEnum.GOOGLE_SHARE.label),
-                readingItem = TopBarItem.ReadingItem().copy(
-                    action = { navigator.pop() }
-                ),
-            )
+        fun onBack() {
+            if (uiState.isGuestMode) {
+                screenModel.updateIsGuestMode(false)
+            } else {
+                navigator.pop()
+            }
         }
+
+        BackHandler(
+            enabled = true,
+            onBack = { onBack() }
+        )
 
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
+            WMTopBar(
+                title = TopBarItem.Title(MenuEnum.GOOGLE_SHARE.label),
+                readingItem = TopBarItem.ReadingItem().copy(action = { onBack() }),
+            )
+
             HeadLineText(
                 text = "구글 드라이브를 통해 가족, 연인과 함께\n가계부를 공유해 보세요.",
                 modifier = Modifier
