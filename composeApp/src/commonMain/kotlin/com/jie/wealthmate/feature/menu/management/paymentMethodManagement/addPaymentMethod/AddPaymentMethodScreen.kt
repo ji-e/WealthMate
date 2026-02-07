@@ -8,14 +8,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.annotation.InternalVoyagerApi
 import cafe.adriel.voyager.navigator.LocalNavigator
@@ -27,9 +25,9 @@ import com.jie.wealthmate.component.ButtonSize
 import com.jie.wealthmate.component.WMButton
 import com.jie.wealthmate.component.textField.WMTextField
 import com.jie.wealthmate.component.topbar.TopBarItem
+import com.jie.wealthmate.component.topbar.WMTopBar
 import com.jie.wealthmate.feature.menu.component.MenuEnum
 import com.jie.wealthmate.feature.menu.management.paymentMethodManagement.paymentMethodGroup.PaymentMethodGroupModalBottomSheet
-import com.jie.wealthmate.theme.WMTheme
 import com.jie.wealthmate.utils.default
 import com.jie.wealthmate.vo.PaymentMethodVo
 import org.koin.compose.koinInject
@@ -62,17 +60,6 @@ class AddPaymentMethodScreen(
             onBack = onBack
         )
 
-        if (navigator.lastItem is AddPaymentMethodScreen) {
-            SideEffect {
-                screenModel.updateTopBar(
-                    title = TopBarItem.Title("${MenuEnum.PAYMENT_METHOD.label} 추가"),
-                    readingItem = TopBarItem.ReadingItem().copy(
-                        action = { onBack() }
-                    ),
-                )
-            }
-        }
-
         LaunchedEffect(Unit) {
             screenModel.updateInit(
                 paymentMethodItems = paymentMethodItems
@@ -88,10 +75,15 @@ class AddPaymentMethodScreen(
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
+            WMTopBar(
+                title = TopBarItem.Title("${MenuEnum.PAYMENT_METHOD.label} 추가"),
+                readingItem = TopBarItem.ReadingItem().copy(action = { onBack() }),
+            )
+
             Column(
                 modifier = Modifier
                     .weight(1f)
-                    .padding(horizontal = 20.dp)
+                    .padding(horizontal = 28.dp)
             ) {
                 WMTextField(
                     value = uiState.label,
@@ -107,7 +99,7 @@ class AddPaymentMethodScreen(
                 WMTextField(
                     value = uiState.group?.label.default(),
                     onValueChange = { },
-                    modifier = Modifier.padding(top = 20.dp),
+                    modifier = Modifier.padding(top = 4.dp),
                     label = "결제수단 그룹",
                     placeholder = "신용카드",
                     readOnly = true,
@@ -119,7 +111,7 @@ class AddPaymentMethodScreen(
                 text = "저장",
                 buttonSize = ButtonSize.LARGE,
                 modifier = Modifier
-                    .padding(horizontal = 20.dp)
+                    .padding(horizontal = 28.dp)
                     .padding(bottom = 20.dp)
                     .fillMaxWidth(),
                 enabled = uiState.label.text.isNotBlank(),
@@ -140,14 +132,6 @@ class AddPaymentMethodScreen(
                 onSuccessRemove = { screenModel.updatePaymentMethodGroup(null) },
                 onDismissRequest = { isShowPaymentMethodModalBottomSheet = false }
             )
-        }
-    }
-
-    @Composable
-    @Preview(showBackground = true)
-    private fun AddPaymentMethodScreenPreview() {
-        WMTheme {
-            AddPaymentMethodScreen()
         }
     }
 }
