@@ -70,7 +70,9 @@ class GoogleCloudShareScreenModel(
             reduceState { state ->
                 state.copy(
                     googleDrivePermissionVo = googleDrivePermissionVo,
-                    isOwnerMode = googleDrivePermissionVo.permissions.find { it.emailAddress == state.userName }?.role == "owner"
+                    isOwnerMode = googleDrivePermissionVo.permissions
+                        .find { it.emailAddress.equals(state.userName, ignoreCase = true) }
+                        ?.role == "owner"
                 )
             }
         }

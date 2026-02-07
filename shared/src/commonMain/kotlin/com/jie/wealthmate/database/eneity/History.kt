@@ -1,5 +1,6 @@
 package com.jie.wealthmate.database.eneity
 
+import androidx.room.ColumnInfo
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -23,6 +24,7 @@ data class HistoryEntity(
     val content: String? = null,
     val isVisibility: Boolean = true,
     val userId: String? = null,
+    val createdAt : Long = Clock.System.now().toEpochMilliseconds(),
     val updatedAt: Long = Clock.System.now().toEpochMilliseconds(),
     val isDeleted: Boolean = false,
 )

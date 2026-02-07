@@ -35,4 +35,10 @@ interface PaymentMethodGroupDao {
      */
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun upsertAll(paymentMethodGroups: List<PaymentMethodGroupEntity>)
+
+    /**
+     * 모든 결제 수단 그룹 삭제 (백업 복원 시 사용)
+     */
+    @Query("DELETE FROM payment_method_groups")
+    suspend fun deleteAll()
 }

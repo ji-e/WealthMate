@@ -60,7 +60,7 @@ interface HistoryDao {
         SELECT * FROM histories 
         WHERE isDeleted = 0 
         AND date BETWEEN :startDate AND :endDate 
-        ORDER BY date DESC
+        ORDER BY date DESC, createdAt DESC
     """)
     fun getHistoriesByMonth(startDate: Long, endDate: Long): Flow<List<HistoryWithDetails>>
 
@@ -113,4 +113,10 @@ interface HistoryDao {
      */
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun upsertAll(histories: List<HistoryEntity>)
+
+    /**
+     * 모든 내역 삭제 (백업 복원 시 사용)
+     */
+    @Query("DELETE FROM histories")
+    suspend fun deleteAll()
 }

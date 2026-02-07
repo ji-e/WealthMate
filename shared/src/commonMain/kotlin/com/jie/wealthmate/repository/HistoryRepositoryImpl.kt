@@ -55,6 +55,7 @@ class HistoryRepositoryImpl(private val databaseProvider: DatabaseProvider) : Hi
         ) {
             val history = history.copy(
                 id = generateId(),
+                createdAt = Clock.System.now().toEpochMilliseconds(),
                 updatedAt = Clock.System.now().toEpochMilliseconds(),
             )
             dao.insertHistory(history)

@@ -70,4 +70,10 @@ interface PaymentMethodDao {
      */
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun upsertAll(paymentMethods: List<PaymentMethodEntity>)
+
+    /**
+     * 모든 결제 수단 삭제 (백업 복원 시 사용)
+     */
+    @Query("DELETE FROM payment_method")
+    suspend fun deleteAll()
 }

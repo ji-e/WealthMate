@@ -65,13 +65,72 @@ class DatabaseSyncManager(
     suspend fun syncFromCloud(): Result<Unit> = withContext(context = Dispatchers.IO) {
         return@withContext try {
             val bytes = googleRepository.downloadDatabase(syncFileName)
+            mergeBackupData(bytes)
+        } catch (e: Exception) {
+            Result.failure(exception = e)
+        }
+    }
+
+    /**
+     * 특정 백업 파일 ID를 사용하여 현재 로컬 데이터를 모두 지우고 백업 데이터로 완전히 교체합니다.
+     */
+    suspend fun restoreFromBackup(fileId: String): Result<Unit> = withContext(Dispatchers.IO) {
+        return@withContext try {
+            val bytes = googleRepository.downloadFileById(fileId)
+            overwriteWithBackupData(bytes)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    /**
+     * 로컬 데이터를 모두 삭제하고 전달받은 백업 데이터로 완전히 교체합니다.
+     */
+    suspend fun overwriteWithBackupData(bytes: ByteArray): Result<Unit> = withContext(Dispatchers.IO) {
+        return@withContext try {
+            val jsonString = bytes.decodeToString()
+            val payload = json.decodeFromString(SyncPayload.serializer(), jsonString)
+            val db = databaseProvider.database
+
+            // 모든 기존 데이터 삭제
+            db.historyDao().deleteAll()
+            db.installmentDao().deleteAll()
+            db.repeatCycleDao().deleteAll()
+            db.paymentMethodDao().deleteAll()
+            db.paymentMethodGroupDao().deleteAll()
+            db.categoryDao().deleteAll()
+
+            // 백업 데이터로 교체
+            mergePayload(payload)
+
+            // 마지막 동기화 시간도 백업 시점으로 맞춤
+            authRepository.saveLastSyncTime(payload.lastSyncTime)
+
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    /**
+     * 외부에서 전달받은 백업 데이터(ByteArray)를 현재 데이터베이스와 병합합니다.
+     */
+    suspend fun mergeBackupData(bytes: ByteArray): Result<Unit> = withContext(Dispatchers.IO) {
+        return@withContext try {
             val jsonString = bytes.decodeToString()
             val payload = json.decodeFromString(SyncPayload.serializer(), jsonString)
 
             mergePayload(payload)
-            Result.success(value = Unit)
+
+            // 병합한 데이터의 시점이 로컬보다 최신인 경우 마지막 동기화 시간 업데이트
+            val currentLastSync = authRepository.getLastSyncTime()
+            if (payload.lastSyncTime > currentLastSync) {
+                authRepository.saveLastSyncTime(payload.lastSyncTime)
+            }
+
+            Result.success(Unit)
         } catch (e: Exception) {
-            Result.failure(exception = e)
+            Result.failure(e)
         }
     }
 

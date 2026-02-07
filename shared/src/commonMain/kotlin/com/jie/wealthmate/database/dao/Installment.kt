@@ -36,4 +36,10 @@ interface InstallmentDao {
      */
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun upsertAll(installments: List<InstallmentEntity>)
+
+    /**
+     * 모든 할부 내역 삭제 (백업 복원 시 사용)
+     */
+    @Query("DELETE FROM installments")
+    suspend fun deleteAll()
 }

@@ -35,4 +35,10 @@ interface RepeatCycleDao {
      */
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun upsertAll(repeatCycles: List<RepeatCycleEntity>)
+
+    /**
+     * 모든 반복 주기 삭제 (백업 복원 시 사용)
+     */
+    @Query("DELETE FROM repeat_cycle")
+    suspend fun deleteAll()
 }
