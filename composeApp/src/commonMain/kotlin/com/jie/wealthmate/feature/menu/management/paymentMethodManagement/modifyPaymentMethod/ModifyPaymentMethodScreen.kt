@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -26,13 +25,13 @@ import com.jie.wealthmate.component.ButtonSize
 import com.jie.wealthmate.component.WMButton
 import com.jie.wealthmate.component.textField.WMTextField
 import com.jie.wealthmate.component.topbar.TopBarItem
+import com.jie.wealthmate.component.topbar.WMTopBar
 import com.jie.wealthmate.feature.menu.component.MenuEnum
 import com.jie.wealthmate.feature.menu.management.paymentMethodManagement.paymentMethodGroup.PaymentMethodGroupModalBottomSheet
-import com.jie.wealthmate.theme.ColorRed
 import com.jie.wealthmate.utils.default
 import org.koin.compose.koinInject
 import wealthmate.composeapp.generated.resources.Res
-import wealthmate.composeapp.generated.resources.ic_delete
+import wealthmate.composeapp.generated.resources.ic_delete_outline
 
 class ModifyPaymentMethodScreen(
     val paymentMethodId: String,
@@ -62,28 +61,6 @@ class ModifyPaymentMethodScreen(
             onBack = onBack
         )
 
-        if (navigator.lastItem is ModifyPaymentMethodScreen) {
-            SideEffect {
-                screenModel.updateTopBar(
-                    title = TopBarItem.Title("${MenuEnum.PAYMENT_METHOD.label} 수정"),
-                    readingItem = TopBarItem.ReadingItem().copy(
-                        action = { onBack() }
-                    ),
-                    trailingItem = listOf(
-                        TopBarItem.TrailingItem(
-                            iconRes = Res.drawable.ic_delete,
-                            tint = ColorRed.Red_300,
-                            action = {
-                                showRemoveDialog() {
-                                    screenModel.removePaymentMethod()
-                                }
-                            }
-                        )
-                    )
-                )
-            }
-        }
-
         LaunchedEffect(Unit) {
             screenModel.updateInit(
                 paymentMethodId = paymentMethodId
@@ -99,10 +76,25 @@ class ModifyPaymentMethodScreen(
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
+            WMTopBar(
+                title = TopBarItem.Title("${MenuEnum.PAYMENT_METHOD.label} 수정"),
+                readingItem = TopBarItem.ReadingItem().copy(action = { onBack() }),
+                trailingItem = listOf(
+                    TopBarItem.TrailingItem(
+                        iconRes = Res.drawable.ic_delete_outline,
+                        action = {
+                            showRemoveDialog() {
+                                screenModel.removePaymentMethod()
+                            }
+                        }
+                    )
+                )
+            )
+
             Column(
                 modifier = Modifier
                     .weight(1f)
-                    .padding(horizontal = 24.dp)
+                    .padding(horizontal = 28.dp)
             ) {
                 WMTextField(
                     value = uiState.label,
@@ -118,7 +110,7 @@ class ModifyPaymentMethodScreen(
                 WMTextField(
                     value = uiState.group?.label.default(),
                     onValueChange = { },
-                    modifier = Modifier.padding(top = 20.dp),
+                    modifier = Modifier.padding(top = 4.dp),
                     label = "결제수단 그룹",
                     placeholder = "신용카드",
                     readOnly = true,
@@ -130,7 +122,7 @@ class ModifyPaymentMethodScreen(
                 text = "저장",
                 buttonSize = ButtonSize.LARGE,
                 modifier = Modifier
-                    .padding(horizontal = 20.dp)
+                    .padding(horizontal = 28.dp)
                     .padding(bottom = 20.dp)
                     .fillMaxWidth(),
                 enabled = uiState.label.text.isNotBlank(),
