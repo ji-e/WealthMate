@@ -12,6 +12,7 @@ fun CategoryIconModalBottomSheet(
     onDismissRequest: () -> Unit,
 ) {
     WMModalBottomSheet(
+        title = "카테고리 아이콘",
         onDismissRequest = onDismissRequest,
     ) {
         CategoryIconGrid(
