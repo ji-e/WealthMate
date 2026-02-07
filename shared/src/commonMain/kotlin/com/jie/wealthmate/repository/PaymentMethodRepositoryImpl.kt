@@ -141,6 +141,7 @@ class PaymentMethodRepositoryImpl(
             methodName = "deletePaymentMethodGroup",
             params = mapOf("paymentMethodGroupId" to paymentMethodGroupId)
         ) {
+            paymentMethodDao.clearGroupId(paymentMethodGroupId)
             paymentMethodGroupDao.softDelete(paymentMethodGroupId)
         }
     }
