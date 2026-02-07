@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -31,23 +32,37 @@ import kotlin.jvm.Transient
 
 abstract class BaseScreen : Screen {
     @Transient
-    var isShowConfirmDialog = mutableStateOf(false)
+    private var _isShowConfirmDialog: MutableState<Boolean>? = null
+    val isShowConfirmDialog: MutableState<Boolean>
+        get() = _isShowConfirmDialog ?: mutableStateOf(false).also { _isShowConfirmDialog = it }
 
     @Transient
-    var confirmContent = mutableStateOf("")
+    private var _confirmContent: MutableState<String>? = null
+    val confirmContent: MutableState<String>
+        get() = _confirmContent ?: mutableStateOf("").also { _confirmContent = it }
 
     @Transient
-    var confirmDialogButtonLabel: MutableState<Pair<String?, String>> = mutableStateOf("취소" to "확인")
-
-
-    @Transient
-    var isShowSaveBackDialog = mutableStateOf(false)
-
-    @Transient
-    var isShowRemoveDialog = mutableStateOf(false)
+    private var _confirmDialogButtonLabel: MutableState<Pair<String?, String>>? = null
+    val confirmDialogButtonLabel: MutableState<Pair<String?, String>>
+        get() = _confirmDialogButtonLabel
+            ?: mutableStateOf<Pair<String?, String>>("취소" to "확인").also {
+                _confirmDialogButtonLabel = it
+            }
 
     @Transient
-    var confirmCallback = mutableStateOf({})
+    private var _isShowSaveBackDialog: MutableState<Boolean>? = null
+    val isShowSaveBackDialog: MutableState<Boolean>
+        get() = _isShowSaveBackDialog ?: mutableStateOf(false).also { _isShowSaveBackDialog = it }
+
+    @Transient
+    private var _isShowRemoveDialog: MutableState<Boolean>? = null
+    val isShowRemoveDialog: MutableState<Boolean>
+        get() = _isShowRemoveDialog ?: mutableStateOf(false).also { _isShowRemoveDialog = it }
+
+    @Transient
+    private var _confirmCallback: MutableState<() -> Unit>? = null
+    val confirmCallback: MutableState<() -> Unit>
+        get() = _confirmCallback ?: mutableStateOf({}).also { _confirmCallback = it }
 
     fun showConfirmDialog(
         isShow: Boolean,
@@ -128,7 +143,7 @@ abstract class BaseScreen : Screen {
                 modifier = Modifier
                     .clip(shape = RoundedCornerShape(20.dp))
                     .background(ColorGray.White)
-                    .height(200.dp)
+                    .heightIn(min = 180.dp)
                     .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
@@ -141,14 +156,14 @@ abstract class BaseScreen : Screen {
                     WMText(
                         text = contentText,
                         textAlign = TextAlign.Center,
-                        style = Typography().bodyMedium,
+                        style = Typography().titleMedium,
                     )
                 }
                 Row {
                     cancelLabel?.let {
                         Box(
                             modifier = Modifier
-                                .height(60.dp)
+                                .height(52.dp)
                                 .weight(1f)
                                 .background(ColorGray.Gray_50)
                                 .clickable {
@@ -164,7 +179,7 @@ abstract class BaseScreen : Screen {
                     }
                     Box(
                         modifier = Modifier
-                            .height(60.dp)
+                            .height(52.dp)
                             .weight(1f)
                             .background(confirmColor)
                             .clickable {
