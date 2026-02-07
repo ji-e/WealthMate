@@ -126,10 +126,10 @@ fun CategoryItem(
         Box(modifier = Modifier.width(60.dp)) {
             Box(
                 modifier = Modifier
-                    .padding(start = 8.dp)
                     .clip(CircleShape)
                     .background(data.largeCategory.backgroundColor)
-                    .size(40.dp),
+                    .size(40.dp)
+                    .align(Alignment.Center),
                 contentAlignment = Alignment.Center
             ) {
                 WMText(
