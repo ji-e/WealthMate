@@ -31,6 +31,14 @@ class AddHistoryScreenModel(
         getPaymentMethods()
     }
 
+    fun updateInit(selectedDate: LocalDate){
+        reduceState { state ->
+            state.copy(
+                date = selectedDate
+            )
+        }
+    }
+
     fun updateLargeCategory(largeCategory: LargeCategoryEnum) {
         reduceState { state ->
             state.copy(

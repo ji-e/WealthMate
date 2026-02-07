@@ -27,7 +27,7 @@ import com.jie.wealthmate.theme.ColorGray
 import com.jie.wealthmate.theme.ColorPrimary
 import com.jie.wealthmate.theme.WMTheme
 import com.jie.wealthmate.utils.convertLocalDateToString
-import com.jie.wealthmate.utils.formatDateHyphenYMDE
+import com.jie.wealthmate.utils.formatDateDotYYYYMDE
 import com.jie.wealthmate.utils.formatWithCommas
 import com.jie.wealthmate.utils.today
 import kotlinx.datetime.LocalDate
@@ -53,7 +53,7 @@ fun DateTextField(
 ) {
     Box(modifier = modifier) {
         WMTextField(
-            value = selectedDate.convertLocalDateToString(formatDateHyphenYMDE),
+            value = selectedDate.convertLocalDateToString(formatDateDotYYYYMDE),
             onValueChange = {},
             label = "날짜",
             readOnly = true,

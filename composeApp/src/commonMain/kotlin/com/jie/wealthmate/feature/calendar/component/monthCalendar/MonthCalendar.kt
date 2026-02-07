@@ -262,7 +262,7 @@ private fun MonthCalendarHeader(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 4.dp),
+            .padding(horizontal = 12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         TextButton(

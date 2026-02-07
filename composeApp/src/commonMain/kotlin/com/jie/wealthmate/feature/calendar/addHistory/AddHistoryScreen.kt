@@ -28,7 +28,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.annotation.InternalVoyagerApi
 import cafe.adriel.voyager.navigator.LocalNavigator
@@ -43,6 +42,7 @@ import com.jie.wealthmate.component.textField.WMTextField
 import com.jie.wealthmate.component.textField.rememberIntegerVisualTransformation
 import com.jie.wealthmate.component.textField.toIntegerTextFieldValue
 import com.jie.wealthmate.component.topbar.TopBarItem
+import com.jie.wealthmate.component.topbar.WMTopBar
 import com.jie.wealthmate.feature.calendar.addHistory.component.CategorySelectionRow
 import com.jie.wealthmate.feature.calendar.addHistory.component.DateSelectModalBottomSheet
 import com.jie.wealthmate.feature.calendar.addHistory.component.DateTextField
@@ -52,10 +52,10 @@ import com.jie.wealthmate.feature.calendar.addHistory.component.PaymentMethodMod
 import com.jie.wealthmate.feature.calendar.addHistory.component.PaymentMethodTextField
 import com.jie.wealthmate.feature.calendar.addHistory.component.RepeatCycleModalBottomSheet
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
-import com.jie.wealthmate.theme.WMTheme
+import kotlinx.datetime.LocalDate
 import org.koin.compose.koinInject
 
-class AddHistoryScreen() : BaseScreen() {
+class AddHistoryScreen(private val selectedDate: LocalDate) : BaseScreen() {
     @Composable
     override fun Content() {
         super.Content()
@@ -86,6 +86,10 @@ class AddHistoryScreen() : BaseScreen() {
 
         BackHandler(true) { onBack() }
 
+        LaunchedEffect(Unit) {
+            screenModel.updateInit(selectedDate)
+        }
+
         screenModel.collectSideEffect { sideEffect ->
             when (sideEffect) {
                 is AddHistoryUiSideEffect.OnSuccessSave -> {
@@ -94,9 +98,12 @@ class AddHistoryScreen() : BaseScreen() {
             }
         }
 
-        // 스크롤 상태에 따라 TopBar 업데이트
-        LaunchedEffect(isLargeCategoryVisible) {
-            screenModel.updateTopBar(
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .imePadding()
+        ) {
+            WMTopBar(
                 title = TopBarItem.Title("내역 추가"),
                 readingItem = TopBarItem.ReadingItem().copy(
                     action = { onBack() }
@@ -116,22 +123,15 @@ class AddHistoryScreen() : BaseScreen() {
                     }
                 } else null
             )
-        }
-
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .imePadding()
-        ) {
             Column(
                 modifier = Modifier
                     .weight(1f)
-                    .padding(horizontal = 20.dp)
+                    .padding(horizontal = 28.dp)
                     .verticalScroll(scrollState)
             ) {
                 // 수입, 지출, 저출 카테고리 선택
                 LargeCategorySelectBox(
-                    modifier = Modifier.padding(top = 8.dp),
+                    modifier = Modifier.padding(top = 4.dp),
                     selectedLargeCategory = uiState.selectedLargeCategory,
                     onLargeCategoryClick = screenModel::updateLargeCategory
                 )
@@ -201,40 +201,28 @@ class AddHistoryScreen() : BaseScreen() {
                     ),
                 )
 
-                // 카테고리 선택
-//                CategoryTextField(
-//                    selectedCategory = uiState.categoryItems.firstOrNull(), // todo temp
-//                    selectedCategoryTag = uiState.categoryItems.firstOrNull()?.tags?.firstOrNull(), // todo temp
-//                    onCategoryClick = { isShowCategorySelectModalBottomSheet = true }
-//                )
+                CategorySelectionRow(
+                    modifier = Modifier.padding(bottom = 24.dp),
+                    categoryItems = uiState.categoryItems,
+                    selectedLargeCategory = uiState.selectedLargeCategory,
+                    selectedCategory = uiState.category,
+                    selectedCategoryTag = uiState.categoryTag,
+                    onCategoryClick = screenModel::updateCategory,
+                    onCategoryTagClick = screenModel::updateCategoryTag
+                )
 
-//                CategorySelectionAllTagColumn(
-//                    categoryItems = uiState.categoryItems,
-//                    selectedCategory = uiState.categoryItems.firstOrNull(), // todo temp
-//                    selectedCategoryTag = uiState.categoryItems.firstOrNull()?.tags?.firstOrNull(), // todo temp
-//                )
-
-                if (uiState.selectedLargeCategory != LargeCategoryEnum.TRANSFER) {
-                    CategorySelectionRow(
-                        modifier = Modifier.padding(bottom = 24.dp),
-                        categoryItems = uiState.categoryItems,
+                // 결제수단/자산 선택
+                if (uiState.selectedLargeCategory == LargeCategoryEnum.EXPENSES) {
+                    PaymentMethodTextField(
                         selectedLargeCategory = uiState.selectedLargeCategory,
-                        selectedCategory = uiState.category,
-                        selectedCategoryTag = uiState.categoryTag,
-                        onCategoryClick = screenModel::updateCategory,
-                        onCategoryTagClick = screenModel::updateCategoryTag
+                        selectedPaymentMethod = uiState.paymentMethod,
+                        onPaymentMethodClick = { isShowPaymentMethodModalBottomSheet = true }
                     )
                 }
 
-                // 결제수단/자산 선택
-                PaymentMethodTextField(
-                    selectedLargeCategory = uiState.selectedLargeCategory,
-                    selectedPaymentMethod = uiState.paymentMethod,
-                    onPaymentMethodClick = { isShowPaymentMethodModalBottomSheet = true }
-                )
-
                 // 내용 입력
                 WMTextField(
+                    modifier = Modifier.padding(top = 4.dp),
                     value = uiState.content,
                     onValueChange = screenModel::updateContent,
                     label = "내용",
@@ -251,7 +239,7 @@ class AddHistoryScreen() : BaseScreen() {
                 text = "저장",
                 buttonSize = ButtonSize.LARGE,
                 modifier = Modifier
-                    .padding(horizontal = 20.dp)
+                    .padding(horizontal = 28.dp)
                     .padding(bottom = 20.dp)
                     .fillMaxWidth(),
                 enabled = uiState.isSaveButtonEnable,
@@ -291,13 +279,5 @@ class AddHistoryScreen() : BaseScreen() {
                 onDismissRequest = { isShowPaymentMethodModalBottomSheet = false }
             )
         }
-    }
-}
-
-@Composable
-@Preview(showBackground = true)
-private fun AddHistoryScreenPreview() {
-    WMTheme {
-        AddHistoryScreen().Content()
     }
 }

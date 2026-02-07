@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -28,6 +27,7 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import com.jie.wealthmate.component.WMIconButton
 import com.jie.wealthmate.component.calculateAdjustedToastPadding
 import com.jie.wealthmate.component.topbar.TopBarItem
+import com.jie.wealthmate.component.topbar.WMTopBar
 import com.jie.wealthmate.feature.calendar.addHistory.AddHistoryScreen
 import com.jie.wealthmate.feature.calendar.component.SelectedCalendarModalBottomSheet
 import com.jie.wealthmate.feature.calendar.component.listCalendar.ListCalendar
@@ -65,14 +65,6 @@ class CalendarScreen() : Screen {
 
         var isShowSelectedCalendarModalBottomSheet by remember { mutableStateOf(false) }
 
-        if (navigator.lastItem is CalendarScreen) {
-            SideEffect {
-                screenModel.updateTopBar(
-                    title = TopBarItem.Title("캘린더")
-                )
-            }
-        }
-
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -81,6 +73,10 @@ class CalendarScreen() : Screen {
             Column(
                 modifier = Modifier.fillMaxSize(),
             ) {
+                WMTopBar(
+                    title = TopBarItem.Title("캘린더")
+                )
+
                 MonthCalendar(
                     selectedMonth = uiState.selectedMonth,
                     selectedDate = uiState.selectedDate,
@@ -129,7 +125,7 @@ class CalendarScreen() : Screen {
                     .background(ColorPrimary.Primary_500)
                     .align(Alignment.BottomEnd),
                 tint = ColorGray.White,
-                onClick = { navigator.push(AddHistoryScreen()) }
+                onClick = { navigator.push(AddHistoryScreen(uiState.selectedDate)) }
             )
         }
 

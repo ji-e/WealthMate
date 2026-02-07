@@ -229,7 +229,7 @@ internal fun DayItem(
 
         WMText(
             modifier = Modifier
-                .padding(bottom = 2.dp)
+                .padding(vertical = 2.dp)
                 .background(color = dayBackgroundColor, shape = CircleShape)
                 .align(Alignment.CenterHorizontally)
                 .width(24.dp),

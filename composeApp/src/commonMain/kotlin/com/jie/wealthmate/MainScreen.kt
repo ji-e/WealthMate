@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -62,9 +61,10 @@ open class MainScreen : Screen {
         LaunchedEffect(Unit) {
             MainUiManager.sideEffect.collect { sideEffect ->
                 when (sideEffect) {
-                    is BaseUiSideEffect.ShowLoading ->{
+                    is BaseUiSideEffect.ShowLoading -> {
                         isShowLoading = sideEffect.isShowLoading
                     }
+
                     is BaseUiSideEffect.ShowSnackbar -> {
                         scope.launch {
                             snackbarState.showSnackbar(message = sideEffect.message)
@@ -107,7 +107,7 @@ open class MainScreen : Screen {
             ) { innerPadding ->
                 Column(
                     modifier = Modifier
-                        .statusBarsPadding()
+//                        .statusBarsPadding()
                         .navigationBarsPadding()
                         .fillMaxSize(),
                     horizontalAlignment = Alignment.CenterHorizontally,

@@ -34,7 +34,6 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.jie.wealthmate.component.WMText
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.theme.ColorGray
@@ -259,12 +258,7 @@ fun CategorySelectionRow(
             }
 
             LazyRow(
-                contentPadding = PaddingValues(
-                    start = 16.dp,
-                    end = 6.dp,
-                    top = 12.dp,
-                    bottom = 12.dp
-                )
+                contentPadding = PaddingValues(vertical = 12.dp, horizontal = 8.dp)
             ) {
                 items(
                     count = categoryItems.size,
@@ -343,12 +337,13 @@ private fun CategorySelectionItem(
                 modifier = Modifier
                     .clip(CircleShape)
                     .background(category.largeCategory.backgroundColor)
-                    .size(40.dp),
+                    .size(40.dp)
+                    .align(Alignment.Center),
                 contentAlignment = Alignment.Center
             ) {
                 WMText(
                     text = category.icon,
-                    style = Typography().bodyLarge.copy(fontSize = 20.sp)
+                    style = Typography().titleLarge
                 )
             }
             if (category.isFixed) {
@@ -357,7 +352,6 @@ private fun CategorySelectionItem(
                     contentDescription = null,
                     tint = ColorRed.Red_300,
                     modifier = Modifier
-                        .padding(start = 24.dp)
                         .size(24.dp)
                         .align(Alignment.TopStart)
                 )
@@ -369,9 +363,8 @@ private fun CategorySelectionItem(
                     contentDescription = null,
                     tint = ColorPrimary.Primary_500,
                     modifier = Modifier
-                        .padding(start = 30.dp)
                         .size(24.dp)
-                        .align(Alignment.BottomStart)
+                        .align(Alignment.BottomEnd)
                 )
             }
         }
@@ -379,7 +372,7 @@ private fun CategorySelectionItem(
         WMText(
             text = category.middleLabel,
             style = Typography().titleSmall,
-            modifier = Modifier.padding(top = 2.dp, end = 12.dp)
+            modifier = Modifier.padding(top = 2.dp)
         )
     }
 }
