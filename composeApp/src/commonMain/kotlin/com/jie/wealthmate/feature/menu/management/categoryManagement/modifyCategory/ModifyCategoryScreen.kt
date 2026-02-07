@@ -46,7 +46,7 @@ import com.jie.wealthmate.theme.WMTheme
 import com.jie.wealthmate.utils.default
 import org.koin.compose.koinInject
 import wealthmate.composeapp.generated.resources.Res
-import wealthmate.composeapp.generated.resources.ic_delete
+import wealthmate.composeapp.generated.resources.ic_delete_outline
 import wealthmate.composeapp.generated.resources.ic_expand_circle_right
 
 class ModifyCategoryScreen(
@@ -110,7 +110,7 @@ class ModifyCategoryScreen(
                 ),
                 trailingItem = listOf(
                     TopBarItem.TrailingItem(
-                        iconRes = Res.drawable.ic_delete,
+                        iconRes = Res.drawable.ic_delete_outline,
                         action = {
                             showRemoveDialog() {
                                 screenModel.removeCategory()

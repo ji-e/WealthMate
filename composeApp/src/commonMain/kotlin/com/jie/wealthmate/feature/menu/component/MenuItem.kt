@@ -62,7 +62,8 @@ fun MenuItem(
         Icon(
             painter = painterResource(Res.drawable.ic_keyboard_arrow_right),
             contentDescription = menu.label,
-            modifier = Modifier.size(28.dp)
+            modifier = Modifier.size(24.dp),
+            tint = ColorGray.Gray_300,
         )
     }
 }

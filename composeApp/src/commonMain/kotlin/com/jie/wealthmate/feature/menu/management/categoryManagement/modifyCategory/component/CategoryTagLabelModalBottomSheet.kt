@@ -19,7 +19,7 @@ import com.jie.wealthmate.component.WMIconButton
 import com.jie.wealthmate.component.WMModalBottomSheet
 import com.jie.wealthmate.component.textField.WMTextField
 import wealthmate.composeapp.generated.resources.Res
-import wealthmate.composeapp.generated.resources.ic_delete
+import wealthmate.composeapp.generated.resources.ic_delete_outline
 
 
 @Composable
@@ -48,7 +48,6 @@ fun CategoryTagLabelModalBottomSheet(
             modifier = Modifier.padding(bottom = 20.dp)
         ) {
 
-
             Row(
                 modifier = Modifier.padding(start = 28.dp, end = 12.dp),
                 verticalAlignment = Alignment.CenterVertically
@@ -65,7 +64,7 @@ fun CategoryTagLabelModalBottomSheet(
                 )
 
                 WMIconButton(
-                    iconRes = Res.drawable.ic_delete,
+                    iconRes = Res.drawable.ic_delete_outline,
                     onClick = {
                         onRemoveClick()
                         onDismissRequest()

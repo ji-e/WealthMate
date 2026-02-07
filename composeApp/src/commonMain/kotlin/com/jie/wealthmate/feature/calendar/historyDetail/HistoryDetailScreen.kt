@@ -48,10 +48,9 @@ import com.jie.wealthmate.feature.calendar.historyDetail.component.CategorySelec
 import com.jie.wealthmate.feature.calendar.historyDetail.component.Installment
 import com.jie.wealthmate.feature.calendar.historyDetail.component.RepeatCycle
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
-import com.jie.wealthmate.theme.ColorRed
 import org.koin.compose.koinInject
 import wealthmate.composeapp.generated.resources.Res
-import wealthmate.composeapp.generated.resources.ic_delete
+import wealthmate.composeapp.generated.resources.ic_delete_outline
 
 class HistoryDetailScreen(
     val largeCategory: LargeCategoryEnum,
@@ -95,8 +94,7 @@ class HistoryDetailScreen(
                 ),
                 trailingItem = listOf(
                     TopBarItem.TrailingItem(
-                        iconRes = Res.drawable.ic_delete,
-                        tint = ColorRed.Red_300,
+                        iconRes = Res.drawable.ic_delete_outline,
                         action = {
                             showRemoveDialog() {
                                 screenModel.removeHistory()

@@ -25,6 +25,7 @@ import wealthmate.composeapp.generated.resources.ic_close
 fun WMModalBottomSheet(
     modifier: Modifier = Modifier,
     title: String? = null,
+    readingItem: @Composable (() -> Unit)? = null,
     trailingItem: @Composable (() -> Unit)? = null,
     onDismissRequest: () -> Unit,
     content: @Composable ColumnScope.() -> Unit,
@@ -59,6 +60,16 @@ fun WMModalBottomSheet(
                         modifier = Modifier.padding(vertical = 20.dp, horizontal = 28.dp)
                     )
                 }
+
+                Box(
+                    modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 12.dp),
+                    contentAlignment = Alignment.CenterStart
+                ) {
+                    readingItem?.invoke()
+                }
+
                 Box(
                     modifier
                         .fillMaxWidth()
@@ -80,6 +91,7 @@ fun WMModalBottomSheet(
                     }
                 }
             }
+
             content()
         }
     }
