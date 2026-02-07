@@ -30,12 +30,11 @@ import com.jie.wealthmate.component.textField.WMTextField
 import com.jie.wealthmate.feature.menu.management.paymentMethodManagement.addPaymentMethod.AddPaymentMethodScreenModel
 import com.jie.wealthmate.feature.menu.management.paymentMethodManagement.addPaymentMethod.component.PaymentMethodGroupItemData
 import com.jie.wealthmate.feature.menu.management.paymentMethodManagement.addPaymentMethod.component.PaymentMethodGroupList
-import com.jie.wealthmate.theme.ColorRed
 import com.jie.wealthmate.utils.default
 import org.koin.compose.koinInject
 import wealthmate.composeapp.generated.resources.Res
 import wealthmate.composeapp.generated.resources.ic_add
-import wealthmate.composeapp.generated.resources.ic_delete
+import wealthmate.composeapp.generated.resources.ic_delete_outline
 
 @InternalVoyagerApi
 @Composable
@@ -140,8 +139,7 @@ fun PaymentMethodGroupModalBottomSheet(
                     )
 
                     WMIconButton(
-                        iconRes = Res.drawable.ic_delete,
-                        tint = ColorRed.Red_300,
+                        iconRes = Res.drawable.ic_delete_outline,
                         onClick = {
                             isModify = false
                             onRemoveClick {

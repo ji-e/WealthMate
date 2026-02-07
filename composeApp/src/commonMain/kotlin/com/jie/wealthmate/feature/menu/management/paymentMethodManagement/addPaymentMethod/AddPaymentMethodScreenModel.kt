@@ -3,19 +3,19 @@ package com.jie.wealthmate.feature.menu.management.paymentMethodManagement.addPa
 import androidx.compose.ui.text.input.TextFieldValue
 import com.jie.wealthmate.base.BaseScreenModel
 import com.jie.wealthmate.feature.menu.management.paymentMethodManagement.addPaymentMethod.component.PaymentMethodGroupItemData
-import com.jie.wealthmate.feature.menu.management.paymentMethodManagement.component.PaymentMethodItemData
 import com.jie.wealthmate.repository.PaymentMethodRepository
+import com.jie.wealthmate.vo.PaymentMethodVo
 
 class AddPaymentMethodScreenModel(
     private val paymentMethodRepository: PaymentMethodRepository,
 ) : BaseScreenModel<AddPaymentMethodUiState>() {
-    private var paymentMethodItems: List<PaymentMethodItemData> = emptyList()
+    private var paymentMethodItems: List<PaymentMethodVo> = emptyList()
 
     override val initialState: AddPaymentMethodUiState
         get() = AddPaymentMethodUiState()
 
     fun updateInit(
-        paymentMethodItems: List<PaymentMethodItemData>,
+        paymentMethodItems: List<PaymentMethodVo>,
     ) {
         this.paymentMethodItems = paymentMethodItems
     }

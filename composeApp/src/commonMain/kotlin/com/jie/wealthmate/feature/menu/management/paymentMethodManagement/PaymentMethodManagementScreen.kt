@@ -7,8 +7,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -26,12 +26,14 @@ import com.jie.wealthmate.component.ButtonSize
 import com.jie.wealthmate.component.WMFloatingButton
 import com.jie.wealthmate.component.reorderable.rememberReorderableLazyListState
 import com.jie.wealthmate.component.topbar.TopBarItem
+import com.jie.wealthmate.component.topbar.WMTopBar
 import com.jie.wealthmate.feature.menu.component.MenuEnum
 import com.jie.wealthmate.feature.menu.management.paymentMethodManagement.addPaymentMethod.AddPaymentMethodScreen
 import com.jie.wealthmate.feature.menu.management.paymentMethodManagement.component.PaymentMethod
 import com.jie.wealthmate.feature.menu.management.paymentMethodManagement.modifyPaymentMethod.ModifyPaymentMethodScreen
 import com.jie.wealthmate.theme.ColorGray
 import com.jie.wealthmate.theme.WMTheme
+import com.jie.wealthmate.utils.default
 import org.koin.compose.koinInject
 import wealthmate.composeapp.generated.resources.Res
 import wealthmate.composeapp.generated.resources.ic_add
@@ -47,6 +49,9 @@ class PaymentMethodManagementScreen() : BaseScreen() {
         val uiState by screenModel.container.uiState.collectAsState()
 
         var isDragging by remember { mutableStateOf(false) }
+        val isAddItemEnabled by remember {
+            derivedStateOf { uiState.paymentMethodItems?.size.default() < 10 }
+        }
         val listState = rememberReorderableLazyListState(
             onMove = { from, to ->
                 screenModel.handleReorderCategoryItems(
@@ -74,44 +79,39 @@ class PaymentMethodManagementScreen() : BaseScreen() {
             onBack = onBack
         )
 
-        if (navigator.lastItem is PaymentMethodManagementScreen) {
-            SideEffect {
-                if (isDragging) {
-                    screenModel.updateTopBar(
-                        title = TopBarItem.Title("${MenuEnum.PAYMENT_METHOD.label} 순서 변경"),
-                        readingItem = TopBarItem.ReadingItem().copy(
-                            action = { onBack() }
-                        )
-                    )
-                } else {
-                    val isAddItemEnabled = uiState.paymentMethodItems.size < 10
-                    screenModel.updateTopBar(
-                        title = TopBarItem.Title(MenuEnum.PAYMENT_METHOD.title),
-                        readingItem = TopBarItem.ReadingItem().copy(
-                            action = { navigator.pop() }
-                        ),
-                        trailingItem = listOf(
-                            TopBarItem.TrailingItem(
-                                iconRes = Res.drawable.ic_add,
-                                tint = if (isAddItemEnabled) ColorGray.Gray_700 else ColorGray.Gray_100,
-                                action = {
-                                    if (isAddItemEnabled.not()) return@TrailingItem
-
-                                    navigator.push(
-                                        AddPaymentMethodScreen(
-                                            paymentMethodItems = uiState.paymentMethodItems
-                                        )
-                                    )
-                                }
-                            )
-                        )
-                    )
-                }
-            }
-        }
-
         Column {
-            if (uiState.paymentMethodItems.isEmpty()) {
+            if (isDragging) {
+                WMTopBar(
+                    title = TopBarItem.Title("${MenuEnum.PAYMENT_METHOD.label} 순서 변경"),
+                    readingItem = TopBarItem.ReadingItem().copy(action = { onBack() })
+                )
+            } else {
+                WMTopBar(
+                    title = TopBarItem.Title(MenuEnum.PAYMENT_METHOD.title),
+                    readingItem = TopBarItem.ReadingItem().copy(
+                        action = { navigator.pop() }
+                    ),
+                    trailingItem = listOf(
+                        TopBarItem.TrailingItem(
+                            iconRes = Res.drawable.ic_add,
+                            tint = if (isAddItemEnabled) ColorGray.Gray_700 else ColorGray.Gray_100,
+                            action = {
+                                if (isAddItemEnabled.not()) return@TrailingItem
+
+                                navigator.push(
+                                    AddPaymentMethodScreen(
+                                        paymentMethodItems = uiState.paymentMethodItems.default()
+                                    )
+                                )
+                            }
+                        )
+                    )
+                )
+            }
+
+            uiState.paymentMethodItems ?: return@Column
+
+            if (uiState.paymentMethodItems.isNullOrEmpty()) {
                 EmptyListView(
                     modifier = Modifier.fillMaxSize().padding(20.dp),
                     contentText = "결제수단을 추가해주세요.",
@@ -119,7 +119,7 @@ class PaymentMethodManagementScreen() : BaseScreen() {
             } else {
                 PaymentMethod(
                     listState = listState,
-                    paymentMethodItems = uiState.paymentMethodItems,
+                    paymentMethodItems = uiState.paymentMethodItems.default(),
                     isDragging = isDragging,
                     onIsDraggingChange = { isDragging = it },
                     onItemClick = {
@@ -136,7 +136,7 @@ class PaymentMethodManagementScreen() : BaseScreen() {
                         text = "저장",
                         buttonSize = ButtonSize.LARGE,
                         modifier = Modifier
-                            .padding(horizontal = 20.dp)
+                            .padding(horizontal = 28.dp)
                             .padding(bottom = 20.dp)
                             .fillMaxWidth(),
                         onClick = {

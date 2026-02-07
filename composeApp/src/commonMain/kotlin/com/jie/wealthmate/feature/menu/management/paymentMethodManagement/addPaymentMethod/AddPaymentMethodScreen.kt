@@ -28,14 +28,14 @@ import com.jie.wealthmate.component.WMButton
 import com.jie.wealthmate.component.textField.WMTextField
 import com.jie.wealthmate.component.topbar.TopBarItem
 import com.jie.wealthmate.feature.menu.component.MenuEnum
-import com.jie.wealthmate.feature.menu.management.paymentMethodManagement.component.PaymentMethodItemData
 import com.jie.wealthmate.feature.menu.management.paymentMethodManagement.paymentMethodGroup.PaymentMethodGroupModalBottomSheet
 import com.jie.wealthmate.theme.WMTheme
 import com.jie.wealthmate.utils.default
+import com.jie.wealthmate.vo.PaymentMethodVo
 import org.koin.compose.koinInject
 
 class AddPaymentMethodScreen(
-    val paymentMethodItems: List<PaymentMethodItemData> = emptyList(),
+    val paymentMethodItems: List<PaymentMethodVo> = emptyList(),
 ) : BaseScreen() {
 
     @Composable
