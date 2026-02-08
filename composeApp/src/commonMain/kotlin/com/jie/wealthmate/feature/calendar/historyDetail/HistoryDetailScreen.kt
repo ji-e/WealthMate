@@ -46,8 +46,8 @@ import com.jie.wealthmate.feature.calendar.addHistory.component.RepeatCycleModal
 import com.jie.wealthmate.feature.calendar.historyDetail.component.Category
 import com.jie.wealthmate.feature.calendar.historyDetail.component.CategorySelectModalBottomSheet
 import com.jie.wealthmate.feature.calendar.historyDetail.component.Installment
-import com.jie.wealthmate.feature.calendar.historyDetail.component.RemoveInstallmentConfirmDialog
 import com.jie.wealthmate.feature.calendar.historyDetail.component.ModifyInstallmentModalBottomSheet
+import com.jie.wealthmate.feature.calendar.historyDetail.component.RemoveInstallmentConfirmDialog
 import com.jie.wealthmate.feature.calendar.historyDetail.component.RepeatCycle
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.utils.default
@@ -68,6 +68,7 @@ class HistoryDetailScreen(
         val uiState by screenModel.container.uiState.collectAsState()
 
         var isShowDateSelectModalBottomSheet by remember { mutableStateOf(false) }
+        var isShowEndDateSelectModalBottomSheet by remember { mutableStateOf(false) }
         var isShowRepeatCycleModalBottomSheet by remember { mutableStateOf(false) }
         var isShowCategorySelectModalBottomSheet by remember { mutableStateOf(false) }
         var isShowPaymentMethodModalBottomSheet by remember { mutableStateOf(false) }
@@ -165,10 +166,18 @@ class HistoryDetailScreen(
                             // 반복
                             if (history.repeatCycle != null) {
                                 RepeatCycle(
-                                    modifier = Modifier.padding(top = 4.dp, bottom = 24.dp),
+                                    modifier = Modifier.padding(top = 8.dp, bottom = 24.dp),
                                     repeatCycle = history.repeatCycle,
-                                    onModifyRepeatCycleClick = { isShowRepeatCycleModalBottomSheet = true },
-                                    onEndDateClick = { isShowDateSelectModalBottomSheet = true }
+                                    onModifyRepeatCycleClick = {
+                                        isShowRepeatCycleModalBottomSheet = true
+                                    },
+                                    onEndDateClick = { isRemoveEndDateClick ->
+                                        if (isRemoveEndDateClick) {
+                                            screenModel.updateEndDate(null)
+                                        } else {
+                                            isShowEndDateSelectModalBottomSheet = true
+                                        }
+                                    }
                                 )
                             }
                             // 할부
@@ -233,9 +242,19 @@ class HistoryDetailScreen(
 
         if (isShowDateSelectModalBottomSheet) {
             DateSelectModalBottomSheet(
+                title = if (uiState.history?.repeatCycle?.repeatCycle == null) "" else "날짜 선택",
                 selectedDate = uiState.date,
                 onSelectClick = screenModel::updateDate,
                 onDismissRequest = { isShowDateSelectModalBottomSheet = false }
+            )
+        }
+
+        if (isShowEndDateSelectModalBottomSheet) {
+            DateSelectModalBottomSheet(
+                title = "종료일 선택",
+                selectedDate = uiState.history?.repeatCycle?.endDate,
+                onSelectClick = screenModel::updateEndDate,
+                onDismissRequest = { isShowEndDateSelectModalBottomSheet = false }
             )
         }
 

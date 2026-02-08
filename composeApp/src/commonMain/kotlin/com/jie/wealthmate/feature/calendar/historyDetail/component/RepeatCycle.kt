@@ -3,6 +3,7 @@ package com.jie.wealthmate.feature.calendar.historyDetail.component
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -26,6 +27,7 @@ import com.jie.wealthmate.utils.formatDateDotYYMDE
 import com.jie.wealthmate.vo.RepeatCycleVo
 import org.jetbrains.compose.resources.painterResource
 import wealthmate.composeapp.generated.resources.Res
+import wealthmate.composeapp.generated.resources.ic_delete_outline
 import wealthmate.composeapp.generated.resources.ic_edit
 import wealthmate.composeapp.generated.resources.ic_keyboard_arrow_right
 
@@ -34,7 +36,7 @@ fun RepeatCycle(
     modifier: Modifier = Modifier,
     repeatCycle: RepeatCycleVo,
     onModifyRepeatCycleClick: () -> Unit,
-    onEndDateClick: () -> Unit,
+    onEndDateClick: (isRemoveEndDateClick: Boolean) -> Unit,
 ) {
     Column(
         modifier = modifier
@@ -85,30 +87,48 @@ fun RepeatCycle(
         }
 
         Row(
-            modifier = Modifier
-                .noRippleClickable { onEndDateClick() }
-                .fillMaxWidth()
+            modifier = Modifier.fillMaxWidth()
                 .padding(horizontal = 16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            WMText(
-                text = "종료일",
-                style = Typography().bodyMedium.copy(
-                    fontWeight = FontWeight.SemiBold,
-                    color = ColorGray.Gray_500
-                ),
-                modifier = Modifier.width(50.dp)
-            )
+            Row(
+                modifier = Modifier.noRippleClickable { onEndDateClick(false) },
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                WMText(
+                    text = "종료일",
+                    style = Typography().bodyMedium.copy(
+                        fontWeight = FontWeight.SemiBold,
+                        color = ColorGray.Gray_500
+                    ),
+                    modifier = Modifier.width(50.dp)
+                )
 
-            WMText(
-                text = repeatCycle.endDate.convertLocalDateToString(formatDateDotYYMDE, "없음"),
-            )
+                WMText(
+                    text = repeatCycle.endDate.convertLocalDateToString(formatDateDotYYMDE, "없음"),
+                )
 
-            Icon(
-                painter = painterResource(Res.drawable.ic_keyboard_arrow_right),
-                modifier = Modifier.size(18.dp),
-                contentDescription = null
-            )
+                Icon(
+                    painter = painterResource(Res.drawable.ic_keyboard_arrow_right),
+                    modifier = Modifier
+                        .padding(start = 4.dp)
+                        .size(18.dp),
+                    contentDescription = null
+                )
+            }
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            if (repeatCycle.endDate != null) {
+                Icon(
+                    painter = painterResource(Res.drawable.ic_delete_outline),
+                    modifier = Modifier
+                        .padding(start = 4.dp)
+                        .size(18.dp)
+                        .noRippleClickable() { onEndDateClick(true) },
+                    contentDescription = null
+                )
+            }
         }
     }
 

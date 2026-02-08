@@ -43,6 +43,19 @@ class HistoryDetailScreenModel(
         }
     }
 
+    fun updateEndDate(date: LocalDate?) {
+        reduceState { state ->
+            state.copy(
+                isDataChanged = true,
+                history = state.history?.copy(
+                    repeatCycle = state.history.repeatCycle?.copy(
+                        endDate = date
+                    )
+                )
+            )
+        }
+    }
+
     fun updateRepeatCycle(repeatCycle: RepeatCycleEnum?) {
         repeatCycle ?: return
         reduceState { state ->
