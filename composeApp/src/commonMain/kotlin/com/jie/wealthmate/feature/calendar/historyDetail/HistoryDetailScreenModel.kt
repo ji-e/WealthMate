@@ -4,24 +4,30 @@ import androidx.compose.ui.text.input.TextFieldValue
 import com.jie.wealthmate.base.BaseScreenModel
 import com.jie.wealthmate.database.eneity.HistoryEntity
 import com.jie.wealthmate.database.eneity.HistoryInstallment
+import com.jie.wealthmate.database.eneity.InstallmentEntity
 import com.jie.wealthmate.feature.calendar.addHistory.component.RepeatCycleEnum
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.repository.CategoryRepository
 import com.jie.wealthmate.repository.HistoryRepository
+import com.jie.wealthmate.repository.InstallmentRepository
 import com.jie.wealthmate.repository.PaymentMethodRepository
 import com.jie.wealthmate.utils.default
 import com.jie.wealthmate.utils.formatRemoveCommas
 import com.jie.wealthmate.utils.toEpochMilliseconds
+import com.jie.wealthmate.utils.toLocalDate
 import com.jie.wealthmate.vo.CategoryTagVo
 import com.jie.wealthmate.vo.CategoryVo
 import com.jie.wealthmate.vo.HistoryVo.Companion.mapperToVo
 import com.jie.wealthmate.vo.PaymentMethodVo
+import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.plus
 
 class HistoryDetailScreenModel(
     private val categoryRepository: CategoryRepository,
     private val paymentMethodRepository: PaymentMethodRepository,
     private val historyRepository: HistoryRepository,
+    private val installmentRepository: InstallmentRepository,
 ) : BaseScreenModel<HistoryDetailUiState>() {
 
     override val initialState: HistoryDetailUiState
@@ -193,7 +199,100 @@ class HistoryDetailScreenModel(
     }
 
     fun updateInstallment(totalAmount: Long, totalCount: Long) {
+        val uiState = container.uiState.value
+        val historyVo = uiState.history ?: return
+        val installmentVo = historyVo.installment ?: return
+        val installmentId = installmentVo.id
 
+        launchSafe(
+            block = {
+                // 1. 할부 정보 업데이트
+                val currentInstallment = InstallmentEntity(
+                    id = installmentId,
+                    content = installmentVo.content,
+                    amount = totalAmount,
+                    count = totalCount,
+                    startDate = installmentVo.startDate.toEpochMilliseconds(),
+                    paymentMethodId = installmentVo.paymentMethodId
+                )
+                installmentRepository.updateInstallment(currentInstallment)
+
+                // 2. 관련 내역들 재계산
+                val histories = historyRepository.getHistoriesByInstallmentId(installmentId)
+                    .sortedBy { it.installment?.installmentTime }
+
+                val baseAmount = totalAmount / totalCount
+                val remainder = totalAmount % totalCount
+
+                val updatedHistories = mutableListOf<HistoryEntity>()
+                val newHistories = mutableListOf<HistoryEntity>()
+                val historiesToDelete = mutableListOf<HistoryEntity>()
+
+                var runningRemainAmount = totalAmount
+                var lastDate = histories.firstOrNull()?.date?.toLocalDate() ?: installmentVo.startDate
+
+                for (i in 1..totalCount) {
+                    val amount = if (i == 1L) baseAmount + remainder else baseAmount
+                    runningRemainAmount -= amount
+
+                    val existingHistory = histories.find { it.installment?.installmentTime == i }
+
+                    if (existingHistory != null) {
+                        updatedHistories.add(
+                            existingHistory.copy(
+                                amount = amount,
+                                installment = existingHistory.installment?.copy(
+                                    installmentRemainAmount = runningRemainAmount
+                                )
+                            )
+                        )
+                        lastDate = existingHistory.date.toLocalDate()
+                    } else {
+                        lastDate = lastDate.plus(1, DateTimeUnit.MONTH)
+                        newHistories.add(
+                            HistoryEntity(
+                                largeCategory = historyVo.largeCategory.name,
+                                date = lastDate.toEpochMilliseconds(),
+                                amount = amount,
+                                installmentId = installmentId,
+                                installment = HistoryInstallment(
+                                    installmentTime = i,
+                                    installmentRemainAmount = runningRemainAmount
+                                ),
+                                categoryId = historyVo.category?.id,
+                                categoryTagId = historyVo.categoryTag?.id,
+                                paymentMethodId = historyVo.paymentMethod?.id,
+                                content = historyVo.content,
+                                isVisibility = historyVo.isVisibility
+                            )
+                        )
+                    }
+                }
+
+                // totalCount가 줄어든 경우 기존 내역 삭제
+                histories.forEach { history ->
+                    if (history.installment?.installmentTime.default() > totalCount) {
+                        historiesToDelete.add(history)
+                    }
+                }
+
+                // DB 작업
+                if (updatedHistories.isNotEmpty()) {
+                    historyRepository.updateHistories(updatedHistories)
+                }
+                newHistories.forEach {
+                    historyRepository.insertHistory(it)
+                }
+                historiesToDelete.forEach {
+                    historyRepository.deleteHistory(it.id)
+                }
+
+                // UI 상태 갱신
+                getHistory(historyVo.id)
+            }
+        ) {
+            showSnackbar("할부 정보가 수정되었습니다.")
+        }
     }
 
     fun saveHistory() {
