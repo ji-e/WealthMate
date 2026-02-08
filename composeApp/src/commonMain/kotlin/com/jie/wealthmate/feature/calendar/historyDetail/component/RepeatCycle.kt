@@ -1,6 +1,7 @@
 package com.jie.wealthmate.feature.calendar.historyDetail.component
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -29,6 +30,7 @@ import org.jetbrains.compose.resources.painterResource
 import wealthmate.composeapp.generated.resources.Res
 import wealthmate.composeapp.generated.resources.ic_delete_outline
 import wealthmate.composeapp.generated.resources.ic_edit
+import wealthmate.composeapp.generated.resources.ic_error_outline
 import wealthmate.composeapp.generated.resources.ic_keyboard_arrow_right
 
 @Composable
@@ -43,8 +45,10 @@ fun RepeatCycle(
             .fillMaxWidth()
             .clip(RoundedCornerShape(8.dp))
             .background(ColorGray.Gray_50)
+            .padding(horizontal = 16.dp)
             .padding(top = 6.dp, bottom = 16.dp),
     ) {
+
         Row(
             modifier = Modifier.padding(bottom = 6.dp),
             verticalAlignment = Alignment.CenterVertically
@@ -52,9 +56,7 @@ fun RepeatCycle(
             WMText(
                 text = repeatCycle.repeatCycle.formattedShortDescription(repeatCycle.startDate),
                 style = Typography().titleMedium.copy(fontWeight = FontWeight.SemiBold),
-                modifier = Modifier
-                    .padding(start = 16.dp)
-                    .weight(1f, false)
+                modifier = Modifier.weight(1f, false)
             )
 
             WMIconButton(
@@ -68,7 +70,6 @@ fun RepeatCycle(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp)
                 .padding(bottom = 4.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -87,8 +88,7 @@ fun RepeatCycle(
         }
 
         Row(
-            modifier = Modifier.fillMaxWidth()
-                .padding(horizontal = 16.dp),
+            modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Row(
@@ -129,6 +129,23 @@ fun RepeatCycle(
                     contentDescription = null
                 )
             }
+        }
+        Row(
+            modifier = Modifier.padding(top = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            Icon(
+                painter = painterResource(Res.drawable.ic_error_outline),
+                contentDescription = null,
+                modifier = Modifier.size(14.dp),
+                tint = ColorGray.Gray_500
+            )
+
+            WMText(
+                text = "수정시 바로 적용됩니다.",
+                style = Typography().bodySmall.copy(color = ColorGray.Gray_500)
+            )
         }
     }
 
