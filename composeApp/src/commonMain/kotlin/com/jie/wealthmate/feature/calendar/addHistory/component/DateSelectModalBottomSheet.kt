@@ -23,12 +23,13 @@ import kotlin.time.Instant
 
 @Composable
 fun DateSelectModalBottomSheet(
-    selectedDate: LocalDate,
+    title: String? = null,
+    selectedDate: LocalDate?,
     onSelectClick: (LocalDate) -> Unit,
     onDismissRequest: () -> Unit,
 ) {
     val initialMillis = remember(selectedDate) {
-        selectedDate.atStartOfDayIn(TimeZone.UTC).toEpochMilliseconds()
+        selectedDate?.atStartOfDayIn(TimeZone.UTC)?.toEpochMilliseconds()
     }
 
     val datePickerState = rememberDatePickerState(
@@ -46,10 +47,10 @@ fun DateSelectModalBottomSheet(
     }
 
     WMModalBottomSheet(
+        title = title,
         onDismissRequest = onDismissRequest,
     ) {
         DatePicker(
-            modifier = Modifier.padding(top = 12.dp),
             state = datePickerState,
             colors = DatePickerDefaults.colors(
                 containerColor = ColorGray.White,

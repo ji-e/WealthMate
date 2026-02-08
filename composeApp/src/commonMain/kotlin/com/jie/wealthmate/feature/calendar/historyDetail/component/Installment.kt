@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -27,8 +28,10 @@ import com.jie.wealthmate.utils.formatDateDotYYMD
 import com.jie.wealthmate.utils.formatWithCommas
 import com.jie.wealthmate.utils.toLocalDate
 import com.jie.wealthmate.vo.InstallmentVo
+import org.jetbrains.compose.resources.painterResource
 import wealthmate.composeapp.generated.resources.Res
 import wealthmate.composeapp.generated.resources.ic_edit
+import wealthmate.composeapp.generated.resources.ic_error_outline
 
 
 @Composable
@@ -44,40 +47,54 @@ fun Installment(
             .fillMaxWidth()
             .clip(RoundedCornerShape(8.dp))
             .background(ColorGray.Gray_50)
-            .padding(top = 8.dp, bottom = 16.dp),
+            .padding(horizontal = 16.dp)
+            .padding(top = 6.dp, bottom = 16.dp),
     ) {
 
         Row(
-            modifier = Modifier.padding(bottom = 6.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             WMText(
                 text = "총 ${formatWithCommas(installment.amount.toString())}원 / ${installment.count}개월",
                 style = Typography().titleMedium.copy(fontWeight = FontWeight.SemiBold),
-                modifier = Modifier
-                    .padding(start = 16.dp)
-                    .weight(1f, false)
+                modifier = Modifier.weight(1f, false)
             )
 
             WMIconButton(
                 iconRes = Res.drawable.ic_edit,
                 iconButtonModifier = Modifier.size(36.dp),
-                modifier = Modifier.size(20.dp),
+                modifier = Modifier.size(18.dp),
                 onClick = onModifyClick
+            )
+        }
+
+        Row(
+            modifier = Modifier.padding(bottom = 14.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            Icon(
+                painter = painterResource(Res.drawable.ic_error_outline),
+                contentDescription = null,
+                modifier = Modifier.size(14.dp),
+                tint = ColorGray.Gray_500
+            )
+
+            WMText(
+                text = "수정시 바로 적용됩니다.",
+                style = Typography().bodySmall.copy(color = ColorGray.Gray_500)
             )
         }
 
         WMText(
             text = "할부 내역",
             style = Typography().bodyMedium.copy(fontWeight = FontWeight.SemiBold),
-            modifier = Modifier.padding(horizontal = 16.dp)
         )
 
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 8.dp, bottom = 4.dp)
-                .padding(horizontal = 16.dp),
+                .padding(top = 8.dp, bottom = 4.dp),
             horizontalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             WMText(
@@ -134,7 +151,7 @@ fun Installment(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(color = backgroundColor)
-                    .padding(vertical = 2.dp, horizontal = 16.dp),
+                    .padding(vertical = 2.dp),
                 horizontalArrangement = Arrangement.spacedBy(4.dp)
             ) {
 

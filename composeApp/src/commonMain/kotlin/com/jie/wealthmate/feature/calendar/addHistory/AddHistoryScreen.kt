@@ -251,6 +251,7 @@ class AddHistoryScreen(private val selectedDate: LocalDate) : BaseScreen() {
 
         if (isShowDateSelectModalBottomSheet) {
             DateSelectModalBottomSheet(
+                title = "",
                 selectedDate = uiState.date,
                 onSelectClick = screenModel::updateDate,
                 onDismissRequest = { isShowDateSelectModalBottomSheet = false }

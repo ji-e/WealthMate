@@ -9,6 +9,7 @@ import com.jie.wealthmate.repository.HistoryRepository
 import com.jie.wealthmate.repository.PaymentMethodRepository
 import com.jie.wealthmate.usecase.ModifyHistoryUseCase
 import com.jie.wealthmate.usecase.UpdateInstallmentUseCase
+import com.jie.wealthmate.usecase.UpdateRepeatCycleUseCase
 import com.jie.wealthmate.utils.default
 import com.jie.wealthmate.utils.formatRemoveCommas
 import com.jie.wealthmate.vo.CategoryTagVo
@@ -22,6 +23,7 @@ class HistoryDetailScreenModel(
     private val paymentMethodRepository: PaymentMethodRepository,
     private val historyRepository: HistoryRepository,
     private val updateInstallmentUseCase: UpdateInstallmentUseCase,
+    private val updateRepeatCycleUseCase: UpdateRepeatCycleUseCase,
     private val modifyHistoryUseCase: ModifyHistoryUseCase,
 ) : BaseScreenModel<HistoryDetailUiState>() {
 
@@ -43,20 +45,26 @@ class HistoryDetailScreenModel(
         }
     }
 
-    fun updateRepeatCycle(repeatCycle: RepeatCycleEnum?) {
-        reduceState { state ->
-            state.copy(
-                isDataChanged = true,
-                repeatCycle = repeatCycle
+    fun updateEndDate(date: LocalDate?) {
+        val uiState = container.uiState.value
+
+        uiState.history?.repeatCycle?.let { repeatCycleVo ->
+            updateRepeatCycle(
+                repeatCycle = repeatCycleVo.repeatCycle,
+                endDate = date
             )
         }
     }
 
-    fun updateInstallmentCount(installmentCount: Long?) {
-        reduceState { state ->
-            state.copy(
-                isDataChanged = true,
-                totalInstallmentCount = installmentCount
+    fun updateRepeatCycle(repeatCycle: RepeatCycleEnum?) {
+        repeatCycle ?: return
+        val uiState = container.uiState.value
+
+
+        uiState.history?.repeatCycle?.let { repeatCycleVo ->
+            updateRepeatCycle(
+                repeatCycle = repeatCycle,
+                endDate = repeatCycleVo.endDate
             )
         }
     }
@@ -204,10 +212,28 @@ class HistoryDetailScreenModel(
                     totalAmount = totalAmount,
                     totalCount = totalCount
                 )
-                getHistory(historyVo.id)
             }
         ) {
+            getHistory(historyVo.id)
             showSnackbar("할부 정보가 수정되었습니다.")
+        }
+    }
+
+    private fun updateRepeatCycle(repeatCycle: RepeatCycleEnum, endDate: LocalDate?) {
+        val uiState = container.uiState.value
+        val historyVo = uiState.history ?: return
+
+        launchSafe(
+            block = {
+                updateRepeatCycleUseCase(
+                    historyId = historyVo.id,
+                    newRepeatCycle = repeatCycle.name,
+                    newEndDate = endDate
+                )
+            }
+        ) {
+            getHistory(historyVo.id)
+            showSnackbar("반복 정보가 수정되었습니다.")
         }
     }
 
@@ -228,9 +254,9 @@ class HistoryDetailScreenModel(
                     newContent = uiState.content.text,
                     isVisibility = uiState.isVisibility
                 )
-                getHistory(historyVo.id)
             }
         ) {
+            getHistory(historyVo.id)
             showSnackbar("저장되었습니다.")
             reduceState { state ->
                 state.copy(isDataChanged = false)

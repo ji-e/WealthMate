@@ -31,11 +31,11 @@ class ModifyHistoryUseCase(
             val totalAmount = historyWithDetails.installment?.amount.default()
 
             val precedingSum = installmentHistoryItems
-                .filter { it.installment?.installmentTime != null && it.installment!!.installmentTime < installmentTime }
+                .filter { it.installment?.installmentTime != null && it.installment.installmentTime < installmentTime }
                 .sumOf { it.amount }
 
             val succeedingHistories = installmentHistoryItems
-                .filter { it.installment?.installmentTime != null && it.installment!!.installmentTime > installmentTime }
+                .filter { it.installment?.installmentTime != null && it.installment.installmentTime > installmentTime }
                 .sortedBy { it.installment!!.installmentTime }
 
             val currentRemainAmount = totalAmount - precedingSum - newAmount

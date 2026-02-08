@@ -34,6 +34,7 @@ import com.jie.wealthmate.repository.RepeatCycleRepositoryImpl
 import com.jie.wealthmate.usecase.ModifyHistoryUseCase
 import com.jie.wealthmate.usecase.SaveHistoryUseCase
 import com.jie.wealthmate.usecase.UpdateInstallmentUseCase
+import com.jie.wealthmate.usecase.UpdateRepeatCycleUseCase
 import org.koin.dsl.module
 
 val commonModule = module {
@@ -52,6 +53,7 @@ val commonModule = module {
 
     single { SaveHistoryUseCase(get(), get(), get()) }
     single { UpdateInstallmentUseCase(get(), get()) }
+    single { UpdateRepeatCycleUseCase(get(), get()) }
     single { ModifyHistoryUseCase(get()) }
 
 
@@ -61,7 +63,7 @@ val commonModule = module {
     // 캘린더
     factory { CalendarScreenModel(get(), get()) }
     factory { AddHistoryScreenModel(get(), get(), get(), get()) }
-    factory { HistoryDetailScreenModel(get(), get(), get(), get(), get()) }
+    factory { HistoryDetailScreenModel(get(), get(), get(), get(), get(), get()) }
 
 
     // 자산
