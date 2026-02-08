@@ -125,14 +125,6 @@ class GoogleCloudShareScreen() : BaseScreen() {
                         permissionsItems = uiState.googleDrivePermissionVo?.permissions.default(),
                         isOwner = uiState.isOwnerMode,
                         onRemoveClick = {},
-                        emptyContent = {
-                            EmptyListView(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .padding(vertical = 20.dp, horizontal = 28.dp),
-                                contentText = "공유된 멤버가 없습니다.",
-                            )
-                        }
                     )
                 }
             } else {

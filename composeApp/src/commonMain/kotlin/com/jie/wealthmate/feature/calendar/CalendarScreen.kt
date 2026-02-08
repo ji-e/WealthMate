@@ -104,14 +104,6 @@ class CalendarScreen() : BaseScreen() {
                                     )
                                 )
                             },
-                            emptyContent = {
-                                EmptyListView(
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .padding(vertical = 20.dp, horizontal = 28.dp),
-                                    contentText = "내역이 없습니다.",
-                                )
-                            }
                         )
                     }
                 }

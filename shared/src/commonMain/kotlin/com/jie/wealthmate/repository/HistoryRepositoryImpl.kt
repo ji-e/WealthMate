@@ -97,6 +97,19 @@ class HistoryRepositoryImpl(private val databaseProvider: DatabaseProvider) : Hi
         }
     }
 
+    override suspend fun deleteHistoriesByInstallmentId(installmentId: String) = withContext(Dispatchers.Default) {
+        loggedCall(
+            repositoryName = repoName,
+            methodName = "deleteHistoriesByInstallmentId",
+            params = mapOf("installmentId" to installmentId)
+        ) {
+            val timestamp = Clock.System.now().toEpochMilliseconds()
+            dao.getHistoriesByInstallmentId(installmentId).forEach {
+                dao.softDeleteHistory(it.id, timestamp)
+            }
+        }
+    }
+
     override fun getHistoriesByMonth(
         startDate: Long,
         endDate: Long,
