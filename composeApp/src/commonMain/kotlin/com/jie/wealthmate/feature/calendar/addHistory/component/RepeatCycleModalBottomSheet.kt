@@ -55,7 +55,7 @@ fun RepeatCycleModalBottomSheet(
     ) {
         Column(
             modifier = Modifier
-                .padding(horizontal = 20.dp)
+                .padding(horizontal = 28.dp)
                 .padding(bottom = 20.dp)
         ) {
             RepeatCycleList(

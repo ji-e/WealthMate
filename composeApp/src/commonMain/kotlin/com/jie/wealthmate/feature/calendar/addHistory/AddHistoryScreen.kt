@@ -215,6 +215,7 @@ class AddHistoryScreen(private val selectedDate: LocalDate) : BaseScreen() {
                 // 결제수단/자산 선택
                 if (uiState.selectedLargeCategory == LargeCategoryEnum.EXPENSES) {
                     PaymentMethodTextField(
+                        modifier = Modifier.padding(bottom = 4.dp),
                         selectedLargeCategory = uiState.selectedLargeCategory,
                         selectedPaymentMethod = uiState.paymentMethod,
                         onPaymentMethodClick = { isShowPaymentMethodModalBottomSheet = true }
@@ -223,7 +224,6 @@ class AddHistoryScreen(private val selectedDate: LocalDate) : BaseScreen() {
 
                 // 내용 입력
                 WMTextField(
-                    modifier = Modifier.padding(top = 4.dp),
                     value = uiState.content,
                     onValueChange = screenModel::updateContent,
                     label = "내용",

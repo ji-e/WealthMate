@@ -192,6 +192,10 @@ class HistoryDetailScreenModel(
             }
     }
 
+    fun updateInstallment(totalAmount: Long, totalCount: Long) {
+
+    }
+
     fun saveHistory() {
         val uiState = container.uiState.value
         val historyVo = uiState.history ?: return

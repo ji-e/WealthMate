@@ -47,8 +47,10 @@ import com.jie.wealthmate.feature.calendar.addHistory.component.RepeatCycleModal
 import com.jie.wealthmate.feature.calendar.historyDetail.component.Category
 import com.jie.wealthmate.feature.calendar.historyDetail.component.CategorySelectModalBottomSheet
 import com.jie.wealthmate.feature.calendar.historyDetail.component.Installment
+import com.jie.wealthmate.feature.calendar.historyDetail.component.ModifyInstallmentModalBottomSheet
 import com.jie.wealthmate.feature.calendar.historyDetail.component.RepeatCycle
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
+import com.jie.wealthmate.utils.default
 import org.koin.compose.koinInject
 import wealthmate.composeapp.generated.resources.Res
 import wealthmate.composeapp.generated.resources.ic_delete_outline
@@ -70,6 +72,7 @@ class HistoryDetailScreen(
         var isShowInstallmentModalBottomSheet by remember { mutableStateOf(false) }
         var isShowCategorySelectModalBottomSheet by remember { mutableStateOf(false) }
         var isShowPaymentMethodModalBottomSheet by remember { mutableStateOf(false) }
+        var isShowModifyInstallmentModalBottomSheet by remember { mutableStateOf(false) }
 
         fun onBack() {
             showSaveBackDialog(uiState.isDataChanged) {
@@ -198,7 +201,10 @@ class HistoryDetailScreen(
                                     modifier = Modifier.padding(top = 8.dp, bottom = 24.dp),
                                     installment = history.installment,
                                     installmentTime = history.installmentTime,
-                                    installmentHistoryItems = uiState.installmentHistoryItems
+                                    installmentHistoryItems = uiState.installmentHistoryItems,
+                                    onModifyClick = {
+                                        isShowModifyInstallmentModalBottomSheet = true
+                                    }
                                 )
                             }
                         }
@@ -293,6 +299,20 @@ class HistoryDetailScreen(
                 paymentMethodItems = uiState.paymentMethodItems,
                 onConfirmClick = screenModel::updatePaymentMethod,
                 onDismissRequest = { isShowPaymentMethodModalBottomSheet = false }
+            )
+        }
+
+        if (isShowModifyInstallmentModalBottomSheet) {
+            ModifyInstallmentModalBottomSheet(
+                totalAmount = uiState.history?.installment?.amount,
+                totalCount = uiState.history?.installment?.count,
+                onConfirmClick = { totalAmount, totalCount ->
+                    screenModel.updateInstallment(
+                        totalAmount = totalAmount.toLongOrNull().default(),
+                        totalCount = totalCount.toLongOrNull().default()
+                    )
+                },
+                onDismissRequest = { isShowModifyInstallmentModalBottomSheet = false },
             )
         }
     }
