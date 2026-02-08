@@ -5,6 +5,7 @@ import com.jie.wealthmate.base.BaseUiState
 import com.jie.wealthmate.base.UiSideEffect
 import com.jie.wealthmate.feature.calendar.addHistory.component.RepeatCycleEnum
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
+import com.jie.wealthmate.utils.default
 import com.jie.wealthmate.utils.today
 import com.jie.wealthmate.vo.CategoryTagVo
 import com.jie.wealthmate.vo.CategoryVo
@@ -25,7 +26,8 @@ data class AddHistoryUiState(
     val categoryItems: List<CategoryVo> = emptyList(),
     val paymentMethodItems: List<PaymentMethodVo> = emptyList(),
 ) : BaseUiState {
-    val isSaveButtonEnable = amount.text.isNotBlank()
+    val isSaveButtonEnable = amount.text.isNotBlank() &&
+            (category?.isFixed != true || content.text.isNotBlank())
 }
 
 sealed class AddHistoryUiSideEffect : UiSideEffect {

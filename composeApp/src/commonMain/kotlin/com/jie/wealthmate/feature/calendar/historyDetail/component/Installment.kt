@@ -32,6 +32,7 @@ fun Installment(
     modifier: Modifier = Modifier,
     date: LocalDate,
     installment: InstallmentVo,
+    installmentTime: Long?,
 ) {
     Column(
         modifier = modifier

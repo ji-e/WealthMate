@@ -198,6 +198,7 @@ class HistoryDetailScreen(
                                     modifier = Modifier.padding(top = 4.dp, bottom = 24.dp),
                                     date = history.date,
                                     installment = history.installment,
+                                    installmentTime = history.installmentTime,
                                 )
                             }
                         }

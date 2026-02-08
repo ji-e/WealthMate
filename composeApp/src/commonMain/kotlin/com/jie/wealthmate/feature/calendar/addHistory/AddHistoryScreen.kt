@@ -52,6 +52,7 @@ import com.jie.wealthmate.feature.calendar.addHistory.component.PaymentMethodMod
 import com.jie.wealthmate.feature.calendar.addHistory.component.PaymentMethodTextField
 import com.jie.wealthmate.feature.calendar.addHistory.component.RepeatCycleModalBottomSheet
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
+import com.jie.wealthmate.utils.default
 import kotlinx.datetime.LocalDate
 import org.koin.compose.koinInject
 
@@ -227,6 +228,7 @@ class AddHistoryScreen(private val selectedDate: LocalDate) : BaseScreen() {
                     onValueChange = screenModel::updateContent,
                     label = "내용",
                     maxLength = 20,
+                    isRequire = uiState.category?.isFixed.default(),
                     placeholder = "내용을 입력해 주세요.",
                 )
 
