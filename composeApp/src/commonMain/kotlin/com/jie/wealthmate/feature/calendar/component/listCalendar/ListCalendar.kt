@@ -2,6 +2,7 @@ package com.jie.wealthmate.feature.calendar.component.listCalendar
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -13,6 +14,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import com.jie.wealthmate.component.EmptyListView
 import com.jie.wealthmate.vo.HistoryVo
 import kotlinx.datetime.LocalDate
 
@@ -23,7 +26,6 @@ fun ListCalendar(
     historyItems: List<HistoryVo>,
     onDateSelected: (LocalDate) -> Unit, // 날짜가 변경되었을 때 호출될 콜백
     onHistoryClick: (HistoryVo) -> Unit,
-    emptyContent: @Composable () -> Unit,
 ) {
     // 1. 데이터를 날짜별 내림차순으로 정렬 및 그룹화
     val groupedItems = remember(historyItems) {
@@ -105,7 +107,12 @@ fun ListCalendar(
     }
 
     if (groupedItems.isEmpty()) {
-        emptyContent()
+        EmptyListView(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(vertical = 20.dp, horizontal = 28.dp),
+            contentText = "내역이 없습니다.",
+        )
         return
     }
 
