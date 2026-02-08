@@ -2,16 +2,15 @@ package com.jie.wealthmate.feature.calendar.historyDetail
 
 import androidx.compose.ui.text.input.TextFieldValue
 import com.jie.wealthmate.base.BaseScreenModel
-import com.jie.wealthmate.database.eneity.HistoryEntity
 import com.jie.wealthmate.feature.calendar.addHistory.component.RepeatCycleEnum
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.repository.CategoryRepository
 import com.jie.wealthmate.repository.HistoryRepository
 import com.jie.wealthmate.repository.PaymentMethodRepository
-import com.jie.wealthmate.usecase.HistorySaveUseCase
+import com.jie.wealthmate.usecase.ModifyHistoryUseCase
+import com.jie.wealthmate.usecase.UpdateInstallmentUseCase
 import com.jie.wealthmate.utils.default
 import com.jie.wealthmate.utils.formatRemoveCommas
-import com.jie.wealthmate.utils.toEpochMilliseconds
 import com.jie.wealthmate.vo.CategoryTagVo
 import com.jie.wealthmate.vo.CategoryVo
 import com.jie.wealthmate.vo.HistoryVo.Companion.mapperToVo
@@ -22,7 +21,8 @@ class HistoryDetailScreenModel(
     private val categoryRepository: CategoryRepository,
     private val paymentMethodRepository: PaymentMethodRepository,
     private val historyRepository: HistoryRepository,
-    private val historySaveUseCase: HistorySaveUseCase,
+    private val updateInstallmentUseCase: UpdateInstallmentUseCase,
+    private val modifyHistoryUseCase: ModifyHistoryUseCase,
 ) : BaseScreenModel<HistoryDetailUiState>() {
 
     override val initialState: HistoryDetailUiState
@@ -52,11 +52,11 @@ class HistoryDetailScreenModel(
         }
     }
 
-    fun updateInstallmentCount(installmentCount: Int?) {
+    fun updateInstallmentCount(installmentCount: Long?) {
         reduceState { state ->
             state.copy(
                 isDataChanged = true,
-                installmentCount = installmentCount
+                totalInstallmentCount = installmentCount
             )
         }
     }
@@ -124,9 +124,25 @@ class HistoryDetailScreenModel(
                     content = TextFieldValue(history.content.default()),
                 )
             }
-
+            getInstallmentHistory(history.installment?.id)
             getCategories(history.largeCategory)
             println(response)
+        }
+    }
+
+    fun getInstallmentHistory(installmentId: String?) {
+        installmentId ?: return
+
+        launchSafe(
+            block = {
+                historyRepository.getHistoriesByInstallmentId(installmentId)
+            }
+        ) { response ->
+            reduceState { state ->
+                state.copy(
+                    installmentHistoryItems = response
+                )
+            }
         }
     }
 
@@ -177,25 +193,42 @@ class HistoryDetailScreenModel(
             }
     }
 
-    fun saveHistory() {
+    fun updateInstallment(totalAmount: Long, totalCount: Long) {
         val uiState = container.uiState.value
-        uiState.history?.id ?: return
+        val historyVo = uiState.history ?: return
 
         launchSafe(
             block = {
-                historyRepository.updateHistory(
-                    HistoryEntity(
-                        id = uiState.history.id,
-                        largeCategory = uiState.largeCategory.name,
-                        date = uiState.date.toEpochMilliseconds(),
-                        amount = uiState.amount.text.formatRemoveCommas().toLong(),
-                        categoryId = uiState.category?.id,
-                        categoryTagId = uiState.categoryTag?.id,
-                        paymentMethodId = uiState.paymentMethod?.id,
-                        content = uiState.content.text,
-                        isVisibility = uiState.isVisibility
-                    )
+                updateInstallmentUseCase(
+                    historyId = historyVo.id,
+                    totalAmount = totalAmount,
+                    totalCount = totalCount
                 )
+                getHistory(historyVo.id)
+            }
+        ) {
+            showSnackbar("할부 정보가 수정되었습니다.")
+        }
+    }
+
+    fun modifyHistory() {
+        val uiState = container.uiState.value
+        val historyVo = uiState.history ?: return
+        val newAmount = uiState.amount.text.formatRemoveCommas().toLongOrNull().default()
+
+        launchSafe(
+            block = {
+                modifyHistoryUseCase(
+                    historyId = historyVo.id,
+                    newAmount = newAmount,
+                    newDate = uiState.date,
+                    newCategoryId = uiState.category?.id,
+                    newCategoryTagId = uiState.categoryTag?.id,
+                    newPaymentMethodId = uiState.paymentMethod?.id,
+                    newContent = uiState.content.text,
+                    isVisibility = uiState.isVisibility
+                )
+                getHistory(historyVo.id)
             }
         ) {
             showSnackbar("저장되었습니다.")

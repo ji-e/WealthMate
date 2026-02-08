@@ -5,7 +5,6 @@ import com.jie.wealthmate.base.BaseUiState
 import com.jie.wealthmate.base.UiSideEffect
 import com.jie.wealthmate.feature.calendar.addHistory.component.RepeatCycleEnum
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
-import com.jie.wealthmate.utils.default
 import com.jie.wealthmate.utils.today
 import com.jie.wealthmate.vo.CategoryTagVo
 import com.jie.wealthmate.vo.CategoryVo
@@ -17,7 +16,7 @@ data class AddHistoryUiState(
     val selectedLargeCategory: LargeCategoryEnum = LargeCategoryEnum.EXPENSES,
     val date: LocalDate = today,
     val repeatCycle: RepeatCycleEnum? = null,
-    val totalInstallment: Int? = null,
+    val totalInstallmentCount: Long? = null,
     val content: TextFieldValue = TextFieldValue(""),
     val amount: TextFieldValue = TextFieldValue(""),
     val category: CategoryVo? = null,

@@ -57,7 +57,7 @@ fun PaymentMethodModalBottomSheet(
     ) {
         Column(
             modifier = Modifier
-                .padding(horizontal = 20.dp)
+                .padding(horizontal = 28.dp)
                 .padding(bottom = 20.dp)
         ) {
             PaymentMethodList(
@@ -70,19 +70,6 @@ fun PaymentMethodModalBottomSheet(
                     onConfirmClick(tempSelectedPaymentMethod)
                 }
             )
-            // todo 사용자 액션 줄일까 고민 중
-//            WMButton(
-//                text = "확인",
-//                buttonStyle = ButtonStyle.FILLED,
-//                buttonSize = ButtonSize.LARGE,
-//                modifier = Modifier
-//                    .padding(top = 20.dp)
-//                    .fillMaxWidth(),
-//                onClick = {
-//                    onDismissRequest()
-//                    onConfirmClick(tempSelectedPaymentMethod)
-//                }
-//            )
         }
     }
 }

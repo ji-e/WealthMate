@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.jie.wealthmate.component.LabelText
 import com.jie.wealthmate.component.WMText
 import com.jie.wealthmate.theme.ColorGray
 import com.jie.wealthmate.theme.ColorRed
@@ -37,10 +38,7 @@ fun Category(
     onCategoryClick: () -> Unit,
 ) {
     Column(modifier = modifier) {
-        WMText(
-            text = "카테고리",
-            style = Typography().titleSmall.copy(fontWeight = FontWeight.SemiBold)
-        )
+        LabelText(text = "카테고리")
 
         Row(
             modifier = Modifier.fillMaxWidth()

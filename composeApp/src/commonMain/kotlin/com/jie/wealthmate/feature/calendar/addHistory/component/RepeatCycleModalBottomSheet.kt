@@ -24,9 +24,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.jie.wealthmate.component.ButtonSize
-import com.jie.wealthmate.component.ButtonStyle
-import com.jie.wealthmate.component.WMButton
 import com.jie.wealthmate.component.WMModalBottomSheet
 import com.jie.wealthmate.component.WMText
 import com.jie.wealthmate.theme.ColorGray
@@ -55,24 +52,15 @@ fun RepeatCycleModalBottomSheet(
     ) {
         Column(
             modifier = Modifier
-                .padding(horizontal = 20.dp)
+                .padding(horizontal = 28.dp)
                 .padding(bottom = 20.dp)
         ) {
             RepeatCycleList(
                 listState = listState,
                 repeatCycleItems = repeatCycleItems,
                 tempSelectedRepeatCycle = tempSelectedRepeatCycle,
-                onRepeatCycleClick = { tempSelectedRepeatCycle = it }
-            )
-
-            WMButton(
-                text = "확인",
-                buttonStyle = ButtonStyle.FILLED,
-                buttonSize = ButtonSize.LARGE,
-                modifier = Modifier
-                    .padding(top = 20.dp)
-                    .fillMaxWidth(),
-                onClick = {
+                onRepeatCycleClick = {
+                    tempSelectedRepeatCycle = it
                     onDismissRequest()
                     onConfirmClick(tempSelectedRepeatCycle)
                 }

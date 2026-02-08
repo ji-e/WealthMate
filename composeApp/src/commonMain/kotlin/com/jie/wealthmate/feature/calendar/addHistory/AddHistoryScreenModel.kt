@@ -8,7 +8,7 @@ import com.jie.wealthmate.feature.menu.management.categoryManagement.component.L
 import com.jie.wealthmate.repository.CategoryRepository
 import com.jie.wealthmate.repository.HistoryRepository
 import com.jie.wealthmate.repository.PaymentMethodRepository
-import com.jie.wealthmate.usecase.HistorySaveUseCase
+import com.jie.wealthmate.usecase.SaveHistoryUseCase
 import com.jie.wealthmate.utils.formatRemoveCommas
 import com.jie.wealthmate.utils.toEpochMilliseconds
 import com.jie.wealthmate.vo.CategoryTagVo
@@ -20,7 +20,7 @@ class AddHistoryScreenModel(
     private val categoryRepository: CategoryRepository,
     private val paymentMethodRepository: PaymentMethodRepository,
     private val historyRepository: HistoryRepository,
-    private val historySaveUseCase: HistorySaveUseCase,
+    private val saveHistoryUseCase: SaveHistoryUseCase,
 ) : BaseScreenModel<AddHistoryUiState>() {
 
     override val initialState: AddHistoryUiState
@@ -67,11 +67,11 @@ class AddHistoryScreenModel(
         }
     }
 
-    fun updateTotalInstallmentCount(totalInstallment: Int?) {
+    fun updateTotalInstallmentCount(totalInstallment: Long?) {
         reduceState { state ->
             state.copy(
                 isDataChanged = true,
-                totalInstallment = totalInstallment
+                totalInstallmentCount = totalInstallment
             )
         }
     }
@@ -172,7 +172,7 @@ class AddHistoryScreenModel(
         val uiState = container.uiState.value
         launchSafe(
             block = {
-                historySaveUseCase(
+                saveHistoryUseCase(
                     history = HistoryEntity(
                         largeCategory = uiState.selectedLargeCategory.name,
                         date = uiState.date.toEpochMilliseconds(),
@@ -183,7 +183,7 @@ class AddHistoryScreenModel(
                         content = uiState.content.text,
                     ),
                     repeatCycle = uiState.repeatCycle?.name,
-                    totalInstallment = uiState.totalInstallment?.toLong()
+                    totalInstallmentCount = uiState.totalInstallmentCount
                 )
             }
         ) {

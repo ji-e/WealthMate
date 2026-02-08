@@ -6,33 +6,38 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.jie.wealthmate.component.WMIconButton
 import com.jie.wealthmate.component.WMText
+import com.jie.wealthmate.database.eneity.HistoryEntity
 import com.jie.wealthmate.theme.ColorGray
 import com.jie.wealthmate.theme.ColorPrimary
-import com.jie.wealthmate.usecase.getInstallmentPlan
 import com.jie.wealthmate.utils.convertLocalDateToString
 import com.jie.wealthmate.utils.formatDateDotYYMD
 import com.jie.wealthmate.utils.formatWithCommas
+import com.jie.wealthmate.utils.toLocalDate
 import com.jie.wealthmate.vo.InstallmentVo
-import kotlinx.datetime.DateTimeUnit
-import kotlinx.datetime.LocalDate
-import kotlinx.datetime.plus
+import wealthmate.composeapp.generated.resources.Res
+import wealthmate.composeapp.generated.resources.ic_edit
+
 
 @Composable
 fun Installment(
     modifier: Modifier = Modifier,
-    date: LocalDate,
     installment: InstallmentVo,
     installmentTime: Long?,
+    installmentHistoryItems: List<HistoryEntity>,
+    onModifyClick: () -> Unit,
 ) {
     Column(
         modifier = modifier
@@ -41,8 +46,30 @@ fun Installment(
             .background(ColorGray.Gray_50)
             .padding(vertical = 12.dp),
     ) {
+
+
+        Row(
+            modifier = Modifier.padding(bottom = 6.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            WMText(
+                text = "총 ${formatWithCommas(installment.amount.toString())}원 / ${installment.count}개월",
+                style = Typography().titleMedium.copy(fontWeight = FontWeight.SemiBold),
+                modifier = Modifier
+                    .padding(start = 12.dp)
+                    .weight(1f, false)
+            )
+
+            WMIconButton(
+                iconRes = Res.drawable.ic_edit,
+                iconButtonModifier = Modifier.size(36.dp),
+                modifier = Modifier.size(20.dp),
+                onClick = onModifyClick
+            )
+        }
+
         WMText(
-            text = "할부 내역 | ${installment.count}개월",
+            text = "할부 내역",
             style = Typography().bodyMedium.copy(fontWeight = FontWeight.SemiBold),
             modifier = Modifier.padding(horizontal = 12.dp)
         )
@@ -60,7 +87,7 @@ fun Installment(
                     fontWeight = FontWeight.SemiBold,
                     color = ColorGray.Gray_500
                 ),
-                modifier = Modifier.width(40.dp)
+                modifier = Modifier.width(48.dp)
             )
             WMText(
                 text = "날짜",
@@ -91,14 +118,9 @@ fun Installment(
                 maxLines = 1
             )
         }
-
-        val installmentAmounts = getInstallmentPlan(installment.amount, installment.count)
-        val remainAmounts =
-            installmentAmounts.scan(installment.amount) { acc, installmentAmount -> acc - installmentAmount }
-
-        repeat(installment.count.toInt()) {
-            val installmentDate = installment.startDate.plus(it, DateTimeUnit.MONTH)
-            val isInstallmentSelected = date == installmentDate
+        installmentHistoryItems.forEach { installmentHistory ->
+            val isInstallmentSelected =
+                installmentHistory.installment?.installmentTime == installmentTime
             val backgroundColor: Color
             val fontWeight: FontWeight
             if (isInstallmentSelected) {
@@ -118,25 +140,26 @@ fun Installment(
             ) {
 
                 WMText(
-                    text = "${it + 1}회차",
+                    text = "${installmentHistory.installment?.installmentTime}회차",
                     style = Typography().bodyMedium.copy(fontWeight = fontWeight),
-                    modifier = Modifier.width(40.dp)
+                    modifier = Modifier.width(48.dp)
                 )
                 WMText(
-                    text = installmentDate.convertLocalDateToString(formatDateDotYYMD),
+                    text = installmentHistory.date.toLocalDate()
+                        .convertLocalDateToString(formatDateDotYYMD),
                     style = Typography().bodyMedium.copy(fontWeight = fontWeight),
                     modifier = Modifier.width(60.dp),
                     maxLines = 1
 
                 )
                 WMText(
-                    text = "${formatWithCommas(installmentAmounts[it].toString())}원",
+                    text = "${formatWithCommas(installmentHistory.amount.toString())}원",
                     style = Typography().bodyMedium.copy(fontWeight = fontWeight),
                     modifier = Modifier.weight(2f),
                     maxLines = 1
                 )
                 WMText(
-                    text = "${formatWithCommas(remainAmounts[it + 1].toString())}원",
+                    text = "${formatWithCommas(installmentHistory.installment?.installmentRemainAmount.toString())}원",
                     style = Typography().bodyMedium.copy(fontWeight = fontWeight),
                     modifier = Modifier.weight(3f),
                     maxLines = 1

@@ -49,6 +49,7 @@ fun DateSelectModalBottomSheet(
         onDismissRequest = onDismissRequest,
     ) {
         DatePicker(
+            modifier = Modifier.padding(top = 12.dp),
             state = datePickerState,
             colors = DatePickerDefaults.colors(
                 containerColor = ColorGray.White,
@@ -65,7 +66,7 @@ fun DateSelectModalBottomSheet(
             text = "선택",
             buttonSize = ButtonSize.LARGE,
             modifier = Modifier
-                .padding(horizontal = 20.dp)
+                .padding(horizontal = 28.dp)
                 .padding(top = 12.dp, bottom = 20.dp)
                 .fillMaxWidth(),
             onClick = {

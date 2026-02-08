@@ -44,7 +44,7 @@ fun DateTextField(
     selectedDate: LocalDate,
     amount: TextFieldValue? = null,
     repeatCycle: RepeatCycleEnum? = null,
-    totalInstallment: Int? = null,
+    totalInstallmentCount: Long? = null,
     isTrailingIconVisible: Boolean = true,
     onDateClick: () -> Unit = {},
     onRepeatClick: () -> Unit = {},
@@ -62,10 +62,10 @@ fun DateTextField(
             supportingContent = {
                 val supportingText = when {
                     repeatCycle != null -> repeatCycle.formattedDescription(selectedDate)
-                    totalInstallment != null -> {
-                        val installmentAmount = amount?.text?.toIntOrNull()?.div(totalInstallment)
+                    totalInstallmentCount != null -> {
+                        val installmentAmount = amount?.text?.toIntOrNull()?.div(totalInstallmentCount)
 
-                        "할부 ${totalInstallment}개월" +
+                        "할부 ${totalInstallmentCount}개월" +
                                 if (installmentAmount != null) {
                                     " (매월 ${formatWithCommas(installmentAmount.toString())}원)"
                                 } else {
@@ -121,10 +121,10 @@ fun DateTextField(
                         modifier = Modifier
                             .size(30.dp)
                             .clip(CircleShape)
-                            .background(if (totalInstallment != null) ColorPrimary.Primary_500 else ColorGray.Gray_50)
+                            .background(if (totalInstallmentCount != null) ColorPrimary.Primary_500 else ColorGray.Gray_50)
                             .clickable { onInstallmentClick() }
                             .padding(6.dp),
-                        tint = if (totalInstallment != null) ColorGray.White else ColorGray.Gray_500
+                        tint = if (totalInstallmentCount != null) ColorGray.White else ColorGray.Gray_500
                     )
                 }
             }
@@ -150,7 +150,7 @@ private fun DateTextFieldPreview() {
             )
             DateTextField(
                 selectedDate = today,
-                totalInstallment = 4
+                totalInstallmentCount = 4
             )
         }
     }
