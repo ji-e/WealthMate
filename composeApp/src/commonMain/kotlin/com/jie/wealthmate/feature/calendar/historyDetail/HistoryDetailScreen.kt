@@ -251,7 +251,7 @@ class HistoryDetailScreen(
                     .padding(bottom = 20.dp)
                     .fillMaxWidth(),
                 enabled = uiState.isSaveButtonEnable,
-                onClick = screenModel::saveHistory
+                onClick = screenModel::modifyHistory
             )
         }
 

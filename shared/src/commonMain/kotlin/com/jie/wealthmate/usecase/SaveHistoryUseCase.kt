@@ -16,7 +16,7 @@ import kotlinx.datetime.isoDayNumber
 import kotlinx.datetime.number
 import kotlinx.datetime.plus
 
-class HistorySaveUseCase(
+class SaveHistoryUseCase(
     private val historyRepository: HistoryRepository,
     private val repeatRepository: RepeatCycleRepository,
     private val installmentRepository: InstallmentRepository,

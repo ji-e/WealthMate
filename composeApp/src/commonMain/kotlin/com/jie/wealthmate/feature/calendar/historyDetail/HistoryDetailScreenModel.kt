@@ -2,32 +2,27 @@ package com.jie.wealthmate.feature.calendar.historyDetail
 
 import androidx.compose.ui.text.input.TextFieldValue
 import com.jie.wealthmate.base.BaseScreenModel
-import com.jie.wealthmate.database.eneity.HistoryEntity
-import com.jie.wealthmate.database.eneity.HistoryInstallment
-import com.jie.wealthmate.database.eneity.InstallmentEntity
 import com.jie.wealthmate.feature.calendar.addHistory.component.RepeatCycleEnum
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.repository.CategoryRepository
 import com.jie.wealthmate.repository.HistoryRepository
-import com.jie.wealthmate.repository.InstallmentRepository
 import com.jie.wealthmate.repository.PaymentMethodRepository
+import com.jie.wealthmate.usecase.ModifyHistoryUseCase
+import com.jie.wealthmate.usecase.UpdateInstallmentUseCase
 import com.jie.wealthmate.utils.default
 import com.jie.wealthmate.utils.formatRemoveCommas
-import com.jie.wealthmate.utils.toEpochMilliseconds
-import com.jie.wealthmate.utils.toLocalDate
 import com.jie.wealthmate.vo.CategoryTagVo
 import com.jie.wealthmate.vo.CategoryVo
 import com.jie.wealthmate.vo.HistoryVo.Companion.mapperToVo
 import com.jie.wealthmate.vo.PaymentMethodVo
-import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
-import kotlinx.datetime.plus
 
 class HistoryDetailScreenModel(
     private val categoryRepository: CategoryRepository,
     private val paymentMethodRepository: PaymentMethodRepository,
     private val historyRepository: HistoryRepository,
-    private val installmentRepository: InstallmentRepository,
+    private val updateInstallmentUseCase: UpdateInstallmentUseCase,
+    private val modifyHistoryUseCase: ModifyHistoryUseCase,
 ) : BaseScreenModel<HistoryDetailUiState>() {
 
     override val initialState: HistoryDetailUiState
@@ -201,93 +196,14 @@ class HistoryDetailScreenModel(
     fun updateInstallment(totalAmount: Long, totalCount: Long) {
         val uiState = container.uiState.value
         val historyVo = uiState.history ?: return
-        val installmentVo = historyVo.installment ?: return
-        val installmentId = installmentVo.id
 
         launchSafe(
             block = {
-                // 1. 할부 정보 업데이트
-                val currentInstallment = InstallmentEntity(
-                    id = installmentId,
-                    content = installmentVo.content,
-                    amount = totalAmount,
-                    count = totalCount,
-                    startDate = installmentVo.startDate.toEpochMilliseconds(),
-                    paymentMethodId = installmentVo.paymentMethodId
+                updateInstallmentUseCase(
+                    historyId = historyVo.id,
+                    totalAmount = totalAmount,
+                    totalCount = totalCount
                 )
-                installmentRepository.updateInstallment(currentInstallment)
-
-                // 2. 관련 내역들 재계산
-                val histories = historyRepository.getHistoriesByInstallmentId(installmentId)
-                    .sortedBy { it.installment?.installmentTime }
-
-                val baseAmount = totalAmount / totalCount
-                val remainder = totalAmount % totalCount
-
-                val updatedHistories = mutableListOf<HistoryEntity>()
-                val newHistories = mutableListOf<HistoryEntity>()
-                val historiesToDelete = mutableListOf<HistoryEntity>()
-
-                var runningRemainAmount = totalAmount
-                var lastDate = histories.firstOrNull()?.date?.toLocalDate() ?: installmentVo.startDate
-
-                for (i in 1..totalCount) {
-                    val amount = if (i == 1L) baseAmount + remainder else baseAmount
-                    runningRemainAmount -= amount
-
-                    val existingHistory = histories.find { it.installment?.installmentTime == i }
-
-                    if (existingHistory != null) {
-                        updatedHistories.add(
-                            existingHistory.copy(
-                                amount = amount,
-                                installment = existingHistory.installment?.copy(
-                                    installmentRemainAmount = runningRemainAmount
-                                )
-                            )
-                        )
-                        lastDate = existingHistory.date.toLocalDate()
-                    } else {
-                        lastDate = lastDate.plus(1, DateTimeUnit.MONTH)
-                        newHistories.add(
-                            HistoryEntity(
-                                largeCategory = historyVo.largeCategory.name,
-                                date = lastDate.toEpochMilliseconds(),
-                                amount = amount,
-                                installmentId = installmentId,
-                                installment = HistoryInstallment(
-                                    installmentTime = i,
-                                    installmentRemainAmount = runningRemainAmount
-                                ),
-                                categoryId = historyVo.category?.id,
-                                categoryTagId = historyVo.categoryTag?.id,
-                                paymentMethodId = historyVo.paymentMethod?.id,
-                                content = historyVo.content,
-                                isVisibility = historyVo.isVisibility
-                            )
-                        )
-                    }
-                }
-
-                // totalCount가 줄어든 경우 기존 내역 삭제
-                histories.forEach { history ->
-                    if (history.installment?.installmentTime.default() > totalCount) {
-                        historiesToDelete.add(history)
-                    }
-                }
-
-                // DB 작업
-                if (updatedHistories.isNotEmpty()) {
-                    historyRepository.updateHistories(updatedHistories)
-                }
-                newHistories.forEach {
-                    historyRepository.insertHistory(it)
-                }
-                historiesToDelete.forEach {
-                    historyRepository.deleteHistory(it.id)
-                }
-
-                // UI 상태 갱신
                 getHistory(historyVo.id)
             }
         ) {
@@ -295,98 +211,24 @@ class HistoryDetailScreenModel(
         }
     }
 
-    fun saveHistory() {
+    fun modifyHistory() {
         val uiState = container.uiState.value
         val historyVo = uiState.history ?: return
-        val newAmount = uiState.amount.text.formatRemoveCommas().toLongOrNull() ?: 0L
+        val newAmount = uiState.amount.text.formatRemoveCommas().toLongOrNull().default()
 
         launchSafe(
             block = {
-                val installmentId = historyVo.installment?.id
-                val installmentTime = historyVo.installmentTime
-
-                if (installmentId != null && installmentTime != null) {
-                    val installmentHistoryItems = uiState.installmentHistoryItems
-                    val totalAmount = historyVo.installment.amount.default()
-
-                    val precedingSum = installmentHistoryItems
-                        .filter { it.installment?.installmentTime != null && it.installment?.installmentTime.default() < installmentTime }
-                        .sumOf { it.amount }
-
-                    val succeedingHistories = installmentHistoryItems
-                        .filter { it.installment?.installmentTime != null && it.installment?.installmentTime.default() > installmentTime }
-                        .sortedBy { it.installment?.installmentTime }
-
-                    val currentRemainAmount = totalAmount - precedingSum - newAmount
-
-                    val historiesToUpdate = mutableListOf<HistoryEntity>()
-
-                    // 현재 수정 중인 내역
-                    historiesToUpdate.add(
-                        HistoryEntity(
-                            id = historyVo.id,
-                            largeCategory = uiState.largeCategory.name,
-                            date = uiState.date.toEpochMilliseconds(),
-                            amount = newAmount,
-                            installmentId = installmentId,
-                            installment = HistoryInstallment(
-                                installmentTime = installmentTime,
-                                installmentRemainAmount = currentRemainAmount
-                            ),
-                            categoryId = uiState.category?.id,
-                            categoryTagId = uiState.categoryTag?.id,
-                            paymentMethodId = uiState.paymentMethod?.id,
-                            content = uiState.content.text,
-                            isVisibility = uiState.isVisibility
-                        )
-                    )
-
-                    // 이후 회차 내역들 금액 재계산 및 업데이트 목록 추가
-                    if (succeedingHistories.isNotEmpty()) {
-                        val count = succeedingHistories.size.toLong()
-                        val base = currentRemainAmount / count
-                        val remainder = currentRemainAmount % count
-
-                        var runningRemainAmount = currentRemainAmount
-                        succeedingHistories.forEachIndexed { index, entity ->
-                            val redistributedAmount = if (index == 0) base + remainder else base
-                            runningRemainAmount -= redistributedAmount
-                            historiesToUpdate.add(
-                                entity.copy(
-                                    amount = redistributedAmount,
-                                    installment = entity.installment?.copy(
-                                        installmentRemainAmount = runningRemainAmount
-                                    )
-                                )
-                            )
-                        }
-                    }
-
-                    historyRepository.updateHistories(historiesToUpdate)
-
-                    getInstallmentHistory(installmentId)
-                } else {
-                    historyRepository.updateHistory(
-                        HistoryEntity(
-                            id = historyVo.id,
-                            largeCategory = uiState.largeCategory.name,
-                            date = uiState.date.toEpochMilliseconds(),
-                            amount = newAmount,
-                            installmentId = historyVo.installment?.id,
-                            installment = historyVo.installmentTime?.let {
-                                HistoryInstallment(
-                                    installmentTime = it,
-                                    installmentRemainAmount = historyVo.installmentRemainAmount.default()
-                                )
-                            },
-                            categoryId = uiState.category?.id,
-                            categoryTagId = uiState.categoryTag?.id,
-                            paymentMethodId = uiState.paymentMethod?.id,
-                            content = uiState.content.text,
-                            isVisibility = uiState.isVisibility
-                        )
-                    )
-                }
+                modifyHistoryUseCase(
+                    historyId = historyVo.id,
+                    newAmount = newAmount,
+                    newDate = uiState.date,
+                    newCategoryId = uiState.category?.id,
+                    newCategoryTagId = uiState.categoryTag?.id,
+                    newPaymentMethodId = uiState.paymentMethod?.id,
+                    newContent = uiState.content.text,
+                    isVisibility = uiState.isVisibility
+                )
+                getHistory(historyVo.id)
             }
         ) {
             showSnackbar("저장되었습니다.")

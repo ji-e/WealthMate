@@ -7,11 +7,11 @@ import com.jie.wealthmate.feature.calendar.addHistory.AddHistoryScreenModel
 import com.jie.wealthmate.feature.calendar.historyDetail.HistoryDetailScreenModel
 import com.jie.wealthmate.feature.home.HomeScreenModel
 import com.jie.wealthmate.feature.menu.MenuScreenModel
+import com.jie.wealthmate.feature.menu.data.googleCloudShare.GoogleCloudShareScreenModel
+import com.jie.wealthmate.feature.menu.data.googleCloudSync.GoogleCloudSyncScreenModel
 import com.jie.wealthmate.feature.menu.management.categoryManagement.CategoryManagementScreenModel
 import com.jie.wealthmate.feature.menu.management.categoryManagement.addCategory.AddCategoryScreenModel
 import com.jie.wealthmate.feature.menu.management.categoryManagement.modifyCategory.ModifyCategoryScreenModel
-import com.jie.wealthmate.feature.menu.data.googleCloudShare.GoogleCloudShareScreenModel
-import com.jie.wealthmate.feature.menu.data.googleCloudSync.GoogleCloudSyncScreenModel
 import com.jie.wealthmate.feature.menu.management.paymentMethodManagement.PaymentMethodManagementScreenModel
 import com.jie.wealthmate.feature.menu.management.paymentMethodManagement.addPaymentMethod.AddPaymentMethodScreenModel
 import com.jie.wealthmate.feature.menu.management.paymentMethodManagement.modifyPaymentMethod.ModifyPaymentMethodScreenModel
@@ -31,7 +31,9 @@ import com.jie.wealthmate.repository.PaymentMethodRepository
 import com.jie.wealthmate.repository.PaymentMethodRepositoryImpl
 import com.jie.wealthmate.repository.RepeatCycleRepository
 import com.jie.wealthmate.repository.RepeatCycleRepositoryImpl
-import com.jie.wealthmate.usecase.HistorySaveUseCase
+import com.jie.wealthmate.usecase.ModifyHistoryUseCase
+import com.jie.wealthmate.usecase.SaveHistoryUseCase
+import com.jie.wealthmate.usecase.UpdateInstallmentUseCase
 import org.koin.dsl.module
 
 val commonModule = module {
@@ -48,7 +50,9 @@ val commonModule = module {
     single<RepeatCycleRepository> { RepeatCycleRepositoryImpl(get()) }
 
 
-    single { HistorySaveUseCase(get(), get(), get()) }
+    single { SaveHistoryUseCase(get(), get(), get()) }
+    single { UpdateInstallmentUseCase(get(), get()) }
+    single { ModifyHistoryUseCase(get()) }
 
 
     // 홈
@@ -57,7 +61,7 @@ val commonModule = module {
     // 캘린더
     factory { CalendarScreenModel(get(), get()) }
     factory { AddHistoryScreenModel(get(), get(), get(), get()) }
-    factory { HistoryDetailScreenModel(get(), get(), get(), get()) }
+    factory { HistoryDetailScreenModel(get(), get(), get(), get(), get()) }
 
 
     // 자산
