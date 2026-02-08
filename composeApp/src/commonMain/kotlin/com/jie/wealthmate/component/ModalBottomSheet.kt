@@ -11,6 +11,7 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Typography
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
@@ -31,6 +32,10 @@ fun WMModalBottomSheet(
     content: @Composable ColumnScope.() -> Unit,
 ) {
     val focusManager = LocalFocusManager.current
+
+    LaunchedEffect(Unit){
+        focusManager.clearFocus()
+    }
 
     ModalBottomSheet(
         modifier = modifier,
