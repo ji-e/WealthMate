@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -31,7 +32,7 @@ import com.jie.wealthmate.theme.ColorGray
 import com.jie.wealthmate.theme.ColorRed
 
 @Composable
-fun InstallmentRemoveConfirmDialog(
+fun RemoveInstallmentConfirmDialog(
     onConfirmClick: (Boolean) -> Unit,
     onDismissRequest: () -> Unit,
 ) {
@@ -44,17 +45,22 @@ fun InstallmentRemoveConfirmDialog(
             modifier = Modifier
                 .clip(shape = RoundedCornerShape(20.dp))
                 .background(ColorGray.White)
-                .heightIn(min = 180.dp)
+                .wrapContentHeight()
+                .heightIn(min = 220.dp)
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Box(
                 modifier = Modifier
                     .weight(1f)
-                    .padding(20.dp),
+                    .padding(horizontal = 20.dp, vertical = 32.dp),
                 contentAlignment = Alignment.Center
             ) {
-                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Column(
+                    modifier = Modifier,
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
                     WMText(
                         text = "정말 삭제하시겠습니까?\n삭제된 정보는 복구할 수 없습니다.",
                         textAlign = TextAlign.Center,
@@ -63,8 +69,9 @@ fun InstallmentRemoveConfirmDialog(
 
                     WMCheckBox(
                         label = "관련 모든 할부 내역 삭제",
+                        labelStyle = Typography().titleSmall,
                         checked = isChecked,
-                        onCheckedChange = { isChecked = it }
+                        onCheckedChange = { isChecked = it },
                     )
                 }
             }

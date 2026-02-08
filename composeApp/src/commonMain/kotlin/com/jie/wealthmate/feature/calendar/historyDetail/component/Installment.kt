@@ -44,9 +44,8 @@ fun Installment(
             .fillMaxWidth()
             .clip(RoundedCornerShape(8.dp))
             .background(ColorGray.Gray_50)
-            .padding(vertical = 12.dp),
+            .padding(top = 8.dp, bottom = 16.dp),
     ) {
-
 
         Row(
             modifier = Modifier.padding(bottom = 6.dp),
@@ -56,7 +55,7 @@ fun Installment(
                 text = "총 ${formatWithCommas(installment.amount.toString())}원 / ${installment.count}개월",
                 style = Typography().titleMedium.copy(fontWeight = FontWeight.SemiBold),
                 modifier = Modifier
-                    .padding(start = 12.dp)
+                    .padding(start = 16.dp)
                     .weight(1f, false)
             )
 
@@ -71,14 +70,14 @@ fun Installment(
         WMText(
             text = "할부 내역",
             style = Typography().bodyMedium.copy(fontWeight = FontWeight.SemiBold),
-            modifier = Modifier.padding(horizontal = 12.dp)
+            modifier = Modifier.padding(horizontal = 16.dp)
         )
 
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 8.dp, bottom = 4.dp)
-                .padding(horizontal = 12.dp),
+                .padding(horizontal = 16.dp),
             horizontalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             WMText(
@@ -87,7 +86,7 @@ fun Installment(
                     fontWeight = FontWeight.SemiBold,
                     color = ColorGray.Gray_500
                 ),
-                modifier = Modifier.width(48.dp)
+                modifier = Modifier.width(44.dp)
             )
             WMText(
                 text = "날짜",
@@ -95,7 +94,7 @@ fun Installment(
                     fontWeight = FontWeight.SemiBold,
                     color = ColorGray.Gray_500
                 ),
-                modifier = Modifier.width(60.dp),
+                modifier = Modifier.width(56.dp),
                 maxLines = 1
 
             )
@@ -135,20 +134,20 @@ fun Installment(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(color = backgroundColor)
-                    .padding(vertical = 2.dp, horizontal = 12.dp),
+                    .padding(vertical = 2.dp, horizontal = 16.dp),
                 horizontalArrangement = Arrangement.spacedBy(4.dp)
             ) {
 
                 WMText(
                     text = "${installmentHistory.installment?.installmentTime}회차",
                     style = Typography().bodyMedium.copy(fontWeight = fontWeight),
-                    modifier = Modifier.width(48.dp)
+                    modifier = Modifier.width(44.dp)
                 )
                 WMText(
                     text = installmentHistory.date.toLocalDate()
                         .convertLocalDateToString(formatDateDotYYMD),
                     style = Typography().bodyMedium.copy(fontWeight = fontWeight),
-                    modifier = Modifier.width(60.dp),
+                    modifier = Modifier.width(56.dp),
                     maxLines = 1
 
                 )

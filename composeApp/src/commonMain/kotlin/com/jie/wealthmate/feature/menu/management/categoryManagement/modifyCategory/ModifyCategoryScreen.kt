@@ -123,6 +123,7 @@ class ModifyCategoryScreen(
             Column(
                 modifier = Modifier
                     .weight(1f)
+                    .padding(horizontal = 28.dp)
                     .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -142,9 +143,7 @@ class ModifyCategoryScreen(
                 WMTextField(
                     value = uiState.label,
                     onValueChange = screenModel::updateCategoryLabel,
-                    modifier = Modifier
-                        .padding(top = 32.dp)
-                        .padding(horizontal = 28.dp),
+                    modifier = Modifier.padding(top = 32.dp),
                     textFieldModifier = Modifier.focusRequester(remember { FocusRequester() })
                         .onFocusChanged { focusState ->
                             isKeyboardOpen = focusState.isFocused
@@ -158,9 +157,7 @@ class ModifyCategoryScreen(
 
                 // 카테고리 태그
                 CategoryTag(
-                    modifier = Modifier
-                        .padding(top = 4.dp)
-                        .padding(horizontal = 28.dp),
+                    modifier = Modifier.padding(top = 4.dp),
                     textFieldModifier = Modifier.focusRequester(remember { FocusRequester() })
                         .onFocusChanged { focusState ->
                             isKeyboardOpen = focusState.isFocused
@@ -184,8 +181,8 @@ class ModifyCategoryScreen(
                 label = "고정 카테고리",
                 checked = uiState.isFixed,
                 modifier = Modifier
-                    .padding(start = 14.dp)
-                    .padding(vertical = 8.dp)
+                    .padding(start = 28.dp)
+                    .padding(vertical = 16.dp)
                     .align(Alignment.Start),
                 onCheckedChange = screenModel::updateIsFixed,
             )
