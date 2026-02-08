@@ -9,8 +9,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import com.jie.wealthmate.theme.ColorGray
 import androidx.compose.ui.tooling.preview.Preview
+import com.jie.wealthmate.theme.ColorGray
+import com.jie.wealthmate.theme.noRippleClickable
 
 @Composable
 fun WMCheckBox(
@@ -21,7 +22,7 @@ fun WMCheckBox(
     onCheckedChange: (Boolean) -> Unit = {},
 ) {
     Row(
-        modifier = modifier,
+        modifier = modifier.noRippleClickable { onCheckedChange(checked.not()) },
         verticalAlignment = Alignment.CenterVertically
     ) {
         Checkbox(

@@ -238,13 +238,18 @@ class HistoryDetailScreenModel(
         }
     }
 
-    fun removeHistory() {
+    fun removeHistory(isInstallmentAllRemove: Boolean = false) {
         val uiState = container.uiState.value
-        uiState.history?.id ?: return
+        val historyVo = uiState.history ?: return
 
         launchSafe(
             block = {
-                historyRepository.deleteHistory(uiState.history.id)
+                val installmentId = historyVo.installment?.id
+                if (isInstallmentAllRemove && installmentId != null) {
+                    historyRepository.deleteHistoriesByInstallmentId(installmentId)
+                } else {
+                    historyRepository.deleteHistory(historyVo.id)
+                }
             }
         ) {
             showSnackbar("${uiState.largeCategory.label} 내역이 삭제되었습니다.")

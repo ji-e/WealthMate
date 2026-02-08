@@ -20,6 +20,8 @@ interface HistoryRepository {
 
     suspend fun deleteHistory(id: String)
 
+    suspend fun deleteHistoriesByInstallmentId(installmentId: String)
+
     fun getHistoriesByMonth(startDate: Long, endDate: Long): Flow<List<HistoryWithDetails>>
 
     fun getSumByMonth(startDate: Long, endDate: Long, categoryType: String): Flow<Long>

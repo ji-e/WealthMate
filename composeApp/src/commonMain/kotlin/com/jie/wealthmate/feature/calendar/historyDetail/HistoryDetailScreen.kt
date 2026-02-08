@@ -47,6 +47,7 @@ import com.jie.wealthmate.feature.calendar.addHistory.component.RepeatCycleModal
 import com.jie.wealthmate.feature.calendar.historyDetail.component.Category
 import com.jie.wealthmate.feature.calendar.historyDetail.component.CategorySelectModalBottomSheet
 import com.jie.wealthmate.feature.calendar.historyDetail.component.Installment
+import com.jie.wealthmate.feature.calendar.historyDetail.component.InstallmentRemoveConfirmDialog
 import com.jie.wealthmate.feature.calendar.historyDetail.component.ModifyInstallmentModalBottomSheet
 import com.jie.wealthmate.feature.calendar.historyDetail.component.RepeatCycle
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
@@ -73,6 +74,9 @@ class HistoryDetailScreen(
         var isShowCategorySelectModalBottomSheet by remember { mutableStateOf(false) }
         var isShowPaymentMethodModalBottomSheet by remember { mutableStateOf(false) }
         var isShowModifyInstallmentModalBottomSheet by remember { mutableStateOf(false) }
+
+        var isShowInstallmentRemoveConfirmDialog by remember { mutableStateOf(false) }
+
 
         fun onBack() {
             showSaveBackDialog(uiState.isDataChanged) {
@@ -111,8 +115,12 @@ class HistoryDetailScreen(
                     TopBarItem.TrailingItem(
                         iconRes = Res.drawable.ic_delete_outline,
                         action = {
-                            showRemoveDialog() {
-                                screenModel.removeHistory()
+                            if (uiState.history?.installment == null) {
+                                showRemoveDialog() {
+                                    screenModel.removeHistory()
+                                }
+                            } else {
+                                isShowInstallmentRemoveConfirmDialog = true
                             }
                         }
                     )
@@ -131,38 +139,6 @@ class HistoryDetailScreen(
                     amount = uiState.amount,
                     isTrailingIconVisible = false,
                     onDateClick = { isShowDateSelectModalBottomSheet = true },
-//                    onRepeatClick = {
-//                        if (uiState.installmentCount != null) {
-//                            showConfirmDialog(
-//                                isShow = true,
-//                                content = "할부가 선택되어있습니다.\n할부 선택을 취소하시겠습니까?",
-//                                callback = {
-//                                    screenModel.updateInstallmentCount(null)
-//                                    isShowRepeatCycleModalBottomSheet = true
-//                                }
-//                            )
-//                        } else {
-//                            isShowRepeatCycleModalBottomSheet = true
-//                        }
-//                    },
-//                    onInstallmentClick = {
-//                        if (uiState.repeatCycle != null) {
-//                            showConfirmDialog(
-//                                isShow = true,
-//                                content = "반복 주기가 선택되어있습니다.\n반복 주기 선택을 취소하시겠습니까?",
-//                                callback = {
-//                                    screenModel.updateRepeatCycle(null)
-//                                    isShowInstallmentModalBottomSheet = true
-//                                }
-//                            )
-//                        } else {
-//                            isShowInstallmentModalBottomSheet = true
-//                        }
-//                    },
-//                    onResetClick = {
-//                        screenModel.updateRepeatCycle(null)
-//                        screenModel.updateInstallmentCount(null)
-//                    }
                 )
 
                 // 금액 입력
@@ -313,6 +289,13 @@ class HistoryDetailScreen(
                     )
                 },
                 onDismissRequest = { isShowModifyInstallmentModalBottomSheet = false },
+            )
+        }
+
+        if (isShowInstallmentRemoveConfirmDialog) {
+            InstallmentRemoveConfirmDialog(
+                onConfirmClick = screenModel::removeHistory,
+                onDismissRequest = { isShowInstallmentRemoveConfirmDialog = false }
             )
         }
     }
