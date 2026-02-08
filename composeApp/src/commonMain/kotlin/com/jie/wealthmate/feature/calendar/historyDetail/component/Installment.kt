@@ -44,7 +44,7 @@ fun Installment(
             .fillMaxWidth()
             .clip(RoundedCornerShape(8.dp))
             .background(ColorGray.Gray_50)
-            .padding(top = 8.dp, bottom = 16.dp),
+            .padding(top = 6.dp, bottom = 16.dp),
     ) {
 
         Row(
@@ -62,7 +62,7 @@ fun Installment(
             WMIconButton(
                 iconRes = Res.drawable.ic_edit,
                 iconButtonModifier = Modifier.size(36.dp),
-                modifier = Modifier.size(20.dp),
+                modifier = Modifier.size(18.dp),
                 onClick = onModifyClick
             )
         }

@@ -44,19 +44,15 @@ class HistoryDetailScreenModel(
     }
 
     fun updateRepeatCycle(repeatCycle: RepeatCycleEnum?) {
+        repeatCycle ?: return
         reduceState { state ->
             state.copy(
                 isDataChanged = true,
-                repeatCycle = repeatCycle
-            )
-        }
-    }
-
-    fun updateInstallmentCount(installmentCount: Long?) {
-        reduceState { state ->
-            state.copy(
-                isDataChanged = true,
-                totalInstallmentCount = installmentCount
+                history = state.history?.copy(
+                    repeatCycle = state.history.repeatCycle?.copy(
+                        repeatCycle = repeatCycle
+                    )
+                )
             )
         }
     }

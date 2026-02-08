@@ -40,7 +40,6 @@ import com.jie.wealthmate.component.topbar.TopBarItem
 import com.jie.wealthmate.component.topbar.WMTopBar
 import com.jie.wealthmate.feature.calendar.addHistory.component.DateSelectModalBottomSheet
 import com.jie.wealthmate.feature.calendar.addHistory.component.DateTextField
-import com.jie.wealthmate.feature.calendar.addHistory.component.InstallmentModalBottomSheet
 import com.jie.wealthmate.feature.calendar.addHistory.component.PaymentMethodModalBottomSheet
 import com.jie.wealthmate.feature.calendar.addHistory.component.PaymentMethodTextField
 import com.jie.wealthmate.feature.calendar.addHistory.component.RepeatCycleModalBottomSheet
@@ -70,7 +69,6 @@ class HistoryDetailScreen(
 
         var isShowDateSelectModalBottomSheet by remember { mutableStateOf(false) }
         var isShowRepeatCycleModalBottomSheet by remember { mutableStateOf(false) }
-        var isShowInstallmentModalBottomSheet by remember { mutableStateOf(false) }
         var isShowCategorySelectModalBottomSheet by remember { mutableStateOf(false) }
         var isShowPaymentMethodModalBottomSheet by remember { mutableStateOf(false) }
         var isShowModifyInstallmentModalBottomSheet by remember { mutableStateOf(false) }
@@ -168,7 +166,9 @@ class HistoryDetailScreen(
                             if (history.repeatCycle != null) {
                                 RepeatCycle(
                                     modifier = Modifier.padding(top = 4.dp, bottom = 24.dp),
-                                    repeatCycle = history.repeatCycle
+                                    repeatCycle = history.repeatCycle,
+                                    onModifyRepeatCycleClick = { isShowRepeatCycleModalBottomSheet = true },
+                                    onEndDateClick = { isShowDateSelectModalBottomSheet = true }
                                 )
                             }
                             // 할부
@@ -241,17 +241,9 @@ class HistoryDetailScreen(
 
         if (isShowRepeatCycleModalBottomSheet) {
             RepeatCycleModalBottomSheet(
-                selectedRepeatCycle = uiState.repeatCycle,
+                selectedRepeatCycle = uiState.history?.repeatCycle?.repeatCycle,
                 onConfirmClick = screenModel::updateRepeatCycle,
                 onDismissRequest = { isShowRepeatCycleModalBottomSheet = false }
-            )
-        }
-
-        if (isShowInstallmentModalBottomSheet) {
-            InstallmentModalBottomSheet(
-                totalInstallmentCount = uiState.totalInstallmentCount,
-                onConfirmClick = screenModel::updateInstallmentCount,
-                onDismissRequest = { isShowInstallmentModalBottomSheet = false }
             )
         }
 
