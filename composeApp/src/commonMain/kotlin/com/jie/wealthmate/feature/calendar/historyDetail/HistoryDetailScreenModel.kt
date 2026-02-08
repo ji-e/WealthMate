@@ -8,7 +8,6 @@ import com.jie.wealthmate.feature.menu.management.categoryManagement.component.L
 import com.jie.wealthmate.repository.CategoryRepository
 import com.jie.wealthmate.repository.HistoryRepository
 import com.jie.wealthmate.repository.PaymentMethodRepository
-import com.jie.wealthmate.usecase.HistorySaveUseCase
 import com.jie.wealthmate.utils.default
 import com.jie.wealthmate.utils.formatRemoveCommas
 import com.jie.wealthmate.utils.toEpochMilliseconds
@@ -22,7 +21,6 @@ class HistoryDetailScreenModel(
     private val categoryRepository: CategoryRepository,
     private val paymentMethodRepository: PaymentMethodRepository,
     private val historyRepository: HistoryRepository,
-    private val historySaveUseCase: HistorySaveUseCase,
 ) : BaseScreenModel<HistoryDetailUiState>() {
 
     override val initialState: HistoryDetailUiState
@@ -52,11 +50,11 @@ class HistoryDetailScreenModel(
         }
     }
 
-    fun updateInstallmentCount(installmentCount: Int?) {
+    fun updateInstallmentCount(installmentCount: Long?) {
         reduceState { state ->
             state.copy(
                 isDataChanged = true,
-                installmentCount = installmentCount
+                totalInstallmentCount = installmentCount
             )
         }
     }
@@ -124,13 +122,13 @@ class HistoryDetailScreenModel(
                     content = TextFieldValue(history.content.default()),
                 )
             }
-            getInstallment(history.installment?.id)
+            getInstallmentHistory(history.installment?.id)
             getCategories(history.largeCategory)
             println(response)
         }
     }
 
-    fun getInstallment(installmentId: String?) {
+    fun getInstallmentHistory(installmentId: String?) {
         installmentId ?: return
 
         launchSafe(
@@ -205,7 +203,6 @@ class HistoryDetailScreenModel(
 
                 if (installmentId != null && installmentTime != null) {
                     val installmentHistoryItems = uiState.installmentHistoryItems
-//                        historyRepository.getHistoriesByInstallmentId(installmentId)
                     val totalAmount = historyVo.installment.amount.default()
 
                     val precedingSum = installmentHistoryItems
@@ -216,7 +213,7 @@ class HistoryDetailScreenModel(
                         .filter { it.installmentTime != null && it.installmentTime.default() > installmentTime }
                         .sortedBy { it.installmentTime }
 
-                    val remainingAmount = totalAmount - precedingSum - newAmount
+                    val currentRemainAmount = totalAmount - precedingSum - newAmount
 
                     val historiesToUpdate = mutableListOf<HistoryEntity>()
 
@@ -229,6 +226,7 @@ class HistoryDetailScreenModel(
                             amount = newAmount,
                             installmentId = installmentId,
                             installmentTime = installmentTime,
+                            installmentRemainAmount = currentRemainAmount,
                             categoryId = uiState.category?.id,
                             categoryTagId = uiState.categoryTag?.id,
                             paymentMethodId = uiState.paymentMethod?.id,
@@ -240,20 +238,25 @@ class HistoryDetailScreenModel(
                     // 이후 회차 내역들 금액 재계산 및 업데이트 목록 추가
                     if (succeedingHistories.isNotEmpty()) {
                         val count = succeedingHistories.size.toLong()
-                        val base = remainingAmount / count
-                        val remainder = remainingAmount % count
+                        val base = currentRemainAmount / count
+                        val remainder = currentRemainAmount % count
 
+                        var runningRemainAmount = currentRemainAmount
                         succeedingHistories.forEachIndexed { index, entity ->
                             val redistributedAmount = if (index == 0) base + remainder else base
+                            runningRemainAmount -= redistributedAmount
                             historiesToUpdate.add(
                                 entity.copy(
                                     amount = redistributedAmount,
+                                    installmentRemainAmount = runningRemainAmount
                                 )
                             )
                         }
                     }
 
                     historyRepository.updateHistories(historiesToUpdate)
+
+                    getInstallmentHistory(installmentId)
                 } else {
                     historyRepository.updateHistory(
                         HistoryEntity(

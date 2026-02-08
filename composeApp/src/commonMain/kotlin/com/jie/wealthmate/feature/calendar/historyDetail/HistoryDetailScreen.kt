@@ -267,7 +267,7 @@ class HistoryDetailScreen(
 
         if (isShowInstallmentModalBottomSheet) {
             InstallmentModalBottomSheet(
-                installmentCount = uiState.installmentCount,
+                totalInstallmentCount = uiState.totalInstallmentCount,
                 onConfirmClick = screenModel::updateInstallmentCount,
                 onDismissRequest = { isShowInstallmentModalBottomSheet = false }
             )

@@ -143,10 +143,10 @@ class AddHistoryScreen(private val selectedDate: LocalDate) : BaseScreen() {
                     selectedDate = uiState.date,
                     amount = uiState.amount,
                     repeatCycle = uiState.repeatCycle,
-                    totalInstallment = uiState.totalInstallment,
+                    totalInstallmentCount = uiState.totalInstallmentCount,
                     onDateClick = { isShowDateSelectModalBottomSheet = true },
                     onRepeatClick = {
-                        if (uiState.totalInstallment != null) {
+                        if (uiState.totalInstallmentCount != null) {
                             showConfirmDialog(
                                 isShow = true,
                                 content = "할부가 선택되어있습니다.\n할부 선택을 취소하시겠습니까?",
@@ -267,7 +267,7 @@ class AddHistoryScreen(private val selectedDate: LocalDate) : BaseScreen() {
 
         if (isShowInstallmentModalBottomSheet) {
             InstallmentModalBottomSheet(
-                installmentCount = uiState.totalInstallment,
+                totalInstallmentCount = uiState.totalInstallmentCount,
                 onConfirmClick = screenModel::updateTotalInstallmentCount,
                 onDismissRequest = { isShowInstallmentModalBottomSheet = false }
             )

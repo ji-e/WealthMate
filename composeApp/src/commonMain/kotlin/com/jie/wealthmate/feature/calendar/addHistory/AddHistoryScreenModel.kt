@@ -67,11 +67,11 @@ class AddHistoryScreenModel(
         }
     }
 
-    fun updateTotalInstallmentCount(totalInstallment: Int?) {
+    fun updateTotalInstallmentCount(totalInstallment: Long?) {
         reduceState { state ->
             state.copy(
                 isDataChanged = true,
-                totalInstallment = totalInstallment
+                totalInstallmentCount = totalInstallment
             )
         }
     }
@@ -183,7 +183,7 @@ class AddHistoryScreenModel(
                         content = uiState.content.text,
                     ),
                     repeatCycle = uiState.repeatCycle?.name,
-                    totalInstallment = uiState.totalInstallment?.toLong()
+                    totalInstallmentCount = uiState.totalInstallmentCount
                 )
             }
         ) {

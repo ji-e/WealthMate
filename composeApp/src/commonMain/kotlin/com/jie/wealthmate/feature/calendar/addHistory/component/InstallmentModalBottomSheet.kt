@@ -24,12 +24,12 @@ import com.jie.wealthmate.component.textField.WMTextField
 
 @Composable
 fun InstallmentModalBottomSheet(
-    installmentCount: Int?,
-    onConfirmClick: (Int?) -> Unit,
+    totalInstallmentCount: Long?,
+    onConfirmClick: (Long?) -> Unit,
     onDismissRequest: () -> Unit,
 ) {
     var tempInstallmentCount by remember {
-        mutableStateOf(TextFieldValue(installmentCount?.toString() ?: ""))
+        mutableStateOf(TextFieldValue(totalInstallmentCount?.toString() ?: ""))
     }
 
     WMModalBottomSheet(
@@ -64,7 +64,7 @@ fun InstallmentModalBottomSheet(
                 modifier = Modifier.fillMaxWidth(),
                 onClick = {
                     onDismissRequest()
-                    onConfirmClick(tempInstallmentCount.text.toIntOrNull())
+                    onConfirmClick(tempInstallmentCount.text.toLongOrNull())
                 }
             )
         }

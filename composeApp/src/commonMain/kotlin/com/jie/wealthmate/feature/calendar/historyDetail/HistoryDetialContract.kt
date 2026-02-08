@@ -19,7 +19,7 @@ data class HistoryDetailUiState(
     val largeCategory: LargeCategoryEnum = LargeCategoryEnum.EXPENSES,
     val date: LocalDate = today,
     val repeatCycle: RepeatCycleEnum? = null,
-    val installmentCount: Int? = null,
+    val totalInstallmentCount: Long? = null,
     val content: TextFieldValue = TextFieldValue(""),
     val amount: TextFieldValue = TextFieldValue(""),
     val category: CategoryVo? = null,

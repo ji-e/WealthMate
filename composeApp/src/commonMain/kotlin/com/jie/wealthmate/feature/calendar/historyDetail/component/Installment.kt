@@ -45,7 +45,7 @@ fun Installment(
             modifier = Modifier.padding(horizontal = 12.dp)
         )
         WMText(
-            text = "${formatWithCommas(installment.amount.toString())}원 / ${installment.count}개월",
+            text = "총 ${formatWithCommas(installment.amount.toString())}원 / ${installment.count}개월",
             style = Typography().titleMedium.copy(fontWeight = FontWeight.SemiBold),
             modifier = Modifier
                 .padding(top = 4.dp)
@@ -96,9 +96,7 @@ fun Installment(
                 maxLines = 1
             )
         }
-        var remainAmount = installment.amount
         installmentHistoryItems.forEachIndexed { index, installmentHistory ->
-            remainAmount -= installmentHistory.amount
             val isInstallmentSelected = installmentHistory.installmentTime == installmentTime
             val backgroundColor: Color
             val fontWeight: FontWeight
@@ -138,7 +136,7 @@ fun Installment(
                     maxLines = 1
                 )
                 WMText(
-                    text = "${formatWithCommas(remainAmount.toString())}원",
+                    text = "${formatWithCommas(installmentHistory.installmentRemainAmount.toString())}원",
                     style = Typography().bodyMedium.copy(fontWeight = fontWeight),
                     modifier = Modifier.weight(3f),
                     maxLines = 1

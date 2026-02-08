@@ -25,7 +25,7 @@ class HistorySaveUseCase(
     suspend operator fun invoke(
         history: HistoryEntity,
         repeatCycle: String?,
-        totalInstallment: Long?,
+        totalInstallmentCount: Long?,
     ) {
         if (repeatCycle != null) {
             // 1. 반복 설정 정보 먼저 생성 및 저장
@@ -53,26 +53,28 @@ class HistorySaveUseCase(
             // 2. 생성된 ID를 연결하여 첫 내역 저장
             val linkedHistory = history.copy(repeatCycleId = repeatCycleId)
             historyRepository.insertHistory(linkedHistory)
-        } else if (totalInstallment != null && totalInstallment > 0) {
+        } else if (totalInstallmentCount != null && totalInstallmentCount > 0) {
             // 1. 할부 정보 먼저 생성 및 저장
             val installmentId = generateId()
             val installmentPlan = getInstallmentPlan(
                 totalAmount = history.amount,
-                months = totalInstallment
+                months = totalInstallmentCount
             )
 
             val installmentEntity = InstallmentEntity(
                 id = installmentId,
                 content = history.content,
                 amount = history.amount,
-                count = totalInstallment,
+                count = totalInstallmentCount,
                 startDate = history.date,
                 paymentMethodId = history.paymentMethodId,
             )
             installmentRepository.insertInstallment(installmentEntity)
 
-            // 2. 생성된 ID를 연결하여 첫 내역 저장
+            // 2. 생성된 ID를 연결하여 내역 저장
+            var remainAmount = history.amount
             installmentPlan.forEachIndexed { index, installmentAmount ->
+                remainAmount -= installmentAmount
                 historyRepository.insertHistory(
                     history.copy(
                         date = history.date.toLocalDate()
@@ -80,7 +82,8 @@ class HistorySaveUseCase(
                             .toEpochMilliseconds(),
                         amount = installmentAmount,
                         installmentId = installmentId,
-                        installmentTime = index + 1L
+                        installmentTime = index + 1L,
+                        installmentRemainAmount = remainAmount
                     )
                 )
             }

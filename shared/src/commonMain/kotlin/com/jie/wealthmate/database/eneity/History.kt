@@ -18,6 +18,7 @@ data class HistoryEntity(
     val repeatCycleId: String? = null,
     val installmentId: String? = null,
     val installmentTime: Long? = null,
+    val installmentRemainAmount: Long? = null,
     val categoryId: String? = null,
     val categoryTagId: String? = null,
     val paymentMethodId: String? = null,
