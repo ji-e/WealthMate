@@ -47,7 +47,7 @@ import com.jie.wealthmate.feature.calendar.addHistory.component.RepeatCycleModal
 import com.jie.wealthmate.feature.calendar.historyDetail.component.Category
 import com.jie.wealthmate.feature.calendar.historyDetail.component.CategorySelectModalBottomSheet
 import com.jie.wealthmate.feature.calendar.historyDetail.component.Installment
-import com.jie.wealthmate.feature.calendar.historyDetail.component.InstallmentRemoveConfirmDialog
+import com.jie.wealthmate.feature.calendar.historyDetail.component.RemoveInstallmentConfirmDialog
 import com.jie.wealthmate.feature.calendar.historyDetail.component.ModifyInstallmentModalBottomSheet
 import com.jie.wealthmate.feature.calendar.historyDetail.component.RepeatCycle
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
@@ -75,7 +75,7 @@ class HistoryDetailScreen(
         var isShowPaymentMethodModalBottomSheet by remember { mutableStateOf(false) }
         var isShowModifyInstallmentModalBottomSheet by remember { mutableStateOf(false) }
 
-        var isShowInstallmentRemoveConfirmDialog by remember { mutableStateOf(false) }
+        var isShowRemoveInstallmentConfirmDialog by remember { mutableStateOf(false) }
 
 
         fun onBack() {
@@ -120,7 +120,7 @@ class HistoryDetailScreen(
                                     screenModel.removeHistory()
                                 }
                             } else {
-                                isShowInstallmentRemoveConfirmDialog = true
+                                isShowRemoveInstallmentConfirmDialog = true
                             }
                         }
                     )
@@ -292,10 +292,10 @@ class HistoryDetailScreen(
             )
         }
 
-        if (isShowInstallmentRemoveConfirmDialog) {
-            InstallmentRemoveConfirmDialog(
+        if (isShowRemoveInstallmentConfirmDialog) {
+            RemoveInstallmentConfirmDialog(
                 onConfirmClick = screenModel::removeHistory,
-                onDismissRequest = { isShowInstallmentRemoveConfirmDialog = false }
+                onDismissRequest = { isShowRemoveInstallmentConfirmDialog = false }
             )
         }
     }
