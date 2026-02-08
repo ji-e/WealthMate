@@ -9,6 +9,12 @@ import kotlinx.serialization.Serializable
 import kotlin.time.Clock
 
 @Serializable
+data class HistoryInstallment(
+    val installmentTime: Long,
+    val installmentRemainAmount: Long
+)
+
+@Serializable
 @Entity(tableName = "histories")
 data class HistoryEntity(
     @PrimaryKey val id: String = uuid4().toString(),
@@ -17,8 +23,7 @@ data class HistoryEntity(
     val amount: Long,
     val repeatCycleId: String? = null,
     val installmentId: String? = null,
-    val installmentTime: Long? = null,
-    val installmentRemainAmount: Long? = null,
+    @Embedded val installment: HistoryInstallment? = null,
     val categoryId: String? = null,
     val categoryTagId: String? = null,
     val paymentMethodId: String? = null,

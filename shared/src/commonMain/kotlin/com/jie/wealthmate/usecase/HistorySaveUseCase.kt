@@ -2,6 +2,7 @@ package com.jie.wealthmate.usecase
 
 import com.benasher44.uuid.uuid4
 import com.jie.wealthmate.database.eneity.HistoryEntity
+import com.jie.wealthmate.database.eneity.HistoryInstallment
 import com.jie.wealthmate.database.eneity.InstallmentEntity
 import com.jie.wealthmate.database.eneity.RepeatCycleEntity
 import com.jie.wealthmate.repository.HistoryRepository
@@ -82,8 +83,10 @@ class HistorySaveUseCase(
                             .toEpochMilliseconds(),
                         amount = installmentAmount,
                         installmentId = installmentId,
-                        installmentTime = index + 1L,
-                        installmentRemainAmount = remainAmount
+                        installment = HistoryInstallment(
+                            installmentTime = index + 1L,
+                            installmentRemainAmount = remainAmount
+                        )
                     )
                 )
             }

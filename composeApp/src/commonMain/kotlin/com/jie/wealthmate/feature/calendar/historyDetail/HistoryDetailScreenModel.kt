@@ -3,6 +3,7 @@ package com.jie.wealthmate.feature.calendar.historyDetail
 import androidx.compose.ui.text.input.TextFieldValue
 import com.jie.wealthmate.base.BaseScreenModel
 import com.jie.wealthmate.database.eneity.HistoryEntity
+import com.jie.wealthmate.database.eneity.HistoryInstallment
 import com.jie.wealthmate.feature.calendar.addHistory.component.RepeatCycleEnum
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.repository.CategoryRepository
@@ -206,12 +207,12 @@ class HistoryDetailScreenModel(
                     val totalAmount = historyVo.installment.amount.default()
 
                     val precedingSum = installmentHistoryItems
-                        .filter { it.installmentTime != null && it.installmentTime.default() < installmentTime }
+                        .filter { it.installment?.installmentTime != null && it.installment?.installmentTime.default() < installmentTime }
                         .sumOf { it.amount }
 
                     val succeedingHistories = installmentHistoryItems
-                        .filter { it.installmentTime != null && it.installmentTime.default() > installmentTime }
-                        .sortedBy { it.installmentTime }
+                        .filter { it.installment?.installmentTime != null && it.installment?.installmentTime.default() > installmentTime }
+                        .sortedBy { it.installment?.installmentTime }
 
                     val currentRemainAmount = totalAmount - precedingSum - newAmount
 
@@ -225,8 +226,10 @@ class HistoryDetailScreenModel(
                             date = uiState.date.toEpochMilliseconds(),
                             amount = newAmount,
                             installmentId = installmentId,
-                            installmentTime = installmentTime,
-                            installmentRemainAmount = currentRemainAmount,
+                            installment = HistoryInstallment(
+                                installmentTime = installmentTime,
+                                installmentRemainAmount = currentRemainAmount
+                            ),
                             categoryId = uiState.category?.id,
                             categoryTagId = uiState.categoryTag?.id,
                             paymentMethodId = uiState.paymentMethod?.id,
@@ -248,7 +251,9 @@ class HistoryDetailScreenModel(
                             historiesToUpdate.add(
                                 entity.copy(
                                     amount = redistributedAmount,
-                                    installmentRemainAmount = runningRemainAmount
+                                    installment = entity.installment?.copy(
+                                        installmentRemainAmount = runningRemainAmount
+                                    )
                                 )
                             )
                         }
@@ -265,7 +270,12 @@ class HistoryDetailScreenModel(
                             date = uiState.date.toEpochMilliseconds(),
                             amount = newAmount,
                             installmentId = historyVo.installment?.id,
-                            installmentTime = historyVo.installmentTime,
+                            installment = historyVo.installmentTime?.let {
+                                HistoryInstallment(
+                                    installmentTime = it,
+                                    installmentRemainAmount = historyVo.installmentRemainAmount.default()
+                                )
+                            },
                             categoryId = uiState.category?.id,
                             categoryTagId = uiState.categoryTag?.id,
                             paymentMethodId = uiState.paymentMethod?.id,

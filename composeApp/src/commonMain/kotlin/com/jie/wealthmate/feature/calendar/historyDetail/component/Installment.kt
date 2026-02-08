@@ -97,7 +97,7 @@ fun Installment(
             )
         }
         installmentHistoryItems.forEachIndexed { index, installmentHistory ->
-            val isInstallmentSelected = installmentHistory.installmentTime == installmentTime
+            val isInstallmentSelected = installmentHistory.installment?.installmentTime == installmentTime
             val backgroundColor: Color
             val fontWeight: FontWeight
             if (isInstallmentSelected) {
@@ -117,7 +117,7 @@ fun Installment(
             ) {
 
                 WMText(
-                    text = "${installmentHistory.installmentTime}회차",
+                    text = "${installmentHistory.installment?.installmentTime}회차",
                     style = Typography().bodyMedium.copy(fontWeight = fontWeight),
                     modifier = Modifier.width(48.dp)
                 )
@@ -136,7 +136,7 @@ fun Installment(
                     maxLines = 1
                 )
                 WMText(
-                    text = "${formatWithCommas(installmentHistory.installmentRemainAmount.toString())}원",
+                    text = "${formatWithCommas(installmentHistory.installment?.installmentRemainAmount.toString())}원",
                     style = Typography().bodyMedium.copy(fontWeight = fontWeight),
                     modifier = Modifier.weight(3f),
                     maxLines = 1
