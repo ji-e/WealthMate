@@ -1,6 +1,5 @@
 package com.jie.wealthmate.database.eneity
 
-import androidx.room.ColumnInfo
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -18,13 +17,14 @@ data class HistoryEntity(
     val amount: Long,
     val repeatCycleId: String? = null,
     val installmentId: String? = null,
+    val installmentTime: Long? = null,
     val categoryId: String? = null,
     val categoryTagId: String? = null,
     val paymentMethodId: String? = null,
     val content: String? = null,
     val isVisibility: Boolean = true,
     val userId: String? = null,
-    val createdAt : Long = Clock.System.now().toEpochMilliseconds(),
+    val createdAt: Long = Clock.System.now().toEpochMilliseconds(),
     val updatedAt: Long = Clock.System.now().toEpochMilliseconds(),
     val isDeleted: Boolean = false,
 )
@@ -52,6 +52,6 @@ data class HistoryWithDetails(
     @Relation(
         parentColumn = "installmentId",
         entityColumn = "id"
-        )
+    )
     val installment: InstallmentEntity?,
 )

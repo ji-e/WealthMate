@@ -127,7 +127,8 @@ class GoogleCloudShareScreen() : BaseScreen() {
                         onRemoveClick = {},
                         emptyContent = {
                             EmptyListView(
-                                modifier = Modifier.fillMaxSize()
+                                modifier = Modifier
+                                    .fillMaxSize()
                                     .padding(vertical = 20.dp, horizontal = 28.dp),
                                 contentText = "공유된 멤버가 없습니다.",
                             )

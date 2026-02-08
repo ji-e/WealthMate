@@ -20,6 +20,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.jie.wealthmate.component.InfoText
 import com.jie.wealthmate.component.WMText
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.theme.ColorGray
@@ -66,12 +67,13 @@ fun HistoryItem(
                 modifier = Modifier
                     .clip(CircleShape)
                     .background(category?.largeCategory?.backgroundColor ?: ColorGray.Gray_100)
-                    .size(40.dp),
+                    .size(40.dp)
+                    .align(Alignment.Center),
                 contentAlignment = Alignment.Center
             ) {
                 WMText(
                     text = category?.icon ?: "？",
-                    style = Typography().bodyLarge.copy(fontSize = 20.sp)
+                    style = Typography().titleMedium,
                 )
             }
             if (category?.isFixed.default()) {
@@ -80,7 +82,6 @@ fun HistoryItem(
                     contentDescription = null,
                     tint = ColorRed.Red_300,
                     modifier = Modifier
-                        .padding(start = 24.dp)
                         .size(24.dp)
                         .align(Alignment.TopStart)
                 )
@@ -93,31 +94,29 @@ fun HistoryItem(
             else -> ""
         }
 
-        Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-            WMText(
-                text = "$mark${formatWithCommas(history.amount.toString())}원",
-                style = Typography().titleMedium.copy(
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.SemiBold
-                ),
-            )
+        Column() {
+            Row(
+                modifier = Modifier
+                    .padding(bottom = 2.dp)
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                WMText(
+                    text = "$mark${formatWithCommas(history.amount.toString())}원",
+                    style = Typography().titleMedium.copy(
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.SemiBold
+                    ),
+                    maxLines = 1
+                )
+            }
 
-            Row {
-                category?.middleLabel?.let {
-                    WMText(text = it,)
-                }
-
-                history.categoryTag?.let {
-                    WMText(text = " > ${it.label}",)
-                }
-
-                history.paymentMethod?.let{
-                    WMText(text = " | ${it.label}",)
-                }
-
-                if (history.content.isNullOrEmpty().not()) {
-                    WMText(text = " | ${history.content}",)
-                }
+            if (history.historyInfo.isNotBlank()) {
+                InfoText(
+                    text = history.historyInfo,
+                    maxLines = 2
+                )
             }
         }
     }

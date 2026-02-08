@@ -113,7 +113,9 @@ class PaymentMethodManagementScreen() : BaseScreen() {
 
             if (uiState.paymentMethodItems.isNullOrEmpty()) {
                 EmptyListView(
-                    modifier = Modifier.fillMaxSize().padding(20.dp),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(20.dp),
                     contentText = "결제수단을 추가해주세요.",
                 )
             } else {

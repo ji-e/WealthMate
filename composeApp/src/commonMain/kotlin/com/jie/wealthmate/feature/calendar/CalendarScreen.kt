@@ -20,10 +20,10 @@ import androidx.compose.ui.graphics.shadow.Shadow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
-import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.jie.wealthmate.base.BaseScreen
 import com.jie.wealthmate.component.WMIconButton
 import com.jie.wealthmate.component.calculateAdjustedToastPadding
 import com.jie.wealthmate.component.topbar.TopBarItem
@@ -45,7 +45,7 @@ import wealthmate.composeapp.generated.resources.ic_add
 
 val startDate = LocalDate(2025, 1, 1)
 
-class CalendarScreen() : Screen {
+class CalendarScreen() : BaseScreen() {
     val monthItem = mutableListOf<LocalDate>().apply {
         repeat((today.year - startDate.year) * 12 + 12) {
             add(
@@ -59,6 +59,8 @@ class CalendarScreen() : Screen {
 
     @Composable
     override fun Content() {
+        super.Content()
+
         val navigator = LocalNavigator.currentOrThrow
         val screenModel: CalendarScreenModel = koinScreenModel()
         val uiState = screenModel.container.uiState.collectAsState().value
@@ -102,6 +104,14 @@ class CalendarScreen() : Screen {
                                     )
                                 )
                             },
+                            emptyContent = {
+                                EmptyListView(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .padding(vertical = 20.dp, horizontal = 28.dp),
+                                    contentText = "내역이 없습니다.",
+                                )
+                            }
                         )
                     }
                 }

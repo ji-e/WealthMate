@@ -118,7 +118,7 @@ class GoogleRepositoryImpl(
                     // 개인 앱 데이터 폴더 조회
                     parameter("spaces", "appDataFolder")
                 }
-                parameter("fields", "files(id, name, createdTime, size)")
+                parameter("fields", "files(id, name, modifiedTime, size)")
             }
 
             if (response.status.value == 200) {
@@ -227,7 +227,7 @@ class GoogleRepositoryImpl(
                 client.get("https://www.googleapis.com/drive/v3/files/$fileId") {
                     parameter(
                         "fields",
-                        "id, name, capabilities(canEdit), owners(displayName, emailAddress, photoLink)"
+                        "id, name, modifiedTime, capabilities(canEdit), owners(displayName, emailAddress, photoLink)"
                     )
                 }
 
@@ -271,7 +271,7 @@ class GoogleRepositoryImpl(
             val filesResponse: HttpResponse =
                 client.get("https://www.googleapis.com/drive/v3/files") {
                     parameter("q", "'$folderId' in parents and trashed=false")
-                    parameter("fields", "files(id, name, createdTime, size)")
+                    parameter("fields", "files(id, name, modifiedTime, size)")
                 }
 
             if (filesResponse.status.value == 200) {
@@ -313,7 +313,7 @@ class GoogleRepositoryImpl(
         return try {
             val response: HttpResponse = client.get("https://www.googleapis.com/drive/v3/files") {
                 parameter("q", "'$folderId' in parents and trashed=false")
-                parameter("fields", "files(id, name, createdTime, size)")
+                parameter("fields", "files(id, name, modifiedTime, size)")
             }
 
             if (response.status.value == 200) {

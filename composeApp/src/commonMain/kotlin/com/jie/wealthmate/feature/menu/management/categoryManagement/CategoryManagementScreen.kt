@@ -139,7 +139,9 @@ class CategoryManagementScreen : BaseScreen() {
 
                 if (items.isEmpty()) {
                     EmptyListView(
-                        modifier = Modifier.fillMaxSize().padding(20.dp),
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(20.dp),
                         contentText = "카테고리를 추가해주세요.",
                     )
                 } else {

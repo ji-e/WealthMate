@@ -16,6 +16,7 @@ data class HistoryVo(
     val date: LocalDate,
     val amount: Long,
     val installment: InstallmentVo?,
+    val installmentTime: Long?,
     val repeatCycle: RepeatCycleVo?,
     val category: CategoryVo?,
     val categoryTag: CategoryTagVo?,
@@ -24,6 +25,31 @@ data class HistoryVo(
     val isVisibility: Boolean,
     val userId: String?,
 ) {
+    val historyInfo: String
+        get() {
+            val categoryPart = buildString {
+                val middleLabel = category?.middleLabel
+                val tagLabel = categoryTag?.label
+                if (!middleLabel.isNullOrBlank()) {
+                    append(middleLabel)
+                }
+                if (tagLabel.isNullOrBlank().not()) {
+                    if (isNotEmpty()) append(" > ")
+                    append(tagLabel)
+                }
+            }
+
+            val parts = listOfNotNull(
+                categoryPart.takeIf { it.isNotBlank() },
+                paymentMethod?.label?.takeIf { it.isNotBlank() },
+                content?.takeIf { it.isNotBlank() },
+                installment?.let { "할부 $installmentTime/${it.count}회차" }
+            )
+
+            return parts.joinToString(" | ")
+        }
+
+
     companion object {
         fun HistoryWithDetails?.mapperToVo() = HistoryVo(
             id = this?.history?.id.default(),
@@ -31,6 +57,7 @@ data class HistoryVo(
             date = this?.history?.date.toLocalDate(),
             amount = this?.history?.amount.default(),
             installment = this?.installment?.mapperToVo(),
+            installmentTime = this?.history?.installmentTime,
             repeatCycle = this?.repeatCycle?.mapperToVo(),
             category = this?.category?.mapperToVo(),
             categoryTag = this?.category?.mapperToVo()?.tags?.find { it.id == this.history.categoryTagId },
@@ -41,4 +68,3 @@ data class HistoryVo(
         )
     }
 }
-
