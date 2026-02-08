@@ -14,7 +14,7 @@ import com.jie.wealthmate.component.ButtonStyle
 import com.jie.wealthmate.component.WMButton
 import com.jie.wealthmate.component.WMModalBottomSheet
 import com.jie.wealthmate.feature.calendar.addHistory.component.CategorySelectionRow
-import com.jie.wealthmate.feature.menu.categoryManagement.component.LargeCategoryEnum
+import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.vo.CategoryTagVo
 import com.jie.wealthmate.vo.CategoryVo
 
@@ -35,7 +35,7 @@ fun CategorySelectModalBottomSheet(
         onDismissRequest = onDismissRequest
     ) {
         CategorySelectionRow(
-            modifier = Modifier.padding(horizontal = 20.dp),
+            modifier = Modifier.padding(horizontal = 28.dp),
             title = null,
             categoryItems = categoryItems,
             selectedLargeCategory = selectedLargeCategory,
@@ -50,6 +50,7 @@ fun CategorySelectModalBottomSheet(
             buttonStyle = ButtonStyle.FILLED,
             buttonSize = ButtonSize.LARGE,
             modifier = Modifier
+                .padding(horizontal = 28.dp)
                 .padding(top = 20.dp)
                 .fillMaxWidth(),
             onClick = {

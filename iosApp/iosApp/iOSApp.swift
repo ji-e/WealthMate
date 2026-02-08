@@ -1,6 +1,7 @@
 import SwiftUI
 import ComposeApp
 import GoogleSignIn
+import Firebase
 
 // 1. 반드시 클래스 선언이 struct iOSApp 밖에 있어야 합니다.
 class AppDelegate: NSObject, UIApplicationDelegate {
@@ -16,22 +17,44 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 @main
 struct iOSApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
-    // ✅ Koin 초기화 코드를 여기에 추가!
+
     init() {
-        // 1단계에서 만든 KoinInitializerKt 파일을 통해 initKoin() 함수를 호출합니다.
-        // Kotlin의 top-level 함수는 {파일이름}Kt 클래스의 static 메소드로 변환됩니다.
+        MainViewControllerKt.debugBuild()
         KoinInitializerKt.doInitKoin()
+        FirebaseApp.configure()
+
+        // 조용한 로그인(Silent Sign-In) 프로바이더 등록
+        setupSilentSignInProvider()
     }
 
     var body: some Scene {
         WindowGroup {
             ContentView()
                 .onOpenURL { url in
-                    // 구글 로그인이 처리하지 못한 경우에만 다른 처리를 하도록 구성
                     if !GIDSignIn.sharedInstance.handle(url) {
-                        // 다른 커스텀 URL 스킴 처리 로직이 있다면 여기에 추가
                     }
                 }
+        }
+    }
+
+    private func setupSilentSignInProvider() {
+        // ComposeApp 프레임워크 내에 shared 모듈이 export 되어 있으므로 바로 접근 가능합니다.
+        IosSilentSignInProvider.shared.setProvider { onComplete in
+            GIDSignIn.sharedInstance.restorePreviousSignIn { user, error in
+                if let error = error {
+                    print("iOS Silent Sign-In error: \(error.localizedDescription)")
+                    onComplete(nil)
+                } else if let user = user {
+                    let auth = GoogleAuthEntity(
+                        accessToken: user.accessToken.tokenString,
+                        expiresIn: 3600,
+                        refreshToken: user.refreshToken.tokenString
+                    )
+                    onComplete(auth)
+                } else {
+                    onComplete(nil)
+                }
+            }
         }
     }
 }

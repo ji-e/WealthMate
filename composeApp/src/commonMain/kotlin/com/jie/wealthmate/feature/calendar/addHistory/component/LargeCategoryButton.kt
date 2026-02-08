@@ -15,7 +15,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.jie.wealthmate.component.WMText
-import com.jie.wealthmate.feature.menu.categoryManagement.component.LargeCategoryEnum
+import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.theme.ColorGray
 import com.jie.wealthmate.theme.ColorPrimary
 

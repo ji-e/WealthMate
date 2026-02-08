@@ -71,4 +71,10 @@ interface CategoryDao {
      */
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun upsertAll(categories: List<CategoryEntity>)
+
+    /**
+     * 모든 카테고리 삭제 (백업 복원 시 사용)
+     */
+    @Query("DELETE FROM categories")
+    suspend fun deleteAll()
 }

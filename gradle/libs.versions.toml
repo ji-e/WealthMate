@@ -16,6 +16,7 @@ composeHotReload = "1.0.0"
 composeMultiplatform = "1.10.0"
 composeMaterial3 = "1.9.0"
 
+googlePlayServicesAuth = "21.5.0"
 junit = "4.13.2"
 kotlin = "2.3.0"
 kotlinx-coroutines = "1.10.2"
@@ -40,15 +41,20 @@ sqlite = "2.6.2"
 ksp = "2.3.4"
 
 okio = "3.16.4"
-kmpAuth = "2.3.1"
+kmpAuth = "2.5.0-alpha01"
 
 multiplatformSettings = "1.3.0"
 securityCrypto = "1.1.0-alpha06"
 
 napier = "2.7.1"
 
+firebase-kotlin = "2.4.0"
+
+google-services = "4.4.4"
+
 
 [libraries]
+google-play-services-auth = { module = "com.google.android.gms:play-services-auth", version.ref = "googlePlayServicesAuth" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 kotlin-testJunit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }
 junit = { module = "junit:junit", version.ref = "junit" }
@@ -109,6 +115,7 @@ compose-components-resources = { module = "org.jetbrains.compose.components:comp
 
 kmpAuth-google = { module = "io.github.mirzemehdi:kmpauth-google", version.ref = "kmpAuth" }
 kmpAuth-uihelper = { module = "io.github.mirzemehdi:kmpauth-uihelper", version.ref = "kmpAuth" }
+kmpAuth-firebase = { module = "io.github.mirzemehdi:kmpauth-firebase", version.ref = "kmpAuth" }
 
 
 okio = { module = "com.squareup.okio:okio", version.ref = "okio" }
@@ -117,6 +124,9 @@ multiplatform-settings = { module = "com.russhwolf:multiplatform-settings", vers
 multiplatform-settings-no-arg = { module = "com.russhwolf:multiplatform-settings-no-arg", version.ref = "multiplatformSettings" }
 
 napier = { module = "io.github.aakira:napier", version.ref = "napier" }
+
+firebase-auth = { module = "dev.gitlive:firebase-auth", version.ref = "firebase-kotlin" }
+firebase-firestore = { module = "dev.gitlive:firebase-firestore", version.ref = "firebase-kotlin" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
@@ -131,6 +141,8 @@ kotlinx-atomicfu = { id = "org.jetbrains.kotlinx.atomicfu", version.ref = "kotli
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 androidx-room = { id = "androidx.room", version.ref = "room" }
+google-services = { id = "com.google.gms.google-services", version.ref = "google-services" }
+
 
 
 [bundles]
@@ -141,4 +153,15 @@ ktor-common = [
     "ktor-client-serialization",
     "ktor-serialization-json",
     "ktor-logging"
+]
+
+firebase-common = [
+    "firebase-auth",
+    "firebase-firestore"
+]
+
+kmpAuth-common = [
+    "kmpAuth-google",
+    "kmpAuth-uihelper",
+    "kmpAuth-firebase",
 ]

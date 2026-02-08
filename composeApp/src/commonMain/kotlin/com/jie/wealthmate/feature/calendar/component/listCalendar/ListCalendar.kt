@@ -23,6 +23,7 @@ fun ListCalendar(
     historyItems: List<HistoryVo>,
     onDateSelected: (LocalDate) -> Unit, // 날짜가 변경되었을 때 호출될 콜백
     onHistoryClick: (HistoryVo) -> Unit,
+    emptyContent: @Composable () -> Unit,
 ) {
     // 1. 데이터를 날짜별 내림차순으로 정렬 및 그룹화
     val groupedItems = remember(historyItems) {
@@ -81,7 +82,11 @@ fun ListCalendar(
     ) {
         snapshotFlow {
             // 스크롤 중인지 여부와 현재 인덱스를 함께 관찰
-            Triple(listState.firstVisibleItemIndex, listState.isScrollInProgress, listState.canScrollForward)
+            Triple(
+                listState.firstVisibleItemIndex,
+                listState.isScrollInProgress,
+                listState.canScrollForward
+            )
         }
             .collect { (firstIndex, isScrolling, canScrollForward) ->
                 // 프로그램에 의한 스크롤이 아니고, '실제로 사용자가 스크롤 중'일 때만 업데이트
@@ -99,11 +104,17 @@ fun ListCalendar(
             }
     }
 
+    if (groupedItems.isEmpty()) {
+        emptyContent()
+        return
+    }
 
     LazyColumn(
         state = listState,
         modifier = Modifier.fillMaxSize()
     ) {
+
+
         groupedItems.forEach { (date, items) ->
             stickyHeader(
                 key = "header_$date"

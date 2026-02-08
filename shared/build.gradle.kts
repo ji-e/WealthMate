@@ -11,27 +11,29 @@ plugins {
 kotlin {
     androidTarget()
 
-    // iOS 타겟 설정
     listOf(
         iosX64(),
         iosArm64(),
         iosSimulatorArm64()
-    )
+    ).forEach { iosTarget ->
+        iosTarget.binaries.framework {
+            baseName = "shared"
+        }
+    }
 
     jvm()
 
     sourceSets {
         androidMain.dependencies {
             implementation(libs.koin.android)
-
             implementation(libs.androidx.compose.ui)
             implementation(libs.androidx.ui.graphics)
-
             implementation(libs.androidx.room.sqlite.wrapper)
-
             implementation(libs.ktor.client.okhttp)
-
             implementation(libs.androidx.security.crypto)
+            
+            // 안드로이드 구글 로그인 SDK 의존성 명시적 추가
+            implementation(libs.google.play.services.auth)
         }
         iosMain.dependencies {
             implementation(libs.ktor.client.darwin)
@@ -41,28 +43,19 @@ kotlin {
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.koin.core)
             implementation(libs.koin.compose)
-
             implementation(compose.runtime)
             implementation(compose.foundation)
             implementation(compose.material3)
             implementation(compose.ui)
-
             implementation(libs.androidx.room.runtime)
             implementation(libs.androidx.sqlite.bundled)
-
             implementation(libs.uuid4)
-
             implementation(libs.bundles.ktor.common)
-            implementation(libs.kmpAuth.google)
-            implementation(libs.kmpAuth.uihelper)
+            implementation(libs.bundles.kmpAuth.common)
             implementation(libs.okio)
-
             implementation(libs.multiplatform.settings)
-
             implementation(libs.napier)
-        }
-        commonTest.dependencies {
-            implementation(libs.kotlin.test)
+            implementation(libs.bundles.firebase.common)
         }
     }
 }
@@ -92,7 +85,6 @@ dependencies {
     }
 }
 
-// 각 타겟의 스키마 복사 태스크가 서로 다른 경로를 바라보게 설정
 tasks.withType<androidx.room.gradle.RoomSchemaCopyTask>().configureEach {
     val targetName = name.substringAfter("copyRoomSchemas").replaceFirstChar { it.lowercase() }
     schemaDirectory.set(file("$projectDir/schemas/$targetName"))

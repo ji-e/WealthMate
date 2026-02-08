@@ -7,6 +7,7 @@ plugins {
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.composeHotReload)
     alias(libs.plugins.kotlinx.atomicfu)
+    alias(libs.plugins.google.services)
 }
 
 kotlin {
@@ -20,6 +21,8 @@ kotlin {
             baseName = "ComposeApp"
             isStatic = true
             linkerOpts.add("-lsqlite3")
+            // shared 모듈의 클래스들을 Swift에 노출
+            export(projects.shared)
         }
     }
     
@@ -43,7 +46,7 @@ kotlin {
             implementation(libs.compose.components.resources)
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
-            implementation(projects.shared)
+            api(projects.shared) // implementation 대신 api 사용
 
             implementation(libs.bundles.ktor.common)
             implementation(libs.kotlinx.serialization.json)
@@ -61,11 +64,12 @@ kotlin {
 
             implementation(libs.compottie)
 
-            implementation(libs.kmpAuth.google)
-            implementation(libs.kmpAuth.uihelper)
+            implementation(libs.bundles.kmpAuth.common)
             implementation(libs.multiplatform.settings)
 
             implementation(libs.napier)
+
+            implementation(libs.bundles.firebase.common)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

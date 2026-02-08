@@ -18,7 +18,7 @@ import wealthmate.composeapp.generated.resources.ic_menu
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun WMTobBar(
+fun WMTopBar(
     title: TopBarItem.Title,
     readingItem: TopBarItem.ReadingItem? = TopBarItem.ReadingItem(),
     trailingItem: List<TopBarItem.TrailingItem>? = null,
@@ -73,9 +73,9 @@ fun WMTobBar(
 
 @Composable
 @Preview(showBackground = true)
-private fun WMTobBarPreview() {
+private fun WMTopBarPreview() {
     WMTheme {
-        WMTobBar(
+        WMTopBar(
             title = TopBarItem.Title("title"),
             trailingItem = listOf(
                 TopBarItem.TrailingItem(

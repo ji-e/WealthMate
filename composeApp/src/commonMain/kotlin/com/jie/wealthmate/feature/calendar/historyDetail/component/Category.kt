@@ -20,7 +20,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.jie.wealthmate.component.WMText
 import com.jie.wealthmate.theme.ColorGray
 import com.jie.wealthmate.theme.ColorRed
@@ -50,7 +49,7 @@ fun Category(
                 .clip(RoundedCornerShape(8.dp))
                 .background(ColorGray.Gray_50)
                 .clickable { onCategoryClick() }
-                .padding(horizontal = 12.dp),
+                .padding(horizontal = 8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             if (category == null) {
@@ -72,12 +71,13 @@ fun Category(
                     modifier = Modifier
                         .clip(CircleShape)
                         .background(category.largeCategory.backgroundColor)
-                        .size(40.dp),
+                        .size(40.dp)
+                        .align(Alignment.Center),
                     contentAlignment = Alignment.Center
                 ) {
                     WMText(
                         text = category.icon,
-                        style = Typography().bodyLarge.copy(fontSize = 20.sp)
+                        style = Typography().titleLarge
                     )
                 }
                 if (category.isFixed) {
@@ -86,7 +86,6 @@ fun Category(
                         contentDescription = null,
                         tint = ColorRed.Red_300,
                         modifier = Modifier
-                            .padding(start = 24.dp)
                             .size(24.dp)
                             .align(Alignment.TopStart)
                     )
@@ -95,15 +94,15 @@ fun Category(
 
             WMText(
                 text = category.middleLabel,
-                style = Typography().titleSmall,
-//                modifier = Modifier.padding(top = 2.dp, end = 12.dp)
+                style = Typography().titleMedium,
+                maxLines = 1
             )
 
             categoryTag?.let {
                 WMText(
                     text = " > ${it.label}",
-                    style = Typography().titleSmall,
-//                modifier = Modifier.padding(top = 2.dp, end = 12.dp)
+                    style = Typography().titleMedium,
+                    maxLines = 1
                 )
             }
         }

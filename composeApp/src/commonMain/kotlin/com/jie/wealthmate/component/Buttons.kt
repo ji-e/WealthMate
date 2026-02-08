@@ -18,7 +18,6 @@ import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.Typography
@@ -174,7 +173,7 @@ fun WMIconButton(
     iconRes: DrawableResource,
     contentDescription: String? = null,
     enabled: Boolean = true,
-    tint: Color = LocalContentColor.current,
+    tint: Color = ColorGray.Gray_700,
     onClick: () -> Unit,
 ) {
     val focusManager = LocalFocusManager.current
@@ -240,7 +239,7 @@ fun WMMenuButton(
             .fillMaxWidth()
             .height(48.dp)
             .clickable { onClick() }
-            .padding(horizontal = 20.dp),
+            .padding(horizontal = 28.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         WMText(
@@ -252,7 +251,8 @@ fun WMMenuButton(
         Icon(
             painter = painterResource(Res.drawable.ic_keyboard_arrow_right),
             contentDescription = label,
-            modifier = Modifier.size(24.dp)
+            modifier = Modifier.size(24.dp),
+            tint = ColorGray.Gray_300,
         )
     }
 }

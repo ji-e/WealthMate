@@ -1,5 +1,7 @@
 package com.jie.wealthmate.repository
 
+import com.jie.wealthmate.entity.GoogleAuthEntity
+
 interface AuthRepository {
 
     fun clearAuthData()
@@ -23,4 +25,7 @@ interface AuthRepository {
     fun saveLastSharedSyncTime(time: Long)
     fun getLastSharedSyncTime(): Long
     fun getUserName(): String?
+
+    // 조용한 로그인 (액세스 토큰 만료 시 재인증 시도)
+    suspend fun silentSignIn(): GoogleAuthEntity?
 }

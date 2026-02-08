@@ -24,6 +24,7 @@ const val formatDateKorMD: String = "M월 d일"
 
 const val formatDateDotYYMD: String = "yy.M.d"
 const val formatDateDotYYMDE: String = "yy.M.d (E)"
+const val formatDateDotYYYYMDE: String = "yyyy.M.d (E)"
 
 
 @OptIn(ExperimentalTime::class)
@@ -94,6 +95,7 @@ fun LocalDate?.convertLocalDateToString(
         formatDateKorMD -> "${this.month.number}월 ${this.day}일 "
         formatDateDotYYMD -> "${this.year.toString().takeLast(2)}.${this.month.number}.${this.day}"
         formatDateDotYYMDE -> "${this.year.toString().takeLast(2)}.${this.month.number}.${this.day} ($e)"
+        formatDateDotYYYYMDE -> "${this.year}.${this.month.number}.${this.day} ($e)"
         else -> defaultValue
     }
 }

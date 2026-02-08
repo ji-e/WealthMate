@@ -98,7 +98,7 @@ fun PaymentMethodList(
     LazyColumn(
         modifier = modifier
             .fillMaxWidth()
-            .heightIn(max = 180.dp),
+            .heightIn(max = 200.dp),
         state = listState,
     ) {
         val colorList = ColorGroup.getColorList()

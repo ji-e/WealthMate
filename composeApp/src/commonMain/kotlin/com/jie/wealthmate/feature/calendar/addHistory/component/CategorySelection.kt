@@ -18,11 +18,14 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,12 +34,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.jie.wealthmate.component.WMText
-import com.jie.wealthmate.feature.menu.categoryManagement.component.LargeCategoryEnum
+import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.theme.ColorGray
 import com.jie.wealthmate.theme.ColorPrimary
 import com.jie.wealthmate.theme.ColorRed
@@ -231,6 +234,23 @@ fun CategorySelectionRow(
     onCategoryClick: (CategoryVo) -> Unit,
     onCategoryTagClick: (CategoryTagVo) -> Unit,
 ) {
+    val categoryLazyListState = rememberLazyListState()
+    val density = LocalDensity.current
+    val itemWidthPx = with(density) { 60.dp.roundToPx() }
+
+    LaunchedEffect(selectedCategory) {
+        val index = categoryItems.indexOfFirst { it.id == selectedCategory?.id }
+        if (index >= 0) {
+            val viewportWidth = categoryLazyListState.layoutInfo.viewportSize.width
+            val offset = if (viewportWidth > 0) {
+                -(viewportWidth / 2 - itemWidthPx / 2 - 36)
+            } else {
+                0
+            }
+            categoryLazyListState.animateScrollToItem(index, offset)
+        }
+    }
+
     Column(modifier = modifier) {
         title?.let {
             WMText(
@@ -255,16 +275,12 @@ fun CategorySelectionRow(
                     textAlign = TextAlign.Center,
                     style = Typography().bodyMedium.copy(color = ColorGray.Gray_300)
                 )
-                return
+                return@Column
             }
 
             LazyRow(
-                contentPadding = PaddingValues(
-                    start = 16.dp,
-                    end = 6.dp,
-                    top = 12.dp,
-                    bottom = 12.dp
-                )
+                state = categoryLazyListState,
+                contentPadding = PaddingValues(vertical = 12.dp, horizontal = 8.dp)
             ) {
                 items(
                     count = categoryItems.size,
@@ -301,10 +317,10 @@ fun CategorySelectionRow(
                 if (selectedLargeCategory != selectedCategory?.largeCategory) return@LazyRow
 
                 items(
-                    count = selectedCategory?.tags?.size.default(),
-                    key = { index -> selectedCategory?.tags?.get(index)?.id.default() }
+                    count = selectedCategory.tags.size,
+                    key = { index -> selectedCategory.tags[index].id.default() }
                 ) {
-                    val tag = selectedCategory?.tags?.get(it) ?: return@items
+                    val tag = selectedCategory.tags[it]
                     val isSelectedTag = selectedCategoryTag?.id == tag.id
 
                     Box(
@@ -343,12 +359,13 @@ private fun CategorySelectionItem(
                 modifier = Modifier
                     .clip(CircleShape)
                     .background(category.largeCategory.backgroundColor)
-                    .size(40.dp),
+                    .size(40.dp)
+                    .align(Alignment.Center),
                 contentAlignment = Alignment.Center
             ) {
                 WMText(
                     text = category.icon,
-                    style = Typography().bodyLarge.copy(fontSize = 20.sp)
+                    style = Typography().titleLarge
                 )
             }
             if (category.isFixed) {
@@ -357,7 +374,6 @@ private fun CategorySelectionItem(
                     contentDescription = null,
                     tint = ColorRed.Red_300,
                     modifier = Modifier
-                        .padding(start = 24.dp)
                         .size(24.dp)
                         .align(Alignment.TopStart)
                 )
@@ -369,9 +385,8 @@ private fun CategorySelectionItem(
                     contentDescription = null,
                     tint = ColorPrimary.Primary_500,
                     modifier = Modifier
-                        .padding(start = 30.dp)
                         .size(24.dp)
-                        .align(Alignment.BottomStart)
+                        .align(Alignment.BottomEnd)
                 )
             }
         }
@@ -379,7 +394,8 @@ private fun CategorySelectionItem(
         WMText(
             text = category.middleLabel,
             style = Typography().titleSmall,
-            modifier = Modifier.padding(top = 2.dp, end = 12.dp)
+            modifier = Modifier.padding(top = 2.dp),
+            maxLines = 1
         )
     }
 }

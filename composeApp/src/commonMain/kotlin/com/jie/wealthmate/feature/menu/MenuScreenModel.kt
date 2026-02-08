@@ -6,6 +6,8 @@ import com.jie.wealthmate.feature.menu.component.MenuItemData
 import com.jie.wealthmate.repository.AuthRepository
 import com.jie.wealthmate.repository.GoogleRepository
 import com.jie.wealthmate.utils.default
+import com.mmk.kmpauth.google.GoogleAuthCredentials
+import com.mmk.kmpauth.google.GoogleAuthProvider
 
 class MenuScreenModel(
     val authRepository: AuthRepository,
@@ -37,17 +39,33 @@ class MenuScreenModel(
         }
     }
 
-    fun getToken(authCode: String?, email: String) {
-        authCode ?: return
+    fun updateUser(accessToken: String?, email: String) {
+        authRepository.saveAuthData(accessToken.default(), null, email)
 
+        reduceState { state ->
+            state.copy(
+                userName = email
+            )
+        }
+    }
+
+    fun logout() {
         launchSafe(
             block = {
-                googleRepository.fetchGoogleAuth(
-                    authCode = authCode,
-                    email = email
+                GoogleAuthProvider.create(
+                    credentials = GoogleAuthCredentials(serverId = "808791516955-mvuausum2tbonst3bf4kqna8t99tkkk6.apps.googleusercontent.com")
+                ).signOut()
+                authRepository.clearAuthData()
+            }
+        ){
+            showSnackbar("계정 연동이 해제 되었습니다.")
+
+            reduceState { state ->
+                state.copy(
+                    userName = ""
                 )
             }
-        ) {}
+        }
     }
 
 }

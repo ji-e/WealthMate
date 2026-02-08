@@ -1,10 +1,12 @@
 package com.jie.wealthmate.vo
 
+import androidx.compose.runtime.Immutable
 import com.jie.wealthmate.database.eneity.CategoryEntity
-import com.jie.wealthmate.feature.menu.categoryManagement.component.LargeCategoryEnum
+import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.utils.default
 import com.jie.wealthmate.vo.CategoryTagVo.Companion.mapperToVo
 
+@Immutable
 data class CategoryVo(
     val id: String,
     val icon: String,

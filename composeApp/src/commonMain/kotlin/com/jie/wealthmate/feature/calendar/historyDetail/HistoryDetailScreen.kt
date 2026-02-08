@@ -37,6 +37,7 @@ import com.jie.wealthmate.component.textField.WMTextField
 import com.jie.wealthmate.component.textField.rememberIntegerVisualTransformation
 import com.jie.wealthmate.component.textField.toIntegerTextFieldValue
 import com.jie.wealthmate.component.topbar.TopBarItem
+import com.jie.wealthmate.component.topbar.WMTopBar
 import com.jie.wealthmate.feature.calendar.addHistory.component.DateSelectModalBottomSheet
 import com.jie.wealthmate.feature.calendar.addHistory.component.DateTextField
 import com.jie.wealthmate.feature.calendar.addHistory.component.InstallmentModalBottomSheet
@@ -47,11 +48,10 @@ import com.jie.wealthmate.feature.calendar.historyDetail.component.Category
 import com.jie.wealthmate.feature.calendar.historyDetail.component.CategorySelectModalBottomSheet
 import com.jie.wealthmate.feature.calendar.historyDetail.component.Installment
 import com.jie.wealthmate.feature.calendar.historyDetail.component.RepeatCycle
-import com.jie.wealthmate.feature.menu.categoryManagement.component.LargeCategoryEnum
-import com.jie.wealthmate.theme.ColorRed
+import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
 import org.koin.compose.koinInject
 import wealthmate.composeapp.generated.resources.Res
-import wealthmate.composeapp.generated.resources.ic_delete
+import wealthmate.composeapp.generated.resources.ic_delete_outline
 
 class HistoryDetailScreen(
     val largeCategory: LargeCategoryEnum,
@@ -88,26 +88,6 @@ class HistoryDetailScreen(
         }
 
         LaunchedEffect(Unit) {
-            screenModel.updateTopBar(
-                title = TopBarItem.Title("${largeCategory.label} 내역 상세"),
-                readingItem = TopBarItem.ReadingItem().copy(
-                    action = { onBack() }
-                ),
-                trailingItem = listOf(
-                    TopBarItem.TrailingItem(
-                        iconRes = Res.drawable.ic_delete,
-                        tint = ColorRed.Red_300,
-                        action = {
-                            showRemoveDialog() {
-                                screenModel.removeHistory()
-                            }
-                        }
-                    )
-                )
-            )
-        }
-
-        LaunchedEffect(Unit) {
             screenModel.updateInit(
                 historyId = historyId
             )
@@ -119,10 +99,26 @@ class HistoryDetailScreen(
                 .fillMaxSize()
                 .imePadding()
         ) {
+            WMTopBar(
+                title = TopBarItem.Title("${largeCategory.label} 내역 상세"),
+                readingItem = TopBarItem.ReadingItem().copy(
+                    action = { onBack() }
+                ),
+                trailingItem = listOf(
+                    TopBarItem.TrailingItem(
+                        iconRes = Res.drawable.ic_delete_outline,
+                        action = {
+                            showRemoveDialog() {
+                                screenModel.removeHistory()
+                            }
+                        }
+                    )
+                )
+            )
             Column(
                 modifier = Modifier
                     .weight(1f)
-                    .padding(horizontal = 20.dp)
+                    .padding(horizontal = 28.dp)
                     .verticalScroll(rememberScrollState())
             ) {
                 // 날짜 선택
@@ -168,7 +164,7 @@ class HistoryDetailScreen(
 
                 // 금액 입력
                 WMTextField(
-//                    modifier = Modifier.padding(top = 20.dp),
+                    modifier = Modifier.padding(top = 4.dp),
                     value = uiState.amount,
                     onValueChange = {
                         screenModel.updateAmount(it.toIntegerTextFieldValue())
@@ -202,6 +198,7 @@ class HistoryDetailScreen(
                                     modifier = Modifier.padding(top = 4.dp, bottom = 24.dp),
                                     date = history.date,
                                     installment = history.installment,
+                                    installmentTime = history.installmentTime,
                                 )
                             }
                         }
@@ -210,6 +207,7 @@ class HistoryDetailScreen(
 
                 // 카테고리
                 Category(
+                    modifier = Modifier.padding(top = 4.dp),
                     category = uiState.category,
                     categoryTag = uiState.categoryTag,
                     onCategoryClick = { isShowCategorySelectModalBottomSheet = true }
@@ -228,6 +226,7 @@ class HistoryDetailScreen(
                 WMTextField(
                     value = uiState.content,
                     onValueChange = screenModel::updateContent,
+                    modifier = Modifier.padding(top = 4.dp),
                     label = "내용",
                     maxLength = 20,
                     placeholder = "내용 없음",
@@ -242,7 +241,7 @@ class HistoryDetailScreen(
                 text = "저장",
                 buttonSize = ButtonSize.LARGE,
                 modifier = Modifier
-                    .padding(horizontal = 20.dp)
+                    .padding(horizontal = 28.dp)
                     .padding(bottom = 20.dp)
                     .fillMaxWidth(),
                 enabled = uiState.isSaveButtonEnable,

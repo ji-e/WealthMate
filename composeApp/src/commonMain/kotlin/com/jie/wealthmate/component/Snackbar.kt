@@ -40,7 +40,7 @@ import kotlinx.coroutines.delay
 data class SnackbarData(
     val message: String,
     val actionLabel: String? = null,
-    val duration: Long = 3000L,
+    val duration: Long = 1000L,
     val onAction: (() -> Unit)? = null,
 )
 
@@ -52,7 +52,7 @@ class SnackbarState {
     suspend fun showSnackbar(
         message: String,
         actionLabel: String? = null,
-        duration: Long = 3000L,
+        duration: Long = 1000L,
         onAction: (() -> Unit)? = null,
     ) {
         _currentSnackbar.value = SnackbarData(message, actionLabel, duration, onAction)

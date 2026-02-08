@@ -90,11 +90,13 @@ fun HeadLineText(
 fun InfoText(
     modifier: Modifier = Modifier,
     text: String,
+    maxLines: Int = Int.MAX_VALUE,
 ) {
     WMText(
         text = text,
         style = Typography().bodyMedium.copy(color = ColorGray.Gray_500),
-        modifier = modifier
+        modifier = modifier,
+        maxLines = maxLines
     )
 }
 

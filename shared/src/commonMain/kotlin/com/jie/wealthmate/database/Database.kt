@@ -19,6 +19,8 @@ import com.jie.wealthmate.database.eneity.InstallmentEntity
 import com.jie.wealthmate.database.eneity.PaymentMethodEntity
 import com.jie.wealthmate.database.eneity.PaymentMethodGroupEntity
 import com.jie.wealthmate.database.eneity.RepeatCycleEntity
+import androidx.room.DeleteColumn
+import androidx.room.migration.AutoMigrationSpec
 
 @Database(
     entities = [
@@ -30,13 +32,15 @@ import com.jie.wealthmate.database.eneity.RepeatCycleEntity
         RepeatCycleEntity::class,
     ],
     version = 1,
-    exportSchema = true,
+    exportSchema = false,
     autoMigrations = [
-//        AutoMigration(from = 1, to = 2),
+//        AutoMigration(from = 1, to = 2)
+//        AutoMigration(from = 1, to = 2, spec = Migration1To2::class),
 //        AutoMigration(from = 2, to = 3),
 //        AutoMigration(from = 3, to = 4)
     ]
 )
+
 
 @TypeConverters(CategoryConverters::class)
 @ConstructedBy(AppDatabaseConstructor::class)

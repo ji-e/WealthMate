@@ -79,7 +79,8 @@ class HistorySaveUseCase(
                             .plus(index, DateTimeUnit.MONTH)
                             .toEpochMilliseconds(),
                         amount = installmentAmount,
-                        installmentId = installmentId
+                        installmentId = installmentId,
+                        installmentTime = index + 1L
                     )
                 )
             }
