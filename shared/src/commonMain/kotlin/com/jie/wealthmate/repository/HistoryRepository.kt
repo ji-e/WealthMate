@@ -16,9 +16,13 @@ interface HistoryRepository {
 
     suspend fun updateHistory(history: HistoryEntity)
 
+    suspend fun updateHistories(histories: List<HistoryEntity>)
+
     suspend fun deleteHistory(id: String)
 
     fun getHistoriesByMonth(startDate: Long, endDate: Long): Flow<List<HistoryWithDetails>>
 
     fun getSumByMonth(startDate: Long, endDate: Long, categoryType: String): Flow<Long>
+
+    suspend fun getHistoriesByInstallmentId(installmentId: String): List<HistoryEntity>
 }

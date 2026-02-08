@@ -74,6 +74,19 @@ class HistoryRepositoryImpl(private val databaseProvider: DatabaseProvider) : Hi
         }
     }
 
+    override suspend fun updateHistories(histories: List<HistoryEntity>) = withContext(Dispatchers.Default) {
+        loggedCall(
+            repositoryName = repoName,
+            methodName = "updateHistories",
+            params = mapOf("histories" to histories)
+        ) {
+            val timestamp = Clock.System.now().toEpochMilliseconds()
+            histories.forEach { history ->
+                dao.updateHistory(history.copy(updatedAt = timestamp))
+            }
+        }
+    }
+
     override suspend fun deleteHistory(id: String) = withContext(Dispatchers.Default) {
         loggedCall(
             repositoryName = repoName,
@@ -104,4 +117,14 @@ class HistoryRepositoryImpl(private val databaseProvider: DatabaseProvider) : Hi
         ) {
             dao.getSumByMonth(startDate, endDate, categoryType).map { it.default() }
         }.flowOn(Dispatchers.Default)
+
+    override suspend fun getHistoriesByInstallmentId(installmentId: String): List<HistoryEntity> = withContext(Dispatchers.Default) {
+        loggedCall(
+            repositoryName = repoName,
+            methodName = "getHistoriesByInstallmentId",
+            params = mapOf("installmentId" to installmentId)
+        ) {
+            dao.getHistoriesByInstallmentId(installmentId)
+        }
+    }
 }

@@ -3,6 +3,7 @@ package com.jie.wealthmate.feature.calendar.historyDetail
 import androidx.compose.ui.text.input.TextFieldValue
 import com.jie.wealthmate.base.BaseUiState
 import com.jie.wealthmate.base.UiSideEffect
+import com.jie.wealthmate.database.eneity.HistoryEntity
 import com.jie.wealthmate.feature.calendar.addHistory.component.RepeatCycleEnum
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.utils.today
@@ -25,6 +26,7 @@ data class HistoryDetailUiState(
     val categoryTag: CategoryTagVo? = null,
     val paymentMethod: PaymentMethodVo? = null,
     val isVisibility: Boolean = true,
+    val installmentHistoryItems: List<HistoryEntity> = emptyList(),
     val categoryItems: List<CategoryVo> = emptyList(),
     val paymentMethodItems: List<PaymentMethodVo> = emptyList(),
 ) : BaseUiState {

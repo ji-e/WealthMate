@@ -38,6 +38,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.jie.wealthmate.component.LabelText
 import com.jie.wealthmate.component.WMText
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.theme.ColorGray
@@ -253,9 +254,8 @@ fun CategorySelectionRow(
 
     Column(modifier = modifier) {
         title?.let {
-            WMText(
+            LabelText(
                 text = it,
-                style = Typography().titleSmall.copy(fontWeight = FontWeight.SemiBold),
                 modifier = Modifier.padding(bottom = 12.dp)
             )
         }

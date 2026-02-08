@@ -9,6 +9,7 @@ import androidx.room.Transaction
 import androidx.room.Update
 import com.jie.wealthmate.database.eneity.HistoryEntity
 import com.jie.wealthmate.database.eneity.HistoryWithDetails
+import com.jie.wealthmate.database.eneity.InstallmentEntity
 import kotlinx.coroutines.flow.Flow
 import kotlin.time.Clock
 
@@ -101,6 +102,12 @@ interface HistoryDao {
         currentTimestamp: Long,
         timestamp: Long = Clock.System.now().toEpochMilliseconds()
     )
+
+    /**
+     * 특정 할부 ID를 가진 모든 내역 조회 (회차순)
+     */
+    @Query("SELECT * FROM histories WHERE installmentId = :installmentId AND isDeleted = 0 ORDER BY installmentTime ASC")
+    suspend fun getHistoriesByInstallmentId(installmentId: String): List<HistoryEntity>
 
     /**
      * 특정 시점 이후에 변경된 모든 내역 조회 (삭제된 항목 포함)

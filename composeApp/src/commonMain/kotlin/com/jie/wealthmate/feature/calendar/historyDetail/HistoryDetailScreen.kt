@@ -195,10 +195,10 @@ class HistoryDetailScreen(
                             // 할부
                             if (history.installment != null) {
                                 Installment(
-                                    modifier = Modifier.padding(top = 4.dp, bottom = 24.dp),
-                                    date = history.date,
+                                    modifier = Modifier.padding(top = 8.dp, bottom = 24.dp),
                                     installment = history.installment,
                                     installmentTime = history.installmentTime,
+                                    installmentHistoryItems = uiState.installmentHistoryItems
                                 )
                             }
                         }
