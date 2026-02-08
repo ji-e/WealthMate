@@ -24,6 +24,9 @@ interface RepeatCycleDao {
     @Query("UPDATE repeat_cycle SET isActive = 0, updatedAt = :updatedAt WHERE id = :id")
     suspend fun deactivate(id: String, updatedAt: Long = Clock.System.now().toEpochMilliseconds())
 
+    @Query("UPDATE repeat_cycle SET isDeleted = 1, updatedAt = :updatedAt WHERE id = :id")
+    suspend fun delete(id: String, updatedAt: Long = Clock.System.now().toEpochMilliseconds())
+
     /**
      * 특정 시점 이후에 변경된 모든 반복 주기 조회 (삭제된 항목 포함)
      */

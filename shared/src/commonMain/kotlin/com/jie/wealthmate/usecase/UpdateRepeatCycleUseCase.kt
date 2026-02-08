@@ -20,6 +20,11 @@ class UpdateRepeatCycleUseCase(
         val repeatCycleEntity = historyWithDetails.repeatCycle ?: return
         val historyEntity = historyWithDetails.history
 
+        if (newRepeatCycle == "UNKNOWN") {
+            repeatCycleRepository.deleteRepeatCycle(repeatCycleEntity.id)
+            return
+        }
+
         val updatedRepeatCycle = repeatCycleEntity.copy(
             repeatCycle = newRepeatCycle,
             endDate = newEndDate?.toEpochMilliseconds(),
