@@ -57,7 +57,7 @@ class RepeatHistoryManagementScreen : BaseScreen() {
                 RepeatHistoryList(
                     repeatHistoryItems = uiState.repeatHistoryItems,
                     onItemClick = {},
-                    onIsActiveChange = {}
+                    onIsActiveChange = screenModel::modifyRepeatCycle
                 )
             }
         }

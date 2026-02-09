@@ -1,6 +1,7 @@
 package com.jie.wealthmate.feature.menu.management.repeatHistoryManagement
 
 import com.jie.wealthmate.base.BaseScreenModel
+import com.jie.wealthmate.database.eneity.RepeatCycleEntity
 import com.jie.wealthmate.repository.RepeatCycleRepository
 
 class RepeatHistoryManagementScreenModel(
@@ -23,5 +24,19 @@ class RepeatHistoryManagementScreenModel(
                     )
                 }
             }
+    }
+
+    fun modifyRepeatCycle(repeatCycle: RepeatCycleEntity, isActive: Boolean) {
+        launchSafe(
+            block = {
+                repeatCycleRepository.updateRepeatCycle(
+                    repeatCycle.copy(
+                        isActive = isActive
+                    )
+                )
+            }
+        ) {
+            showSnackbar("반복 정보가 수정되었습니다.")
+        }
     }
 }

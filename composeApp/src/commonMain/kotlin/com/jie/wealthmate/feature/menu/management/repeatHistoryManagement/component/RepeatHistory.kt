@@ -44,8 +44,8 @@ import wealthmate.composeapp.generated.resources.ic_push_pin
 fun ColumnScope.RepeatHistoryList(
     modifier: Modifier = Modifier,
     repeatHistoryItems: List<RepeatCycleWithDetails>,
-    onItemClick: (RepeatCycleWithDetails) -> Unit = {},
-    onIsActiveChange: (Boolean) -> Unit = {},
+    onItemClick: (RepeatCycleWithDetails) -> Unit,
+    onIsActiveChange: (RepeatCycleEntity, Boolean) -> Unit,
 ) {
     LazyColumn(
         modifier = modifier.fillMaxSize(),
@@ -70,7 +70,7 @@ fun ColumnScope.RepeatHistoryList(
 private fun RepeatHistoryItem(
     modifier: Modifier = Modifier,
     data: RepeatCycleWithDetails,
-    onIsActiveChange: (Boolean) -> Unit = {},
+    onIsActiveChange: (RepeatCycleEntity, Boolean) -> Unit,
 ) {
     val typography = MaterialTheme.typography
     val repeatCycle = data.repeatCycle
@@ -134,7 +134,7 @@ private fun RepeatHistoryItem(
             WMSwitch(
                 checked = data.repeatCycle.isActive,
                 switchSize = SwitchSize.X_SMALL,
-                onCheckedChange = onIsActiveChange,
+                onCheckedChange = { onIsActiveChange(data.repeatCycle, it) }
             )
         }
     }
