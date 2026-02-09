@@ -1,10 +1,10 @@
 package com.jie.wealthmate.feature.menu.management.repeatHistoryManagement
 
 import com.jie.wealthmate.base.BaseUiState
-import com.jie.wealthmate.vo.RepeatCycleVo
+import com.jie.wealthmate.database.eneity.RepeatCycleWithDetails
 
 data class RepeatHistoryManagementUiState(
-    val repeatHistoryItems: List<RepeatCycleVo> = emptyList(),
+    val repeatHistoryItems: List<RepeatCycleWithDetails> = emptyList(),
 ) : BaseUiState {
 
 }

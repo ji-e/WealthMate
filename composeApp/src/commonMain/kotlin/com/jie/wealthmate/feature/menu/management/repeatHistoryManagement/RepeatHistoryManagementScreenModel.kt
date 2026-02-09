@@ -10,5 +10,18 @@ class RepeatHistoryManagementScreenModel(
     override val initialState: RepeatHistoryManagementUiState
         get() = RepeatHistoryManagementUiState()
 
+    init {
+        getRepeatHistory()
+    }
 
+    private fun getRepeatHistory() {
+        repeatCycleRepository.getRepeatCycleWithDetails()
+            .apiFlow { response ->
+                reduceState { state ->
+                    state.copy(
+                        repeatHistoryItems = response
+                    )
+                }
+            }
+    }
 }
