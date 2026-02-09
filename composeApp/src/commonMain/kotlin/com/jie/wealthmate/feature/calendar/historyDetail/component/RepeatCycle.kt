@@ -31,7 +31,7 @@ import com.jie.wealthmate.utils.formatDateDotYYMDE
 import com.jie.wealthmate.vo.RepeatCycleVo
 import org.jetbrains.compose.resources.painterResource
 import wealthmate.composeapp.generated.resources.Res
-import wealthmate.composeapp.generated.resources.ic_delete_outline
+import wealthmate.composeapp.generated.resources.ic_close
 import wealthmate.composeapp.generated.resources.ic_edit
 import wealthmate.composeapp.generated.resources.ic_error_outline
 import wealthmate.composeapp.generated.resources.ic_keyboard_arrow_right
@@ -143,7 +143,7 @@ fun RepeatCycle(
                     )
                 } else {
                     Icon(
-                        painter = painterResource(Res.drawable.ic_delete_outline),
+                        painter = painterResource(Res.drawable.ic_close),
                         modifier = Modifier
                             .padding(start = 4.dp)
                             .size(18.dp)
