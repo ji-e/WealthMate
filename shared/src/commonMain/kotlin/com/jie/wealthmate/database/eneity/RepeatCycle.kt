@@ -20,6 +20,7 @@ data class RepeatCycleEntity(
     val startDate: Long,
     val endDate: Long? = null,
     val categoryId: String?,
+    val categoryTagId: String?,
     val paymentMethodId: String?,
     val isActive: Boolean = true, // 반복 중단 여부
     val updatedAt: Long = Clock.System.now().toEpochMilliseconds(),
@@ -33,9 +34,13 @@ data class RepeatCycleWithDetails(
         entityColumn = "id"
     )
     val category: CategoryEntity?,
+    
     @Relation(
         parentColumn = "paymentMethodId",
         entityColumn = "id"
     )
     val paymentMethod: PaymentMethodEntity?
-)
+) {
+    val categoryTag: CategoryTagEntity?
+        get() = category?.tags?.find { it.id == repeatCycle.categoryTagId }
+}

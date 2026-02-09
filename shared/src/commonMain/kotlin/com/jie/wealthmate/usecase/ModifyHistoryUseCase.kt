@@ -30,6 +30,7 @@ class ModifyHistoryUseCase(
                 repeatCycle.copy(
                     amount = newAmount,
                     categoryId = newCategoryId,
+                    categoryTagId = newCategoryTagId,
                     paymentMethodId = newPaymentMethodId,
                     content = newContent,
                     dayOfWeek = if (repeatCycle.repeatCycle == "WEEKLY") newDate.dayOfWeek.isoDayNumber else null,
