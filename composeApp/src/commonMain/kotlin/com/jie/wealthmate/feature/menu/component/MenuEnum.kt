@@ -28,8 +28,8 @@ enum class MenuEnum(
     ),
     REPEAT_HISTORY(
         route = "repeat_history",
-        label = "반복내역",
-        title = "반복내역 관리",
+        label = "반복 내역",
+        title = "반복 내역 관리",
         icon = null
     ),
 
@@ -52,8 +52,8 @@ enum class MenuEnum(
         val managementMenu = listOf(
             CATEGORY,
             PAYMENT_METHOD,
-            ASSET,
-//            REPEAT_HISTORY,
+//            ASSET,
+            REPEAT_HISTORY,
         )
         val syncMenu = listOf(
             GOOGLE_SYNC,
