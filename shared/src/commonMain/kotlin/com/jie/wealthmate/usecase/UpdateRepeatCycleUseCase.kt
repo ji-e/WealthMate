@@ -19,7 +19,6 @@ class UpdateRepeatCycleUseCase(
     ) {
         val historyWithDetails = historyRepository.getHistoryById(historyId) ?: return
         val repeatCycleEntity = historyWithDetails.repeatCycle ?: return
-        val historyEntity = historyWithDetails.history
 
         if (newRepeatCycle == "UNKNOWN") {
             repeatCycleRepository.deleteRepeatCycle(repeatCycleEntity.id)
@@ -30,8 +29,8 @@ class UpdateRepeatCycleUseCase(
             isActive = newIsActive,
             repeatCycle = newRepeatCycle,
             endDate = newEndDate?.toEpochMilliseconds(),
-            dayOfWeek = if (newRepeatCycle == "WEEKLY") historyEntity.date.toLocalDate().dayOfWeek.isoDayNumber else null,
-            dayOfMonth = if (newRepeatCycle == "MONTHLY") historyEntity.date.toLocalDate().day else null,
+            dayOfWeek = if (newRepeatCycle == "WEEKLY") repeatCycleEntity.startDate.toLocalDate().dayOfWeek.isoDayNumber else null,
+            dayOfMonth = if (newRepeatCycle == "MONTHLY") repeatCycleEntity.startDate.toLocalDate().day else null,
         )
         repeatCycleRepository.updateRepeatCycle(updatedRepeatCycle)
     }

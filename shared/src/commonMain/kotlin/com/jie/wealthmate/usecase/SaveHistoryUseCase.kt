@@ -13,7 +13,6 @@ import com.jie.wealthmate.utils.toEpochMilliseconds
 import com.jie.wealthmate.utils.toLocalDate
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.isoDayNumber
-import kotlinx.datetime.number
 import kotlinx.datetime.plus
 
 class SaveHistoryUseCase(
@@ -34,7 +33,7 @@ class SaveHistoryUseCase(
             val dayOfWeek =
                 if (repeatCycle == "WEEKLY") history.date.toLocalDate().dayOfWeek.isoDayNumber else null
             val dayOfMonth =
-                if (repeatCycle == "MONTHLY") history.date.toLocalDate().month.number else null
+                if (repeatCycle == "MONTHLY") history.date.toLocalDate().day else null
 
             val repeatCycleEntity = RepeatCycleEntity(
                 id = repeatCycleId,
@@ -112,7 +111,7 @@ fun getInstallmentPlan(
     totalAmount: Long,
     months: Long,
     currentAmount: Long? = null,
-    currentTime: Long? = null
+    currentTime: Long? = null,
 ): List<Long> {
     if (months <= 0) return emptyList()
 
@@ -150,7 +149,8 @@ fun getInstallmentPlan(
         val remainderRemaining = remainingAmount % remainingMonths
 
         for (i in currentTime.toInt() until months.toInt()) {
-            val amount = if (i == currentTime.toInt()) baseRemaining + remainderRemaining else baseRemaining
+            val amount =
+                if (i == currentTime.toInt()) baseRemaining + remainderRemaining else baseRemaining
             plan[i] = amount
         }
     }
