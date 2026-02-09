@@ -45,13 +45,14 @@ class HistoryDetailScreenModel(
         }
     }
 
-    fun updateEndDate(date: LocalDate?) {
+    fun updateRepeatCycleIsActive(isActive: Boolean) {
         val uiState = container.uiState.value
 
         uiState.history?.repeatCycle?.let { repeatCycleVo ->
             updateRepeatCycle(
+                isActive = isActive,
                 repeatCycle = repeatCycleVo.repeatCycle,
-                endDate = date
+                endDate = repeatCycleVo.endDate
             )
         }
     }
@@ -63,8 +64,21 @@ class HistoryDetailScreenModel(
 
         uiState.history?.repeatCycle?.let { repeatCycleVo ->
             updateRepeatCycle(
+                isActive = repeatCycleVo.isActive,
                 repeatCycle = repeatCycle,
                 endDate = repeatCycleVo.endDate
+            )
+        }
+    }
+
+    fun updateRepeatCycleEndDate(date: LocalDate?) {
+        val uiState = container.uiState.value
+
+        uiState.history?.repeatCycle?.let { repeatCycleVo ->
+            updateRepeatCycle(
+                isActive = repeatCycleVo.isActive,
+                repeatCycle = repeatCycleVo.repeatCycle,
+                endDate = date
             )
         }
     }
@@ -221,7 +235,11 @@ class HistoryDetailScreenModel(
         }
     }
 
-    private fun updateRepeatCycle(repeatCycle: RepeatCycleEnum, endDate: LocalDate?) {
+    private fun updateRepeatCycle(
+        isActive: Boolean,
+        repeatCycle: RepeatCycleEnum,
+        endDate: LocalDate?,
+    ) {
         val uiState = container.uiState.value
         val historyVo = uiState.history ?: return
 
@@ -229,6 +247,7 @@ class HistoryDetailScreenModel(
             block = {
                 updateRepeatCycleUseCase(
                     historyId = historyVo.id,
+                    newIsActive = isActive,
                     newRepeatCycle = repeatCycle.name,
                     newEndDate = endDate
                 )

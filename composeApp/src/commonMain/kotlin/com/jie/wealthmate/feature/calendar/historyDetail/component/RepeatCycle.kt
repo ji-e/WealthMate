@@ -18,7 +18,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.jie.wealthmate.component.SwitchSize
 import com.jie.wealthmate.component.WMIconButton
+import com.jie.wealthmate.component.WMSwitch
 import com.jie.wealthmate.component.WMText
 import com.jie.wealthmate.feature.calendar.addHistory.component.RepeatCycleEnum.Companion.formattedShortDescription
 import com.jie.wealthmate.theme.ColorGray
@@ -37,6 +39,7 @@ import wealthmate.composeapp.generated.resources.ic_keyboard_arrow_right
 fun RepeatCycle(
     modifier: Modifier = Modifier,
     repeatCycle: RepeatCycleVo,
+    onIsActiveChange: (Boolean) -> Unit,
     onModifyRepeatCycleClick: () -> Unit,
     onEndDateClick: (isRemoveEndDateClick: Boolean) -> Unit,
 ) {
@@ -56,7 +59,6 @@ fun RepeatCycle(
             WMText(
                 text = repeatCycle.repeatCycle.formattedShortDescription(repeatCycle.startDate),
                 style = Typography().titleMedium.copy(fontWeight = FontWeight.SemiBold),
-                modifier = Modifier.weight(1f, false)
             )
 
             WMIconButton(
@@ -64,6 +66,14 @@ fun RepeatCycle(
                 iconButtonModifier = Modifier.size(36.dp),
                 modifier = Modifier.size(18.dp),
                 onClick = onModifyRepeatCycleClick
+            )
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            WMSwitch(
+                checked = repeatCycle.isActive,
+                switchSize = SwitchSize.X_SMALL,
+                onCheckedChange = onIsActiveChange,
             )
         }
 
@@ -130,6 +140,7 @@ fun RepeatCycle(
                 )
             }
         }
+
         Row(
             modifier = Modifier.padding(top = 12.dp),
             verticalAlignment = Alignment.CenterVertically,

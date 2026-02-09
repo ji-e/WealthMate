@@ -168,12 +168,13 @@ class HistoryDetailScreen(
                                 RepeatCycle(
                                     modifier = Modifier.padding(top = 8.dp, bottom = 24.dp),
                                     repeatCycle = history.repeatCycle,
+                                    onIsActiveChange =screenModel::updateRepeatCycleIsActive,
                                     onModifyRepeatCycleClick = {
                                         isShowRepeatCycleModalBottomSheet = true
                                     },
                                     onEndDateClick = { isRemoveEndDateClick ->
                                         if (isRemoveEndDateClick) {
-                                            screenModel.updateEndDate(null)
+                                            screenModel.updateRepeatCycleEndDate(null)
                                         } else {
                                             isShowEndDateSelectModalBottomSheet = true
                                         }
@@ -253,7 +254,7 @@ class HistoryDetailScreen(
             DateSelectModalBottomSheet(
                 title = "종료일 선택",
                 selectedDate = uiState.history?.repeatCycle?.endDate,
-                onSelectClick = screenModel::updateEndDate,
+                onSelectClick = screenModel::updateRepeatCycleEndDate,
                 onDismissRequest = { isShowEndDateSelectModalBottomSheet = false }
             )
         }
