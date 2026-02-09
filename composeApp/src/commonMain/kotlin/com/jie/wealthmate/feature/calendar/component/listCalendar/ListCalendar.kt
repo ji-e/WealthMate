@@ -57,7 +57,12 @@ fun ListCalendar(
     ) {
         val targetIndex = groupStartIndices.find { it.second == selectedDate }?.first
         if (targetIndex != null) {
-            // 현재 리스트의 첫 번째 아이템이 이미 목표 인덱스라면 스크롤 건너뜀 (루프 방지)
+            // 현재 리스트에서 상단에 위치한 날짜 확인
+            val currentVisibleDate = groupStartIndices.lastOrNull { it.first <= listState.firstVisibleItemIndex }?.second
+
+            // 사용자가 스크롤 중이고, 이미 해당 날짜 섹션을 보고 있다면 스크롤 이동을 무시하여 점프 방지
+            if (listState.isScrollInProgress && currentVisibleDate == selectedDate) return@LaunchedEffect
+
             if (listState.firstVisibleItemIndex == targetIndex) return@LaunchedEffect
 
             try {
