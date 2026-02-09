@@ -17,7 +17,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.dropShadow
 import androidx.compose.ui.graphics.shadow.Shadow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.koin.koinScreenModel
@@ -35,8 +34,8 @@ import com.jie.wealthmate.feature.calendar.component.monthCalendar.MonthCalendar
 import com.jie.wealthmate.feature.calendar.historyDetail.HistoryDetailScreen
 import com.jie.wealthmate.theme.ColorGray
 import com.jie.wealthmate.theme.ColorPrimary
-import com.jie.wealthmate.theme.WMTheme
 import com.jie.wealthmate.utils.today
+import com.jie.wealthmate.vo.HistoryVo
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.plus
@@ -46,16 +45,6 @@ import wealthmate.composeapp.generated.resources.ic_add
 val startDate = LocalDate(2025, 1, 1)
 
 class CalendarScreen() : BaseScreen() {
-    val monthItem = mutableListOf<LocalDate>().apply {
-        repeat((today.year - startDate.year) * 12 + 12) {
-            add(
-                startDate.plus(
-                    it,
-                    DateTimeUnit.MONTH
-                )
-            )
-        }
-    }
 
     @Composable
     override fun Content() {
@@ -63,9 +52,32 @@ class CalendarScreen() : BaseScreen() {
 
         val navigator = LocalNavigator.currentOrThrow
         val screenModel: CalendarScreenModel = koinScreenModel()
-        val uiState = screenModel.container.uiState.collectAsState().value
+        val uiState by screenModel.container.uiState.collectAsState()
 
         var isShowSelectedCalendarModalBottomSheet by remember { mutableStateOf(false) }
+
+        val monthItems = remember {
+            mutableListOf<LocalDate>().apply {
+                repeat((today.year - startDate.year) * 12 + 12) {
+                    add(startDate.plus(it, DateTimeUnit.MONTH))
+                }
+            }
+        }
+
+        // 람다 정의를 Box 외부(상단)로 이동하여 하단 시트에서도 접근 가능하게 함
+        val onMonthChanged =
+            remember { { month: LocalDate -> screenModel.updateSelectedMonth(month) } }
+        val onDateChanged = remember { { date: LocalDate -> screenModel.updateSelectedDate(date) } }
+        val onHistoryClick = remember {
+            { history: HistoryVo ->
+                navigator.push(
+                    HistoryDetailScreen(
+                        largeCategory = history.largeCategory,
+                        historyId = history.id
+                    )
+                )
+            }
+        }
 
         Box(
             modifier = Modifier
@@ -75,38 +87,25 @@ class CalendarScreen() : BaseScreen() {
             Column(
                 modifier = Modifier.fillMaxSize(),
             ) {
-                WMTopBar(
-                    title = TopBarItem.Title("캘린더")
-                )
+                WMTopBar(title = TopBarItem.Title("캘린더"))
 
                 MonthCalendar(
                     selectedMonth = uiState.selectedMonth,
                     selectedDate = uiState.selectedDate,
                     historyItems = uiState.histories,
-                    onMonthChanged = screenModel::updateSelectedMonth,
-                    onTodayClick = screenModel::updateSelectedMonth,
+                    onMonthChanged = onMonthChanged,
+                    onTodayClick = { screenModel.updateSelectedMonth() },
                     onSelectedMonthClick = { isShowSelectedCalendarModalBottomSheet = true },
-                    onDateClick = screenModel::updateSelectedDate
-                ) {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
+                    onDateClick = onDateChanged,
+                    bottomContent = {
                         ListCalendar(
                             selectedDate = uiState.selectedDate,
                             historyItems = uiState.histories,
-                            onDateSelected = screenModel::updateSelectedDate,
-                            onHistoryClick = {
-                                navigator.push(
-                                    HistoryDetailScreen(
-                                        largeCategory = it.largeCategory,
-                                        historyId = it.id
-                                    )
-                                )
-                            },
+                            onDateSelected = onDateChanged,
+                            onHistoryClick = onHistoryClick,
                         )
                     }
-                }
+                )
             }
 
             WMIconButton(
@@ -118,9 +117,8 @@ class CalendarScreen() : BaseScreen() {
                         shape = CircleShape,
                         shadow = Shadow(
                             radius = 4.dp,
-                            spread = 0.dp,
                             color = ColorGray.Gray_200,
-                            offset = DpOffset(x = 2.dp, 2.dp)
+                            offset = DpOffset(2.dp, 2.dp)
                         )
                     )
                     .clip(CircleShape)
@@ -133,19 +131,14 @@ class CalendarScreen() : BaseScreen() {
 
         if (isShowSelectedCalendarModalBottomSheet) {
             SelectedCalendarModalBottomSheet(
-                monthItem = monthItem,
+                monthItem = monthItems,
                 selectedMonth = uiState.selectedMonth,
-                onMonthChange = screenModel::updateSelectedMonth,
+                onMonthChange = { month ->
+                    onMonthChanged(month)
+                    isShowSelectedCalendarModalBottomSheet = false
+                },
                 onDismissRequest = { isShowSelectedCalendarModalBottomSheet = false }
             )
-        }
-    }
-
-    @Composable
-    @Preview(showBackground = true)
-    private fun CalendarScreenPreview() {
-        WMTheme {
-            CalendarScreen()
         }
     }
 }

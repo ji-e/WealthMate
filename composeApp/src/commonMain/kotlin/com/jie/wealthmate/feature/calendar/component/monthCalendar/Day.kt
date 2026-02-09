@@ -3,7 +3,6 @@ package com.jie.wealthmate.feature.calendar.component.monthCalendar
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -16,7 +15,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
@@ -27,10 +25,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.lerp
-import androidx.compose.ui.unit.sp
 import com.jie.wealthmate.component.WMText
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.theme.ColorBlue
@@ -54,7 +52,6 @@ import wealthmate.composeapp.generated.resources.ic_push_pin
 import kotlin.math.abs
 import kotlin.math.ceil
 
-
 @Composable
 fun DayGrid(
     selectedDate: LocalDate,
@@ -66,12 +63,16 @@ fun DayGrid(
     collapseProgress: Float,
     onClickDate: (LocalDate) -> Unit,
 ) {
+    // 1. 데이터 그룹화 최적화: 날짜별로 미리 묶어두어 O(1) 접근 가능하게 함
+    val historyByDate = remember(historyItems) {
+        historyItems.groupBy { it.date }
+    }
+
     val items = remember(selectedMonth) {
         mutableListOf<Pair<LocalDate, MonthPeriodEnum>>().apply {
             val firstDay = selectedMonth.firstDayOfMonth()
             val startPadding = firstDay.dayOfWeek.isoDayNumber % 7
 
-            // 이전 달
             repeat(startPadding) {
                 add(
                     firstDay.minus(
@@ -80,35 +81,21 @@ fun DayGrid(
                     ) to MonthPeriodEnum.LAST_MONTH
                 )
             }
-
-            // 이번 달
             repeat(selectedMonth.lastDayOfMonth().day) {
                 add(firstDay.plus(it, DateTimeUnit.DAY) to MonthPeriodEnum.THIS_MONTH)
             }
-
-            // 다음 달
             val itemsSize = this.size
-            if (itemsSize < 35) {
-                repeat(35 - this.size) {
-                    add(
-                        firstDay.lastDayOfMonth()
-                            .plus(it + 1, DateTimeUnit.DAY) to MonthPeriodEnum.NEXT_MONTH
-                    )
-                }
-            } else if (itemsSize > 35) {
-                repeat(42 - this.size) {
-                    add(
-                        firstDay.lastDayOfMonth()
-                            .plus(it + 1, DateTimeUnit.DAY) to MonthPeriodEnum.NEXT_MONTH
-                    )
-                }
+            val targetSize = if (itemsSize <= 35) 35 else 42
+            repeat(targetSize - itemsSize) {
+                add(
+                    firstDay.lastDayOfMonth()
+                        .plus(it + 1, DateTimeUnit.DAY) to MonthPeriodEnum.NEXT_MONTH
+                )
             }
         }
     }
 
     val numRowsForCurrentMonth = ceil(items.size / 7f)
-
-    // 선택된 날짜가 몇 번째 주에 속하는지 계산
     val selectedItemIndex = remember(items, selectedDate) {
         items.indexOfFirst { it.first == selectedDate }
     }
@@ -121,31 +108,39 @@ fun DayGrid(
         label = "selectedRowIndexAnimation"
     )
 
-    if (items.isEmpty().not()) {
+    if (items.isNotEmpty()) {
         LazyVerticalGrid(
             modifier = Modifier.fillMaxSize(),
             columns = GridCells.Fixed(7),
             contentPadding = PaddingValues(horizontal = 4.dp),
             userScrollEnabled = false
         ) {
-            items(items.size) { index ->
-                val history = historyItems.filter { it.date == items[index].first }
-                val fixedItems = history.filter { it.category?.isFixed.default() }
-                val incomeAmount = history
-                    .filter { it.largeCategory == LargeCategoryEnum.INCOME }
-                    .sumOf { it.amount }
-                val expenseAmount = history
-                    .filter { it.largeCategory == LargeCategoryEnum.EXPENSES }
-                    .sumOf { it.amount }
-                    .minus(fixedItems.sumOf { it.amount })
+            items(
+                count = items.size,
+                key = { index -> items[index].first.toString() } // Key 추가로 리컴포지션 최적화
+            ) { index ->
+                val date = items[index].first
+                val dayHistory = historyByDate[date] ?: emptyList()
 
-                val day = items[index]
-                val rowIndex = index / 7
+                // 2. 금액 계산 최적화: 필요한 데이터만 미리 추출
+                val fixedItems =
+                    remember(dayHistory) { dayHistory.filter { it.category?.isFixed.default() } }
+                val incomeAmount = remember(dayHistory) {
+                    dayHistory.filter { it.largeCategory == LargeCategoryEnum.INCOME }
+                        .sumOf { it.amount }
+                }
+                val expenseAmount = remember(dayHistory) {
+                    val totalExpense =
+                        dayHistory.filter { it.largeCategory == LargeCategoryEnum.EXPENSES }
+                            .sumOf { it.amount }
+                    val fixedExpense = fixedItems.sumOf { it.amount }
+                    totalExpense - fixedExpense
+                }
 
                 DayItem(
-                    day = day,
-                    isSelected = day.first == selectedDate,
-                    rowIndex = rowIndex,
+                    day = items[index],
+                    isSelected = date == selectedDate,
+                    rowIndex = index / 7,
                     animatedRowIndex = animatedRowIndex,
                     incomeAmount = incomeAmount,
                     expenseAmount = expenseAmount,
@@ -170,7 +165,7 @@ internal fun DayItem(
     animatedRowIndex: Float,
     incomeAmount: Long,
     expenseAmount: Long,
-    fixedItems: List<HistoryVo?>,
+    fixedItems: List<HistoryVo>,
     dayNormalHeight: Dp,
     dayMaxHeight: Dp,
     expansionProgress: Float,
@@ -179,31 +174,22 @@ internal fun DayItem(
 ) {
     val selectionFactor = (1f - abs(rowIndex - animatedRowIndex)).coerceIn(0f, 1f)
 
-    // 확장/축소 진행률에 따라 높이와 투명도를 계산
     val height = when {
-        // 1. 축소 중 (Normal -> Minimized)
         collapseProgress > 0f -> {
             val minHeight = 72.dp * selectionFactor
             lerp(start = dayNormalHeight, stop = minHeight, fraction = collapseProgress)
         }
-        // 2. 확장 중 (Normal -> Maximized)
+
         expansionProgress > 0f -> {
             lerp(start = dayNormalHeight, stop = dayMaxHeight, fraction = expansionProgress)
         }
-        // 3. 기본 상태 (Normal)
+
         else -> dayNormalHeight
     }
 
-    val alpha = when {
-        // 축소 중에만 선택되지 않은 주의 투명도를 조절
-        collapseProgress > 0f -> {
-            // 축소된 상태(collapseProgress=1)에서 selectionFactor에 따라 투명도 조절
-            // 확장된 상태(collapseProgress=0)에서는 모두 1f
-            1f - (collapseProgress * (1f - selectionFactor))
-        }
-
-        else -> 1f
-    }
+    val alpha = if (collapseProgress > 0f) {
+        1f - (collapseProgress * (1f - selectionFactor))
+    } else 1f
 
     Column(
         modifier = modifier
@@ -213,12 +199,11 @@ internal fun DayItem(
             .background(if (isSelected) ColorPrimary.Primary_200 else ColorGray.White)
             .clickable { onClickDate(day.first) }
             .padding(2.dp),
-
-        ) {
+    ) {
         val isToday = day.first == today
         val dayColor = when {
             isToday -> ColorGray.White
-            day.second == MonthPeriodEnum.LAST_MONTH || day.second == MonthPeriodEnum.NEXT_MONTH -> ColorGray.Gray_200
+            day.second != MonthPeriodEnum.THIS_MONTH -> ColorGray.Gray_200
             else -> WeekEnum.creator(day.first.dayOfWeek.isoDayNumber).color
         }
         val dayBackgroundColor = when {
@@ -241,94 +226,60 @@ internal fun DayItem(
             textAlign = TextAlign.Center
         )
 
+        // 3. UI 단순화: autoSize를 제거하고 overflow 처리로 변경 (성능 향상 핵심)
         if (incomeAmount > 0) {
             WMText(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(14.dp),
+                modifier = Modifier.fillMaxWidth().height(14.dp),
                 text = "+${formatWithCommas(incomeAmount.toString())}",
                 style = Typography().labelSmall.copy(color = ColorBlue.Blue_300),
                 textAlign = TextAlign.Center,
                 maxLines = 1,
-                autoSize = TextAutoSize.StepBased(
-                    minFontSize = 9.sp,
-                    maxFontSize = 11.sp,
-                    stepSize = 1.sp
-                )
+                overflow = TextOverflow.Ellipsis
             )
         }
         if (expenseAmount > 0) {
             WMText(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(14.dp),
+                modifier = Modifier.fillMaxWidth().height(14.dp),
                 text = "-${formatWithCommas(expenseAmount.toString())}",
                 style = Typography().labelSmall.copy(color = ColorRed.Red_300),
                 textAlign = TextAlign.Center,
                 maxLines = 1,
-                autoSize = TextAutoSize.StepBased(
-                    minFontSize = 8.sp,
-                    maxFontSize = 11.sp,
-                    stepSize = 1.sp
-                )
+                overflow = TextOverflow.Ellipsis
             )
         }
 
-        // 고정 아이템 영역
-        if (fixedItems.isNotEmpty()) {
-            BoxWithConstraints(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .alpha(alpha = alpha),
-            ) {
-                val itemHeight = 14.dp
-                val maxVisibleItems = (maxHeight / itemHeight).toInt()
-                val isOverflow = fixedItems.size > maxVisibleItems
+        // 4. BoxWithConstraints 제거: 고정 높이 기반으로 단순 계산하여 렌더링
+        if (fixedItems.isNotEmpty() && height > 60.dp) {
+            val itemHeight = 14.dp
+            val availableHeight = height - 40.dp // 날짜 및 금액 영역 제외 대략적 높이
+            val maxVisibleItems =
+                (availableHeight / itemHeight).toInt().coerceAtMost(fixedItems.size)
 
+            if (maxVisibleItems > 0) {
                 Column {
-                    val itemsToShow =
-                        if (isOverflow) {
-                            fixedItems.take(
-                                (maxVisibleItems - 1).coerceAtLeast(minimumValue = 0)
-                            )
-                        } else {
-                            fixedItems
-                        }
-
-                    itemsToShow.forEach { item ->
+                    fixedItems.take(maxVisibleItems).forEach { item ->
                         Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(height = itemHeight),
+                            modifier = Modifier.fillMaxWidth().height(itemHeight),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Icon(
-                                painter = painterResource(resource = Res.drawable.ic_push_pin),
+                                painter = painterResource(Res.drawable.ic_push_pin),
                                 contentDescription = null,
                                 tint = ColorRed.Red_300,
-                                modifier = Modifier.size(size = 10.dp)
+                                modifier = Modifier.size(10.dp)
                             )
-
                             WMText(
-                                text = item?.content.default(),
+                                text = item.content.default(),
                                 style = Typography().labelSmall,
                                 maxLines = 1,
                                 modifier = Modifier.padding(start = 2.dp),
-                                autoSize = TextAutoSize.StepBased(
-                                    minFontSize = 8.sp,
-                                    maxFontSize = 11.sp,
-                                    stepSize = 1.sp
-                                )
+                                overflow = TextOverflow.Ellipsis
                             )
                         }
                     }
-
-                    // 높이를 초과할 경우 "..." 표시
-                    if (isOverflow && maxVisibleItems > 0) {
+                    if (fixedItems.size > maxVisibleItems) {
                         WMText(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(height = itemHeight),
+                            modifier = Modifier.fillMaxWidth().height(itemHeight),
                             text = "...",
                             style = Typography().labelSmall,
                             textAlign = TextAlign.Center

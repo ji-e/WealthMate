@@ -7,6 +7,7 @@ import io.github.aakira.napier.Napier
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -31,6 +32,8 @@ abstract class BaseScreenModel<S : UiState> : ScreenModel, ContainerHost<S> {
      *   UI의 안정성을 높입니다.
      */
     protected val screenScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
+    protected val ioScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+
 
     /**
      * 화면의 초기 UI 상태를 정의합니다.
@@ -167,7 +170,7 @@ abstract class BaseScreenModel<S : UiState> : ScreenModel, ContainerHost<S> {
         onError: (suspend (Throwable) -> Unit)? = null,
         onSuccess: (suspend (T) -> Unit)? = null,
     ) = event {
-        screenScope.launch {
+        ioScope.launch {
             if (isHideKeyboard) hideKeyboard()
 
             if (showLoading) {
@@ -216,6 +219,6 @@ abstract class BaseScreenModel<S : UiState> : ScreenModel, ContainerHost<S> {
 
         }.onCompletion {
             showLoading(false)
-        }.launchIn(screenScope)
+        }.launchIn(ioScope)
     }
 }

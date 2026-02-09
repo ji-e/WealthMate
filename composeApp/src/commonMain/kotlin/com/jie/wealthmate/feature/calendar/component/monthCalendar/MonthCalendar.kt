@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
@@ -39,7 +40,6 @@ import androidx.compose.ui.draw.dropShadow
 import androidx.compose.ui.graphics.shadow.Shadow
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
@@ -54,6 +54,7 @@ import com.jie.wealthmate.vo.HistoryVo
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.monthsUntil
+import kotlinx.datetime.number
 import kotlinx.datetime.plus
 import org.jetbrains.compose.resources.painterResource
 import wealthmate.composeapp.generated.resources.Res
@@ -62,16 +63,6 @@ import wealthmate.composeapp.generated.resources.ic_calendar_today
 import wealthmate.composeapp.generated.resources.ic_horizontal_rule
 import wealthmate.composeapp.generated.resources.ic_more_vert
 
-
-/**
- * MonthCalendar Composable to display a month view calendar.
- * @param selectedMonth 선택된 월 (예: "2024-06")
- * @param selectedDate 선택된 날짜 (예: "2024-06-10")
- * @param onMonthChanged 월이 변경되었을 때 호출되는 콜백
- * @param onTodayClick 오늘 날짜 클릭
- * @param onSelectedMonthClick 월 변경 클릭
- * @param onDateClick 선택하고 싶은 날짜 클릭
- */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MonthCalendar(
@@ -86,43 +77,36 @@ fun MonthCalendar(
     bottomContent: @Composable () -> Unit = {},
 ) {
     var displaySelectedMonth by remember {
-        mutableStateOf(
-            today.convertLocalDateToString(
-                formatDateKorYM
-            )
-        )
+        mutableStateOf(selectedMonth.convertLocalDateToString(formatDateKorYM))
     }
 
     val pagerState = rememberPagerState(
-        initialPage = startDate.monthsUntil(selectedMonth),
+        initialPage = remember { startDate.monthsUntil(selectedMonth) },
         pageCount = { (today.year - startDate.year) * 12 + 12 }
     )
 
-//    LaunchedEffect(pagerState) {
-//        snapshotFlow { pagerState.targetPage }.collect { page ->
-//            val newMonth = startDate.plus(value = page, unit = DateTimeUnit.MONTH)
-//            onMonthChanged(newMonth)
-//        }
-//    }
     LaunchedEffect(pagerState) {
         snapshotFlow { pagerState.settledPage }.collect { page ->
             val newMonth = startDate.plus(value = page, unit = DateTimeUnit.MONTH)
-            displaySelectedMonth = newMonth.convertLocalDateToString(formatDateKorYM)
-            onMonthChanged(newMonth)
+            if (displaySelectedMonth != newMonth.convertLocalDateToString(formatDateKorYM)) {
+                displaySelectedMonth = newMonth.convertLocalDateToString(formatDateKorYM)
+                onMonthChanged(newMonth)
+            }
         }
     }
-
 
     LaunchedEffect(selectedMonth) {
-        val page = startDate.monthsUntil(selectedMonth)
-        if (page != pagerState.currentPage) {
-            pagerState.requestScrollToPage(page)
+        val targetPage = startDate.monthsUntil(selectedMonth)
+        if (targetPage != pagerState.currentPage) {
+            pagerState.scrollToPage(targetPage)
         }
     }
 
-    Column(
-        modifier = modifier.fillMaxSize()
-    ) {
+    val historyByMonth = remember(historyItems) {
+        historyItems.groupBy { "${it.date.year}-${it.date.month.number}" }
+    }
+
+    Column(modifier = modifier.fillMaxSize()) {
         MonthCalendarHeader(
             displaySelectedMonth = displaySelectedMonth,
             onTodayClick = onTodayClick,
@@ -130,124 +114,119 @@ fun MonthCalendar(
         )
         WeekHeader()
 
-        BoxWithConstraints(
-            modifier = Modifier.weight(1f).clipToBounds()
-        ) {
-            val density = LocalDensity.current
-            val dragBarHeight = 32.dp
-            val dragBarHeightPx = with(density) { dragBarHeight.toPx() }
+        CollapsibleCalendarContent(
+            pagerState = pagerState,
+            selectedDate = selectedDate,
+            historyByMonth = historyByMonth,
+            onDateClick = onDateClick,
+            bottomContent = bottomContent
+        )
+    }
+}
 
-            val dayHeight = 72.dp
-            val dayHeightPx = with(density) { dayHeight.toPx() }
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+private fun CollapsibleCalendarContent(
+    pagerState: PagerState,
+    selectedDate: LocalDate,
+    historyByMonth: Map<String, List<HistoryVo>>,
+    onDateClick: (LocalDate) -> Unit,
+    bottomContent: @Composable () -> Unit,
+) {
+    BoxWithConstraints(
+        modifier = Modifier.fillMaxSize().clipToBounds()
+    ) {
+        val density = LocalDensity.current
+        val dragBarHeight = 32.dp
+        val dayHeight = 72.dp
 
-            val maximizedHeightPx = with(density) { maxHeight.toPx() }
-            val minimizedHeightPx = dayHeightPx + dragBarHeightPx
-            val normalCalendarHeight = 400.dp
-            val normalCalendarHeightPx = with(density) { normalCalendarHeight.toPx() }
+        val maximizedHeightPx = constraints.maxHeight.toFloat()
+        val minimizedHeightPx = with(density) { (dayHeight + dragBarHeight).toPx() }
+        val normalCalendarHeight = 400.dp
+        val normalCalendarHeightPx = with(density) { normalCalendarHeight.toPx() }
 
-            val anchoredState = remember(maximizedHeightPx) {
-                AnchoredDraggableState(
-                    initialValue = CalendarStateEnum.Normal,
-                    anchors = DraggableAnchors {
-                        CalendarStateEnum.Maximized at 0f
-                        CalendarStateEnum.Normal at -(maximizedHeightPx - normalCalendarHeightPx)
-                        CalendarStateEnum.Minimized at -(maximizedHeightPx - minimizedHeightPx)
-                    },
-                )
+        val anchoredState = remember(maximizedHeightPx) {
+            AnchoredDraggableState(
+                initialValue = CalendarStateEnum.Normal,
+                anchors = DraggableAnchors {
+                    CalendarStateEnum.Maximized at 0f
+                    CalendarStateEnum.Normal at -(maximizedHeightPx - normalCalendarHeightPx)
+                    CalendarStateEnum.Minimized at -(maximizedHeightPx - minimizedHeightPx)
+                },
+            )
+        }
+
+        val currentOffset = anchoredState.requireOffset()
+
+        val normalHeightPx = remember(anchoredState.anchors, maximizedHeightPx, normalCalendarHeightPx) {
+            anchoredState.anchors.positionOf(CalendarStateEnum.Normal).let {
+                if (it.isFinite()) maximizedHeightPx + it else normalCalendarHeightPx
             }
+        }
 
-            val currentOffset = anchoredState.requireOffset()
-            val normalHeightPx = anchoredState.anchors.positionOf(CalendarStateEnum.Normal)
-                .takeIf { it.isFinite() }
-                ?.let { maximizedHeightPx + it }
-                ?: normalCalendarHeightPx
+        val expansionProgress = remember(currentOffset, maximizedHeightPx, normalHeightPx) {
+            if (normalHeightPx == maximizedHeightPx) 0f
+            else ((currentOffset + maximizedHeightPx - normalHeightPx) / (maximizedHeightPx - normalHeightPx)).coerceIn(0f, 1f)
+        }
 
-            val expansionProgress =
-                if (normalHeightPx == maximizedHeightPx) {
-                    0f
-                } else {
-                    ((currentOffset + maximizedHeightPx - normalHeightPx) / (maximizedHeightPx - normalHeightPx))
-                        .coerceIn(0f, 1f)
-                }
+        val collapseProgress = remember(currentOffset, normalHeightPx, minimizedHeightPx) {
+            if (normalHeightPx == minimizedHeightPx) 0f
+            else ((currentOffset + maximizedHeightPx - normalHeightPx) / (minimizedHeightPx - normalHeightPx)).coerceIn(0f, 1f)
+        }
 
-            val collapseProgress =
-                if (normalHeightPx == minimizedHeightPx) {
-                    0f
-                } else {
-                    ((currentOffset + maximizedHeightPx - normalHeightPx) / (minimizedHeightPx - normalHeightPx))
-                        .coerceIn(0f, 1f)
-                }
+        val dayNormalHeight = (normalCalendarHeight - dragBarHeight)
+        val dayMaxHeight = (maxHeight - dragBarHeight)
 
-            val dayNormalHeight = (normalCalendarHeight - dragBarHeight)
-            val dayMaxHeight = (maxHeight - dragBarHeight)
-
+        Column(modifier = Modifier.fillMaxSize()) {
             Column(
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier.height(with(density) { (maximizedHeightPx + currentOffset).toDp() })
             ) {
-                // 캘린더 영역 (드래그에 따라 높이 가변)
-                Column(
-                    modifier = Modifier.height(with(density) { (maximizedHeightPx + currentOffset).toDp() })
-                ) {
-                    HorizontalPager(
-                        modifier = Modifier.weight(1f),
-                        state = pagerState,
-                    ) { page ->
-                        val month = startDate.plus(page, DateTimeUnit.MONTH)
-                        MonthCalendarContent(
-                            selectedDate = selectedDate,
-                            selectedMonth = month,
-                            historyItems = historyItems,
-                            dayNormalHeight = dayNormalHeight,
-                            dayMaxHeight = dayMaxHeight,
-                            expansionProgress = expansionProgress,
-                            collapseProgress = collapseProgress,
-                            onClickDate = onDateClick
-                        )
+                HorizontalPager(
+                    modifier = Modifier.weight(1f),
+                    state = pagerState,
+                    beyondViewportPageCount = 0,
+                    key = { it }
+                ) { page ->
+                    val month = remember(page) { startDate.plus(page, DateTimeUnit.MONTH) }
+                    val monthHistories = remember(historyByMonth, month) {
+                        historyByMonth["${month.year}-${month.month.number}"] ?: emptyList()
                     }
 
-                    // dragBar
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(dragBarHeight)
-                            .dropShadow(
-                                shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
-                                shadow = Shadow(
-                                    radius = 8.dp,
-                                    spread = 0.dp,
-                                    color = ColorGray.Gray_100,
-                                    offset = DpOffset(
-                                        x = 0.dp,
-                                        y = (-5).dp
-                                    )
-                                )
-                            )
-                            .clip(
-                                shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
-                            )
-                            .background(color = ColorGray.White)
-                            .anchoredDraggable(
-                                state = anchoredState,
-                                orientation = Orientation.Vertical
-                            ),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            painter = painterResource(Res.drawable.ic_horizontal_rule),
-                            contentDescription = null,
-                            tint = ColorGray.Gray_400,
-                            modifier = Modifier.size(40.dp),
-                        )
-                    }
+                    MonthCalendarContent(
+                        selectedDate = selectedDate,
+                        selectedMonth = month,
+                        historyItems = monthHistories,
+                        dayNormalHeight = dayNormalHeight,
+                        dayMaxHeight = dayMaxHeight,
+                        expansionProgress = expansionProgress,
+                        collapseProgress = collapseProgress,
+                        onClickDate = onDateClick
+                    )
                 }
-                // dragBar 아래 공간을 꽉 채우는 리스트뷰 영역
+
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .weight(1f)
+                        .height(dragBarHeight)
+                        .dropShadow(
+                            shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
+                            shadow = Shadow(radius = 8.dp, color = ColorGray.Gray_100, offset = DpOffset(0.dp, (-5).dp))
+                        )
+                        .clip(RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp))
+                        .background(ColorGray.White)
+                        .anchoredDraggable(anchoredState, Orientation.Vertical),
+                    contentAlignment = Alignment.Center
                 ) {
-                    bottomContent()
+                    Icon(
+                        painter = painterResource(Res.drawable.ic_horizontal_rule),
+                        contentDescription = null,
+                        tint = ColorGray.Gray_400,
+                        modifier = Modifier.size(40.dp),
+                    )
                 }
+            }
+            Box(modifier = Modifier.fillMaxWidth().weight(1f)) {
+                bottomContent()
             }
         }
     }
@@ -260,24 +239,17 @@ private fun MonthCalendarHeader(
     onSelectedMonthClick: () -> Unit,
 ) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 12.dp),
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         TextButton(
             contentPadding = PaddingValues(horizontal = 12.dp),
             onClick = onSelectedMonthClick
         ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
                 WMText(
                     text = displaySelectedMonth,
-                    style = Typography().titleMedium.copy(
-                        fontWeight = FontWeight.SemiBold,
-                        color = ColorGray.Gray_700
-                    )
+                    style = Typography().titleMedium.copy(fontWeight = FontWeight.SemiBold, color = ColorGray.Gray_700)
                 )
                 Icon(
                     painter = painterResource(Res.drawable.ic_arrow_drop_down),
@@ -287,21 +259,10 @@ private fun MonthCalendarHeader(
                 )
             }
         }
-
         Spacer(modifier = Modifier.weight(1f))
-
-        IconButton(
-            onClick = onTodayClick
-        ) {
-            Box(
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    painter = painterResource(Res.drawable.ic_calendar_today),
-                    modifier = Modifier.size(24.dp),
-                    contentDescription = "오늘"
-                )
-
+        IconButton(onClick = onTodayClick) {
+            Box(contentAlignment = Alignment.Center) {
+                Icon(painter = painterResource(Res.drawable.ic_calendar_today), modifier = Modifier.size(24.dp), contentDescription = "오늘")
                 WMText(
                     text = today.day.toString(),
                     style = Typography().labelSmall.copy(fontWeight = FontWeight.SemiBold),
@@ -309,18 +270,12 @@ private fun MonthCalendarHeader(
                 )
             }
         }
-
-        WMIconButton(
-            iconRes = Res.drawable.ic_more_vert,
-            contentDescription = "더보기",
-            onClick = {}
-        )
+        WMIconButton(iconRes = Res.drawable.ic_more_vert, contentDescription = "더보기", onClick = {})
     }
 }
 
 @Composable
 private fun MonthCalendarContent(
-    modifier: Modifier = Modifier,
     selectedDate: LocalDate,
     selectedMonth: LocalDate,
     historyItems: List<HistoryVo>,
@@ -330,26 +285,14 @@ private fun MonthCalendarContent(
     collapseProgress: Float,
     onClickDate: (LocalDate) -> Unit,
 ) {
-    Column(modifier = modifier) {
-        DayGrid(
-            selectedDate = selectedDate,
-            selectedMonth = selectedMonth,
-            historyItems = historyItems,
-            dayNormalHeight = dayNormalHeight,
-            dayMaxHeight = dayMaxHeight,
-            expansionProgress = expansionProgress,
-            collapseProgress = collapseProgress,
-            onClickDate = onClickDate
-        )
-    }
-}
-
-@Composable
-@Preview(showBackground = true)
-private fun MonthCalendarPreview() {
-    MonthCalendar(
-        selectedMonth = today,
-        selectedDate = today,
-        onMonthChanged = {}
+    DayGrid(
+        selectedDate = selectedDate,
+        selectedMonth = selectedMonth,
+        historyItems = historyItems,
+        dayNormalHeight = dayNormalHeight,
+        dayMaxHeight = dayMaxHeight,
+        expansionProgress = expansionProgress,
+        collapseProgress = collapseProgress,
+        onClickDate = onClickDate
     )
 }
