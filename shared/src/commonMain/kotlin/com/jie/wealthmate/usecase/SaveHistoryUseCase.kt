@@ -47,6 +47,7 @@ class SaveHistoryUseCase(
                 startDate = history.date,
                 endDate = null,
                 categoryId = history.categoryId,
+                categoryTagId = history.categoryTagId,
                 paymentMethodId = history.paymentMethodId,
             )
             repeatRepository.insertRepeatCycle(repeatCycleEntity)

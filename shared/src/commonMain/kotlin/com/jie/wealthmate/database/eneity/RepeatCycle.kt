@@ -1,7 +1,9 @@
 package com.jie.wealthmate.database.eneity
 
+import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import androidx.room.Relation
 import kotlinx.serialization.Serializable
 import kotlin.time.Clock
 
@@ -18,8 +20,27 @@ data class RepeatCycleEntity(
     val startDate: Long,
     val endDate: Long? = null,
     val categoryId: String?,
+    val categoryTagId: String?,
     val paymentMethodId: String?,
     val isActive: Boolean = true, // 반복 중단 여부
     val updatedAt: Long = Clock.System.now().toEpochMilliseconds(),
     val isDeleted: Boolean = false,
 )
+
+data class RepeatCycleWithDetails(
+    @Embedded val repeatCycle: RepeatCycleEntity,
+    @Relation(
+        parentColumn = "categoryId",
+        entityColumn = "id"
+    )
+    val category: CategoryEntity?,
+    
+    @Relation(
+        parentColumn = "paymentMethodId",
+        entityColumn = "id"
+    )
+    val paymentMethod: PaymentMethodEntity?
+) {
+    val categoryTag: CategoryTagEntity?
+        get() = category?.tags?.find { it.id == repeatCycle.categoryTagId }
+}

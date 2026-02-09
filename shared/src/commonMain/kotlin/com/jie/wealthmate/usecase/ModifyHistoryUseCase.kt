@@ -3,12 +3,15 @@ package com.jie.wealthmate.usecase
 import com.jie.wealthmate.database.eneity.HistoryEntity
 import com.jie.wealthmate.database.eneity.HistoryInstallment
 import com.jie.wealthmate.repository.HistoryRepository
+import com.jie.wealthmate.repository.RepeatCycleRepository
 import com.jie.wealthmate.utils.default
 import com.jie.wealthmate.utils.toEpochMilliseconds
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.isoDayNumber
 
 class ModifyHistoryUseCase(
     private val historyRepository: HistoryRepository,
+    private val repeatCycleRepository: RepeatCycleRepository,
 ) {
     suspend operator fun invoke(
         historyId: String,
@@ -21,6 +24,21 @@ class ModifyHistoryUseCase(
         isVisibility: Boolean,
     ) {
         val historyWithDetails = historyRepository.getHistoryById(historyId) ?: return
+
+        historyWithDetails.repeatCycle?.let { repeatCycle ->
+            repeatCycleRepository.updateRepeatCycle(
+                repeatCycle.copy(
+                    amount = newAmount,
+                    categoryId = newCategoryId,
+                    categoryTagId = newCategoryTagId,
+                    paymentMethodId = newPaymentMethodId,
+                    content = newContent,
+                    dayOfWeek = if (repeatCycle.repeatCycle == "WEEKLY") newDate.dayOfWeek.isoDayNumber else null,
+                    dayOfMonth = if (repeatCycle.repeatCycle == "MONTHLY") newDate.day else null,
+                )
+            )
+        }
+
         val historyEntity = historyWithDetails.history
         val installmentId = historyEntity.installmentId
         val installmentTime = historyEntity.installment?.installmentTime

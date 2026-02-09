@@ -55,7 +55,7 @@ val commonModule = module {
     single { SaveHistoryUseCase(get(), get(), get()) }
     single { UpdateInstallmentUseCase(get(), get()) }
     single { UpdateRepeatCycleUseCase(get(), get()) }
-    single { ModifyHistoryUseCase(get()) }
+    single { ModifyHistoryUseCase(get(), get()) }
 
 
     // 홈

@@ -30,7 +30,8 @@ data class HistoryDetailUiState(
 ) : BaseUiState {
     val isSaveButtonEnable = amount.text.isNotBlank() &&
             isDataChanged &&
-            (category?.isFixed != true || content.text.isNotBlank())
+            (category?.isFixed != true || content.text.isNotBlank()) &&
+            (history?.repeatCycle == null || content.text.isNotBlank())
 }
 
 sealed class HistoryDetailUiSideEffect : UiSideEffect {

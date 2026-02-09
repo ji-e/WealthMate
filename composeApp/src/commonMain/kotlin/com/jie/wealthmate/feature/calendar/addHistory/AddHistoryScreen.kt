@@ -228,7 +228,7 @@ class AddHistoryScreen(private val selectedDate: LocalDate) : BaseScreen() {
                     onValueChange = screenModel::updateContent,
                     label = "내용",
                     maxLength = 20,
-                    isRequire = uiState.category?.isFixed.default(),
+                    isRequire = uiState.category?.isFixed.default() || uiState.repeatCycle != null,
                     placeholder = "내용을 입력해 주세요.",
                 )
 

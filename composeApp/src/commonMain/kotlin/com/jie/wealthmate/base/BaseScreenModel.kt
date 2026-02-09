@@ -201,6 +201,7 @@ abstract class BaseScreenModel<S : UiState> : ScreenModel, ContainerHost<S> {
         this@apiFlow.onStart {
             showLoading(true)
         }.onEach { data ->
+            Napier.d("response::: $data")
             successFunc(data)
             showLoading(false)
         }.catch { e ->
