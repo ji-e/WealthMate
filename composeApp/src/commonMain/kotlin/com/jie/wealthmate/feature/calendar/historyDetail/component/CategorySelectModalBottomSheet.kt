@@ -41,7 +41,10 @@ fun CategorySelectModalBottomSheet(
             selectedLargeCategory = selectedLargeCategory,
             selectedCategory = tempSelectedCategory,
             selectedCategoryTag = tempSelectedCategoryTag,
-            onCategoryClick = { tempSelectedCategory = it },
+            onCategoryClick = {
+                tempSelectedCategory = it
+                tempSelectedCategoryTag = null
+            },
             onCategoryTagClick = { tempSelectedCategoryTag = it }
         )
 
