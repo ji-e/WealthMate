@@ -5,7 +5,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.koin.koinScreenModel
@@ -16,7 +18,9 @@ import com.jie.wealthmate.component.EmptyListView
 import com.jie.wealthmate.component.topbar.TopBarItem
 import com.jie.wealthmate.component.topbar.WMTopBar
 import com.jie.wealthmate.feature.menu.component.MenuEnum
+import com.jie.wealthmate.feature.menu.management.repeatHistoryManagement.addRepeatHistory.AddRepeatHistoryScreen
 import com.jie.wealthmate.feature.menu.management.repeatHistoryManagement.component.RepeatHistoryList
+import com.jie.wealthmate.theme.ColorGray
 import wealthmate.composeapp.generated.resources.Res
 import wealthmate.composeapp.generated.resources.ic_add
 
@@ -30,6 +34,8 @@ class RepeatHistoryManagementScreen : BaseScreen() {
         val screenModel: RepeatHistoryManagementScreenModel = koinScreenModel()
         val uiState by screenModel.container.uiState.collectAsState()
 
+        val isAddItemEnabled by remember { derivedStateOf { uiState.repeatHistoryItems.size < 15 } }
+
         Column {
             WMTopBar(
                 title = TopBarItem.Title(MenuEnum.REPEAT_HISTORY.title),
@@ -37,11 +43,11 @@ class RepeatHistoryManagementScreen : BaseScreen() {
                 trailingItem = listOf(
                     TopBarItem.TrailingItem(
                         iconRes = Res.drawable.ic_add,
-//                        tint = if (isAddItemEnabled) ColorGray.Gray_700 else ColorGray.Gray_100,
-//                        action = {
+                        tint = if (isAddItemEnabled) ColorGray.Gray_700 else ColorGray.Gray_100,
+                        action = {
 //                            if (isAddItemEnabled.not()) return@TrailingItem
-//                            navigator.push(AddCategoryScreen(largeCategory = largeCategoryItems[pagerState.currentPage]))
-//                        }
+                            navigator.push(AddRepeatHistoryScreen())
+                        }
                     )
                 )
             )
