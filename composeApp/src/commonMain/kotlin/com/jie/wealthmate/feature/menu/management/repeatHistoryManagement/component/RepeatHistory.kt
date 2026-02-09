@@ -88,7 +88,7 @@ private fun RepeatHistoryItem(
             Box(
                 modifier = Modifier
                     .clip(CircleShape)
-                    .background(LargeCategoryEnum.creator(category?.largeCategory).backgroundColor)
+                    .background(LargeCategoryEnum.creator(data.repeatCycle.largeCategory).backgroundColor)
                     .size(40.dp)
                     .align(Alignment.Center),
                 contentAlignment = Alignment.Center
