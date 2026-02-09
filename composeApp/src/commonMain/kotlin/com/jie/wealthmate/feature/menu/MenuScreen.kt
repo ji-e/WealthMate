@@ -28,6 +28,7 @@ import com.jie.wealthmate.feature.menu.data.googleCloudShare.GoogleCloudShareScr
 import com.jie.wealthmate.feature.menu.data.googleCloudSync.GoogleCloudSyncScreen
 import com.jie.wealthmate.feature.menu.management.categoryManagement.CategoryManagementScreen
 import com.jie.wealthmate.feature.menu.management.paymentMethodManagement.PaymentMethodManagementScreen
+import com.jie.wealthmate.feature.menu.management.repeatHistoryManagement.RepeatHistoryManagementScreen
 import com.jie.wealthmate.theme.WMTheme
 import com.jie.wealthmate.utils.default
 import com.mmk.kmpauth.google.GoogleButtonUiContainer
@@ -50,6 +51,10 @@ class MenuScreen(val calculateBottomPadding: Dp) : Screen {
 
                         MenuEnum.PAYMENT_METHOD -> {
                             navigator.push(PaymentMethodManagementScreen())
+                        }
+
+                        MenuEnum.REPEAT_HISTORY -> {
+                            navigator.push(RepeatHistoryManagementScreen())
                         }
 
                         MenuEnum.GOOGLE_SYNC -> {
