@@ -221,6 +221,7 @@ class HistoryDetailScreen(
                     modifier = Modifier.padding(top = 4.dp),
                     label = "내용",
                     maxLength = 20,
+                    isRequire = uiState.category?.isFixed.default() || uiState.history?.repeatCycle != null,
                     placeholder = "내용 없음",
                 )
 

@@ -131,7 +131,7 @@ fun RepeatCycle(
                     style = Typography().bodyMedium.copy(color = contentColor)
                 )
 
-                if (isActivated.not()) return
+                if (isActivated.not()) return@Row
                 if (repeatCycle.endDate == null) {
                     Icon(
                         painter = painterResource(Res.drawable.ic_keyboard_arrow_right),
