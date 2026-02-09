@@ -5,6 +5,7 @@ package com.jie.wealthmate.repository
 import com.benasher44.uuid.uuid4
 import com.jie.wealthmate.database.DatabaseProvider
 import com.jie.wealthmate.database.eneity.RepeatCycleEntity
+import com.jie.wealthmate.database.eneity.RepeatCycleWithDetails
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
@@ -73,6 +74,14 @@ class RepeatCycleRepositoryImpl(private val databaseProvider: DatabaseProvider) 
         params = mapOf()
     ) {
         dao.getRepeatCycles()
+    }.flowOn(Dispatchers.Default)
+
+    override fun getRepeatCycleWithDetails(): Flow<List<RepeatCycleWithDetails>> = loggedFlow(
+        repositoryName = repoName,
+        methodName = "getRepeatCycles",
+        params = mapOf()
+    ) {
+        dao.getRepeatCyclesWithDetail()
     }.flowOn(Dispatchers.Default)
 
 }

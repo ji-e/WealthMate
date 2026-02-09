@@ -6,13 +6,17 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import com.jie.wealthmate.database.eneity.RepeatCycleEntity
+import com.jie.wealthmate.database.eneity.RepeatCycleWithDetails
 import kotlinx.coroutines.flow.Flow
 import kotlin.time.Clock
 
 @Dao
 interface RepeatCycleDao {
-    @Query("SELECT * FROM repeat_cycle WHERE isActive = 1 AND isDeleted = 0")
+    @Query("SELECT * FROM repeat_cycle WHERE isDeleted = 0")
     fun getRepeatCycles(): Flow<List<RepeatCycleEntity>>
+
+    @Query("SELECT * FROM repeat_cycle WHERE isDeleted = 0")
+    fun getRepeatCyclesWithDetail(): Flow<List<RepeatCycleWithDetails>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(repeatCycle: RepeatCycleEntity)
