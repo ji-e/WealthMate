@@ -12,5 +12,7 @@ interface RepeatCycleRepository {
 
     suspend fun deactivateRepeatCycle(repeatCycleId: String)
 
+    suspend fun deleteRepeatCycle(repeatCycleId: String)
+
     fun getRepeatCycles(): Flow<List<RepeatCycleEntity>>
 }

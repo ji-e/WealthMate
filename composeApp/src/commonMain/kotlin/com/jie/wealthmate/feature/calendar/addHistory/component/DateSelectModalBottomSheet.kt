@@ -70,6 +70,7 @@ fun DateSelectModalBottomSheet(
                 .padding(horizontal = 28.dp)
                 .padding(top = 12.dp, bottom = 20.dp)
                 .fillMaxWidth(),
+            enabled = selectedLocalDate != null,
             onClick = {
                 selectedLocalDate?.let { date ->
                     onSelectClick(date)

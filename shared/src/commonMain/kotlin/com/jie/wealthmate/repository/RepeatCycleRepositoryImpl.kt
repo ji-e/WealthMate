@@ -57,6 +57,16 @@ class RepeatCycleRepositoryImpl(private val databaseProvider: DatabaseProvider) 
         }
     }
 
+    override suspend fun deleteRepeatCycle(repeatCycleId: String) = withContext(Dispatchers.Default) {
+        loggedCall(
+            repositoryName = repoName,
+            methodName = "deleteRepeatCycle",
+            params = mapOf("repeatCycleId" to repeatCycleId)
+        ) {
+            dao.delete(repeatCycleId)
+        }
+    }
+
     override fun getRepeatCycles(): Flow<List<RepeatCycleEntity>> = loggedFlow(
         repositoryName = repoName,
         methodName = "getRepeatCycles",

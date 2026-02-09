@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -18,7 +19,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.jie.wealthmate.component.SwitchSize
 import com.jie.wealthmate.component.WMIconButton
+import com.jie.wealthmate.component.WMSwitch
 import com.jie.wealthmate.component.WMText
 import com.jie.wealthmate.feature.calendar.addHistory.component.RepeatCycleEnum.Companion.formattedShortDescription
 import com.jie.wealthmate.theme.ColorGray
@@ -37,9 +40,12 @@ import wealthmate.composeapp.generated.resources.ic_keyboard_arrow_right
 fun RepeatCycle(
     modifier: Modifier = Modifier,
     repeatCycle: RepeatCycleVo,
+    onIsActiveChange: (Boolean) -> Unit,
     onModifyRepeatCycleClick: () -> Unit,
     onEndDateClick: (isRemoveEndDateClick: Boolean) -> Unit,
 ) {
+    val isActivated = repeatCycle.isActive
+    val contentColor = if (isActivated) ColorGray.Gray_700 else ColorGray.Gray_500
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -50,20 +56,35 @@ fun RepeatCycle(
     ) {
 
         Row(
-            modifier = Modifier.padding(bottom = 6.dp),
+            modifier = Modifier
+                .padding(bottom = 6.dp)
+                .height(36.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             WMText(
                 text = repeatCycle.repeatCycle.formattedShortDescription(repeatCycle.startDate),
-                style = Typography().titleMedium.copy(fontWeight = FontWeight.SemiBold),
-                modifier = Modifier.weight(1f, false)
+                style = Typography().titleMedium.copy(
+                    color = contentColor,
+                    fontWeight = FontWeight.SemiBold
+                ),
             )
 
-            WMIconButton(
-                iconRes = Res.drawable.ic_edit,
-                iconButtonModifier = Modifier.size(36.dp),
-                modifier = Modifier.size(18.dp),
-                onClick = onModifyRepeatCycleClick
+            if (isActivated) {
+                WMIconButton(
+                    iconRes = Res.drawable.ic_edit,
+                    iconButtonModifier = Modifier.size(36.dp),
+                    modifier = Modifier.size(18.dp),
+                    onClick = onModifyRepeatCycleClick,
+                    tint = contentColor
+                )
+            }
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            WMSwitch(
+                checked = isActivated,
+                switchSize = SwitchSize.X_SMALL,
+                onCheckedChange = onIsActiveChange,
             )
         }
 
@@ -84,6 +105,7 @@ fun RepeatCycle(
 
             WMText(
                 text = repeatCycle.startDate.convertLocalDateToString(formatDateDotYYMDE),
+                style = Typography().bodyMedium.copy(color = contentColor)
             )
         }
 
@@ -92,7 +114,7 @@ fun RepeatCycle(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Row(
-                modifier = Modifier.noRippleClickable { onEndDateClick(false) },
+                modifier = Modifier.noRippleClickable(isActivated) { onEndDateClick(false) },
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 WMText(
@@ -106,30 +128,36 @@ fun RepeatCycle(
 
                 WMText(
                     text = repeatCycle.endDate.convertLocalDateToString(formatDateDotYYMDE, "없음"),
+                    style = Typography().bodyMedium.copy(color = contentColor)
                 )
 
-                Icon(
-                    painter = painterResource(Res.drawable.ic_keyboard_arrow_right),
-                    modifier = Modifier
-                        .padding(start = 4.dp)
-                        .size(18.dp),
-                    contentDescription = null
-                )
+                if (isActivated) {
+                    Icon(
+                        painter = painterResource(Res.drawable.ic_keyboard_arrow_right),
+                        modifier = Modifier
+                            .padding(start = 4.dp)
+                            .size(18.dp),
+                        contentDescription = null,
+                        tint = ColorGray.Gray_500
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.weight(1f))
 
-            if (repeatCycle.endDate != null) {
+            if (repeatCycle.endDate != null && isActivated) {
                 Icon(
                     painter = painterResource(Res.drawable.ic_delete_outline),
                     modifier = Modifier
                         .padding(start = 4.dp)
                         .size(18.dp)
-                        .noRippleClickable() { onEndDateClick(true) },
-                    contentDescription = null
+                        .noRippleClickable { onEndDateClick(true) },
+                    contentDescription = null,
+                    tint = ColorGray.Gray_500
                 )
             }
         }
+
         Row(
             modifier = Modifier.padding(top = 12.dp),
             verticalAlignment = Alignment.CenterVertically,

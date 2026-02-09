@@ -13,6 +13,7 @@ class UpdateRepeatCycleUseCase(
 ) {
     suspend operator fun invoke(
         historyId: String,
+        newIsActive: Boolean,
         newRepeatCycle: String,
         newEndDate: LocalDate?,
     ) {
@@ -20,7 +21,13 @@ class UpdateRepeatCycleUseCase(
         val repeatCycleEntity = historyWithDetails.repeatCycle ?: return
         val historyEntity = historyWithDetails.history
 
+        if (newRepeatCycle == "UNKNOWN") {
+            repeatCycleRepository.deleteRepeatCycle(repeatCycleEntity.id)
+            return
+        }
+
         val updatedRepeatCycle = repeatCycleEntity.copy(
+            isActive = newIsActive,
             repeatCycle = newRepeatCycle,
             endDate = newEndDate?.toEpochMilliseconds(),
             dayOfWeek = if (newRepeatCycle == "WEEKLY") historyEntity.date.toLocalDate().dayOfWeek.isoDayNumber else null,
