@@ -5,9 +5,9 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
@@ -27,6 +27,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.jie.wealthmate.component.EmptyListView
 import com.jie.wealthmate.component.WMModalBottomSheet
 import com.jie.wealthmate.component.WMText
 import com.jie.wealthmate.theme.ColorGray
@@ -57,9 +58,17 @@ fun PaymentMethodModalBottomSheet(
     ) {
         Column(
             modifier = Modifier
+                .height(300.dp)
                 .padding(horizontal = 28.dp)
                 .padding(bottom = 20.dp)
         ) {
+            if (paymentMethodItems.isEmpty()) {
+                EmptyListView(
+                    modifier = Modifier.fillMaxSize(),
+                    contentText = "결제수단이 없습니다."
+                )
+                return@Column
+            }
             PaymentMethodList(
                 listState = listState,
                 paymentMethodItems = paymentMethodItems,
@@ -83,9 +92,7 @@ fun PaymentMethodList(
     onPaymentMethodClick: (PaymentMethodVo) -> Unit = {},
 ) {
     LazyColumn(
-        modifier = modifier
-            .fillMaxWidth()
-            .heightIn(max = 200.dp),
+        modifier = modifier.fillMaxWidth(),
         state = listState,
     ) {
         val colorList = ColorGroup.getColorList()
