@@ -17,7 +17,6 @@ data class RepeatHistoryDetailUiState(
     val startDate: LocalDate = today,
     val endDate: LocalDate? = null,
     val repeatCycle: RepeatCycleEnum? = null,
-    val totalInstallmentCount: Long? = null,
     val content: TextFieldValue = TextFieldValue(""),
     val amount: TextFieldValue = TextFieldValue(""),
     val category: CategoryVo? = null,

@@ -9,13 +9,17 @@ import com.jie.wealthmate.feature.menu.management.repeatHistoryManagement.addRep
 import com.jie.wealthmate.repository.CategoryRepository
 import com.jie.wealthmate.repository.PaymentMethodRepository
 import com.jie.wealthmate.repository.RepeatCycleRepository
+import com.jie.wealthmate.utils.default
 import com.jie.wealthmate.utils.formatRemoveCommas
 import com.jie.wealthmate.utils.toEpochMilliseconds
+import com.jie.wealthmate.utils.toLocalDate
 import com.jie.wealthmate.utils.today
 import com.jie.wealthmate.vo.CategoryTagVo
+import com.jie.wealthmate.vo.CategoryTagVo.Companion.mapperToVo
 import com.jie.wealthmate.vo.CategoryVo
 import com.jie.wealthmate.vo.CategoryVo.Companion.mapperToVo
 import com.jie.wealthmate.vo.PaymentMethodVo
+import com.jie.wealthmate.vo.PaymentMethodVo.Companion.mapperToVo
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.isoDayNumber
 
@@ -37,6 +41,7 @@ class RepeatHistoryDetailScreenModel(
 
     fun updateInit(repeatCycleId: String) {
         this.repeatCycleId = repeatCycleId
+        getRepeatCycle()
     }
 
     fun updateLargeCategory(largeCategory: LargeCategoryEnum) {
@@ -65,15 +70,6 @@ class RepeatHistoryDetailScreenModel(
             state.copy(
                 isDataChanged = true,
                 repeatCycle = repeatCycle
-            )
-        }
-    }
-
-    fun updateTotalInstallmentCount(totalInstallment: Long?) {
-        reduceState { state ->
-            state.copy(
-                isDataChanged = true,
-                totalInstallmentCount = totalInstallment
             )
         }
     }
@@ -120,6 +116,30 @@ class RepeatHistoryDetailScreenModel(
                 isDataChanged = true,
                 content = content
             )
+        }
+    }
+
+    private fun getRepeatCycle() {
+        launchSafe(
+            block = {
+                repeatCycleRepository.getRepeatCycleById(repeatCycleId.default())
+            }
+        ) { response ->
+            val repeatCycle = response?.repeatCycle ?: return@launchSafe
+            reduceState { state ->
+                state.copy(
+                    selectedLargeCategory = LargeCategoryEnum.creator(repeatCycle.largeCategory),
+                    startDate = repeatCycle.startDate.toLocalDate(),
+                    endDate = if (repeatCycle.endDate == 0L) null else repeatCycle.endDate.toLocalDate(),
+                    repeatCycle = RepeatCycleEnum.create(repeatCycle.repeatCycle),
+                    content = TextFieldValue(repeatCycle.content.default()),
+                    amount = TextFieldValue(repeatCycle.amount.default().toString()),
+                    category = response.category.mapperToVo(),
+                    categoryTag = response.categoryTag.mapperToVo(),
+                    paymentMethod = response.paymentMethod.mapperToVo(),
+                )
+            }
+
         }
     }
 

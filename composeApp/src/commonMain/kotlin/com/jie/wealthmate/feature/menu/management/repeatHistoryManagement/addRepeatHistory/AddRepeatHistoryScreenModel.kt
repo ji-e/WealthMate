@@ -62,15 +62,6 @@ class AddRepeatHistoryScreenModel(
         }
     }
 
-    fun updateTotalInstallmentCount(totalInstallment: Long?) {
-        reduceState { state ->
-            state.copy(
-                isDataChanged = true,
-                totalInstallmentCount = totalInstallment
-            )
-        }
-    }
-
     fun updateAmount(amount: TextFieldValue) {
         reduceState { state ->
             state.copy(
