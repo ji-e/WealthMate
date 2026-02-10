@@ -62,6 +62,24 @@ class HistoryRepositoryImpl(private val databaseProvider: DatabaseProvider) : Hi
         }
     }
 
+    override suspend fun insertHistories(histories: List<HistoryEntity>) = withContext(Dispatchers.Default) {
+        loggedCall(
+            repositoryName = repoName,
+            methodName = "insertHistories",
+            params = mapOf("histories" to histories)
+        ) {
+            val timestamp = Clock.System.now().toEpochMilliseconds()
+            val historiesWithIds = histories.map {
+                it.copy(
+                    id = generateId(),
+                    createdAt = timestamp,
+                    updatedAt = timestamp,
+                )
+            }
+            dao.insertHistories(historiesWithIds)
+        }
+    }
+
     override suspend fun updateHistory(history: HistoryEntity) = withContext(Dispatchers.Default) {
         loggedCall(
             repositoryName = repoName,

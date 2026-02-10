@@ -9,6 +9,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.launchIn
@@ -87,6 +88,8 @@ abstract class BaseScreenModel<S : UiState> : ScreenModel, ContainerHost<S> {
                 is RealContainer -> (container as RealContainer<S>).close()
                 else -> println("Container doesn't support close operation: ${container::class.simpleName}")
             }
+            screenScope.cancel()
+            ioScope.cancel()
         } catch (e: Exception) {
             println("Error closing container: $e")
         }
