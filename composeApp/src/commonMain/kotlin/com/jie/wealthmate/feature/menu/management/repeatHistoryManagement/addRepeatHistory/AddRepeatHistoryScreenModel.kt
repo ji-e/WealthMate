@@ -2,16 +2,21 @@ package com.jie.wealthmate.feature.menu.management.repeatHistoryManagement.addRe
 
 import androidx.compose.ui.text.input.TextFieldValue
 import com.jie.wealthmate.base.BaseScreenModel
+import com.jie.wealthmate.database.eneity.RepeatCycleEntity
 import com.jie.wealthmate.feature.calendar.addHistory.component.RepeatCycleEnum
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.repository.CategoryRepository
 import com.jie.wealthmate.repository.PaymentMethodRepository
 import com.jie.wealthmate.repository.RepeatCycleRepository
+import com.jie.wealthmate.utils.formatRemoveCommas
+import com.jie.wealthmate.utils.toEpochMilliseconds
 import com.jie.wealthmate.utils.today
 import com.jie.wealthmate.vo.CategoryTagVo
 import com.jie.wealthmate.vo.CategoryVo
+import com.jie.wealthmate.vo.CategoryVo.Companion.mapperToVo
 import com.jie.wealthmate.vo.PaymentMethodVo
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.isoDayNumber
 
 class AddRepeatHistoryScreenModel(
     private val repeatCycleRepository: RepeatCycleRepository,
@@ -116,23 +121,7 @@ class AddRepeatHistoryScreenModel(
             .apiFlow { response ->
                 reduceState { state ->
                     state.copy(
-                        categoryItems = response.map {
-                            CategoryVo(
-                                id = it.id,
-                                icon = it.icon,
-                                largeCategory = LargeCategoryEnum.creator(it.largeCategory),
-                                middleLabel = it.middleLabel,
-                                sort = it.sort,
-                                isFixed = it.isFixed,
-                                tags = it.tags.map { tag ->
-                                    CategoryTagVo(
-                                        id = tag.id,
-                                        label = tag.tagLabel
-                                    )
-                                }
-
-                            )
-                        }
+                        categoryItems = response.map { it.mapperToVo() }
                     )
                 }
             }
@@ -159,16 +148,28 @@ class AddRepeatHistoryScreenModel(
     }
 
     fun saveRepeatCycle() {
+        val uiState = container.uiState.value
         launchSafe(
             block = {
-//                repeatCycleRepository.updateRepeatCycle(
-//                    repeatCycle.copy(
-//                        isActive = isActive
-//                    )
-//                )
+                repeatCycleRepository.insertRepeatCycle(
+                    RepeatCycleEntity(
+                        largeCategory = uiState.selectedLargeCategory.name,
+                        content = uiState.content.text,
+                        amount = uiState.amount.text.formatRemoveCommas().toLong(),
+                        repeatCycle = uiState.repeatCycle?.name ?: RepeatCycleEnum.UNKNOWN.name,
+                        dayOfWeek = if (uiState.repeatCycle == RepeatCycleEnum.WEEKLY) uiState.startDate.dayOfWeek.isoDayNumber else null,
+                        dayOfMonth = if (uiState.repeatCycle == RepeatCycleEnum.MONTHLY) uiState.startDate.day else null,
+                        startDate = uiState.startDate.toEpochMilliseconds(),
+                        endDate = uiState.endDate?.toEpochMilliseconds(),
+                        categoryId = uiState.category?.id,
+                        categoryTagId = uiState.categoryTag?.id,
+                        paymentMethodId = uiState.paymentMethod?.id,
+                    )
+                )
             }
         ) {
             showSnackbar("반복 정보가 저장되었습니다.")
+            postSideEffect { AddRepeatHistoryUiSideEffect.OnSuccessSave }
         }
     }
 

@@ -13,6 +13,7 @@ import com.jie.wealthmate.utils.formatRemoveCommas
 import com.jie.wealthmate.utils.toEpochMilliseconds
 import com.jie.wealthmate.vo.CategoryTagVo
 import com.jie.wealthmate.vo.CategoryVo
+import com.jie.wealthmate.vo.CategoryVo.Companion.mapperToVo
 import com.jie.wealthmate.vo.PaymentMethodVo
 import kotlinx.datetime.LocalDate
 
@@ -31,7 +32,7 @@ class AddHistoryScreenModel(
         getPaymentMethods()
     }
 
-    fun updateInit(selectedDate: LocalDate){
+    fun updateInit(selectedDate: LocalDate) {
         reduceState { state ->
             state.copy(
                 date = selectedDate
@@ -126,23 +127,7 @@ class AddHistoryScreenModel(
             .apiFlow { response ->
                 reduceState { state ->
                     state.copy(
-                        categoryItems = response.map {
-                            CategoryVo(
-                                id = it.id,
-                                icon = it.icon,
-                                largeCategory = LargeCategoryEnum.creator(it.largeCategory),
-                                middleLabel = it.middleLabel,
-                                sort = it.sort,
-                                isFixed = it.isFixed,
-                                tags = it.tags.map { tag ->
-                                    CategoryTagVo(
-                                        id = tag.id,
-                                        label = tag.tagLabel
-                                    )
-                                }
-
-                            )
-                        }
+                        categoryItems = response.map { it.mapperToVo() }
                     )
                 }
             }

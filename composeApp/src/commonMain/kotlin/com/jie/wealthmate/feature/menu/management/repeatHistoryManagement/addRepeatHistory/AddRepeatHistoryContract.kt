@@ -2,6 +2,7 @@ package com.jie.wealthmate.feature.menu.management.repeatHistoryManagement.addRe
 
 import androidx.compose.ui.text.input.TextFieldValue
 import com.jie.wealthmate.base.BaseUiState
+import com.jie.wealthmate.base.UiSideEffect
 import com.jie.wealthmate.feature.calendar.addHistory.component.RepeatCycleEnum
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.utils.today
@@ -28,3 +29,8 @@ data class AddRepeatHistoryUiState(
     val isSaveButtonEnable: Boolean
         get() = isDataChanged && amount.text.isNotEmpty() && content.text.isNotEmpty()
 }
+
+sealed class AddRepeatHistoryUiSideEffect : UiSideEffect {
+    data object OnSuccessSave : AddRepeatHistoryUiSideEffect()
+}
+

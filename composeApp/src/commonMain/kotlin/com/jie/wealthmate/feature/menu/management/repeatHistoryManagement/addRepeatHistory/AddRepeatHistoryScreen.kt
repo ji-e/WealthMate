@@ -43,7 +43,6 @@ import com.jie.wealthmate.component.textField.rememberIntegerVisualTransformatio
 import com.jie.wealthmate.component.textField.toIntegerTextFieldValue
 import com.jie.wealthmate.component.topbar.TopBarItem
 import com.jie.wealthmate.component.topbar.WMTopBar
-import com.jie.wealthmate.feature.calendar.addHistory.AddHistoryUiSideEffect
 import com.jie.wealthmate.feature.calendar.addHistory.component.CategorySelectionRow
 import com.jie.wealthmate.feature.calendar.addHistory.component.DateSelectModalBottomSheet
 import com.jie.wealthmate.feature.calendar.addHistory.component.LargeCategorySelectBox
@@ -92,12 +91,11 @@ class AddRepeatHistoryScreen : BaseScreen() {
 
         screenModel.collectSideEffect { sideEffect ->
             when (sideEffect) {
-                is AddHistoryUiSideEffect.OnSuccessSave -> {
+                is AddRepeatHistoryUiSideEffect.OnSuccessSave -> {
                     navigator.pop()
                 }
             }
         }
-
 
         Column(
             modifier = Modifier
