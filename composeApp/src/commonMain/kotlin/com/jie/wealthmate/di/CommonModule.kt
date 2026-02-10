@@ -18,6 +18,7 @@ import com.jie.wealthmate.feature.menu.management.paymentMethodManagement.modify
 import com.jie.wealthmate.feature.menu.management.paymentMethodManagement.paymentMethodGroup.PaymentMethodGroupScreenModel
 import com.jie.wealthmate.feature.menu.management.repeatHistoryManagement.RepeatHistoryManagementScreenModel
 import com.jie.wealthmate.feature.menu.management.repeatHistoryManagement.addRepeatHistory.AddRepeatHistoryScreenModel
+import com.jie.wealthmate.feature.menu.management.repeatHistoryManagement.repeatHistoryDetail.RepeatHistoryDetailScreenModel
 import com.jie.wealthmate.network.HttpClientFactory
 import com.jie.wealthmate.repository.AuthRepository
 import com.jie.wealthmate.repository.AuthRepositoryImpl
@@ -82,7 +83,7 @@ val commonModule = module {
     factory { ModifyPaymentMethodScreenModel(get()) }
     factory { RepeatHistoryManagementScreenModel(get()) }
     factory { AddRepeatHistoryScreenModel(get(), get(), get()) }
-
+    factory { RepeatHistoryDetailScreenModel(get(), get(), get()) }
 
     factory { GoogleCloudSyncScreenModel(get(), get(), get()) }
     factory { GoogleCloudShareScreenModel(get(), get(), get()) }
