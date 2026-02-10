@@ -62,7 +62,7 @@ fun RepeatCycle(
             verticalAlignment = Alignment.CenterVertically
         ) {
             WMText(
-                text = repeatCycle.repeatCycle.formattedShortDescription(repeatCycle.startDate),
+                text = repeatCycle.repeatCycle.formattedShortDescription(repeatCycle.date),
                 style = Typography().titleMedium.copy(
                     color = contentColor,
                     fontWeight = FontWeight.SemiBold

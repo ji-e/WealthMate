@@ -16,6 +16,7 @@ data class RepeatCycleVo(
     val repeatCycle: RepeatCycleEnum,        // RepeatCycleEnum
     val dayOfWeek: Int? = null,     // WEEKLY일 때 사용 (1=월, 7=일)
     val dayOfMonth: Int? = null,    // MONTHLY일 때 사용 (1~31)
+    val date: LocalDate,
     val startDate: LocalDate,
     val endDate: LocalDate?,
     val categoryId: String?,
@@ -32,6 +33,7 @@ data class RepeatCycleVo(
             repeatCycle = RepeatCycleEnum.create(this?.repeatCycle),
             dayOfWeek = this?.dayOfWeek.default(),
             dayOfMonth = this?.dayOfMonth.default(),
+            date = this?.date.toLocalDate(),
             startDate = this?.startDate.toLocalDate(),
             endDate = this?.endDate?.toLocalDate(),
             categoryId = this?.categoryId.default(),

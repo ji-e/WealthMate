@@ -130,15 +130,16 @@ class CalendarScreenModel(
         month: LocalDate,
     ): List<LocalDate> {
         val cycle = RepeatCycleEnum.create(repeatCycle.repeatCycle)
-        val cycleStartDate = repeatCycle.startDate.toLocalDate()
-        val cycleEndDate = repeatCycle.endDate?.toLocalDate()
+        val referenceDate = repeatCycle.date.toLocalDate()
+        val startDate = repeatCycle.startDate.toLocalDate()
+        val endDate = repeatCycle.endDate?.toLocalDate()
 
         val monthStart = month.firstDayOfMonth()
         val monthEnd = month.lastDayOfMonth()
 
         // 실제 처리해야 할 기간 설정
-        val start = if (cycleStartDate > monthStart) cycleStartDate else monthStart
-        val end = if (cycleEndDate != null && cycleEndDate < monthEnd) cycleEndDate else monthEnd
+        val start = if (startDate > monthStart) startDate else monthStart
+        val end = if (endDate != null && endDate < monthEnd) endDate else monthEnd
 
         if (start > end) return emptyList()
 
@@ -153,7 +154,7 @@ class CalendarScreenModel(
                 RepeatCycleEnum.WEEKLY -> currentDate.dayOfWeek.isoDayNumber == repeatCycle.dayOfWeek
                 RepeatCycleEnum.MONTHLY -> currentDate.day == repeatCycle.dayOfMonth
                 RepeatCycleEnum.MONTH_END -> currentDate == currentDate.lastDayOfMonth()
-                RepeatCycleEnum.YEARLY -> currentDate.month.number == cycleStartDate.month.number && currentDate.day == cycleStartDate.day
+                RepeatCycleEnum.YEARLY -> currentDate.month.number == referenceDate.month.number && currentDate.day == referenceDate.day
                 else -> false
             }
             if (shouldAdd) dates.add(currentDate)

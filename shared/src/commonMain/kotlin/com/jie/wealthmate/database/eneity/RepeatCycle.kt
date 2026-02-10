@@ -18,6 +18,7 @@ data class RepeatCycleEntity(
     val repeatCycle: String,        // RepeatCycleEnum
     val dayOfWeek: Int? = null,     // WEEKLY일 때 사용 (1=월, 7=일)
     val dayOfMonth: Int? = null,    // MONTHLY일 때 사용 (1~31)
+    val date: Long,
     val startDate: Long,
     val endDate: Long? = null,
     val categoryId: String?,
