@@ -20,6 +20,7 @@ import com.jie.wealthmate.component.topbar.WMTopBar
 import com.jie.wealthmate.feature.menu.component.MenuEnum
 import com.jie.wealthmate.feature.menu.management.repeatHistoryManagement.addRepeatHistory.AddRepeatHistoryScreen
 import com.jie.wealthmate.feature.menu.management.repeatHistoryManagement.component.RepeatHistoryList
+import com.jie.wealthmate.feature.menu.management.repeatHistoryManagement.repeatHistoryDetail.RepeatHistoryDetailScreen
 import com.jie.wealthmate.theme.ColorGray
 import wealthmate.composeapp.generated.resources.Res
 import wealthmate.composeapp.generated.resources.ic_add
@@ -62,7 +63,9 @@ class RepeatHistoryManagementScreen : BaseScreen() {
             } else {
                 RepeatHistoryList(
                     repeatHistoryItems = uiState.repeatHistoryItems,
-                    onItemClick = {},
+                    onItemClick = {
+                        navigator.push(RepeatHistoryDetailScreen(it.repeatCycle.id))
+                    },
                     onIsActiveChange = screenModel::modifyRepeatCycle
                 )
             }
