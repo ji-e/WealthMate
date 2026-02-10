@@ -66,14 +66,14 @@ fun HistoryItem(
             Box(
                 modifier = Modifier
                     .clip(CircleShape)
-                    .background(category?.largeCategory?.backgroundColor ?: ColorGray.Gray_100)
+                    .background(history.largeCategory.backgroundColor)
                     .size(40.dp)
                     .align(Alignment.Center),
                 contentAlignment = Alignment.Center
             ) {
                 WMText(
                     text = category?.icon ?: "？",
-                    style = Typography().titleMedium,
+                    style = Typography().titleLarge,
                 )
             }
             if (category?.isFixed.default()) {
