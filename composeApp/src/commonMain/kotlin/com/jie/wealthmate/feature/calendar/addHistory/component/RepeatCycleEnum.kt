@@ -55,41 +55,55 @@ enum class RepeatCycleEnum(
 
     companion object {
         fun create(name: String?) = RepeatCycleEnum.entries.find { it.name == name } ?: UNKNOWN
+    }
+}
 
-        fun RepeatCycleEnum.formattedDescription(data: LocalDate): String {
-            return when (this) {
-                RepeatCycleEnum.WEEKLY -> {
-                    "매주 ${WeekEnum.creator(data.dayOfWeek.isoDayNumber).korDisplayName}요일에 반복돼요."
-                }
-
-                RepeatCycleEnum.MONTHLY -> {
-                    "매월 ${data.day}일에 반복돼요."
-                }
-
-                RepeatCycleEnum.YEARLY -> {
-                    "매년 ${data.convertLocalDateToString(formatDateKorMD)}에 반복돼요."
-                }
-
-                else -> description
-            }
+fun RepeatCycleEnum.formattedDescription(data: LocalDate): String {
+    return when (this) {
+        RepeatCycleEnum.WEEKLY -> {
+            "매주 ${WeekEnum.creator(data.dayOfWeek.isoDayNumber).korDisplayName}요일에 반복돼요."
         }
 
-        fun RepeatCycleEnum.formattedShortDescription(data: LocalDate): String {
-            return when (this) {
-                RepeatCycleEnum.WEEKLY -> {
-                    "매주 ${WeekEnum.creator(data.dayOfWeek.isoDayNumber).korDisplayName}요일 반복"
-                }
-
-                RepeatCycleEnum.MONTHLY -> {
-                    "매월 ${data.day}일 반복"
-                }
-
-                RepeatCycleEnum.YEARLY -> {
-                    "매년 ${data.convertLocalDateToString(formatDateKorMD)} 반복"
-                }
-
-                else -> shortDescription
-            }
+        RepeatCycleEnum.MONTHLY -> {
+            "매월 ${data.day}일에 반복돼요."
         }
+
+        RepeatCycleEnum.YEARLY -> {
+            "매년 ${data.convertLocalDateToString(formatDateKorMD)}에 반복돼요."
+        }
+
+        else -> description
+    }
+}
+
+fun RepeatCycleEnum.formattedShortDescription(data: LocalDate): String {
+    return when (this) {
+        RepeatCycleEnum.WEEKLY -> {
+            "매주 ${WeekEnum.creator(data.dayOfWeek.isoDayNumber).korDisplayName}요일 반복"
+        }
+
+        RepeatCycleEnum.MONTHLY -> {
+            "매월 ${data.day}일 반복"
+        }
+
+        RepeatCycleEnum.YEARLY -> {
+            "매년 ${data.convertLocalDateToString(formatDateKorMD)} 반복"
+        }
+
+        else -> shortDescription
+    }
+}
+
+fun RepeatCycleEnum.formattedShortDescription(day: Int): String {
+    return when (this) {
+        RepeatCycleEnum.WEEKLY -> {
+            "매주 ${WeekEnum.creator(day).korDisplayName}요일 반복"
+        }
+
+        RepeatCycleEnum.MONTHLY -> {
+            "매월 ${day}일 반복"
+        }
+
+        else -> shortDescription
     }
 }

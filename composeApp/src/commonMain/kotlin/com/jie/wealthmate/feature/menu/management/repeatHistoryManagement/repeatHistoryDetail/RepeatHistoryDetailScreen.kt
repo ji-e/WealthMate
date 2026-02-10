@@ -224,7 +224,14 @@ class RepeatHistoryDetailScreen(
                     .padding(bottom = 20.dp)
                     .fillMaxWidth(),
                 enabled = uiState.isSaveButtonEnable,
-                onClick = screenModel::modifyRepeatCycle
+                onClick = {
+                    showConfirmDialog(
+                        isShow = true,
+                        content = "다음 달 부터 적용됩니다."
+                    ) {
+                        screenModel.modifyRepeatCycle()
+                    }
+                }
             )
         }
 

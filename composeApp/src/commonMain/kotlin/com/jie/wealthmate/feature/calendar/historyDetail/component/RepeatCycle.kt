@@ -23,7 +23,7 @@ import com.jie.wealthmate.component.SwitchSize
 import com.jie.wealthmate.component.WMIconButton
 import com.jie.wealthmate.component.WMSwitch
 import com.jie.wealthmate.component.WMText
-import com.jie.wealthmate.feature.calendar.addHistory.component.RepeatCycleEnum.Companion.formattedShortDescription
+import com.jie.wealthmate.feature.calendar.addHistory.component.formattedShortDescription
 import com.jie.wealthmate.theme.ColorGray
 import com.jie.wealthmate.theme.noRippleClickable
 import com.jie.wealthmate.utils.convertLocalDateToString

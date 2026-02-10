@@ -29,7 +29,7 @@ import com.jie.wealthmate.component.WMText
 import com.jie.wealthmate.database.eneity.RepeatCycleEntity
 import com.jie.wealthmate.database.eneity.RepeatCycleWithDetails
 import com.jie.wealthmate.feature.calendar.addHistory.component.RepeatCycleEnum
-import com.jie.wealthmate.feature.calendar.addHistory.component.RepeatCycleEnum.Companion.formattedShortDescription
+import com.jie.wealthmate.feature.calendar.addHistory.component.formattedShortDescription
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.theme.ColorGray
 import com.jie.wealthmate.theme.ColorRed
@@ -142,12 +142,24 @@ private fun RepeatHistoryItem(
 
 private fun repeatCycleInfoText(data: RepeatCycleEntity): String {
     val content = data.content
-    val repeatCycle = RepeatCycleEnum.create(data.repeatCycle)
-        .formattedShortDescription(data.date.toLocalDate())
+    val repeatDescription =
+        when (val repeatCycleEnum = RepeatCycleEnum.create(data.repeatCycle)) {
+            RepeatCycleEnum.WEEKLY -> {
+                repeatCycleEnum.formattedShortDescription(data.dayOfWeek ?: 1)
+            }
+
+            RepeatCycleEnum.MONTHLY -> {
+                repeatCycleEnum.formattedShortDescription(data.dayOfMonth ?: 1)
+            }
+
+            else -> {
+                repeatCycleEnum.formattedShortDescription(data.date.toLocalDate())
+            }
+        }
 
     val parts = listOfNotNull(
         content.takeIf { it.isNullOrBlank().not() },
-        repeatCycle,
+        repeatDescription,
     )
 
     return parts.joinToString(" | ")
