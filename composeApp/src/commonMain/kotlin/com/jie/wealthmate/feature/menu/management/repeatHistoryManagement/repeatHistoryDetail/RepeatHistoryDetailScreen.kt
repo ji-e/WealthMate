@@ -2,7 +2,6 @@
 
 package com.jie.wealthmate.feature.menu.management.repeatHistoryManagement.repeatHistoryDetail
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,21 +10,17 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -44,19 +39,23 @@ import com.jie.wealthmate.component.textField.rememberIntegerVisualTransformatio
 import com.jie.wealthmate.component.textField.toIntegerTextFieldValue
 import com.jie.wealthmate.component.topbar.TopBarItem
 import com.jie.wealthmate.component.topbar.WMTopBar
-import com.jie.wealthmate.feature.calendar.addHistory.component.CategorySelectionRow
 import com.jie.wealthmate.feature.calendar.addHistory.component.DateSelectModalBottomSheet
-import com.jie.wealthmate.feature.calendar.addHistory.component.LargeCategorySelectBox
 import com.jie.wealthmate.feature.calendar.addHistory.component.PaymentMethodModalBottomSheet
 import com.jie.wealthmate.feature.calendar.addHistory.component.PaymentMethodTextField
-import com.jie.wealthmate.feature.calendar.addHistory.component.RepeatCycleEnum.Companion.formattedShortDescription
+import com.jie.wealthmate.feature.calendar.addHistory.component.RepeatCycleEnum
 import com.jie.wealthmate.feature.calendar.addHistory.component.RepeatCycleModalBottomSheet
+import com.jie.wealthmate.feature.calendar.historyDetail.component.Category
+import com.jie.wealthmate.feature.calendar.historyDetail.component.CategorySelectModalBottomSheet
 import com.jie.wealthmate.feature.menu.component.MenuEnum
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.feature.menu.management.repeatHistoryManagement.addRepeatHistory.AddRepeatHistoryScreenModel.Companion.END_DATE
 import com.jie.wealthmate.feature.menu.management.repeatHistoryManagement.addRepeatHistory.AddRepeatHistoryScreenModel.Companion.START_DATE
+import com.jie.wealthmate.feature.menu.management.repeatHistoryManagement.addRepeatHistory.component.RepeatCycleDateFullModalBottomSheet
+import com.jie.wealthmate.feature.menu.management.repeatHistoryManagement.addRepeatHistory.component.RepeatCycleDateModalBottomSheet
 import com.jie.wealthmate.feature.menu.management.repeatHistoryManagement.addRepeatHistory.component.RepeatCyclePeriod
-import com.jie.wealthmate.utils.default
+import kotlinx.datetime.number
+import wealthmate.composeapp.generated.resources.Res
+import wealthmate.composeapp.generated.resources.ic_delete_outline
 
 class RepeatHistoryDetailScreen(
     private val repeatCycleId: String,
@@ -73,16 +72,9 @@ class RepeatHistoryDetailScreen(
         var isShowStartDateSelectModalBottomSheet by remember { mutableStateOf(false) }
         var isShowEndDateSelectModalBottomSheet by remember { mutableStateOf(false) }
         var isShowRepeatCycleModalBottomSheet by remember { mutableStateOf(false) }
+        var isShowRepeatDateModalBottomSheet by remember { mutableStateOf(false) }
+        var isShowCategorySelectModalBottomSheet by remember { mutableStateOf(false) }
         var isShowPaymentMethodModalBottomSheet by remember { mutableStateOf(false) }
-
-        val scrollState = rememberScrollState()
-        val density = LocalDensity.current
-
-        val isLargeCategoryVisible by remember {
-            derivedStateOf {
-                scrollState.value > with(density) { 56.dp.toPx() }
-            }
-        }
 
         fun onBack() {
             showSaveBackDialog(uiState.isDataChanged) {
@@ -110,38 +102,28 @@ class RepeatHistoryDetailScreen(
                 .imePadding()
         ) {
             WMTopBar(
-                title = TopBarItem.Title("${MenuEnum.REPEAT_HISTORY.label} 상세"),
+                title = TopBarItem.Title("${uiState.selectedLargeCategory.label} ${MenuEnum.REPEAT_HISTORY.label} 상세"),
                 readingItem = TopBarItem.ReadingItem().copy(action = { navigator.pop() }),
-                trailingCustomItem = if (isLargeCategoryVisible) {
-                    TopBarItem.TrailingCustomItem {
-                        val selectedLargeCategoryEnum = uiState.selectedLargeCategory
-                        WMText(
-                            text = selectedLargeCategoryEnum.label,
-                            style = Typography().labelMedium.copy(fontWeight = FontWeight.SemiBold),
-                            modifier = Modifier
-                                .padding(horizontal = 16.dp)
-                                .clip(CircleShape)
-                                .background(selectedLargeCategoryEnum.backgroundColor)
-                                .padding(horizontal = 8.dp, vertical = 4.dp)
-                        )
-                    }
-                } else null
+                trailingItem = listOf(
+                    TopBarItem.TrailingItem(
+                        iconRes = Res.drawable.ic_delete_outline,
+                        action = {
+                            showRemoveDialog() {
+//                                screenModel.removeCategory()
+                            }
+                        }
+                    )
+                )
             )
             Column(
                 modifier = Modifier
                     .weight(1f)
                     .padding(horizontal = 28.dp)
-                    .verticalScroll(scrollState)
+                    .verticalScroll(rememberScrollState())
             ) {
-                // 수입, 지출, 저출 카테고리 선택
-                LargeCategorySelectBox(
-                    modifier = Modifier.padding(top = 4.dp),
-                    selectedLargeCategory = uiState.selectedLargeCategory,
-                    onLargeCategoryClick = screenModel::updateLargeCategory
-                )
-
                 // 기간
                 RepeatCyclePeriod(
+                    modifier = Modifier.padding(top = 4.dp),
                     startDate = uiState.startDate,
                     endDate = uiState.endDate,
                     onStartDateClick = { isShowStartDateSelectModalBottomSheet = true },
@@ -153,8 +135,7 @@ class RepeatHistoryDetailScreen(
 
                 // 반복 주기
                 WMTextField(
-                    value = uiState.repeatCycle
-                        ?.formattedShortDescription(uiState.startDate).default(),
+                    value = uiState.repeatCycle.shortDescription,
                     onValueChange = {},
                     label = "반복 주기",
                     readOnly = true,
@@ -163,6 +144,20 @@ class RepeatHistoryDetailScreen(
                     modifier = Modifier.padding(top = 4.dp),
                     onReadOnlyClick = { isShowRepeatCycleModalBottomSheet = true },
                 )
+
+                // 반복 날짜
+                if (uiState.repeatCycle == RepeatCycleEnum.WEEKLY || uiState.repeatCycle == RepeatCycleEnum.MONTHLY || uiState.repeatCycle == RepeatCycleEnum.YEARLY) {
+                    WMTextField(
+                        value = uiState.repeatCycleDateText,
+                        onValueChange = {},
+                        label = "반복 날짜",
+                        readOnly = true,
+                        isRequire = true,
+                        placeholder = "반복될 날짜를 설정해 주세요.",
+                        modifier = Modifier.padding(top = 4.dp),
+                        onReadOnlyClick = { isShowRepeatDateModalBottomSheet = true },
+                    )
+                }
 
 
                 // 금액 입력
@@ -200,14 +195,11 @@ class RepeatHistoryDetailScreen(
                 )
 
                 // 카테고리 선택
-                CategorySelectionRow(
+                Category(
                     modifier = Modifier.padding(top = 4.dp, bottom = 24.dp),
-                    categoryItems = uiState.categoryItems,
-                    selectedLargeCategory = uiState.selectedLargeCategory,
-                    selectedCategory = uiState.category,
-                    selectedCategoryTag = uiState.categoryTag,
-                    onCategoryClick = screenModel::updateCategory,
-                    onCategoryTagClick = screenModel::updateCategoryTag
+                    category = uiState.category,
+                    categoryTag = uiState.categoryTag,
+                    onCategoryClick = { isShowCategorySelectModalBottomSheet = true }
                 )
 
                 // 결제수단/자산 선택
@@ -223,16 +215,16 @@ class RepeatHistoryDetailScreen(
 
             }
 
-            // 저장 버튼
+            // 수정 버튼
             WMFloatingButton(
-                text = "저장",
+                text = "수정",
                 buttonSize = ButtonSize.LARGE,
                 modifier = Modifier
                     .padding(horizontal = 28.dp)
                     .padding(bottom = 20.dp)
                     .fillMaxWidth(),
                 enabled = uiState.isSaveButtonEnable,
-                onClick = screenModel::saveRepeatCycle
+                onClick = screenModel::modifyRepeatCycle
             )
         }
 
@@ -270,6 +262,41 @@ class RepeatHistoryDetailScreen(
                 onDismissRequest = { isShowRepeatCycleModalBottomSheet = false }
             )
         }
+
+        if (isShowRepeatDateModalBottomSheet) {
+            if (uiState.repeatCycle == RepeatCycleEnum.YEARLY) {
+                RepeatCycleDateFullModalBottomSheet(
+                    repeatCycleDateMonth = uiState.repeatCycleDateFull?.month?.number,
+                    repeatCycleDateDay = uiState.repeatCycleDateFull?.day,
+                    onConfirmClick = { month, day ->
+                        screenModel.updateRepeatCycleDateFull(month, day)
+                    },
+                    onDismissRequest = { isShowRepeatDateModalBottomSheet = false }
+                )
+            } else {
+                RepeatCycleDateModalBottomSheet(
+                    repeatCycleDate = uiState.repeatCycleDate,
+                    repeatCycleDateItems = uiState.repeatCycleDateItems,
+                    onConfirmClick = screenModel::updateRepeatCycleDate,
+                    onDismissRequest = { isShowRepeatDateModalBottomSheet = false }
+                )
+            }
+        }
+
+        if (isShowCategorySelectModalBottomSheet) {
+            CategorySelectModalBottomSheet(
+                categoryItems = uiState.categoryItems,
+                selectedLargeCategory = uiState.selectedLargeCategory,
+                selectedCategory = uiState.category,
+                selectedCategoryTag = uiState.categoryTag,
+                onConfirmClick = { category, categoryTag ->
+                    screenModel.updateCategory(category)
+                    screenModel.updateCategoryTag(categoryTag)
+                },
+                onDismissRequest = { isShowCategorySelectModalBottomSheet = false }
+            )
+        }
+
 
         if (isShowPaymentMethodModalBottomSheet) {
             PaymentMethodModalBottomSheet(

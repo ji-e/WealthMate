@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
@@ -32,9 +31,9 @@ import com.jie.wealthmate.theme.ColorPrimary
 
 @Composable
 fun RepeatCycleDateModalBottomSheet(
-    repeatCycleDate: Long?,
-    repeatCycleDateItems: List<Pair<Long, String>>,
-    onConfirmClick: (Long?) -> Unit,
+    repeatCycleDate: Int?,
+    repeatCycleDateItems: List<Pair<Int, String>>,
+    onConfirmClick: (Int?) -> Unit,
     onDismissRequest: () -> Unit,
 ) {
     val listState = rememberLazyListState()
@@ -75,9 +74,9 @@ fun RepeatCycleDateModalBottomSheet(
 private fun RepeatCycleDateList(
     modifier: Modifier = Modifier,
     listState: LazyListState,
-    repeatCycleDateItems: List<Pair<Long, String>>,
-    tempSelectedRepeatCycleDate: Long? = null,
-    onRepeatCycleClick: (Long) -> Unit = {},
+    repeatCycleDateItems: List<Pair<Int, String>>,
+    tempSelectedRepeatCycleDate: Int? = null,
+    onRepeatCycleClick: (Int) -> Unit = {},
 ) {
     LazyColumn(
         modifier = modifier.fillMaxWidth(),

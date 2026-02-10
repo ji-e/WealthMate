@@ -4,6 +4,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import com.jie.wealthmate.base.BaseUiState
 import com.jie.wealthmate.base.UiSideEffect
 import com.jie.wealthmate.feature.calendar.addHistory.component.RepeatCycleEnum
+import com.jie.wealthmate.feature.calendar.component.monthCalendar.WeekEnum
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.utils.convertLocalDateToString
 import com.jie.wealthmate.utils.default
@@ -20,7 +21,7 @@ data class AddRepeatHistoryUiState(
     val startDate: LocalDate = today,
     val endDate: LocalDate? = null,
     val repeatCycle: RepeatCycleEnum? = null,
-    val repeatCycleDate: Long? = null,
+    val repeatCycleDate: Int? = null,
     val repeatCycleDateFull: LocalDate? = null,
     val content: TextFieldValue = TextFieldValue(""),
     val amount: TextFieldValue = TextFieldValue(""),
@@ -33,42 +34,28 @@ data class AddRepeatHistoryUiState(
     val isSaveButtonEnable: Boolean
         get() = isDataChanged && amount.text.isNotEmpty() && content.text.isNotEmpty()
 
-    val repeatCycleDateItems: List<Pair<Long, String>> = when (repeatCycle) {
+    val repeatCycleDateItems: List<Pair<Int, String>> = when (repeatCycle) {
         RepeatCycleEnum.WEEKLY -> {
-            listOf(
-                1L to "월요일",
-                2L to "화요일",
-                3L to "수요일",
-                4L to "목요일",
-                5L to "금요일",
-                6L to "토요일",
-                7L to "일요일"
-            )
+            WeekEnum.entries.sortedBy { it.isoDayNumber }.map {
+                it.isoDayNumber to "${it.korDisplayName}요일"
+            }
         }
 
         RepeatCycleEnum.MONTHLY -> {
-            val list = mutableListOf<Pair<Long, String>>()
-            repeat(31) {
-                val index = it+1L
-                list.add(index to index.toString() + "일")
-            }
-            list
+            (1..31).map { it to "${it}일" }
         }
 
-        else -> emptyList<Pair<Long, String>>()
+        else -> emptyList()
     }
 
     val repeatCycleDateText: String
-        get() {
-            return if(repeatCycle == RepeatCycleEnum.YEARLY) {
-                repeatCycleDateFull.convertLocalDateToString(formatDateKorMD)
-            }else {
-                repeatCycleDateItems.find { it.first == repeatCycleDate }?.second.default()
-            }
+        get() = if (repeatCycle == RepeatCycleEnum.YEARLY) {
+            repeatCycleDateFull.convertLocalDateToString(formatDateKorMD)
+        } else {
+            repeatCycleDateItems.find { it.first == repeatCycleDate }?.second.default()
         }
 }
 
 sealed class AddRepeatHistoryUiSideEffect : UiSideEffect {
     data object OnSuccessSave : AddRepeatHistoryUiSideEffect()
 }
-

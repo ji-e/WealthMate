@@ -35,12 +35,13 @@ import com.jie.wealthmate.component.WMText
 import com.jie.wealthmate.theme.ColorGray
 import com.jie.wealthmate.theme.ColorPrimary
 import com.jie.wealthmate.utils.default
+import kotlin.math.max
 
 @Composable
 fun RepeatCycleDateFullModalBottomSheet(
-    repeatCycleDateMonth: Long?,
-    repeatCycleDateDay: Long?,
-    onConfirmClick: (Long, Long) -> Unit,
+    repeatCycleDateMonth: Int?,
+    repeatCycleDateDay: Int?,
+    onConfirmClick: (Int, Int) -> Unit,
     onDismissRequest: () -> Unit,
 ) {
     val listStateMonth = rememberLazyListState()
@@ -48,31 +49,19 @@ fun RepeatCycleDateFullModalBottomSheet(
     var tempSelectedRepeatCycleMonth by remember { mutableStateOf(repeatCycleDateMonth) }
     var tempSelectedRepeatCycleDay by remember { mutableStateOf(repeatCycleDateDay) }
 
-    val repeatCycleDateMonthItems = listOf(
-        1L to "1월",
-        2L to "2월",
-        3L to "3월",
-        4L to "4월",
-        5L to "5월",
-        6L to "6월",
-        7L to "7월",
-        8L to "8월",
-        9L to "9월",
-        10L to "10월",
-        11L to "11월",
-        12L to "12월",
-    )
-
+    val repeatCycleDateMonthItems = remember {
+        (1..12).map { it to "${it}월" }
+    }
 
     // 선택된 월에 따라 일수 계산 (윤년 고려하여 2월은 29일까지 허용)
     val repeatCycleDateDayItems = remember(tempSelectedRepeatCycleMonth) {
         val month = tempSelectedRepeatCycleMonth ?: return@remember emptyList()
         val days = when (month) {
-            2L -> 29
-            4L, 6L, 9L, 11L -> 30
+            2 -> 29
+            4, 6, 9, 11 -> 30
             else -> 31
         }
-        (1..days).map { it.toLong() to "${it}일" }
+        (1..days).map { it to "${it}일" }
     }
 
     // 월 변경 시 선택된 일자가 해당 월의 최대 일수를 넘어가면 마지막 일로 조정
@@ -86,15 +75,16 @@ fun RepeatCycleDateFullModalBottomSheet(
 
     LaunchedEffect(Unit) {
         val indexMonth =
-            repeatCycleDateMonthItems.map { it.first }.indexOf(tempSelectedRepeatCycleMonth)
-        val movePositionMonth = if (indexMonth <= 0) 0 else indexMonth - 1
+            repeatCycleDateMonthItems.indexOfFirst { it.first == tempSelectedRepeatCycleMonth }
+        if (indexMonth >= 0) {
+            listStateMonth.scrollToItem(max(0, indexMonth - 1))
+        }
 
-        listStateMonth.scrollToItem(movePositionMonth)
-
-        val indexDay = repeatCycleDateDayItems.map { it.first }.indexOf(tempSelectedRepeatCycleDay)
-        val movePositionDay = if (indexDay <= 0) 0 else indexDay - 1
-
-        listStateDay.scrollToItem(movePositionDay)
+        val indexDay =
+            repeatCycleDateDayItems.indexOfFirst { it.first == tempSelectedRepeatCycleDay }
+        if (indexDay >= 0) {
+            listStateDay.scrollToItem(max(0, indexDay - 1))
+        }
     }
 
     WMModalBottomSheet(
@@ -108,7 +98,7 @@ fun RepeatCycleDateFullModalBottomSheet(
                 .padding(bottom = 20.dp)
         ) {
             Row(
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.weight(1f)
             ) {
                 RepeatCycleDateFullList(
                     listState = listStateMonth,
@@ -156,9 +146,9 @@ fun RepeatCycleDateFullModalBottomSheet(
 private fun RowScope.RepeatCycleDateFullList(
     modifier: Modifier = Modifier,
     listState: LazyListState,
-    repeatCycleDateItems: List<Pair<Long, String>>,
-    tempSelectedRepeatCycleDate: Long? = null,
-    onRepeatCycleClick: (Long) -> Unit = {},
+    repeatCycleDateItems: List<Pair<Int, String>>,
+    tempSelectedRepeatCycleDate: Int? = null,
+    onRepeatCycleClick: (Int) -> Unit = {},
 ) {
     LazyColumn(
         modifier = modifier.weight(1f),
@@ -167,8 +157,8 @@ private fun RowScope.RepeatCycleDateFullList(
         items(
             count = repeatCycleDateItems.size,
             key = { index -> repeatCycleDateItems[index].first },
-        ) {
-            val repeatCycleDate = repeatCycleDateItems[it]
+        ) { index ->
+            val repeatCycleDate = repeatCycleDateItems[index]
 
             RepeatCycleDateFullItem(
                 label = repeatCycleDate.second,

@@ -5,7 +5,6 @@ import com.jie.wealthmate.base.BaseScreenModel
 import com.jie.wealthmate.database.eneity.RepeatCycleEntity
 import com.jie.wealthmate.feature.calendar.addHistory.component.RepeatCycleEnum
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
-import com.jie.wealthmate.feature.menu.management.repeatHistoryManagement.addRepeatHistory.AddRepeatHistoryUiSideEffect
 import com.jie.wealthmate.repository.CategoryRepository
 import com.jie.wealthmate.repository.PaymentMethodRepository
 import com.jie.wealthmate.repository.RepeatCycleRepository
@@ -21,7 +20,6 @@ import com.jie.wealthmate.vo.CategoryVo.Companion.mapperToVo
 import com.jie.wealthmate.vo.PaymentMethodVo
 import com.jie.wealthmate.vo.PaymentMethodVo.Companion.mapperToVo
 import kotlinx.datetime.LocalDate
-import kotlinx.datetime.isoDayNumber
 
 class RepeatHistoryDetailScreenModel(
     private val repeatCycleRepository: RepeatCycleRepository,
@@ -66,10 +64,33 @@ class RepeatHistoryDetailScreenModel(
     }
 
     fun updateRepeatCycle(repeatCycle: RepeatCycleEnum?) {
+        repeatCycle ?: return
+
         reduceState { state ->
             state.copy(
                 isDataChanged = true,
-                repeatCycle = repeatCycle
+                repeatCycle = repeatCycle,
+                repeatCycleDate = null,
+                repeatCycleDateFull = null
+            )
+        }
+    }
+
+    fun updateRepeatCycleDate(repeatCycleDate: Int?) {
+        reduceState { state ->
+            state.copy(
+                isDataChanged = true,
+                repeatCycleDate = repeatCycleDate
+            )
+        }
+    }
+
+    fun updateRepeatCycleDateFull(month: Int, day: Int) {
+        reduceState { state ->
+            state.copy(
+                isDataChanged = true,
+                // 2월 29일을 처리하기 위해 항상 윤년인 2000년을 기준으로 저장합니다.
+                repeatCycleDateFull = LocalDate(2000, month, day)
             )
         }
     }
@@ -83,7 +104,7 @@ class RepeatHistoryDetailScreenModel(
         }
     }
 
-    fun updateCategory(category: CategoryVo) {
+    fun updateCategory(category: CategoryVo?) {
         reduceState { state ->
             state.copy(
                 isDataChanged = true,
@@ -92,7 +113,7 @@ class RepeatHistoryDetailScreenModel(
         }
     }
 
-    fun updateCategoryTag(categoryTag: CategoryTagVo) {
+    fun updateCategoryTag(categoryTag: CategoryTagVo?) {
         reduceState { state ->
             state.copy(
                 isDataChanged = true,
@@ -126,17 +147,21 @@ class RepeatHistoryDetailScreenModel(
             }
         ) { response ->
             val repeatCycle = response?.repeatCycle ?: return@launchSafe
+            val repeatCycleEnum = RepeatCycleEnum.create(repeatCycle.repeatCycle)
+
             reduceState { state ->
                 state.copy(
                     selectedLargeCategory = LargeCategoryEnum.creator(repeatCycle.largeCategory),
                     startDate = repeatCycle.startDate.toLocalDate(),
-                    endDate = if (repeatCycle.endDate == 0L) null else repeatCycle.endDate.toLocalDate(),
-                    repeatCycle = RepeatCycleEnum.create(repeatCycle.repeatCycle),
+                    endDate = repeatCycle.endDate?.toLocalDate(),
+                    repeatCycle = repeatCycleEnum,
+                    repeatCycleDate = if (repeatCycleEnum == RepeatCycleEnum.WEEKLY) repeatCycle.dayOfWeek else if (repeatCycleEnum == RepeatCycleEnum.MONTHLY) repeatCycle.dayOfMonth else null,
+                    repeatCycleDateFull = repeatCycle.date.toLocalDate(),
                     content = TextFieldValue(repeatCycle.content.default()),
                     amount = TextFieldValue(repeatCycle.amount.default().toString()),
-                    category = response.category.mapperToVo(),
-                    categoryTag = response.categoryTag.mapperToVo(),
-                    paymentMethod = response.paymentMethod.mapperToVo(),
+                    category = response.category?.mapperToVo(),
+                    categoryTag = response.categoryTag?.mapperToVo(),
+                    paymentMethod = response.paymentMethod?.mapperToVo(),
                 )
             }
 
@@ -174,19 +199,22 @@ class RepeatHistoryDetailScreenModel(
             }
     }
 
-    fun saveRepeatCycle() {
+    fun modifyRepeatCycle() {
+        val repeatCycleId = repeatCycleId ?: return
+
         val uiState = container.uiState.value
         launchSafe(
             block = {
-                repeatCycleRepository.insertRepeatCycle(
+                repeatCycleRepository.updateRepeatCycle(
                     RepeatCycleEntity(
+                        id = repeatCycleId,
                         largeCategory = uiState.selectedLargeCategory.name,
                         content = uiState.content.text,
                         amount = uiState.amount.text.formatRemoveCommas().toLong(),
-                        repeatCycle = uiState.repeatCycle?.name ?: RepeatCycleEnum.UNKNOWN.name,
-                        dayOfWeek = if (uiState.repeatCycle == RepeatCycleEnum.WEEKLY) uiState.startDate.dayOfWeek.isoDayNumber else null,
-                        dayOfMonth = if (uiState.repeatCycle == RepeatCycleEnum.MONTHLY) uiState.startDate.day else null,
-                        date = uiState.startDate.toEpochMilliseconds(), //todo
+                        repeatCycle = uiState.repeatCycle.name,
+                        dayOfWeek = if (uiState.repeatCycle == RepeatCycleEnum.WEEKLY) uiState.repeatCycleDate else null,
+                        dayOfMonth = if (uiState.repeatCycle == RepeatCycleEnum.MONTHLY) uiState.repeatCycleDate else null,
+                        date = uiState.repeatCycleDateFull?.toEpochMilliseconds().default(),
                         startDate = uiState.startDate.toEpochMilliseconds(),
                         endDate = uiState.endDate?.toEpochMilliseconds(),
                         categoryId = uiState.category?.id,
@@ -196,8 +224,12 @@ class RepeatHistoryDetailScreenModel(
                 )
             }
         ) {
-            showSnackbar("반복 정보가 저장되었습니다.")
-            postSideEffect { AddRepeatHistoryUiSideEffect.OnSuccessSave }
+            showSnackbar("반복 정보가 수정 되었습니다.")
+            reduceState { state ->
+                state.copy(
+                    isDataChanged = false
+                )
+            }
         }
     }
 

@@ -31,7 +31,7 @@ fun RepeatCyclePeriod(
     onEndDateResetClick: () -> Unit,
 ) {
     LabelText(
-        modifier = modifier.padding(top = 24.dp),
+        modifier = modifier,
         text = "반복 기간",
         isRequire = true,
     )

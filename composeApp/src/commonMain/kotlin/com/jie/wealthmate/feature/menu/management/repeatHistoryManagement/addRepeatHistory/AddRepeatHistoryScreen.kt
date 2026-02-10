@@ -139,6 +139,7 @@ class AddRepeatHistoryScreen : BaseScreen() {
 
                 // 기간
                 RepeatCyclePeriod(
+                    modifier = Modifier.padding(top = 24.dp),
                     startDate = uiState.startDate,
                     endDate = uiState.endDate,
                     onStartDateClick = { isShowStartDateSelectModalBottomSheet = true },
@@ -284,8 +285,8 @@ class AddRepeatHistoryScreen : BaseScreen() {
         if (isShowRepeatDateModalBottomSheet) {
             if (uiState.repeatCycle == RepeatCycleEnum.YEARLY) {
                 RepeatCycleDateFullModalBottomSheet(
-                    repeatCycleDateMonth = uiState.repeatCycleDateFull?.month?.number?.toLong(),
-                    repeatCycleDateDay = uiState.repeatCycleDateFull?.day?.toLong(),
+                    repeatCycleDateMonth = uiState.repeatCycleDateFull?.month?.number,
+                    repeatCycleDateDay = uiState.repeatCycleDateFull?.day,
                     onConfirmClick = { month, day ->
                         screenModel.updateRepeatCycleDateFull(month, day)
                     },
