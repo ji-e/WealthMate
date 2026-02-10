@@ -18,4 +18,6 @@ interface RepeatCycleRepository {
     fun getRepeatCycles(): Flow<List<RepeatCycleEntity>>
 
     fun getRepeatCycleWithDetails(): Flow<List<RepeatCycleWithDetails>>
+
+    suspend fun getRepeatCycleById(repeatCycleId: String): RepeatCycleWithDetails?
 }

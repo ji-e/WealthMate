@@ -18,6 +18,9 @@ interface RepeatCycleDao {
     @Query("SELECT * FROM repeat_cycle WHERE isDeleted = 0")
     fun getRepeatCyclesWithDetail(): Flow<List<RepeatCycleWithDetails>>
 
+    @Query("SELECT * FROM repeat_cycle WHERE id = :id AND isDeleted = 0")
+    suspend fun getRepeatCycleById(id: String): RepeatCycleWithDetails?
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(repeatCycle: RepeatCycleEntity)
 
