@@ -109,7 +109,7 @@ class RepeatHistoryDetailScreen(
                         iconRes = Res.drawable.ic_delete_outline,
                         action = {
                             showRemoveDialog() {
-//                                screenModel.removeCategory()
+                                screenModel.removeRepeatCycle()
                             }
                         }
                     )

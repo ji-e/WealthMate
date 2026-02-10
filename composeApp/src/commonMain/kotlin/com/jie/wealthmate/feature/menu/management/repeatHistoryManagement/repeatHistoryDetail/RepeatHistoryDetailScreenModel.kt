@@ -233,6 +233,18 @@ class RepeatHistoryDetailScreenModel(
         }
     }
 
+    fun removeRepeatCycle() {
+        val repeatCycleId = repeatCycleId ?: return
+        launchSafe(
+            block = {
+                repeatCycleRepository.deleteRepeatCycle(repeatCycleId)
+            }
+        ) {
+            showSnackbar("반복 정보가 삭제 되었습니다.")
+            postSideEffect { RepeatHistoryDetailUiSideEffect.OnSuccess }
+        }
+    }
+
     companion object {
         const val START_DATE = "시작일"
         const val END_DATE = "종료일"

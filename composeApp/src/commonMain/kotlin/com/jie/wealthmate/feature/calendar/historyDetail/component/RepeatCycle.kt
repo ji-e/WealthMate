@@ -125,7 +125,6 @@ fun RepeatCycle(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Row(
-//                modifier = Modifier.noRippleClickable(isActivated) { onEndDateClick(false) },
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 WMText(
@@ -158,7 +157,7 @@ fun RepeatCycle(
                 )
 
                 WMText(
-                    text = "내역 작성 이후 반복 내역 설정이 변경되었습니다.",
+                    text = "내역 작성 이후 반복 설정이 변경되었습니다.",
                     style = Typography().bodySmall.copy(color = ColorGray.Gray_500)
                 )
             }
