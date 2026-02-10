@@ -22,7 +22,9 @@ data class RepeatCycleVo(
     val categoryId: String?,
     val paymentMethodId: String?,
     val isActive: Boolean,
+    val isModified: Boolean,
     val isDeleted: Boolean,
+    val updateAt: LocalDate?,
 ) {
     companion object {
         fun RepeatCycleEntity?.mapperToVo() = RepeatCycleVo(
@@ -39,7 +41,9 @@ data class RepeatCycleVo(
             categoryId = this?.categoryId.default(),
             paymentMethodId = this?.paymentMethodId.default(),
             isActive = this?.isActive.default(),
+            isModified = this?.isModified.default(),
             isDeleted = this?.isDeleted.default(),
+            updateAt = this?.updatedAt?.toLocalDate(),
         )
     }
 }
