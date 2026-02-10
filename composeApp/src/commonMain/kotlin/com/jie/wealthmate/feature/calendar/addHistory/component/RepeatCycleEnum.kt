@@ -32,7 +32,7 @@ enum class RepeatCycleEnum(
         shortDescription = "매주 반복"
     ),
     MONTHLY(
-        label = "매달",
+        label = "매월",
         description = "매월 같은 날짜에 반복돼요.",
         shortDescription = "매월 반복"
     ),
