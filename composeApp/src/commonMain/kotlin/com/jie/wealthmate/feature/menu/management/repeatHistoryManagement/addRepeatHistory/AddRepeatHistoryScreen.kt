@@ -48,14 +48,17 @@ import com.jie.wealthmate.feature.calendar.addHistory.component.DateSelectModalB
 import com.jie.wealthmate.feature.calendar.addHistory.component.LargeCategorySelectBox
 import com.jie.wealthmate.feature.calendar.addHistory.component.PaymentMethodModalBottomSheet
 import com.jie.wealthmate.feature.calendar.addHistory.component.PaymentMethodTextField
-import com.jie.wealthmate.feature.calendar.addHistory.component.RepeatCycleEnum.Companion.formattedShortDescription
+import com.jie.wealthmate.feature.calendar.addHistory.component.RepeatCycleEnum
 import com.jie.wealthmate.feature.calendar.addHistory.component.RepeatCycleModalBottomSheet
 import com.jie.wealthmate.feature.menu.component.MenuEnum
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.feature.menu.management.repeatHistoryManagement.addRepeatHistory.AddRepeatHistoryScreenModel.Companion.END_DATE
 import com.jie.wealthmate.feature.menu.management.repeatHistoryManagement.addRepeatHistory.AddRepeatHistoryScreenModel.Companion.START_DATE
+import com.jie.wealthmate.feature.menu.management.repeatHistoryManagement.addRepeatHistory.component.RepeatCycleDateFullModalBottomSheet
+import com.jie.wealthmate.feature.menu.management.repeatHistoryManagement.addRepeatHistory.component.RepeatCycleDateModalBottomSheet
 import com.jie.wealthmate.feature.menu.management.repeatHistoryManagement.addRepeatHistory.component.RepeatCyclePeriod
 import com.jie.wealthmate.utils.default
+import kotlinx.datetime.number
 
 class AddRepeatHistoryScreen : BaseScreen() {
 
@@ -70,6 +73,7 @@ class AddRepeatHistoryScreen : BaseScreen() {
         var isShowStartDateSelectModalBottomSheet by remember { mutableStateOf(false) }
         var isShowEndDateSelectModalBottomSheet by remember { mutableStateOf(false) }
         var isShowRepeatCycleModalBottomSheet by remember { mutableStateOf(false) }
+        var isShowRepeatDateModalBottomSheet by remember { mutableStateOf(false) }
         var isShowPaymentMethodModalBottomSheet by remember { mutableStateOf(false) }
 
         val scrollState = rememberScrollState()
@@ -146,8 +150,7 @@ class AddRepeatHistoryScreen : BaseScreen() {
 
                 // 반복 주기
                 WMTextField(
-                    value = uiState.repeatCycle
-                        ?.formattedShortDescription(uiState.startDate).default(),
+                    value = uiState.repeatCycle?.shortDescription.default(),
                     onValueChange = {},
                     label = "반복 주기",
                     readOnly = true,
@@ -156,6 +159,20 @@ class AddRepeatHistoryScreen : BaseScreen() {
                     modifier = Modifier.padding(top = 4.dp),
                     onReadOnlyClick = { isShowRepeatCycleModalBottomSheet = true },
                 )
+
+                // 반복 날짜
+                if (uiState.repeatCycle == RepeatCycleEnum.WEEKLY || uiState.repeatCycle == RepeatCycleEnum.MONTHLY || uiState.repeatCycle == RepeatCycleEnum.YEARLY) {
+                    WMTextField(
+                        value = uiState.repeatCycleDateText,
+                        onValueChange = {},
+                        label = "반복 날짜",
+                        readOnly = true,
+                        isRequire = true,
+                        placeholder = "반복될 날짜를 설정해 주세요.",
+                        modifier = Modifier.padding(top = 4.dp),
+                        onReadOnlyClick = { isShowRepeatDateModalBottomSheet = true },
+                    )
+                }
 
 
                 // 금액 입력
@@ -262,6 +279,26 @@ class AddRepeatHistoryScreen : BaseScreen() {
                 onConfirmClick = screenModel::updateRepeatCycle,
                 onDismissRequest = { isShowRepeatCycleModalBottomSheet = false }
             )
+        }
+
+        if (isShowRepeatDateModalBottomSheet) {
+            if (uiState.repeatCycle == RepeatCycleEnum.YEARLY) {
+                RepeatCycleDateFullModalBottomSheet(
+                    repeatCycleDateMonth = uiState.repeatCycleDateFull?.month?.number?.toLong(),
+                    repeatCycleDateDay = uiState.repeatCycleDateFull?.day?.toLong(),
+                    onConfirmClick = { month, day ->
+                        screenModel.updateRepeatCycleDateFull(month, day)
+                    },
+                    onDismissRequest = { isShowRepeatDateModalBottomSheet = false }
+                )
+            } else {
+                RepeatCycleDateModalBottomSheet(
+                    repeatCycleDate = uiState.repeatCycleDate,
+                    repeatCycleDateItems = uiState.repeatCycleDateItems,
+                    onConfirmClick = screenModel::updateRepeatCycleDate,
+                    onDismissRequest = { isShowRepeatDateModalBottomSheet = false }
+                )
+            }
         }
 
         if (isShowPaymentMethodModalBottomSheet) {

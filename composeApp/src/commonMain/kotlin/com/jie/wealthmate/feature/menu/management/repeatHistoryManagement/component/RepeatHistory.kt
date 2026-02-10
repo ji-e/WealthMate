@@ -143,7 +143,7 @@ private fun RepeatHistoryItem(
 private fun repeatCycleInfoText(data: RepeatCycleEntity): String {
     val content = data.content
     val repeatCycle = RepeatCycleEnum.create(data.repeatCycle)
-        .formattedShortDescription(data.startDate.toLocalDate())
+        .formattedShortDescription(data.date.toLocalDate())
 
     val parts = listOfNotNull(
         content.takeIf { it.isNullOrBlank().not() },

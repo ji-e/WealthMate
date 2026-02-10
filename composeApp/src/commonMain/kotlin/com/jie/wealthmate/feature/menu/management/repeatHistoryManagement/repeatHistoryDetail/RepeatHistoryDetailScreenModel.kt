@@ -186,6 +186,7 @@ class RepeatHistoryDetailScreenModel(
                         repeatCycle = uiState.repeatCycle?.name ?: RepeatCycleEnum.UNKNOWN.name,
                         dayOfWeek = if (uiState.repeatCycle == RepeatCycleEnum.WEEKLY) uiState.startDate.dayOfWeek.isoDayNumber else null,
                         dayOfMonth = if (uiState.repeatCycle == RepeatCycleEnum.MONTHLY) uiState.startDate.day else null,
+                        date = uiState.startDate.toEpochMilliseconds(), //todo
                         startDate = uiState.startDate.toEpochMilliseconds(),
                         endDate = uiState.endDate?.toEpochMilliseconds(),
                         categoryId = uiState.category?.id,

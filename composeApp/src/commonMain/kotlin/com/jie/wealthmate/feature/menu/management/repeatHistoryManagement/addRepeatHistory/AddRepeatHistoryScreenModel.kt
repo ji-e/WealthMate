@@ -8,6 +8,7 @@ import com.jie.wealthmate.feature.menu.management.categoryManagement.component.L
 import com.jie.wealthmate.repository.CategoryRepository
 import com.jie.wealthmate.repository.PaymentMethodRepository
 import com.jie.wealthmate.repository.RepeatCycleRepository
+import com.jie.wealthmate.utils.default
 import com.jie.wealthmate.utils.formatRemoveCommas
 import com.jie.wealthmate.utils.toEpochMilliseconds
 import com.jie.wealthmate.utils.today
@@ -57,7 +58,27 @@ class AddRepeatHistoryScreenModel(
         reduceState { state ->
             state.copy(
                 isDataChanged = true,
-                repeatCycle = repeatCycle
+                repeatCycle = repeatCycle,
+                repeatCycleDate = null
+            )
+        }
+    }
+
+    fun updateRepeatCycleDate(repeatCycleDate: Long?) {
+        reduceState { state ->
+            state.copy(
+                isDataChanged = true,
+                repeatCycleDate = repeatCycleDate
+            )
+        }
+    }
+
+    fun updateRepeatCycleDateFull(month: Long, day: Long) {
+        reduceState { state ->
+            state.copy(
+                isDataChanged = true,
+                // 2월 29일을 처리하기 위해 항상 윤년인 2000년을 기준으로 저장합니다.
+                repeatCycleDateFull = LocalDate(2000, month.toInt(), day.toInt())
             )
         }
     }
@@ -150,6 +171,7 @@ class AddRepeatHistoryScreenModel(
                         repeatCycle = uiState.repeatCycle?.name ?: RepeatCycleEnum.UNKNOWN.name,
                         dayOfWeek = if (uiState.repeatCycle == RepeatCycleEnum.WEEKLY) uiState.startDate.dayOfWeek.isoDayNumber else null,
                         dayOfMonth = if (uiState.repeatCycle == RepeatCycleEnum.MONTHLY) uiState.startDate.day else null,
+                        date = uiState.repeatCycleDateFull?.toEpochMilliseconds().default(), //todo
                         startDate = uiState.startDate.toEpochMilliseconds(),
                         endDate = uiState.endDate?.toEpochMilliseconds(),
                         categoryId = uiState.category?.id,
