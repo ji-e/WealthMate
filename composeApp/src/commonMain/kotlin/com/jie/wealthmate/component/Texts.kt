@@ -1,5 +1,8 @@
 package com.jie.wealthmate.component
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.material3.Text
 import androidx.compose.material3.Typography
@@ -12,8 +15,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.jie.wealthmate.theme.ColorGray
+import com.jie.wealthmate.theme.ColorRed
 import com.jie.wealthmate.theme.wantedSansFontFamily
 
 @Composable
@@ -104,10 +109,25 @@ fun InfoText(
 fun LabelText(
     modifier: Modifier = Modifier,
     text: String,
+    isRequire: Boolean = false,
 ) {
-    WMText(
-        text = text,
-        style = Typography().titleSmall.copy(fontWeight = FontWeight.SemiBold),
-        modifier = modifier
-    )
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
+        WMText(
+            text = text,
+            style = Typography().titleSmall.copy(fontWeight = FontWeight.SemiBold),
+        )
+
+        if (isRequire) {
+            WMText(
+                text = "*",
+                style = Typography().titleSmall.copy(
+                    color = ColorRed.Red_300,
+                    fontWeight = FontWeight.SemiBold,
+                )
+            )
+        }
+    }
 }
