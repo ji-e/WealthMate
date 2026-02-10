@@ -92,6 +92,16 @@ class CalendarScreenModel(
 
         for (repeatCycleDetail in activeRepeatCycles) {
             val repeatCycle = repeatCycleDetail.repeatCycle
+
+            // 수정된 데이터이고, 수정된 날짜가 현재 선택된 달과 같으면 이번 달은 반영하지 않음 (다음 달부터 반영)
+            val updatedDate = repeatCycle.updatedAt.toLocalDate()
+            if (repeatCycle.isModified &&
+                updatedDate.year == selectedMonth.year &&
+                updatedDate.month.number == selectedMonth.month.number
+            ) {
+                continue
+            }
+
             val generationDates = getGenerationDatesForMonth(repeatCycle, selectedMonth)
 
             for (date in generationDates) {

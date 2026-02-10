@@ -41,6 +41,7 @@ class RepeatCycleRepositoryImpl(private val databaseProvider: DatabaseProvider) 
             params = mapOf("repeatCycle" to repeatCycle)
         ) {
             val repeatCycle = repeatCycle.copy(
+                isModified = true,
                 updatedAt = Clock.System.now().toEpochMilliseconds(),
             )
 

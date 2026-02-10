@@ -25,6 +25,7 @@ data class RepeatCycleEntity(
     val categoryTagId: String?,
     val paymentMethodId: String?,
     val isActive: Boolean = true, // 반복 중단 여부
+    val isModified: Boolean = false,
     val updatedAt: Long = Clock.System.now().toEpochMilliseconds(),
     val isDeleted: Boolean = false,
 )
