@@ -15,6 +15,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
@@ -23,12 +25,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.lerp
+import androidx.compose.ui.unit.sp
 import com.jie.wealthmate.component.WMText
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.theme.ColorBlue
@@ -196,6 +199,7 @@ internal fun DayItem(
             .alpha(alpha)
             .fillMaxWidth()
             .height(height)
+            .clip(RoundedCornerShape(4.dp))
             .background(if (isSelected) ColorPrimary.Primary_200 else ColorGray.White)
             .clickable { onClickDate(day.first) }
             .padding(2.dp),
@@ -234,7 +238,11 @@ internal fun DayItem(
                 style = Typography().labelSmall.copy(color = ColorBlue.Blue_300),
                 textAlign = TextAlign.Center,
                 maxLines = 1,
-                overflow = TextOverflow.Ellipsis
+                autoSize = TextAutoSize.StepBased(
+                    minFontSize = 9.sp,
+                    maxFontSize = 11.sp,
+                    stepSize = 1.sp
+                )
             )
         }
         if (expenseAmount > 0) {
@@ -244,7 +252,11 @@ internal fun DayItem(
                 style = Typography().labelSmall.copy(color = ColorRed.Red_300),
                 textAlign = TextAlign.Center,
                 maxLines = 1,
-                overflow = TextOverflow.Ellipsis
+                autoSize = TextAutoSize.StepBased(
+                    minFontSize = 9.sp,
+                    maxFontSize = 11.sp,
+                    stepSize = 1.sp
+                )
             )
         }
 
@@ -273,7 +285,11 @@ internal fun DayItem(
                                 style = Typography().labelSmall,
                                 maxLines = 1,
                                 modifier = Modifier.padding(start = 2.dp),
-                                overflow = TextOverflow.Ellipsis
+                                autoSize = TextAutoSize.StepBased(
+                                    minFontSize = 9.sp,
+                                    maxFontSize = 11.sp,
+                                    stepSize = 1.sp
+                                )
                             )
                         }
                     }

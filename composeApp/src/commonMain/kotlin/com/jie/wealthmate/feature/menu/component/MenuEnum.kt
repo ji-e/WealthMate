@@ -28,8 +28,8 @@ enum class MenuEnum(
     ),
     REPEAT_HISTORY(
         route = "repeat_history",
-        label = "반복 내역",
-        title = "반복 내역 관리",
+        label = "반복 설정",
+        title = "반복 설정 관리",
         icon = null
     ),
 

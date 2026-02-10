@@ -1,5 +1,6 @@
 package com.jie.wealthmate.feature.calendar.component.listCalendar
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -31,7 +32,9 @@ import com.jie.wealthmate.vo.HistoryVo
 import kotlinx.datetime.LocalDate
 import org.jetbrains.compose.resources.painterResource
 import wealthmate.composeapp.generated.resources.Res
+import wealthmate.composeapp.generated.resources.ic_percent_on
 import wealthmate.composeapp.generated.resources.ic_push_pin
+import wealthmate.composeapp.generated.resources.ic_repeat_on
 
 
 @Composable
@@ -84,6 +87,26 @@ fun HistoryItem(
                     modifier = Modifier
                         .size(24.dp)
                         .align(Alignment.TopStart)
+                )
+            }
+            history.repeatCycle?.let {
+                Image(
+                    painter = painterResource(Res.drawable.ic_repeat_on),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .padding(end = 4.dp)
+                        .size(24.dp)
+                        .align(Alignment.BottomEnd)
+                )
+            }
+            history.installment?.let {
+                Image(
+                    painter = painterResource(Res.drawable.ic_percent_on),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .padding(end = 4.dp)
+                        .size(24.dp)
+                        .align(Alignment.BottomEnd)
                 )
             }
         }

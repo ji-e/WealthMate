@@ -227,7 +227,7 @@ class RepeatHistoryDetailScreen(
                 onClick = {
                     showConfirmDialog(
                         isShow = true,
-                        content = "다음 달 부터 적용됩니다."
+                        content = "다음 달부터 적용됩니다.\n수정하시겠습니까?"
                     ) {
                         screenModel.modifyRepeatCycle()
                     }
