@@ -117,16 +117,16 @@ class ModifyPaymentMethodScreen(
                     onReadOnlyClick = { isShowPaymentMethodModalBottomSheet = true }
                 )
             }
-            // 저장 버튼
+            // 수정 버튼
             WMButton(
-                text = "저장",
+                text = "수정",
                 buttonSize = ButtonSize.LARGE,
                 modifier = Modifier
                     .padding(horizontal = 28.dp)
                     .padding(bottom = 20.dp)
                     .fillMaxWidth(),
                 enabled = uiState.label.text.isNotBlank(),
-                onClick = screenModel::savePaymentMethod
+                onClick = screenModel::modifyPaymentMethod
             )
         }
 

@@ -63,7 +63,7 @@ class ModifyPaymentMethodScreenModel(
         }
     }
 
-    fun savePaymentMethod() {
+    fun modifyPaymentMethod() {
         val uiState = container.uiState.value
         val isExisted = paymentMethodItems.any {
             it.paymentMethod.id != paymentMethodId && it.group?.id == uiState.group?.id && it.paymentMethod.label == uiState.label.text
