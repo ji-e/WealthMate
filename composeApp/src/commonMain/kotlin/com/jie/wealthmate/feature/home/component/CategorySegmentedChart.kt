@@ -19,6 +19,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -80,6 +81,23 @@ fun CategorySegmentedChart(
                 tint = ColorGray.Gray_500,
                 modifier = Modifier.size(16.dp)
             )
+        }
+
+        if (categorySegmentChartItems.isEmpty()) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(80.dp)
+                    .background(color = ColorGray.Gray_50, shape = RoundedCornerShape(8.dp)),
+
+                contentAlignment = Alignment.Center
+            ) {
+                WMText(
+                    text = "카테고리가 없습니다.",
+                    style = Typography().bodySmall.copy(color = ColorGray.Gray_400)
+                )
+            }
+            return
         }
 
         Row(
