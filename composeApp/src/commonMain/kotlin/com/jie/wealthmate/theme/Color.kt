@@ -4,7 +4,7 @@ import androidx.compose.ui.graphics.Color
 
 
 object ColorGray {
-    val Gray_700 = Color(0xFF20232B)
+    val Gray_700 = Color(0xFF444444)
     val Gray_600 = Color(0xFF44464B)
     val Gray_500 = Color(0xFF636871)
     val Gray_400 = Color(0xFF91969E)

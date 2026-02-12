@@ -48,7 +48,7 @@ fun PaymentMethodSegmentedChart(
     modifier: Modifier = Modifier,
     expensesAmount: Long,
     paymentMethodSegmentChartItems: List<PaymentMethodSegmentChartData>,
-    onChartClick: () -> Unit = {},
+    onPaymentMethodChartClick: () -> Unit = {},
 ) {
     val typography = MaterialTheme.typography
     var isStarted by remember { mutableStateOf(false) }
@@ -67,7 +67,7 @@ fun PaymentMethodSegmentedChart(
     Column(modifier = modifier.fillMaxWidth()) {
         Row(
             modifier = Modifier
-                .clickable(onClick = onChartClick)
+                .clickable(onClick = onPaymentMethodChartClick)
                 .padding(bottom = 12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {

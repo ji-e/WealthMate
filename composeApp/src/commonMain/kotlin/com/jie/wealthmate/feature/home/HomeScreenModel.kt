@@ -1,22 +1,78 @@
 package com.jie.wealthmate.feature.home
 
-import cafe.adriel.voyager.core.model.screenModelScope
 import com.jie.wealthmate.base.BaseScreenModel
-import com.jie.wealthmate.base.BaseUiState
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
+import com.jie.wealthmate.feature.home.component.CategorySegmentChartData
+import com.jie.wealthmate.feature.home.component.PaymentMethodSegmentChartData
+import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
+import com.jie.wealthmate.repository.CategoryRepository
+import com.jie.wealthmate.repository.PaymentMethodRepository
+import com.jie.wealthmate.utils.default
+import com.jie.wealthmate.vo.CategoryVo.Companion.mapperToVo
+import com.jie.wealthmate.vo.PaymentMethodVo.Companion.mapperToVo
 
-class HomeScreenModel() : BaseScreenModel<BaseUiState>() {
-    private val _counter = MutableStateFlow(0)
-    val counter = _counter.asStateFlow()
+class HomeScreenModel(
+    private val categoryRepository: CategoryRepository,
+    private val paymentMethodRepository: PaymentMethodRepository,
+) : BaseScreenModel<HomeUiState>() {
 
-    fun increment() {
-        screenModelScope.launch {
-            _counter.value++
-        }
+    override val initialState: HomeUiState
+        get() = HomeUiState(
+            currentAmount = Amount(
+                expensesAmount = 3000000,
+                incomeAmount = 8000000,
+                savingAmount = 10,
+            ),
+            lastAmount = Amount(
+                expensesAmount = 1000000,
+                incomeAmount = 8000000,
+                savingAmount = 500,
+            )
+        )
+
+
+    init {
+        // temp
+        getCategories()
+        getPaymentMethods()
     }
 
-    override val initialState: BaseUiState
-        get() = TODO("Not yet implemented")
+    fun getCategories() {
+        val largeCategoryEnum = LargeCategoryEnum.EXPENSES
+        categoryRepository.getCategoriesByLargeCategory(largeCategoryEnum.name)
+            .apiFlow { response ->
+                var total = container.uiState.value.currentAmount?.expensesAmount.default()
+                reduceState { state ->
+                    state.copy(
+                        categorySegment = response.filter { it.isFixed.not() }
+                            .mapIndexed { index, it ->
+                                val amount = (total / 1.8 - (index + 1) - (index % 15)).toLong()
+                                total -= amount
+                                CategorySegmentChartData(
+                                    category = it.mapperToVo(),
+                                    amount = amount
+                                )
+                            }
+                    )
+                }
+            }
+    }
+
+    private fun getPaymentMethods() {
+        paymentMethodRepository.getPaymentMethods()
+            .apiFlow { response ->
+                var total = container.uiState.value.currentAmount?.expensesAmount.default()
+                reduceState { state ->
+                    state.copy(
+                        paymentMethodSegment = response.mapIndexed { index, it ->
+                            val amount = (total / 1.8 - (index + 1) - (index % 15)).toLong()
+                            total -= amount
+                            PaymentMethodSegmentChartData(
+                                paymentMethod = it.paymentMethod.mapperToVo(),
+                                amount = amount
+                            )
+                        }
+                    )
+                }
+            }
+    }
 }

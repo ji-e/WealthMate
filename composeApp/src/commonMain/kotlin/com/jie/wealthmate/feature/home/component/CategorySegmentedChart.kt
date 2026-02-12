@@ -48,7 +48,7 @@ fun CategorySegmentedChart(
     modifier: Modifier = Modifier,
     expensesAmount: Long,
     categorySegmentChartItems: List<CategorySegmentChartData>,
-    onCategoryClick: () -> Unit = {},
+    onCategoryChartClick: () -> Unit = {},
 ) {
     val typography = MaterialTheme.typography
     var isStarted by remember { mutableStateOf(false) }
@@ -66,7 +66,7 @@ fun CategorySegmentedChart(
     Column(modifier = modifier.fillMaxWidth()) {
         Row(
             modifier = Modifier
-                .clickable(onClick = onCategoryClick)
+                .clickable(onClick = onCategoryChartClick)
                 .padding(bottom = 12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
