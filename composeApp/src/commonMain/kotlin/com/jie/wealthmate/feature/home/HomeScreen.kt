@@ -47,11 +47,11 @@ class HomeScreen() : Screen {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = 32.dp, bottom = calculateAdjustedToastPadding(80))
+                .padding(top = 44.dp, bottom = calculateAdjustedToastPadding(80))
                 .verticalScroll(rememberScrollState()),
         ) {
 
-            Spacer(modifier = Modifier.height(40.dp))
+            Spacer(modifier = Modifier.height(28.dp))
 
             Today(
                 modifier = Modifier
