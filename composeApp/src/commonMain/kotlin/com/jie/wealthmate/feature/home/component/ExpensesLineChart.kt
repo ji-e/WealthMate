@@ -78,10 +78,10 @@ fun ExpensesLineChart(
             modifier = Modifier
                 .fillMaxWidth()
                 .border(width = 2.dp, color = ColorGray.Gray_50, shape = RoundedCornerShape(8.dp))
-                .padding(16.dp),
         ) {
             Canvas(
                 modifier = Modifier
+                    .padding(16.dp)
                     .fillMaxWidth()
                     .height(80.dp)
             ) {
