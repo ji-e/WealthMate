@@ -30,8 +30,8 @@ import com.jie.wealthmate.utils.toLocalDate
 import com.jie.wealthmate.vo.InstallmentVo
 import org.jetbrains.compose.resources.painterResource
 import wealthmate.composeapp.generated.resources.Res
-import wealthmate.composeapp.generated.resources.ic_edit
 import wealthmate.composeapp.generated.resources.ic_error_outline
+import wealthmate.composeapp.generated.resources.ic_keyboard_arrow_right
 
 
 @Composable
@@ -61,9 +61,9 @@ fun Installment(
             )
 
             WMIconButton(
-                iconRes = Res.drawable.ic_edit,
-                iconButtonModifier = Modifier.size(36.dp),
-                modifier = Modifier.size(18.dp),
+                iconRes = Res.drawable.ic_keyboard_arrow_right,
+                iconButtonModifier = Modifier.size(32.dp),
+                modifier = Modifier.size(24.dp),
                 onClick = onModifyClick
             )
         }

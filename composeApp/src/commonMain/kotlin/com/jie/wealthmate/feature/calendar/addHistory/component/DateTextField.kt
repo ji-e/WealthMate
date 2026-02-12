@@ -21,7 +21,6 @@ import androidx.compose.ui.unit.dp
 import com.jie.wealthmate.component.WMIconButton
 import com.jie.wealthmate.component.WMText
 import com.jie.wealthmate.component.textField.WMTextField
-import com.jie.wealthmate.feature.calendar.addHistory.component.RepeatCycleEnum.Companion.formattedDescription
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.theme.ColorGray
 import com.jie.wealthmate.theme.ColorPrimary
@@ -63,7 +62,8 @@ fun DateTextField(
                 val supportingText = when {
                     repeatCycle != null -> repeatCycle.formattedDescription(selectedDate)
                     totalInstallmentCount != null -> {
-                        val installmentAmount = amount?.text?.toIntOrNull()?.div(totalInstallmentCount)
+                        val installmentAmount =
+                            amount?.text?.toIntOrNull()?.div(totalInstallmentCount)
 
                         "할부 ${totalInstallmentCount}개월" +
                                 if (installmentAmount != null) {

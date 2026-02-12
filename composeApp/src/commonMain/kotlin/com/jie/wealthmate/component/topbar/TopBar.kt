@@ -49,6 +49,7 @@ fun WMTopBar(
             }
         },
         actions = {
+            trailingCustomItem?.content()
             trailingItem?.forEach {
                 WMIconButton(
                     iconRes = it.iconRes,
@@ -58,10 +59,6 @@ fun WMTopBar(
                         it.action()
                     }
                 )
-            }
-
-            trailingCustomItem?.let {
-                it.content()
             }
         },
         colors = TopAppBarDefaults.topAppBarColors().copy(

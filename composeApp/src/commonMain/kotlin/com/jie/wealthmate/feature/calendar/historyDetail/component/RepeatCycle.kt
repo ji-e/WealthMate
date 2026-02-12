@@ -23,29 +23,42 @@ import com.jie.wealthmate.component.SwitchSize
 import com.jie.wealthmate.component.WMIconButton
 import com.jie.wealthmate.component.WMSwitch
 import com.jie.wealthmate.component.WMText
-import com.jie.wealthmate.feature.calendar.addHistory.component.RepeatCycleEnum.Companion.formattedShortDescription
+import com.jie.wealthmate.feature.calendar.addHistory.component.RepeatCycleEnum
+import com.jie.wealthmate.feature.calendar.addHistory.component.formattedShortDescription
 import com.jie.wealthmate.theme.ColorGray
-import com.jie.wealthmate.theme.noRippleClickable
 import com.jie.wealthmate.utils.convertLocalDateToString
 import com.jie.wealthmate.utils.formatDateDotYYMDE
 import com.jie.wealthmate.vo.RepeatCycleVo
+import kotlinx.datetime.LocalDate
 import org.jetbrains.compose.resources.painterResource
 import wealthmate.composeapp.generated.resources.Res
-import wealthmate.composeapp.generated.resources.ic_close
-import wealthmate.composeapp.generated.resources.ic_edit
 import wealthmate.composeapp.generated.resources.ic_error_outline
 import wealthmate.composeapp.generated.resources.ic_keyboard_arrow_right
 
 @Composable
 fun RepeatCycle(
     modifier: Modifier = Modifier,
+    date: LocalDate,
     repeatCycle: RepeatCycleVo,
     onIsActiveChange: (Boolean) -> Unit,
     onModifyRepeatCycleClick: () -> Unit,
-    onEndDateClick: (isRemoveEndDateClick: Boolean) -> Unit,
 ) {
     val isActivated = repeatCycle.isActive
     val contentColor = if (isActivated) ColorGray.Gray_700 else ColorGray.Gray_500
+    val repeatDescription =
+        when (val repeatCycleEnum = repeatCycle.repeatCycle) {
+            RepeatCycleEnum.WEEKLY -> {
+                repeatCycleEnum.formattedShortDescription(repeatCycle.dayOfWeek ?: 1)
+            }
+
+            RepeatCycleEnum.MONTHLY -> {
+                repeatCycleEnum.formattedShortDescription(repeatCycle.dayOfMonth ?: 1)
+            }
+
+            else -> {
+                repeatCycleEnum.formattedShortDescription(repeatCycle.date)
+            }
+        }
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -62,22 +75,20 @@ fun RepeatCycle(
             verticalAlignment = Alignment.CenterVertically
         ) {
             WMText(
-                text = repeatCycle.repeatCycle.formattedShortDescription(repeatCycle.startDate),
+                text = repeatDescription,
                 style = Typography().titleMedium.copy(
                     color = contentColor,
                     fontWeight = FontWeight.SemiBold
                 ),
             )
 
-            if (isActivated) {
-                WMIconButton(
-                    iconRes = Res.drawable.ic_edit,
-                    iconButtonModifier = Modifier.size(36.dp),
-                    modifier = Modifier.size(18.dp),
-                    onClick = onModifyRepeatCycleClick,
-                    tint = contentColor
-                )
-            }
+            WMIconButton(
+                iconRes = Res.drawable.ic_keyboard_arrow_right,
+                iconButtonModifier = Modifier.size(32.dp),
+                modifier = Modifier.size(24.dp),
+                onClick = onModifyRepeatCycleClick,
+                tint = contentColor
+            )
 
             Spacer(modifier = Modifier.weight(1f))
 
@@ -114,7 +125,6 @@ fun RepeatCycle(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Row(
-                modifier = Modifier.noRippleClickable(isActivated) { onEndDateClick(false) },
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 WMText(
@@ -130,49 +140,27 @@ fun RepeatCycle(
                     text = repeatCycle.endDate.convertLocalDateToString(formatDateDotYYMDE, "없음"),
                     style = Typography().bodyMedium.copy(color = contentColor)
                 )
-
-                if (isActivated.not()) return@Row
-                if (repeatCycle.endDate == null) {
-                    Icon(
-                        painter = painterResource(Res.drawable.ic_keyboard_arrow_right),
-                        modifier = Modifier
-                            .padding(start = 4.dp)
-                            .size(18.dp),
-                        contentDescription = null,
-                        tint = ColorGray.Gray_500
-                    )
-                } else {
-                    Icon(
-                        painter = painterResource(Res.drawable.ic_close),
-                        modifier = Modifier
-                            .padding(start = 4.dp)
-                            .size(18.dp)
-                            .noRippleClickable { onEndDateClick(true) },
-                        contentDescription = null,
-                        tint = ColorGray.Gray_500
-                    )
-                }
             }
-
         }
 
-        Row(
-            modifier = Modifier.padding(top = 12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(4.dp)
-        ) {
-            Icon(
-                painter = painterResource(Res.drawable.ic_error_outline),
-                contentDescription = null,
-                modifier = Modifier.size(14.dp),
-                tint = ColorGray.Gray_500
-            )
+        if (repeatCycle.isModified && repeatCycle.updateAt?.year == date.year && repeatCycle.updateAt.month == date.month) {
+            Row(
+                modifier = Modifier.padding(top = 12.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                Icon(
+                    painter = painterResource(Res.drawable.ic_error_outline),
+                    contentDescription = null,
+                    modifier = Modifier.size(14.dp),
+                    tint = ColorGray.Gray_500
+                )
 
-            WMText(
-                text = "수정시 바로 적용됩니다.",
-                style = Typography().bodySmall.copy(color = ColorGray.Gray_500)
-            )
+                WMText(
+                    text = "내역 작성 이후 반복 설정이 변경되었습니다.",
+                    style = Typography().bodySmall.copy(color = ColorGray.Gray_500)
+                )
+            }
         }
     }
-
 }

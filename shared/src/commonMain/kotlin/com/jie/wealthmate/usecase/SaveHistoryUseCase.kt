@@ -43,6 +43,7 @@ class SaveHistoryUseCase(
                 repeatCycle = repeatCycle,
                 dayOfWeek = dayOfWeek,
                 dayOfMonth = dayOfMonth,
+                date = history.date,
                 startDate = history.date,
                 endDate = null,
                 categoryId = history.categoryId,

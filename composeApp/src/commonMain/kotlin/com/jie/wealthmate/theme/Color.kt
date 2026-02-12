@@ -4,7 +4,7 @@ import androidx.compose.ui.graphics.Color
 
 
 object ColorGray {
-    val Gray_700 = Color(0xFF20232B)
+    val Gray_700 = Color(0xFF444444)
     val Gray_600 = Color(0xFF44464B)
     val Gray_500 = Color(0xFF636871)
     val Gray_400 = Color(0xFF91969E)
@@ -104,3 +104,59 @@ object ColorGroup {
     )
 }
 
+object ColorCategory {
+    val Category_Mint = Color(0xFF4ECDC4)      // 저축/수입
+    val Category_Coral = Color(0xFFFF6B6B)     // 식비/생활비
+    val Category_Sky = Color(0xFF4A90E2)       // 고정지출/주거비
+    val Category_Lavender = Color(0xFFA8A4CE)  // 문화/여가
+    val Category_Yellow = Color(0xFFFFD93D)    // 교통/통신비
+    val Category_Ect = Color(0xFFDADEE4)
+
+    fun getColorList() = listOf(
+        Pair("Category_Mint", Category_Mint),
+        Pair("Category_Coral", Category_Coral),
+        Pair("Category_Sky", Category_Sky),
+        Pair("Category_Lavender", Category_Lavender),
+        Pair("Category_Yellow", Category_Yellow),
+        Pair("Category_Ect", Category_Ect)
+    )
+}
+
+object ColorChart {
+    // 더 차분한 버전
+    val Chart_Teal = Color(0xFF5EEAD4)        // 티ール
+    val Chart_Pink = Color(0xFFF9A8D4)        // 연한 핑크
+    val Chart_Blue = Color(0xFF7DD3FC)        // 아쿠아 블루
+    val Chart_Purple = Color(0xFFD8B4FE)      // 연보라
+    val Chart_Amber = Color(0xFFFCD34D)       // 앰버
+    val Chart_Red = Color(0xFFFDA4AF)         // 연한 레드
+    val Chart_Emerald = Color(0xFF6EE7B7)     // 에메랄드
+    val Chart_Sage = Color(0xFFA7C4BC)        // 세이지 그린
+    val Chart_Orange = Color(0xFFFDBA74)      // 연한 오렌지
+    val Chart_Mint = Color(0xFF6EE7B7)        // 부드러운 민트
+    val Chart_Coral = Color(0xFFFCA5A5)       // 코랄/피치
+    val Chart_Sky = Color(0xFF93C5FD)         // 부드러운 하늘색
+    val Chart_Lavender = Color(0xFFC4B5FD)    // 라벤더 (Primary와 유사 계열)
+    val Chart_Butter = Color(0xFFFDE68A)      // 버터/레몬
+    val Chart_Rose = Color(0xFFFBBCBB)        // 연한 로즈
+    val Chart_Peach = Color(0xFFFFD4B8)       // 피치
+    val Category_Ect = Color(0xFFDADEE4)
+
+    fun getCategoryChartColors() = listOf(
+        Chart_Rose,
+        Chart_Sky,
+        Chart_Lavender,
+        Chart_Butter,
+        Chart_Sage,
+        Category_Ect
+    )
+
+    fun getPaymentMethodChartColors() = listOf(
+        Chart_Peach,
+        Chart_Purple,
+        Chart_Amber,
+        Category_Ect
+    )
+
+
+}

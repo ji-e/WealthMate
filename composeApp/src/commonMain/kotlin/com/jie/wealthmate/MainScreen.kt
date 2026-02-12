@@ -114,7 +114,7 @@ open class MainScreen : Screen {
                 ) {
                     when (selectedItem) {
                         BottomNavItem.Home.route -> {
-                            Navigator(HomeScreen(innerPadding.calculateBottomPadding())) { navigator ->
+                            Navigator(HomeScreen()) { navigator ->
 //                                SlideTransition(navigator)
                                 CurrentScreen()
                                 LaunchedEffect(navigator.lastItem) {

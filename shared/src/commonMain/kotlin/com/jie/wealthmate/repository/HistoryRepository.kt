@@ -14,6 +14,8 @@ interface HistoryRepository {
 
     suspend fun insertHistory(history: HistoryEntity)
 
+    suspend fun insertHistories(histories: List<HistoryEntity>)
+
     suspend fun updateHistory(history: HistoryEntity)
 
     suspend fun updateHistories(histories: List<HistoryEntity>)

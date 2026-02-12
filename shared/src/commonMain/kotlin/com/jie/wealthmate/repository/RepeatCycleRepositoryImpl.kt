@@ -41,6 +41,7 @@ class RepeatCycleRepositoryImpl(private val databaseProvider: DatabaseProvider) 
             params = mapOf("repeatCycle" to repeatCycle)
         ) {
             val repeatCycle = repeatCycle.copy(
+                isModified = true,
                 updatedAt = Clock.System.now().toEpochMilliseconds(),
             )
 
@@ -84,4 +85,13 @@ class RepeatCycleRepositoryImpl(private val databaseProvider: DatabaseProvider) 
         dao.getRepeatCyclesWithDetail()
     }.flowOn(Dispatchers.Default)
 
+    override suspend fun getRepeatCycleById(repeatCycleId: String) = withContext(Dispatchers.Default) {
+        loggedCall(
+            repositoryName = repoName,
+            methodName = "getRepeatCycleById",
+            params = mapOf("repeatCycleId" to repeatCycleId)
+        ) {
+            dao.getRepeatCycleById(repeatCycleId)
+        }
+    }
 }

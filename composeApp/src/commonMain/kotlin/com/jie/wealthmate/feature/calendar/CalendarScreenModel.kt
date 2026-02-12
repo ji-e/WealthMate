@@ -73,55 +73,74 @@ class CalendarScreenModel(
             }
     }
 
+    private var isCreatingRepeatHistories = false
+
     private suspend fun checkAndCreateRepeatCycleHistories(repeatCycles: List<RepeatCycleWithDetails>) {
-        val selectedMonth = container.uiState.value.selectedMonth
-        // 오늘이 포함된 달에 대해서만 반복 내역 생성 처리
-        if (selectedMonth.year != today.year || selectedMonth.month.number != today.month.number) {
-            return
-        }
+        if (isCreatingRepeatHistories) return
+        isCreatingRepeatHistories = true
 
-        val histories = historyRepository.getHistoriesByMonth(
-            startDate = selectedMonth.firstDayOfMonth().toEpochMilliseconds(),
-            endDate = selectedMonth.lastDayOfMonth().toEpochMilliseconds()
-        ).first()
+        try {
+            val selectedMonth = container.uiState.value.selectedMonth
+            // 오늘이 포함된 달에 대해서만 반복 내역 생성 처리
+            if (selectedMonth.year != today.year || selectedMonth.month.number != today.month.number) {
+                return
+            }
 
-        val activeRepeatCycles = repeatCycles.filter { it.repeatCycle.isActive }
-        if (activeRepeatCycles.isEmpty()) return
+            val histories = historyRepository.getHistoriesByMonth(
+                startDate = selectedMonth.firstDayOfMonth().toEpochMilliseconds(),
+                endDate = selectedMonth.lastDayOfMonth().toEpochMilliseconds()
+            ).first()
 
-        val newHistories = mutableListOf<HistoryEntity>()
+            val activeRepeatCycles = repeatCycles.filter { it.repeatCycle.isActive }
+            if (activeRepeatCycles.isEmpty()) return
 
-        for (repeatCycleDetail in activeRepeatCycles) {
-            val repeatCycle = repeatCycleDetail.repeatCycle
-            val generationDates = getGenerationDatesForMonth(repeatCycle, selectedMonth)
+            val newHistories = mutableListOf<HistoryEntity>()
 
-            for (date in generationDates) {
-                val alreadyExists = histories.any {
-                    it.history.repeatCycleId == repeatCycle.id && it.history.date.toLocalDate() == date
+            for (repeatCycleDetail in activeRepeatCycles) {
+                val repeatCycle = repeatCycleDetail.repeatCycle
+
+                // 수정된 데이터이고, 수정된 날짜가 현재 선택된 달과 같으면 이번 달은 반영하지 않음 (다음 달부터 반영)
+                val updatedDate = repeatCycle.updatedAt.toLocalDate()
+                if (repeatCycle.isModified &&
+                    updatedDate.year == selectedMonth.year &&
+                    updatedDate.month == selectedMonth.month
+                ) {
+                    continue
                 }
-                if (!alreadyExists) {
-                    newHistories.add(
-                        HistoryEntity(
-                            largeCategory = repeatCycle.largeCategory,
-                            date = date.toEpochMilliseconds(),
-                            amount = repeatCycle.amount,
-                            repeatCycleId = repeatCycle.id,
-                            categoryId = repeatCycle.categoryId,
-                            categoryTagId = repeatCycle.categoryTagId,
-                            paymentMethodId = repeatCycle.paymentMethodId,
-                            content = repeatCycle.content
+
+                val generationDates = getGenerationDatesForMonth(repeatCycle, selectedMonth)
+
+                for (date in generationDates) {
+                    val alreadyExists = histories.any {
+                        it.history.repeatCycleId == repeatCycle.id && it.history.date.toLocalDate() == date
+                    } || newHistories.any {
+                        it.repeatCycleId == repeatCycle.id && it.date.toLocalDate() == date
+                    }
+
+                    if (!alreadyExists) {
+                        newHistories.add(
+                            HistoryEntity(
+                                largeCategory = repeatCycle.largeCategory,
+                                date = date.toEpochMilliseconds(),
+                                amount = repeatCycle.amount,
+                                repeatCycleId = repeatCycle.id,
+                                categoryId = repeatCycle.categoryId,
+                                categoryTagId = repeatCycle.categoryTagId,
+                                paymentMethodId = repeatCycle.paymentMethodId,
+                                content = repeatCycle.content
+                            )
                         )
-                    )
+                    }
                 }
             }
-        }
 
-        if (newHistories.isNotEmpty()) {
-            // 여러 건을 삽입할 때 트랜잭션 부하를 줄이기 위해 루프 최적화 (Repository에 bulk insert가 있으면 가장 좋음)
-            newHistories.forEach { history ->
-                historyRepository.insertHistory(history)
+            if (newHistories.isNotEmpty()) {
+                historyRepository.insertHistories(newHistories)
+                // 삽입 후 UI 갱신을 위해 다시 조회
+                getHistoriesByMonth()
             }
-            // 삽입 후 UI 갱신을 위해 다시 조회
-            getHistoriesByMonth()
+        } finally {
+            isCreatingRepeatHistories = false
         }
     }
 
@@ -130,15 +149,16 @@ class CalendarScreenModel(
         month: LocalDate,
     ): List<LocalDate> {
         val cycle = RepeatCycleEnum.create(repeatCycle.repeatCycle)
-        val cycleStartDate = repeatCycle.startDate.toLocalDate()
-        val cycleEndDate = repeatCycle.endDate?.toLocalDate()
+        val referenceDate = repeatCycle.date.toLocalDate()
+        val startDate = repeatCycle.startDate.toLocalDate()
+        val endDate = repeatCycle.endDate?.toLocalDate()
 
         val monthStart = month.firstDayOfMonth()
         val monthEnd = month.lastDayOfMonth()
 
         // 실제 처리해야 할 기간 설정
-        val start = if (cycleStartDate > monthStart) cycleStartDate else monthStart
-        val end = if (cycleEndDate != null && cycleEndDate < monthEnd) cycleEndDate else monthEnd
+        val start = if (startDate > monthStart) startDate else monthStart
+        val end = if (endDate != null && endDate < monthEnd) endDate else monthEnd
 
         if (start > end) return emptyList()
 
@@ -153,7 +173,7 @@ class CalendarScreenModel(
                 RepeatCycleEnum.WEEKLY -> currentDate.dayOfWeek.isoDayNumber == repeatCycle.dayOfWeek
                 RepeatCycleEnum.MONTHLY -> currentDate.day == repeatCycle.dayOfMonth
                 RepeatCycleEnum.MONTH_END -> currentDate == currentDate.lastDayOfMonth()
-                RepeatCycleEnum.YEARLY -> currentDate.month.number == cycleStartDate.month.number && currentDate.day == cycleStartDate.day
+                RepeatCycleEnum.YEARLY -> currentDate.month.number == referenceDate.month.number && currentDate.day == referenceDate.day
                 else -> false
             }
             if (shouldAdd) dates.add(currentDate)

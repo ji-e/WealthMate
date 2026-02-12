@@ -4,7 +4,11 @@ import androidx.compose.ui.text.input.TextFieldValue
 import com.jie.wealthmate.base.BaseUiState
 import com.jie.wealthmate.base.UiSideEffect
 import com.jie.wealthmate.feature.calendar.addHistory.component.RepeatCycleEnum
+import com.jie.wealthmate.feature.calendar.component.monthCalendar.WeekEnum
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
+import com.jie.wealthmate.utils.convertLocalDateToString
+import com.jie.wealthmate.utils.default
+import com.jie.wealthmate.utils.formatDateKorMD
 import com.jie.wealthmate.utils.today
 import com.jie.wealthmate.vo.CategoryTagVo
 import com.jie.wealthmate.vo.CategoryVo
@@ -16,8 +20,9 @@ data class RepeatHistoryDetailUiState(
     val selectedLargeCategory: LargeCategoryEnum = LargeCategoryEnum.EXPENSES,
     val startDate: LocalDate = today,
     val endDate: LocalDate? = null,
-    val repeatCycle: RepeatCycleEnum? = null,
-    val totalInstallmentCount: Long? = null,
+    val repeatCycle: RepeatCycleEnum = RepeatCycleEnum.UNKNOWN,
+    val repeatCycleDate: Int? = null,
+    val repeatCycleDateFull: LocalDate? = null,
     val content: TextFieldValue = TextFieldValue(""),
     val amount: TextFieldValue = TextFieldValue(""),
     val category: CategoryVo? = null,
@@ -28,6 +33,27 @@ data class RepeatHistoryDetailUiState(
 ) : BaseUiState {
     val isSaveButtonEnable: Boolean
         get() = isDataChanged && amount.text.isNotEmpty() && content.text.isNotEmpty()
+
+    val repeatCycleDateItems: List<Pair<Int, String>> = when (repeatCycle) {
+        RepeatCycleEnum.WEEKLY -> {
+            WeekEnum.entries.sortedBy { it.isoDayNumber }.map {
+                it.isoDayNumber to "${it.korDisplayName}요일"
+            }
+        }
+
+        RepeatCycleEnum.MONTHLY -> {
+            (1..31).map { it to "${it}일" }
+        }
+
+        else -> emptyList()
+    }
+
+    val repeatCycleDateText: String
+        get() = if (repeatCycle == RepeatCycleEnum.YEARLY) {
+            repeatCycleDateFull.convertLocalDateToString(formatDateKorMD)
+        } else {
+            repeatCycleDateItems.find { it.first == repeatCycleDate }?.second.default()
+        }
 }
 
 sealed class RepeatHistoryDetailUiSideEffect : UiSideEffect {

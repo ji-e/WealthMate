@@ -8,6 +8,7 @@ import com.jie.wealthmate.feature.menu.management.categoryManagement.component.L
 import com.jie.wealthmate.repository.CategoryRepository
 import com.jie.wealthmate.repository.PaymentMethodRepository
 import com.jie.wealthmate.repository.RepeatCycleRepository
+import com.jie.wealthmate.utils.default
 import com.jie.wealthmate.utils.formatRemoveCommas
 import com.jie.wealthmate.utils.toEpochMilliseconds
 import com.jie.wealthmate.utils.today
@@ -16,7 +17,6 @@ import com.jie.wealthmate.vo.CategoryVo
 import com.jie.wealthmate.vo.CategoryVo.Companion.mapperToVo
 import com.jie.wealthmate.vo.PaymentMethodVo
 import kotlinx.datetime.LocalDate
-import kotlinx.datetime.isoDayNumber
 
 class AddRepeatHistoryScreenModel(
     private val repeatCycleRepository: RepeatCycleRepository,
@@ -57,16 +57,28 @@ class AddRepeatHistoryScreenModel(
         reduceState { state ->
             state.copy(
                 isDataChanged = true,
-                repeatCycle = repeatCycle
+                repeatCycle = repeatCycle,
+                repeatCycleDate = null,
+                repeatCycleDateFull = null
             )
         }
     }
 
-    fun updateTotalInstallmentCount(totalInstallment: Long?) {
+    fun updateRepeatCycleDate(repeatCycleDate: Int?) {
         reduceState { state ->
             state.copy(
                 isDataChanged = true,
-                totalInstallmentCount = totalInstallment
+                repeatCycleDate = repeatCycleDate
+            )
+        }
+    }
+
+    fun updateRepeatCycleDateFull(month: Int, day: Int) {
+        reduceState { state ->
+            state.copy(
+                isDataChanged = true,
+                // 2월 29일을 처리하기 위해 항상 윤년인 2000년을 기준으로 저장합니다.
+                repeatCycleDateFull = LocalDate(2000, month, day)
             )
         }
     }
@@ -157,8 +169,9 @@ class AddRepeatHistoryScreenModel(
                         content = uiState.content.text,
                         amount = uiState.amount.text.formatRemoveCommas().toLong(),
                         repeatCycle = uiState.repeatCycle?.name ?: RepeatCycleEnum.UNKNOWN.name,
-                        dayOfWeek = if (uiState.repeatCycle == RepeatCycleEnum.WEEKLY) uiState.startDate.dayOfWeek.isoDayNumber else null,
-                        dayOfMonth = if (uiState.repeatCycle == RepeatCycleEnum.MONTHLY) uiState.startDate.day else null,
+                        dayOfWeek = if (uiState.repeatCycle == RepeatCycleEnum.WEEKLY) uiState.repeatCycleDate else null,
+                        dayOfMonth = if (uiState.repeatCycle == RepeatCycleEnum.MONTHLY) uiState.repeatCycleDate else null,
+                        date = uiState.repeatCycleDateFull?.toEpochMilliseconds().default(),
                         startDate = uiState.startDate.toEpochMilliseconds(),
                         endDate = uiState.endDate?.toEpochMilliseconds(),
                         categoryId = uiState.category?.id,

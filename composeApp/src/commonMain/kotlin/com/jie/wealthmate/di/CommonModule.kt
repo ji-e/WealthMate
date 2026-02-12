@@ -61,7 +61,7 @@ val commonModule = module {
 
 
     // 홈
-    factory { HomeScreenModel() }
+    factory { HomeScreenModel(get(), get()) }
 
     // 캘린더
     factory { CalendarScreenModel(get(), get()) }
