@@ -19,6 +19,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -83,6 +84,23 @@ fun PaymentMethodSegmentedChart(
             )
         }
 
+        if (paymentMethodSegmentChartItems.isEmpty()) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(80.dp)
+                    .background(color = ColorGray.Gray_50, shape = RoundedCornerShape(8.dp)),
+
+                contentAlignment = Alignment.Center
+            ) {
+                WMText(
+                    text = "결제수단이 없습니다.",
+                    style = Typography().bodySmall.copy(color = ColorGray.Gray_400)
+                )
+            }
+            return
+        }
+
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -135,7 +153,7 @@ private fun PaymentMethodSegmentedItem(
 ) {
     val typography = MaterialTheme.typography
     val paymentMethod = paymentMethodSegment.paymentMethod
-    
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
