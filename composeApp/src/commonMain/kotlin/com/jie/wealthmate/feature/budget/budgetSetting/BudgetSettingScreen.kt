@@ -1,4 +1,4 @@
-package com.jie.wealthmate.feature.budget.budgetManagement
+package com.jie.wealthmate.feature.budget.budgetSetting
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,13 +16,13 @@ import com.jie.wealthmate.component.topbar.TopBarItem
 import com.jie.wealthmate.component.topbar.WMTopBar
 
 
-class BudgetManagementScreen() : BaseScreen() {
+class BudgetSettingScreen() : BaseScreen() {
     @Composable
     override fun Content() {
         super.Content()
 
         val navigator = LocalNavigator.currentOrThrow
-        val screenModel: BudgetManagementScreenModel = koinScreenModel()
+        val screenModel: BudgetSettingScreenModel = koinScreenModel()
         val uiState by screenModel.container.uiState.collectAsState()
 
         Column(

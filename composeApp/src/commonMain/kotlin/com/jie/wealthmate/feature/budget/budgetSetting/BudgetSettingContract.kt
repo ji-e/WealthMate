@@ -1,8 +1,8 @@
-package com.jie.wealthmate.feature.budget.budgetManagement
+package com.jie.wealthmate.feature.budget.budgetSetting
 
 import com.jie.wealthmate.base.BaseUiState
 
-data class BudgetManagementUiState(
+data class BudgetSettingUiState(
     val isDataChanged: Boolean = false,
 ) : BaseUiState {
 
