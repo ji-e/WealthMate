@@ -42,7 +42,7 @@ fun WMTopBar(
         },
         navigationIcon = {
             if (readingItem == null) {
-                Box(modifier = Modifier.width(12.dp))
+                Box(modifier = Modifier.width(18.dp))
             } else {
                 WMIconButton(
                     iconRes = readingItem.iconRes,
