@@ -1,6 +1,7 @@
 package com.jie.wealthmate.component.topbar
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.TopAppBar
@@ -31,6 +32,7 @@ fun WMTopBar(
     val focusManager = LocalFocusManager.current
 
     TopAppBar(
+        modifier = Modifier.padding(horizontal = 10.dp),
         title = {
             WMText(
                 text = title.title,
@@ -42,7 +44,7 @@ fun WMTopBar(
         },
         navigationIcon = {
             if (readingItem == null) {
-                Box(modifier = Modifier.width(18.dp))
+                Box(modifier = Modifier.width(8.dp))
             } else {
                 WMIconButton(
                     iconRes = readingItem.iconRes,
