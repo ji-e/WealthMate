@@ -2,6 +2,7 @@ package com.jie.wealthmate.di
 
 import com.jie.wealthmate.database.DatabaseSyncManager
 import com.jie.wealthmate.feature.budget.BudgetScreenModel
+import com.jie.wealthmate.feature.budget.addBudget.AddBudgetScreenModel
 import com.jie.wealthmate.feature.budget.budgetSetting.BudgetSettingScreenModel
 import com.jie.wealthmate.feature.calendar.CalendarScreenModel
 import com.jie.wealthmate.feature.calendar.addHistory.AddHistoryScreenModel
@@ -73,6 +74,8 @@ val commonModule = module {
     // 예산
     factory { BudgetScreenModel() }
     factory { BudgetSettingScreenModel() }
+    factory { AddBudgetScreenModel() }
+
 
     // 메뉴
     factory { MenuScreenModel(get(), get()) }
