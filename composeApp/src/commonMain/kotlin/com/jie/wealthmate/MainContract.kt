@@ -2,18 +2,23 @@ package com.jie.wealthmate
 
 import com.jie.wealthmate.base.BaseUiState
 import com.jie.wealthmate.base.UiSideEffect
+import com.jie.wealthmate.component.bottomNav.BottomNavItem
 import com.jie.wealthmate.component.topbar.TopBarItem
+import com.jie.wealthmate.utils.today
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.datetime.LocalDate
 
 data class MainUiState(
     val title: TopBarItem.Title? = null,
     val readingItem: TopBarItem.ReadingItem? = null,
     val trailingItem: List<TopBarItem.TrailingItem>? = null,
     val trailingCustomItem: TopBarItem.TrailingCustomItem? = null,
+    val selectedDate: LocalDate = today,
+    val selectedItem: String = BottomNavItem.Home.route,
 ) : BaseUiState
 
 
@@ -24,21 +29,15 @@ object MainUiManager {
     private val _sideEffect = MutableSharedFlow<UiSideEffect>()
     val sideEffect = _sideEffect.asSharedFlow()
 
-    fun updateTopBar(
-        title: TopBarItem.Title? = null,
-        readingItem: TopBarItem.ReadingItem? = null,
-        trailingItem: List<TopBarItem.TrailingItem>? = null,
-        trailingCustomItem: TopBarItem.TrailingCustomItem? = null,
-    ) {
-        println("updateTopBar called with title: $title, readingItem: $readingItem, trailingItem: $trailingItem")
-
+    fun updateSelectedDate(date: LocalDate) {
         _uiState.update {
-            it.copy(
-                title = title,
-                readingItem = readingItem,
-                trailingItem = trailingItem,
-                trailingCustomItem = trailingCustomItem,
-            )
+            it.copy(selectedDate = date)
+        }
+    }
+
+    fun updateSelectedItem(route: String) {
+        _uiState.update {
+            it.copy(selectedItem = route)
         }
     }
 

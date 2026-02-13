@@ -2,7 +2,6 @@ package com.jie.wealthmate.base
 
 import cafe.adriel.voyager.core.model.ScreenModel
 import com.jie.wealthmate.MainUiManager
-import com.jie.wealthmate.component.topbar.TopBarItem
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
@@ -93,23 +92,6 @@ abstract class BaseScreenModel<S : UiState> : ScreenModel, ContainerHost<S> {
         } catch (e: Exception) {
             println("Error closing container: $e")
         }
-    }
-
-    /**
-     * 전역 TopBar를 업데이트합니다.
-     */
-    fun updateTopBar(
-        title: TopBarItem.Title? = null,
-        readingItem: TopBarItem.ReadingItem? = null,
-        trailingItem: List<TopBarItem.TrailingItem>? = null,
-        trailingCustomItem: TopBarItem.TrailingCustomItem? = null,
-    ) {
-        MainUiManager.updateTopBar(
-            title = title,
-            readingItem = readingItem,
-            trailingItem = trailingItem,
-            trailingCustomItem = trailingCustomItem,
-        )
     }
 
     fun showLoading(

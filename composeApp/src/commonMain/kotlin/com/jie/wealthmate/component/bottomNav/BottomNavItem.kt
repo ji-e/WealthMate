@@ -2,6 +2,7 @@ package com.jie.wealthmate.component.bottomNav
 
 import org.jetbrains.compose.resources.DrawableResource
 import wealthmate.composeapp.generated.resources.Res
+import wealthmate.composeapp.generated.resources.ic_add
 import wealthmate.composeapp.generated.resources.ic_calendar
 import wealthmate.composeapp.generated.resources.ic_chart
 import wealthmate.composeapp.generated.resources.ic_home
@@ -25,9 +26,14 @@ sealed class BottomNavItem(
         label = "캘린더",
         icon = Res.drawable.ic_calendar
     )
-    object Asset : BottomNavItem(
-        route = "asset",
-        label = "자산",
+    object Add: BottomNavItem(
+        route = "add",
+        label = "내역 추가",
+        icon = Res.drawable.ic_add
+    )
+    object Budget: BottomNavItem(
+        route = "budget",
+        label = "예산",
         icon = Res.drawable.ic_chart
     )
     object Menu : BottomNavItem(

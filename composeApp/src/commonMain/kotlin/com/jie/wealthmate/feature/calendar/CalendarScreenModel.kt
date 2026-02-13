@@ -1,5 +1,6 @@
 package com.jie.wealthmate.feature.calendar
 
+import com.jie.wealthmate.MainUiManager
 import com.jie.wealthmate.base.BaseScreenModel
 import com.jie.wealthmate.database.eneity.HistoryEntity
 import com.jie.wealthmate.database.eneity.RepeatCycleEntity
@@ -26,7 +27,10 @@ class CalendarScreenModel(
     private val repeatCycleRepository: RepeatCycleRepository,
 ) : BaseScreenModel<CalendarUiState>() {
     override val initialState: CalendarUiState
-        get() = CalendarUiState()
+        get() = CalendarUiState(
+            selectedDate = MainUiManager.uiState.value.selectedDate,
+            selectedMonth = MainUiManager.uiState.value.selectedDate
+        )
 
     init {
         getHistoriesByMonth()
@@ -38,17 +42,20 @@ class CalendarScreenModel(
             val currentDayOfMonth = state.selectedDate.day
             val lastDayOfNewMonth = month.lastDayOfMonth()
             val newDay = currentDayOfMonth.coerceAtMost(lastDayOfNewMonth.day)
-            val newSelectedDate = LocalDate(month.year, month.month, newDay)
+            val newSelectedDate = if (month == today) today else LocalDate(month.year, month.month, newDay)
+
+            MainUiManager.updateSelectedDate(newSelectedDate)
 
             state.copy(
                 selectedMonth = month,
-                selectedDate = if (month == today) today else newSelectedDate
+                selectedDate = newSelectedDate
             )
         }
         getHistoriesByMonth()
     }
 
     fun updateSelectedDate(date: LocalDate) {
+        MainUiManager.updateSelectedDate(date)
         reduceState { state ->
             state.copy(selectedDate = date)
         }
