@@ -26,15 +26,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.CurrentScreen
+import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import com.jie.wealthmate.base.BaseUiSideEffect
 import com.jie.wealthmate.component.CustomSnackbarHost
 import com.jie.wealthmate.component.bottomNav.BottomNavItem
 import com.jie.wealthmate.component.bottomNav.BottomNavigation
 import com.jie.wealthmate.component.calculateAdjustedToastPadding
 import com.jie.wealthmate.component.rememberSnackbarState
-import com.jie.wealthmate.feature.asset.AssetScreen
+import com.jie.wealthmate.feature.budget.BudgetScreen
 import com.jie.wealthmate.feature.calendar.CalendarScreen
+import com.jie.wealthmate.feature.calendar.addHistory.AddHistoryScreen
 import com.jie.wealthmate.feature.home.HomeScreen
 import com.jie.wealthmate.feature.menu.MenuScreen
 import com.jie.wealthmate.theme.ColorGray
@@ -53,10 +56,16 @@ open class MainScreen : Screen {
 
         var isShowLoading by remember { mutableStateOf(false) }
         var isBottomNaviVisible by remember { mutableStateOf(true) }
-        var selectedItem by remember { mutableStateOf(BottomNavItem.Home.route) }
         val snackbarState = rememberSnackbarState()
         val scope = rememberCoroutineScope()
         val focusManager = LocalFocusManager.current
+        val navigator = LocalNavigator.currentOrThrow
+
+        // 각 탭의 화면 인스턴스를 유지하여 ScreenModel 상태가 보존되도록 함
+        val homeScreen = remember { HomeScreen() }
+        val calendarScreen = remember { CalendarScreen() }
+        val budgetScreen = remember { BudgetScreen() }
+        val menuScreen = remember { MenuScreen() }
 
         LaunchedEffect(Unit) {
             MainUiManager.sideEffect.collect { sideEffect ->
@@ -97,25 +106,29 @@ open class MainScreen : Screen {
                         exit = slideOutVertically { height -> height }
                     ) {
                         BottomNavigation(
-                            selectedItem = selectedItem,
-                            onItemSelected = { selectedItem = it }
+                            selectedItem = uiState.selectedItem,
+                            onItemSelected = {
+                                if (it == BottomNavItem.Add.route) {
+                                    navigator.push(AddHistoryScreen(uiState.selectedDate))
+                                } else {
+                                    MainUiManager.updateSelectedItem(it)
+                                }
+                            }
                         )
                     }
                 },
                 contentWindowInsets = WindowInsets.systemBars,
                 containerColor = ColorGray.White,
-            ) { innerPadding ->
+            ) { _ ->
                 Column(
                     modifier = Modifier
-//                        .statusBarsPadding()
                         .navigationBarsPadding()
                         .fillMaxSize(),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
-                    when (selectedItem) {
+                    when (uiState.selectedItem) {
                         BottomNavItem.Home.route -> {
-                            Navigator(HomeScreen()) { navigator ->
-//                                SlideTransition(navigator)
+                            Navigator(homeScreen) { navigator ->
                                 CurrentScreen()
                                 LaunchedEffect(navigator.lastItem) {
                                     isBottomNaviVisible = (navigator.lastItem is HomeScreen)
@@ -124,8 +137,7 @@ open class MainScreen : Screen {
                         }
 
                         BottomNavItem.Calendar.route -> {
-                            Navigator(CalendarScreen()) { navigator ->
-//                                ScaleTransition(navigator)
+                            Navigator(calendarScreen) { navigator ->
                                 CurrentScreen()
                                 LaunchedEffect(navigator.lastItem) {
                                     isBottomNaviVisible = (navigator.lastItem is CalendarScreen)
@@ -133,18 +145,17 @@ open class MainScreen : Screen {
                             }
                         }
 
-                        BottomNavItem.Asset.route -> {
-                            Navigator(AssetScreen(innerPadding.calculateBottomPadding())) { navigator ->
-//                                ScaleTransition(navigator)
+                        BottomNavItem.Budget.route -> {
+                            Navigator(budgetScreen) { navigator ->
                                 CurrentScreen()
                                 LaunchedEffect(navigator.lastItem) {
-                                    isBottomNaviVisible = (navigator.lastItem is AssetScreen)
+                                    isBottomNaviVisible = (navigator.lastItem is BudgetScreen)
                                 }
                             }
                         }
 
                         BottomNavItem.Menu.route -> {
-                            Navigator(MenuScreen(innerPadding.calculateBottomPadding())) { navigator ->
+                            Navigator(menuScreen) { navigator ->
                                 CurrentScreen()
                                 LaunchedEffect(navigator.lastItem) {
                                     isBottomNaviVisible = (navigator.lastItem is MenuScreen)

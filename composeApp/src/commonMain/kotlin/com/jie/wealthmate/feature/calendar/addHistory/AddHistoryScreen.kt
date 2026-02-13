@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -52,6 +53,7 @@ import com.jie.wealthmate.feature.calendar.addHistory.component.PaymentMethodMod
 import com.jie.wealthmate.feature.calendar.addHistory.component.PaymentMethodTextField
 import com.jie.wealthmate.feature.calendar.addHistory.component.RepeatCycleModalBottomSheet
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
+import com.jie.wealthmate.theme.ColorGray
 import com.jie.wealthmate.utils.default
 import kotlinx.datetime.LocalDate
 import org.koin.compose.koinInject
@@ -101,7 +103,9 @@ class AddHistoryScreen(private val selectedDate: LocalDate) : BaseScreen() {
 
         Column(
             modifier = Modifier
+                .background(ColorGray.White)
                 .fillMaxSize()
+                .navigationBarsPadding()
                 .imePadding()
         ) {
             WMTopBar(

@@ -1,46 +1,31 @@
 package com.jie.wealthmate.feature.calendar
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.dropShadow
-import androidx.compose.ui.graphics.shadow.Shadow
-import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.jie.wealthmate.base.BaseScreen
-import com.jie.wealthmate.component.WMIconButton
 import com.jie.wealthmate.component.calculateAdjustedToastPadding
-import com.jie.wealthmate.component.topbar.TopBarItem
-import com.jie.wealthmate.component.topbar.WMTopBar
-import com.jie.wealthmate.feature.calendar.addHistory.AddHistoryScreen
 import com.jie.wealthmate.feature.calendar.component.SelectedCalendarModalBottomSheet
 import com.jie.wealthmate.feature.calendar.component.listCalendar.ListCalendar
 import com.jie.wealthmate.feature.calendar.component.monthCalendar.MonthCalendar
 import com.jie.wealthmate.feature.calendar.historyDetail.HistoryDetailScreen
-import com.jie.wealthmate.theme.ColorGray
-import com.jie.wealthmate.theme.ColorPrimary
 import com.jie.wealthmate.utils.today
 import com.jie.wealthmate.vo.HistoryVo
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.plus
-import wealthmate.composeapp.generated.resources.Res
-import wealthmate.composeapp.generated.resources.ic_add
 
 val startDate = LocalDate(2025, 1, 1)
 
@@ -82,13 +67,11 @@ class CalendarScreen() : BaseScreen() {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(bottom = calculateAdjustedToastPadding(80))
+                .padding(top = 44.dp, bottom = calculateAdjustedToastPadding(80))
         ) {
             Column(
                 modifier = Modifier.fillMaxSize(),
             ) {
-                WMTopBar(title = TopBarItem.Title("캘린더"))
-
                 MonthCalendar(
                     selectedMonth = uiState.selectedMonth,
                     selectedDate = uiState.selectedDate,
@@ -107,26 +90,6 @@ class CalendarScreen() : BaseScreen() {
                     }
                 )
             }
-
-            WMIconButton(
-                iconRes = Res.drawable.ic_add,
-                contentDescription = "내역 추가",
-                iconButtonModifier = Modifier
-                    .padding(20.dp)
-                    .dropShadow(
-                        shape = CircleShape,
-                        shadow = Shadow(
-                            radius = 4.dp,
-                            color = ColorGray.Gray_200,
-                            offset = DpOffset(2.dp, 2.dp)
-                        )
-                    )
-                    .clip(CircleShape)
-                    .background(ColorPrimary.Primary_500)
-                    .align(Alignment.BottomEnd),
-                tint = ColorGray.White,
-                onClick = { navigator.push(AddHistoryScreen(uiState.selectedDate)) }
-            )
         }
 
         if (isShowSelectedCalendarModalBottomSheet) {

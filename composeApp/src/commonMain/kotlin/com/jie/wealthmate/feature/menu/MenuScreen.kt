@@ -10,14 +10,13 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.jie.wealthmate.base.collectSideEffect
 import com.jie.wealthmate.component.WMMenuButton
+import com.jie.wealthmate.component.calculateAdjustedToastPadding
 import com.jie.wealthmate.component.topbar.TopBarItem
 import com.jie.wealthmate.component.topbar.WMTopBar
 import com.jie.wealthmate.feature.menu.component.MenuEnum
@@ -29,12 +28,11 @@ import com.jie.wealthmate.feature.menu.data.googleCloudSync.GoogleCloudSyncScree
 import com.jie.wealthmate.feature.menu.management.categoryManagement.CategoryManagementScreen
 import com.jie.wealthmate.feature.menu.management.paymentMethodManagement.PaymentMethodManagementScreen
 import com.jie.wealthmate.feature.menu.management.repeatHistoryManagement.RepeatHistoryManagementScreen
-import com.jie.wealthmate.theme.WMTheme
 import com.jie.wealthmate.utils.default
 import com.mmk.kmpauth.google.GoogleButtonUiContainer
 import org.koin.compose.koinInject
 
-class MenuScreen(val calculateBottomPadding: Dp) : Screen {
+class MenuScreen() : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
@@ -79,7 +77,7 @@ class MenuScreen(val calculateBottomPadding: Dp) : Screen {
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(bottom = calculateBottomPadding),
+                    .padding(bottom = calculateAdjustedToastPadding(80)),
                 contentPadding = PaddingValues(top = 8.dp, bottom = 20.dp)
             ) {
                 items(uiState.menuEnums.size) { index ->
@@ -132,14 +130,6 @@ class MenuScreen(val calculateBottomPadding: Dp) : Screen {
                     Spacer(modifier = Modifier.height(28.dp))
                 }
             }
-        }
-    }
-
-    @Composable
-    @Preview(showBackground = true)
-    private fun MenuScreenPreview() {
-        WMTheme {
-            MenuScreen(0.dp)
         }
     }
 }
