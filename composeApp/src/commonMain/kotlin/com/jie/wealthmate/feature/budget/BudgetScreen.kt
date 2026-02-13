@@ -2,6 +2,7 @@ package com.jie.wealthmate.feature.budget
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -13,6 +14,7 @@ import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.jie.wealthmate.base.BaseScreen
+import com.jie.wealthmate.component.EmptyListView
 import com.jie.wealthmate.component.calculateAdjustedToastPadding
 import com.jie.wealthmate.component.topbar.TopBarItem
 import com.jie.wealthmate.component.topbar.WMTopBar
@@ -43,6 +45,12 @@ class BudgetScreen() : BaseScreen() {
                     .verticalScroll(rememberScrollState())
             ) {
 
+                EmptyListView(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
+                    contentText = "설정된 예산이 없습니다."
+                )
             }
         }
     }
