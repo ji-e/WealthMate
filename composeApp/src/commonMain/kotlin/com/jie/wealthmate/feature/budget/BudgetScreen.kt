@@ -18,6 +18,7 @@ import com.jie.wealthmate.component.EmptyListView
 import com.jie.wealthmate.component.calculateAdjustedToastPadding
 import com.jie.wealthmate.component.topbar.TopBarItem
 import com.jie.wealthmate.component.topbar.WMTopBar
+import com.jie.wealthmate.feature.budget.budgetManagement.BudgetManagementScreen
 import wealthmate.composeapp.generated.resources.Res
 import wealthmate.composeapp.generated.resources.ic_setting
 
@@ -42,9 +43,7 @@ class BudgetScreen() : BaseScreen() {
                 trailingItem = listOf(
                     TopBarItem.TrailingItem(
                         iconRes = Res.drawable.ic_setting,
-                        action = {
-                            // todo 예산 설정
-                        }
+                        action = { navigator.push(BudgetManagementScreen()) }
                     )
                 )
             )
