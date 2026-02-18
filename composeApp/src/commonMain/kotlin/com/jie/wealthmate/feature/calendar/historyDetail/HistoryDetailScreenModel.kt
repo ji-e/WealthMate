@@ -14,8 +14,10 @@ import com.jie.wealthmate.utils.default
 import com.jie.wealthmate.utils.formatRemoveCommas
 import com.jie.wealthmate.vo.CategoryTagVo
 import com.jie.wealthmate.vo.CategoryVo
+import com.jie.wealthmate.vo.CategoryVo.Companion.mapperToVo
 import com.jie.wealthmate.vo.HistoryVo.Companion.mapperToVo
 import com.jie.wealthmate.vo.PaymentMethodVo
+import com.jie.wealthmate.vo.PaymentMethodVo.Companion.mapperToVo
 import kotlinx.datetime.LocalDate
 
 class HistoryDetailScreenModel(
@@ -175,23 +177,7 @@ class HistoryDetailScreenModel(
             .apiFlow { response ->
                 reduceState { state ->
                     state.copy(
-                        categoryItems = response.map {
-                            CategoryVo(
-                                id = it.id,
-                                icon = it.icon,
-                                largeCategory = LargeCategoryEnum.creator(it.largeCategory),
-                                middleLabel = it.middleLabel,
-                                sort = it.sort,
-                                isFixed = it.isFixed,
-                                tags = it.tags.map { tag ->
-                                    CategoryTagVo(
-                                        id = tag.id,
-                                        label = tag.tagLabel
-                                    )
-                                }
-
-                            )
-                        }
+                        categoryItems = response.map {it.mapperToVo()}
                     )
                 }
             }
@@ -203,15 +189,7 @@ class HistoryDetailScreenModel(
                 println("response: $response")
                 reduceState { state ->
                     state.copy(
-                        paymentMethodItems = response.map {
-                            PaymentMethodVo(
-                                id = it.paymentMethod.id,
-                                label = it.paymentMethod.label,
-                                groupId = it.group?.id,
-                                groupLabel = it.group?.label,
-                                sort = it.paymentMethod.sort
-                            )
-                        }
+                        paymentMethodItems = response.map {it.paymentMethod.mapperToVo()}
                     )
                 }
             }

@@ -8,6 +8,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -109,7 +110,9 @@ fun InfoText(
 fun LabelText(
     modifier: Modifier = Modifier,
     text: String,
+    textColor: Color = ColorGray.Gray_700,
     isRequire: Boolean = false,
+
 ) {
     Row(
         modifier = modifier.fillMaxWidth(),
@@ -117,7 +120,10 @@ fun LabelText(
     ) {
         WMText(
             text = text,
-            style = Typography().titleSmall.copy(fontWeight = FontWeight.SemiBold),
+            style = Typography().titleSmall.copy(
+                color = textColor,
+                fontWeight = FontWeight.SemiBold
+            ),
         )
 
         if (isRequire) {

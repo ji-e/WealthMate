@@ -5,6 +5,8 @@ import com.jie.wealthmate.database.eneity.CategoryEntity
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.utils.default
 import com.jie.wealthmate.vo.CategoryTagVo.Companion.mapperToVo
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
 
 @Immutable
 data class CategoryVo(
@@ -14,7 +16,7 @@ data class CategoryVo(
     val middleLabel: String,
     val sort: Long,
     val isFixed: Boolean,
-    val tags: List<CategoryTagVo>,
+    val tags: ImmutableList<CategoryTagVo>,
 ) {
     companion object {
         fun CategoryEntity?.mapperToVo() = CategoryVo(
@@ -24,7 +26,7 @@ data class CategoryVo(
             middleLabel = this?.middleLabel.default(),
             sort = this?.sort.default(),
             isFixed = this?.isFixed.default(),
-            tags = this?.tags?.map { it.mapperToVo() }.default()
+            tags = this?.tags?.map { it.mapperToVo() }.orEmpty().toImmutableList()
         )
     }
 }

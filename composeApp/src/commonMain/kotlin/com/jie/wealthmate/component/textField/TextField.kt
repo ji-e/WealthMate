@@ -33,6 +33,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.jie.wealthmate.component.LabelText
 import com.jie.wealthmate.component.WMText
 import com.jie.wealthmate.theme.ColorGray
 import com.jie.wealthmate.theme.ColorPrimary
@@ -173,29 +174,11 @@ fun WMTextField(
 
     Column(modifier = modifier) {
         label?.let {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                WMText(
-                    text = it,
-                    style = Typography().titleSmall.copy(
-                        color = if (enabled.not()) disabledColor
-                        else defaultColor,
-                        fontWeight = FontWeight.SemiBold,
-                    )
-                )
-
-                if (isRequire) {
-                    WMText(
-                        text = "*",
-                        style = Typography().titleSmall.copy(
-                            color = if (enabled.not()) disabledColor else errorColor,
-                            fontWeight = FontWeight.SemiBold,
-                        )
-                    )
-                }
-            }
+            LabelText(
+                text = it,
+                textColor = if (enabled.not()) disabledColor else defaultColor,
+                isRequire = isRequire,
+            )
         }
         Box {
             BasicTextField(
@@ -239,7 +222,8 @@ fun WMTextField(
                             {
                                 WMText(
                                     text = it,
-                                    style = Typography().bodyLarge
+                                    style = Typography().bodyLarge,
+                                    maxLines = 1,
                                 )
                             }
                         },
