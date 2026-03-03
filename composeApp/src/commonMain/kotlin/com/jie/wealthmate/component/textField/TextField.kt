@@ -55,6 +55,7 @@ fun WMTextField(
     placeholder: String? = null,
     supportingText: String? = null,
     supportingContent: @Composable (() -> Unit)? = null,
+    isSupport: Boolean = true,
     isError: Boolean = false,
     isCount: Boolean = false,
     isRequire: Boolean = false,
@@ -99,6 +100,7 @@ fun WMTextField(
         placeholder = placeholder,
         supportingText = supportingText,
         supportingContent = supportingContent,
+        isSupport = isSupport,
         isError = isError,
         isCount = isCount,
         isRequire = isRequire,
@@ -127,6 +129,7 @@ fun WMTextField(
     placeholder: String? = null,
     supportingText: String? = null,
     supportingContent: @Composable (() -> Unit)? = null,
+    isSupport: Boolean = true,
     isError: Boolean = false,
     isCount: Boolean = false,
     isRequire: Boolean = false,
@@ -271,21 +274,23 @@ fun WMTextField(
             }
         }
 
-        Row(
-            modifier = Modifier
-                .padding(top = 4.dp)
-                .fillMaxWidth()
-                .heightIn(min = 14.dp),
-        ) {
-            WMText(
-                text = supportingText.default(),
-                style = Typography().bodyMedium.copy(color = placeholderColor),
+        if(isSupport) {
+            Row(
                 modifier = Modifier
-                    .weight(1f)
-                    .padding(end = 4.dp)
-            )
+                    .padding(top = 4.dp)
+                    .fillMaxWidth()
+                    .heightIn(min = 14.dp),
+            ) {
+                WMText(
+                    text = supportingText.default(),
+                    style = Typography().bodyMedium.copy(color = placeholderColor),
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(end = 4.dp)
+                )
 
-            supportingContent?.invoke()
+                supportingContent?.invoke()
+            }
         }
     }
 }
