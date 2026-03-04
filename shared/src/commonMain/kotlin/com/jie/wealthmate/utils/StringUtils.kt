@@ -18,6 +18,10 @@ fun formatWithCommas(number: String): String {
     return if (isNegative) "-$formatted" else formatted
 }
 
+fun Long.formatWithCommas(): String {
+    return formatWithCommas(this.toString())
+}
+
 fun String.formatRemoveCommas(): String {
     return replace(",", "")
 }
