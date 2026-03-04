@@ -40,7 +40,7 @@ fun WMCheckBox(
             contentDescription = null,
             modifier = Modifier
                 .noRippleClickable(enabled) { onCheckedChange(checked.not()) }
-                .padding(end = 4.dp)
+                .padding(end = 8.dp)
                 .size(24.dp),
             tint = when {
                 enabled.not() -> ColorGray.Gray_100

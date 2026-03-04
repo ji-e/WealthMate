@@ -74,7 +74,7 @@ val commonModule = module {
     // 예산
     factory { BudgetScreenModel() }
     factory { BudgetSettingScreenModel() }
-    factory { AddBudgetScreenModel() }
+    factory { AddBudgetScreenModel(get()) }
 
 
     // 메뉴

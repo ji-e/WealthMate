@@ -5,8 +5,10 @@ import com.jie.wealthmate.feature.home.component.CategorySegmentChartData
 import com.jie.wealthmate.feature.home.component.PaymentMethodSegmentChartData
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.utils.default
+import com.jie.wealthmate.vo.CategoryTagVo
 import com.jie.wealthmate.vo.CategoryVo
 import com.jie.wealthmate.vo.PaymentMethodVo
+import kotlinx.collections.immutable.toImmutableList
 
 data class HomeUiState(
     val statusType: StatusType = StatusType.MONTH,
@@ -25,7 +27,7 @@ data class HomeUiState(
             middleLabel = "그 외",
             sort = 0,
             isFixed = false,
-            tags = emptyList(),
+            tags = emptyList<CategoryTagVo>().toImmutableList(),
         ),
         amount = currentAmount?.expensesAmount.default() - categorySegment.sumOf { it.amount }
     )

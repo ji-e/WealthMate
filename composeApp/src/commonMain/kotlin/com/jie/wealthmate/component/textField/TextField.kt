@@ -2,7 +2,6 @@ package com.jie.wealthmate.component.textField
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -28,11 +27,12 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.TextRange
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.jie.wealthmate.component.LabelText
 import com.jie.wealthmate.component.WMText
 import com.jie.wealthmate.theme.ColorGray
 import com.jie.wealthmate.theme.ColorPrimary
@@ -50,10 +50,12 @@ fun WMTextField(
     readOnlyColor: Color = ColorGray.Gray_700,
     readOnly: Boolean = false,
     enabled: Boolean = true,
+    isRight: Boolean = false,
     label: String? = null,
     placeholder: String? = null,
     supportingText: String? = null,
     supportingContent: @Composable (() -> Unit)? = null,
+    isSupport: Boolean = true,
     isError: Boolean = false,
     isCount: Boolean = false,
     isRequire: Boolean = false,
@@ -94,10 +96,12 @@ fun WMTextField(
         readOnlyColor = readOnlyColor,
         readOnly = readOnly,
         enabled = enabled,
+        isRight = isRight,
         label = label,
         placeholder = placeholder,
         supportingText = supportingText,
         supportingContent = supportingContent,
+        isSupport = isSupport,
         isError = isError,
         isCount = isCount,
         isRequire = isRequire,
@@ -122,10 +126,12 @@ fun WMTextField(
     readOnlyColor: Color = ColorGray.Gray_700,
     readOnly: Boolean = false,
     enabled: Boolean = true,
+    isRight: Boolean = false,
     label: String? = null,
     placeholder: String? = null,
     supportingText: String? = null,
     supportingContent: @Composable (() -> Unit)? = null,
+    isSupport: Boolean = true,
     isError: Boolean = false,
     isCount: Boolean = false,
     isRequire: Boolean = false,
@@ -148,10 +154,10 @@ fun WMTextField(
         disabledTextColor = disabledColor,
         unfocusedTextColor = defaultColor,
         errorTextColor = defaultColor,
-        focusedContainerColor = ColorGray.White,
-        disabledContainerColor = ColorGray.White,
-        unfocusedContainerColor = ColorGray.White,
-        errorContainerColor = ColorGray.White,
+        focusedContainerColor = Color.Transparent,
+        disabledContainerColor = Color.Transparent,
+        unfocusedContainerColor = Color.Transparent,
+        errorContainerColor = Color.Transparent,
         cursorColor = ColorPrimary.Primary_500,
         errorCursorColor = errorColor,
         textSelectionColors = TextSelectionColors(
@@ -173,29 +179,11 @@ fun WMTextField(
 
     Column(modifier = modifier) {
         label?.let {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                WMText(
-                    text = it,
-                    style = Typography().titleSmall.copy(
-                        color = if (enabled.not()) disabledColor
-                        else defaultColor,
-                        fontWeight = FontWeight.SemiBold,
-                    )
-                )
-
-                if (isRequire) {
-                    WMText(
-                        text = "*",
-                        style = Typography().titleSmall.copy(
-                            color = if (enabled.not()) disabledColor else errorColor,
-                            fontWeight = FontWeight.SemiBold,
-                        )
-                    )
-                }
-            }
+            LabelText(
+                text = it,
+                textColor = if (enabled.not()) disabledColor else defaultColor,
+                isRequire = isRequire,
+            )
         }
         Box {
             BasicTextField(
@@ -219,11 +207,12 @@ fun WMTextField(
                 textStyle = Typography().bodyLarge
                     .copy(
                         color =
-                            when {
-                                readOnly -> readOnlyColor
-                                enabled.not() -> disabledColor
-                                else -> defaultColor
-                            },
+                        when {
+                            readOnly -> readOnlyColor
+                            enabled.not() -> disabledColor
+                            else -> defaultColor
+                        },
+                        textAlign = if (isRight) TextAlign.End else TextAlign.Start
                     ),
                 cursorBrush = SolidColor(if (isError) errorColor else ColorPrimary.Primary_500),
                 decorationBox = { innerTextField ->
@@ -239,7 +228,10 @@ fun WMTextField(
                             {
                                 WMText(
                                     text = it,
-                                    style = Typography().bodyLarge
+                                    style = Typography().bodyLarge,
+                                    maxLines = 1,
+                                    textAlign = if (isRight) TextAlign.End else TextAlign.Start,
+                                    modifier = Modifier.fillMaxWidth()
                                 )
                             }
                         },
@@ -287,21 +279,23 @@ fun WMTextField(
             }
         }
 
-        Row(
-            modifier = Modifier
-                .padding(top = 4.dp)
-                .fillMaxWidth()
-                .heightIn(min = 14.dp),
-        ) {
-            WMText(
-                text = supportingText.default(),
-                style = Typography().bodyMedium.copy(color = placeholderColor),
+        if (isSupport) {
+            Row(
                 modifier = Modifier
-                    .weight(1f)
-                    .padding(end = 4.dp)
-            )
+                    .padding(top = 4.dp)
+                    .fillMaxWidth()
+                    .heightIn(min = 14.dp),
+            ) {
+                WMText(
+                    text = supportingText.default(),
+                    style = Typography().bodyMedium.copy(color = placeholderColor),
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(end = 4.dp)
+                )
 
-            supportingContent?.invoke()
+                supportingContent?.invoke()
+            }
         }
     }
 }
