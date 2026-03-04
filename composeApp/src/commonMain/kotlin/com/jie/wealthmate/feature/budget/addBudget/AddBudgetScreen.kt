@@ -27,6 +27,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import cafe.adriel.voyager.navigator.internal.BackHandler
 import com.jie.wealthmate.base.BaseScreen
+import com.jie.wealthmate.base.collectSideEffect
 import com.jie.wealthmate.component.ButtonSize
 import com.jie.wealthmate.component.WMCheckBox
 import com.jie.wealthmate.component.WMFloatingButton
@@ -126,6 +127,12 @@ class AddBudgetScreen() : BaseScreen() {
             }
 
         BackHandler(enabled = true, onBack = onBack)
+
+        screenModel.collectSideEffect { sideEffect ->
+            when (sideEffect) {
+                is AddBudgetUiSideEffect.OnSuccess -> navigator.pop()
+            }
+        }
 
         Column(
             modifier = Modifier.fillMaxSize().imePadding(),
