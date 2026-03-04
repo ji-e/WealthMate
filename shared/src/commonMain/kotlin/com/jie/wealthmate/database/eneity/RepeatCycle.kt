@@ -1,5 +1,6 @@
 package com.jie.wealthmate.database.eneity
 
+import androidx.room.ColumnInfo
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -18,6 +19,7 @@ data class RepeatCycleEntity(
     val repeatCycle: String,        // RepeatCycleEnum
     val dayOfWeek: Int? = null,     // WEEKLY일 때 사용 (1=월, 7=일)
     val dayOfMonth: Int? = null,    // MONTHLY일 때 사용 (1~31)
+    @ColumnInfo(defaultValue = "0")
     val date: Long,
     val startDate: Long,
     val endDate: Long? = null,
@@ -25,6 +27,7 @@ data class RepeatCycleEntity(
     val categoryTagId: String?,
     val paymentMethodId: String?,
     val isActive: Boolean = true, // 반복 중단 여부
+    @ColumnInfo(defaultValue = "0")
     val isModified: Boolean = false,
     val updatedAt: Long = Clock.System.now().toEpochMilliseconds(),
     val isDeleted: Boolean = false,

@@ -11,5 +11,6 @@ data class SyncPayload(
     val installments: List<InstallmentEntity> = emptyList(),
     val repeatCycles: List<RepeatCycleEntity> = emptyList(),
     val paymentMethods: List<PaymentMethodEntity> = emptyList(),
-    val paymentMethodGroups: List<PaymentMethodGroupEntity> = emptyList()
+    val paymentMethodGroups: List<PaymentMethodGroupEntity> = emptyList(),
+    val budgets: List<BudgetEntity> = emptyList()
 )
