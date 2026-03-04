@@ -24,6 +24,8 @@ import com.jie.wealthmate.feature.menu.management.repeatHistoryManagement.repeat
 import com.jie.wealthmate.network.HttpClientFactory
 import com.jie.wealthmate.repository.AuthRepository
 import com.jie.wealthmate.repository.AuthRepositoryImpl
+import com.jie.wealthmate.repository.BudgetRepository
+import com.jie.wealthmate.repository.BudgetRepositoryImpl
 import com.jie.wealthmate.repository.CategoryRepository
 import com.jie.wealthmate.repository.CategoryRepositoryImpl
 import com.jie.wealthmate.repository.GoogleRepository
@@ -54,6 +56,7 @@ val commonModule = module {
     single<HistoryRepository> { HistoryRepositoryImpl(get()) }
     single<InstallmentRepository> { InstallmentRepositoryImpl(get()) }
     single<RepeatCycleRepository> { RepeatCycleRepositoryImpl(get()) }
+    single<BudgetRepository> { BudgetRepositoryImpl(get()) }
 
 
     single { SaveHistoryUseCase(get(), get(), get()) }
@@ -74,7 +77,7 @@ val commonModule = module {
     // 예산
     factory { BudgetScreenModel() }
     factory { BudgetSettingScreenModel() }
-    factory { AddBudgetScreenModel(get()) }
+    factory { AddBudgetScreenModel(get(), get()) }
 
 
     // 메뉴

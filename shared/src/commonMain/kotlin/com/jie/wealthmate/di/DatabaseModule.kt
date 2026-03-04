@@ -2,6 +2,7 @@ package com.jie.wealthmate.di
 
 import com.jie.wealthmate.database.AppDatabase
 import com.jie.wealthmate.database.DatabaseProvider
+import com.jie.wealthmate.database.dao.BudgetDao
 import com.jie.wealthmate.database.dao.CategoryDao
 import com.jie.wealthmate.database.dao.HistoryDao
 import com.jie.wealthmate.database.dao.InstallmentDao
@@ -9,6 +10,8 @@ import com.jie.wealthmate.database.dao.PaymentMethodDao
 import com.jie.wealthmate.database.dao.PaymentMethodGroupDao
 import com.jie.wealthmate.database.dao.RepeatCycleDao
 import com.jie.wealthmate.database.eneity.CategoryConverters
+import com.jie.wealthmate.repository.BudgetRepository
+import com.jie.wealthmate.repository.BudgetRepositoryImpl
 import com.jie.wealthmate.repository.CategoryRepository
 import com.jie.wealthmate.repository.CategoryRepositoryImpl
 import com.jie.wealthmate.repository.GoogleRepository
@@ -43,6 +46,9 @@ val databaseModule = module {
 
     single<RepeatCycleDao> { get<DatabaseProvider>().database.repeatCycleDao() }
     single<RepeatCycleRepository> { RepeatCycleRepositoryImpl(get()) }
+
+    single<BudgetDao> { get<DatabaseProvider>().database.budgetDao() }
+    single<BudgetRepository> { BudgetRepositoryImpl(get()) }
 
     single<GoogleRepository> { GoogleRepositoryImpl(get(), get()) }
 }

@@ -1,5 +1,6 @@
 package com.jie.wealthmate.database.eneity
 
+import androidx.room.ColumnInfo
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -19,6 +20,7 @@ data class HistoryInstallment(
 data class HistoryEntity(
     @PrimaryKey val id: String = uuid4().toString(),
     val largeCategory: String,
+    @ColumnInfo(defaultValue = "0")
     val date: Long,
     val amount: Long,
     val repeatCycleId: String? = null,

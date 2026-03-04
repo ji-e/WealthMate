@@ -6,12 +6,14 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.RoomDatabaseConstructor
 import androidx.room.TypeConverters
+import com.jie.wealthmate.database.dao.BudgetDao
 import com.jie.wealthmate.database.dao.CategoryDao
 import com.jie.wealthmate.database.dao.HistoryDao
 import com.jie.wealthmate.database.dao.InstallmentDao
 import com.jie.wealthmate.database.dao.PaymentMethodDao
 import com.jie.wealthmate.database.dao.PaymentMethodGroupDao
 import com.jie.wealthmate.database.dao.RepeatCycleDao
+import com.jie.wealthmate.database.eneity.BudgetEntity
 import com.jie.wealthmate.database.eneity.CategoryConverters
 import com.jie.wealthmate.database.eneity.CategoryEntity
 import com.jie.wealthmate.database.eneity.HistoryEntity
@@ -19,8 +21,6 @@ import com.jie.wealthmate.database.eneity.InstallmentEntity
 import com.jie.wealthmate.database.eneity.PaymentMethodEntity
 import com.jie.wealthmate.database.eneity.PaymentMethodGroupEntity
 import com.jie.wealthmate.database.eneity.RepeatCycleEntity
-import androidx.room.DeleteColumn
-import androidx.room.migration.AutoMigrationSpec
 
 @Database(
     entities = [
@@ -30,18 +30,14 @@ import androidx.room.migration.AutoMigrationSpec
         HistoryEntity::class,
         InstallmentEntity::class,
         RepeatCycleEntity::class,
+        BudgetEntity::class,
     ],
     version = 1,
-    exportSchema = false,
+    exportSchema = true,
     autoMigrations = [
-//        AutoMigration(from = 1, to = 2)
-//        AutoMigration(from = 1, to = 2, spec = Migration1To2::class),
-//        AutoMigration(from = 2, to = 3),
-//        AutoMigration(from = 3, to = 4)
+//        AutoMigration(from = 1, to = 2),
     ]
 )
-
-
 @TypeConverters(CategoryConverters::class)
 @ConstructedBy(AppDatabaseConstructor::class)
 abstract class AppDatabase : RoomDatabase() {
@@ -51,6 +47,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun historyDao(): HistoryDao
     abstract fun installmentDao(): InstallmentDao
     abstract fun repeatCycleDao(): RepeatCycleDao
+    abstract fun budgetDao(): BudgetDao
 }
 
 @Suppress("KotlinNoActualForExpect")
