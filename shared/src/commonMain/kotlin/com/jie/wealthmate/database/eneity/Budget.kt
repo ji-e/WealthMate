@@ -1,7 +1,9 @@
 package com.jie.wealthmate.database.eneity
 
+import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import androidx.room.Relation
 import com.benasher44.uuid.uuid4
 import kotlinx.serialization.Serializable
 import kotlin.time.Clock
@@ -17,3 +19,15 @@ data class BudgetEntity(
     val updatedAt: Long = Clock.System.now().toEpochMilliseconds(),
     val isDeleted: Boolean = false,
 )
+
+data class BudgetWithDetails(
+    @Embedded val budget: BudgetEntity,
+    @Relation(
+        parentColumn = "categoryId",
+        entityColumn = "id"
+    )
+    val category: CategoryEntity?,
+) {
+    val categoryTag: CategoryTagEntity?
+        get() = category?.tags?.find { it.id == budget.categoryTagId }
+}
