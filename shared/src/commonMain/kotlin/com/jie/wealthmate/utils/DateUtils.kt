@@ -16,6 +16,7 @@ import kotlin.time.Instant
 
 
 const val formatDateHyphen: String = "yyyy-MM-dd"
+const val formatDateHyphenYM: String = "yyyy-MM"
 const val formatDateHyphenYMDE: String = "yyyy-MM-dd (E)"
 
 const val formatDateKor: String = "yyyy년 M월 d일"
@@ -64,10 +65,10 @@ fun String?.convertDateToLocalDate(): LocalDate? {
     try {
         if (this.isNullOrEmpty().not()) {
             val parts = this.split("-")
-            if (parts.size >= 3) {
+            if (parts.isNotEmpty()) {
                 val year = parts[0].toInt()
-                val month = parts[1].toInt()
-                val day = parts[2].toInt()
+                val month = parts.getOrNull(1)?.toIntOrNull() ?: 1
+                val day = parts.getOrNull(2)?.toIntOrNull() ?: 1
                 return LocalDate(year, month, day)
             }
         }
@@ -89,10 +90,12 @@ fun LocalDate?.convertLocalDateToString(
 
     val e =  WeekEnum.creator(this.dayOfWeek.isoDayNumber).korDisplayName
     return when (convertPattern) {
+        formatDateHyphen -> this.toString()
+        formatDateHyphenYM -> "${this.year}-${this.month.number.toString().padStart(2, '0')}"
         formatDateHyphenYMDE -> "$this ($e)"
         formatDateKor -> "${this.year}년 ${this.month.number}월 ${this.day}일"
         formatDateKorYM -> "${this.year}년 ${this.month.number}월"
-        formatDateKorMD -> "${this.month.number}월 ${this.day}일 "
+        formatDateKorMD -> "${this.month.number}월 ${this.day}일"
         formatDateDotYYMD -> "${this.year.toString().takeLast(2)}.${this.month.number}.${this.day}"
         formatDateDotYYMDE -> "${this.year.toString().takeLast(2)}.${this.month.number}.${this.day} ($e)"
         formatDateDotYYYYMDE -> "${this.year}.${this.month.number}.${this.day} ($e)"

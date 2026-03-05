@@ -12,6 +12,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -48,7 +49,9 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.plus
 
 
-class AddBudgetScreen() : BaseScreen() {
+class AddBudgetScreen(
+    val selectedYearMonth: String? = null,
+) : BaseScreen() {
     @Composable
     override fun Content() {
         super.Content()
@@ -67,6 +70,7 @@ class AddBudgetScreen() : BaseScreen() {
         val onMonthChanged = remember(screenModel) {
             { month: LocalDate -> screenModel.updateSelectedMonth(month) }
         }
+
 
         val onBack: () -> Unit = remember(uiState.isDataChanged) {
             {
@@ -127,6 +131,10 @@ class AddBudgetScreen() : BaseScreen() {
             }
 
         BackHandler(enabled = true, onBack = onBack)
+
+        LaunchedEffect(Unit) {
+            screenModel.updateInit(selectedYearMonth)
+        }
 
         screenModel.collectSideEffect { sideEffect ->
             when (sideEffect) {

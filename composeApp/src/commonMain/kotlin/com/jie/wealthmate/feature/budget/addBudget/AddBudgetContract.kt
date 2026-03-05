@@ -18,7 +18,7 @@ data class AddBudgetUiState(
     val selectedMonth: LocalDate = today,
     val selectedLargeCategory: LargeCategoryEnum = LargeCategoryEnum.INCOME,
     val isCategoryTagInclude: Boolean = false,
-    val remainBudget: Long = 5000000L,
+    val remainBudget: Long = 0L,
     val incomeCategoryItems: ImmutableList<CategoryVo> = persistentListOf(),
     val expensesCategoryItems: ImmutableList<CategoryVo> = persistentListOf(),
     val savingCategoryItems: ImmutableList<CategoryVo> = persistentListOf(),
