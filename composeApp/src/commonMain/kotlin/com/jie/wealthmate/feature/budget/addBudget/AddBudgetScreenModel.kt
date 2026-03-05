@@ -6,13 +6,15 @@ import com.jie.wealthmate.database.eneity.BudgetEntity
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.repository.BudgetRepository
 import com.jie.wealthmate.repository.CategoryRepository
+import com.jie.wealthmate.utils.convertDateToLocalDate
+import com.jie.wealthmate.utils.convertLocalDateToString
+import com.jie.wealthmate.utils.formatDateHyphenYM
 import com.jie.wealthmate.utils.today
 import com.jie.wealthmate.vo.CategoryVo
 import com.jie.wealthmate.vo.CategoryVo.Companion.mapperToVo
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.collections.immutable.toImmutableMap
 import kotlinx.datetime.LocalDate
-import kotlinx.datetime.number
 
 class AddBudgetScreenModel(
     private val categoryRepository: CategoryRepository,
@@ -24,6 +26,16 @@ class AddBudgetScreenModel(
 
     init {
         LargeCategoryEnum.entries.forEach { getCategories(it) }
+    }
+
+    fun updateInit(yearMonth: String?) {
+        yearMonth ?: return
+
+        reduceState { state ->
+            state.copy(
+                selectedMonth = yearMonth.convertDateToLocalDate() ?: today
+            )
+        }
     }
 
     fun updateSelectedMonth(month: LocalDate = today) {
@@ -249,9 +261,7 @@ class AddBudgetScreenModel(
 
     fun saveBudget() {
         val state = container.uiState.value
-        val yearMonth = "${state.selectedMonth.year}-${
-            state.selectedMonth.month.number.toString().padStart(2, '0')
-        }"
+        val yearMonth = state.selectedMonth.convertLocalDateToString(formatDateHyphenYM)
         val budgets = mutableListOf<BudgetEntity>()
 
         listOf(
