@@ -2,6 +2,7 @@ package com.jie.wealthmate.feature.budget.addBudget
 
 import androidx.compose.ui.text.input.TextFieldValue
 import com.jie.wealthmate.base.BaseUiState
+import com.jie.wealthmate.base.UiSideEffect
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.utils.default
 import com.jie.wealthmate.utils.today
@@ -38,3 +39,8 @@ data class AddBudgetUiState(
             }
         }
 }
+
+sealed class AddBudgetUiSideEffect : UiSideEffect {
+    data object OnSuccess : AddBudgetUiSideEffect()
+}
+
