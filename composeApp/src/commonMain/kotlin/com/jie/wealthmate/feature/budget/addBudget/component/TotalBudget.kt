@@ -13,7 +13,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.jie.wealthmate.component.LabelText
 import com.jie.wealthmate.component.WMText
 import com.jie.wealthmate.theme.ColorGray
 import com.jie.wealthmate.theme.noRippleClickable
@@ -51,10 +50,7 @@ fun TotalBudget(
             ) {
                 WMText(
                     text = displaySelectedMonth,
-                    style = MaterialTheme.typography.titleMedium.copy(
-                        fontWeight = FontWeight.SemiBold,
-                        color = ColorGray.Gray_700
-                    )
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold,)
                 )
                 Icon(
                     painter = painterResource(Res.drawable.ic_arrow_drop_down),
@@ -64,9 +60,10 @@ fun TotalBudget(
                 )
             }
 
-            LabelText(
+            WMText(
                 text = "총 예산 (수입)",
-                modifier = Modifier.padding(start = 4.dp)
+                modifier = Modifier.padding(start = 4.dp),
+                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold,)
             )
         }
 

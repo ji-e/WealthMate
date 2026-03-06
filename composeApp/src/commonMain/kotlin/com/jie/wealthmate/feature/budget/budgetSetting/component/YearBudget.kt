@@ -102,7 +102,7 @@ private fun SummaryCard(
         modifier = modifier
             .clip(RoundedCornerShape(8.dp))
             .background(ColorGray.White)
-            .padding(8.dp),
+            .padding(10.dp),
         verticalArrangement = Arrangement.spacedBy(2.dp)
     ) {
         WMText(
