@@ -110,8 +110,8 @@ class HomeScreen() : Screen {
                     .padding(horizontal = 28.dp)
                     .padding(top = 32.dp),
                 statusType = uiState.statusType,
-                currentData = List(31) { if (it < 12) (it + (it % 7)) / 100f else null },
-                lastData = List(31) { (it + (it % 9)) / 100f }
+                currentData = uiState.currentExpensesData,
+                lastData = uiState.lastExpensesData
             )
 
             CategorySegmentedChart(

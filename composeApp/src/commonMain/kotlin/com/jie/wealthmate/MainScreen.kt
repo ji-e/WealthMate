@@ -128,37 +128,37 @@ open class MainScreen : Screen {
                 ) {
                     when (uiState.selectedItem) {
                         BottomNavItem.Home.route -> {
-                            Navigator(homeScreen) { navigator ->
+                            Navigator(homeScreen) { innerNavigator ->
                                 CurrentScreen()
-                                LaunchedEffect(navigator.lastItem) {
-                                    isBottomNaviVisible = (navigator.lastItem is HomeScreen)
+                                LaunchedEffect(innerNavigator.lastItem) {
+                                    isBottomNaviVisible = (innerNavigator.lastItem is HomeScreen)
                                 }
                             }
                         }
 
                         BottomNavItem.Calendar.route -> {
-                            Navigator(calendarScreen) { navigator ->
+                            Navigator(calendarScreen) { innerNavigator ->
                                 CurrentScreen()
-                                LaunchedEffect(navigator.lastItem) {
-                                    isBottomNaviVisible = (navigator.lastItem is CalendarScreen)
+                                LaunchedEffect(innerNavigator.lastItem) {
+                                    isBottomNaviVisible = (innerNavigator.lastItem is CalendarScreen)
                                 }
                             }
                         }
 
                         BottomNavItem.Budget.route -> {
-                            Navigator(budgetScreen) { navigator ->
+                            Navigator(budgetScreen) { innerNavigator ->
                                 CurrentScreen()
-                                LaunchedEffect(navigator.lastItem) {
-                                    isBottomNaviVisible = (navigator.lastItem is BudgetScreen)
+                                LaunchedEffect(innerNavigator.lastItem) {
+                                    isBottomNaviVisible = (innerNavigator.lastItem is BudgetScreen)
                                 }
                             }
                         }
 
                         BottomNavItem.Menu.route -> {
-                            Navigator(menuScreen) { navigator ->
+                            Navigator(menuScreen) { innerNavigator ->
                                 CurrentScreen()
-                                LaunchedEffect(navigator.lastItem) {
-                                    isBottomNaviVisible = (navigator.lastItem is MenuScreen)
+                                LaunchedEffect(innerNavigator.lastItem) {
+                                    isBottomNaviVisible = (innerNavigator.lastItem is MenuScreen)
                                 }
                             }
                         }

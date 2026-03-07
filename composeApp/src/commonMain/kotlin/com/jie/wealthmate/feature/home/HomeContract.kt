@@ -12,12 +12,14 @@ import kotlinx.collections.immutable.toImmutableList
 
 data class HomeUiState(
     val statusType: StatusType = StatusType.MONTH,
-    val todayAmount: Long = 120000,
-    val budgetAmount: Long = 7000000,
+    val todayAmount: Long = 0,
+    val budgetAmount: Long = 0,
     val currentAmount: Amount? = null,
     val lastAmount: Amount? = null,
     val categorySegment: List<CategorySegmentChartData> = emptyList(),
     val paymentMethodSegment: List<PaymentMethodSegmentChartData> = emptyList(),
+    val currentExpensesData: List<Float?> = emptyList(),
+    val lastExpensesData: List<Float> = emptyList(),
 ) : BaseUiState {
     val ectCategorySegmentChartData = CategorySegmentChartData(
         category = CategoryVo(
@@ -44,7 +46,6 @@ data class HomeUiState(
         amount = currentAmount?.expensesAmount.default() - paymentMethodSegment.sumOf { it.amount }
     )
 
-    // temp
     val categorySegmentChartItems: List<CategorySegmentChartData>
         get() {
             return if (categorySegment.size >= 5) {
@@ -86,4 +87,3 @@ enum class StatusType(val label: String, val lastLabel: String) {
         lastLabel = "지난 해"
     )
 }
-
