@@ -335,19 +335,24 @@ private fun BudgetSummaryItem(
     modifier: Modifier = Modifier,
     targetLabel: String = "목표",
 ) {
-    Column(modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(2.dp)) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(2.dp)
+    ) {
         WMText(
             text = label,
-            style = typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold),
+            style = typography.bodyMedium.copy(
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 13.sp
+            ),
         )
         WMText(
             text = "${formatWithCommas(actualAmount.toString())}원",
-            style = typography.bodyMedium,
+            style = typography.bodyLarge.copy(fontWeight = FontWeight.Medium),
             maxLines = 1,
             autoSize = TextAutoSize.StepBased(
                 minFontSize = 9.sp,
-                maxFontSize = 14.sp,
+                maxFontSize = 15.sp,
                 stepSize = 1.sp
             )
         )
