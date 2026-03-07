@@ -56,15 +56,20 @@ fun ExpensesLineChart(
     // 데이터 전처리 및 인덱스 계산 최적화
     val validDataCount = remember(currentData) { currentData.count { it != null } }
     val todayIndex = remember(statusType, currentData.size) {
-        val rawIndex = when (statusType) {
-            StatusType.WEEK -> today.dayOfWeek.isoDayNumber
-            StatusType.MONTH -> today.day
-            StatusType.YEAR -> today.month.number
-        } -1
-        rawIndex.coerceIn(0, currentData.size - 1)
+        if (currentData.isEmpty()) {
+            -1
+        } else {
+            val rawIndex = when (statusType) {
+                StatusType.WEEK -> today.dayOfWeek.isoDayNumber
+                StatusType.MONTH -> today.day
+                StatusType.YEAR -> today.month.number
+            } - 1
+            rawIndex.coerceIn(0, currentData.size - 1)
+        }
     }
     val todayDataIndex = remember(currentData, todayIndex) {
-        currentData.take(todayIndex + 1).count { it != null }
+        if (todayIndex == -1) 0
+        else currentData.take(todayIndex + 1).count { it != null }
     }
 
     Column(modifier = modifier.fillMaxWidth()) {
@@ -160,7 +165,7 @@ fun ExpensesLineChart(
                 )
 
                 // 3. 오늘 지점 강조
-                if (todayDataIndex <= pointsToShow) {
+                if (todayIndex != -1 && todayDataIndex <= pointsToShow) {
                     currentData.getOrNull(todayIndex)?.let { todayValue ->
                         drawCircle(
                             color = ColorRed.Red_300,
