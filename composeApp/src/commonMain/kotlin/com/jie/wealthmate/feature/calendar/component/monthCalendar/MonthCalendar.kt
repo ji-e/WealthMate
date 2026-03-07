@@ -62,6 +62,7 @@ import wealthmate.composeapp.generated.resources.ic_arrow_drop_down
 import wealthmate.composeapp.generated.resources.ic_calendar_today
 import wealthmate.composeapp.generated.resources.ic_horizontal_rule
 import wealthmate.composeapp.generated.resources.ic_more_vert
+import wealthmate.composeapp.generated.resources.ic_search
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -273,6 +274,7 @@ private fun MonthCalendarHeader(
                 )
             }
         }
+        WMIconButton(iconRes = Res.drawable.ic_search, contentDescription = "검색", onClick = {})
         WMIconButton(iconRes = Res.drawable.ic_more_vert, contentDescription = "더보기", onClick = {})
     }
 }
