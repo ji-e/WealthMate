@@ -21,6 +21,7 @@ import com.jie.wealthmate.feature.menu.management.paymentMethodManagement.paymen
 import com.jie.wealthmate.feature.menu.management.repeatHistoryManagement.RepeatHistoryManagementScreenModel
 import com.jie.wealthmate.feature.menu.management.repeatHistoryManagement.addRepeatHistory.AddRepeatHistoryScreenModel
 import com.jie.wealthmate.feature.menu.management.repeatHistoryManagement.repeatHistoryDetail.RepeatHistoryDetailScreenModel
+import com.jie.wealthmate.feature.search.SearchScreenModel
 import com.jie.wealthmate.network.HttpClientFactory
 import com.jie.wealthmate.repository.AuthRepository
 import com.jie.wealthmate.repository.AuthRepositoryImpl
@@ -95,5 +96,8 @@ val commonModule = module {
 
     factory { GoogleCloudSyncScreenModel(get(), get(), get()) }
     factory { GoogleCloudShareScreenModel(get(), get(), get()) }
+
+    // 검색
+    factory { SearchScreenModel() }
 
 }
