@@ -21,6 +21,7 @@ import com.jie.wealthmate.feature.calendar.component.SelectedCalendarModalBottom
 import com.jie.wealthmate.feature.calendar.component.listCalendar.ListCalendar
 import com.jie.wealthmate.feature.calendar.component.monthCalendar.MonthCalendar
 import com.jie.wealthmate.feature.calendar.historyDetail.HistoryDetailScreen
+import com.jie.wealthmate.feature.search.SearchScreen
 import com.jie.wealthmate.utils.today
 import com.jie.wealthmate.vo.HistoryVo
 import kotlinx.datetime.DateTimeUnit
@@ -78,6 +79,7 @@ class CalendarScreen() : BaseScreen() {
                     historyItems = uiState.histories,
                     onMonthChanged = onMonthChanged,
                     onTodayClick = { screenModel.updateSelectedMonth() },
+                    onSearchClick = { navigator.push(SearchScreen()) },
                     onSelectedMonthClick = { isShowSelectedCalendarModalBottomSheet = true },
                     onDateClick = onDateChanged,
                     bottomContent = {

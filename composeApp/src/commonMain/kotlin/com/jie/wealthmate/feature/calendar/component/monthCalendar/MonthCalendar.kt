@@ -73,6 +73,7 @@ fun MonthCalendar(
     historyItems: List<HistoryVo> = emptyList(),
     onMonthChanged: (LocalDate) -> Unit = {},
     onTodayClick: () -> Unit = {},
+    onSearchClick: () -> Unit = {},
     onSelectedMonthClick: () -> Unit = {},
     onDateClick: (LocalDate) -> Unit = {},
     bottomContent: @Composable () -> Unit = {},
@@ -111,6 +112,7 @@ fun MonthCalendar(
         MonthCalendarHeader(
             displaySelectedMonth = displaySelectedMonth,
             onTodayClick = onTodayClick,
+            onSearchClick = onSearchClick,
             onSelectedMonthClick = onSelectedMonthClick,
         )
         WeekHeader()
@@ -237,6 +239,7 @@ private fun CollapsibleCalendarContent(
 private fun MonthCalendarHeader(
     displaySelectedMonth: String,
     onTodayClick: () -> Unit,
+    onSearchClick: () -> Unit,
     onSelectedMonthClick: () -> Unit,
 ) {
     Row(
@@ -274,7 +277,7 @@ private fun MonthCalendarHeader(
                 )
             }
         }
-        WMIconButton(iconRes = Res.drawable.ic_search, contentDescription = "검색", onClick = {})
+        WMIconButton(iconRes = Res.drawable.ic_search, contentDescription = "검색", onClick = onSearchClick)
         WMIconButton(iconRes = Res.drawable.ic_more_vert, contentDescription = "더보기", onClick = {})
     }
 }
