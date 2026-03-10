@@ -19,11 +19,11 @@ import com.jie.wealthmate.theme.noRippleClickable
 import org.jetbrains.compose.resources.painterResource
 import wealthmate.composeapp.generated.resources.Res
 import wealthmate.composeapp.generated.resources.ic_check_circle
-import wealthmate.composeapp.generated.resources.ic_circle_outline
 
 @Composable
 fun WMCheckBox(
     modifier: Modifier = Modifier,
+    iconModifier: Modifier = Modifier,
     label: String? = null,
     labelStyle: TextStyle = Typography().titleMedium.copy(fontWeight = FontWeight.Medium),
     checked: Boolean,
@@ -36,11 +36,11 @@ fun WMCheckBox(
     ) {
 
         Icon(
-            painter = painterResource(if (checked) Res.drawable.ic_check_circle else Res.drawable.ic_circle_outline),
+            painter = painterResource(Res.drawable.ic_check_circle),
             contentDescription = null,
-            modifier = Modifier
+            modifier = iconModifier
                 .noRippleClickable(enabled) { onCheckedChange(checked.not()) }
-                .padding(end = 8.dp)
+                .padding(end = 4.dp)
                 .size(24.dp),
             tint = when {
                 enabled.not() -> ColorGray.Gray_100
