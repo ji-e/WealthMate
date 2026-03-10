@@ -22,6 +22,8 @@ interface CategoryRepository {
 
     suspend fun getCategoryById(categoryId: String): CategoryEntity?
 
+    fun getAllCategories(): Flow<List<CategoryEntity>>
+
     fun getCategoriesByLargeCategory(largeCategory: String): Flow<List<CategoryEntity>>
 
 }

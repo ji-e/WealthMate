@@ -62,25 +62,27 @@ class CategoryRepositoryImpl(private val databaseProvider: DatabaseProvider) : C
         }
     }
 
-    override suspend fun updateCategory(category: CategoryEntity) = withContext(Dispatchers.Default) {
-        loggedCall(
-            repositoryName = repoName,
-            methodName = "updateCategory",
-            params = mapOf("category" to category)
-        ) {
-            dao.update(category.copy(updatedAt = Clock.System.now().toEpochMilliseconds()))
+    override suspend fun updateCategory(category: CategoryEntity) =
+        withContext(Dispatchers.Default) {
+            loggedCall(
+                repositoryName = repoName,
+                methodName = "updateCategory",
+                params = mapOf("category" to category)
+            ) {
+                dao.update(category.copy(updatedAt = Clock.System.now().toEpochMilliseconds()))
+            }
         }
-    }
 
-    override suspend fun updateCategoriesSort(updates: List<Pair<String, Long>>) = withContext(Dispatchers.Default) {
-        loggedCall(
-            repositoryName = repoName,
-            methodName = "updateCategoriesSort",
-            params = mapOf("updates" to updates)
-        ) {
-            dao.updateCategoriesSort(updates)
+    override suspend fun updateCategoriesSort(updates: List<Pair<String, Long>>) =
+        withContext(Dispatchers.Default) {
+            loggedCall(
+                repositoryName = repoName,
+                methodName = "updateCategoriesSort",
+                params = mapOf("updates" to updates)
+            ) {
+                dao.updateCategoriesSort(updates)
+            }
         }
-    }
 
     override suspend fun deleteCategory(categoryId: String) = withContext(Dispatchers.Default) {
         loggedCall(
@@ -92,15 +94,26 @@ class CategoryRepositoryImpl(private val databaseProvider: DatabaseProvider) : C
         }
     }
 
-    override suspend fun getCategoryById(categoryId: String): CategoryEntity? = withContext(Dispatchers.Default) {
-        loggedCall(
-            repositoryName = repoName,
-            methodName = "getCategoryById",
-            params = mapOf("categoryId" to categoryId)
-        ) {
-            dao.getById(categoryId)
+    override suspend fun getCategoryById(categoryId: String): CategoryEntity? =
+        withContext(Dispatchers.Default) {
+            loggedCall(
+                repositoryName = repoName,
+                methodName = "getCategoryById",
+                params = mapOf("categoryId" to categoryId)
+            ) {
+                dao.getById(categoryId)
+            }
         }
-    }
+
+    override fun getAllCategories(): Flow<List<CategoryEntity>> =
+        loggedFlow(
+            repositoryName = repoName,
+            methodName = "getCategories",
+            params = mapOf()
+        ) {
+            dao.getAll()
+        }.flowOn(Dispatchers.Default) // DB 조회 및 로그 처리를 백그라운드 스레드에서 실행
+
 
     override fun getCategoriesByLargeCategory(largeCategory: String): Flow<List<CategoryEntity>> =
         loggedFlow(
