@@ -341,7 +341,8 @@ fun WMSearchTextField(
                     }
                 }
             },
-            modifier = Modifier.weight(1f)
+            modifier = Modifier.weight(1f),
+            isSupport = false
         )
 
         WMIconButton(
