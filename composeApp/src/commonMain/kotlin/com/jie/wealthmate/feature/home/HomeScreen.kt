@@ -65,17 +65,17 @@ class HomeScreen() : Screen {
                     .padding(horizontal = 28.dp)
                     .padding(top = 24.dp),
                 todayAmount = uiState.todayAmount,
-                budgetAmount = uiState.budgetAmount,
-                expensesAmount = uiState.currentAmount?.expensesAmount.default()
+                budgetAmount = uiState.thisMonthBudgetAmount,
+                expensesAmount = uiState.thisMonthExpensesAmount
             )
 
-            if (uiState.budgetAmount > 0L) {
+            if (uiState.thisMonthBudgetAmount > 0L) {
                 RemainBudget(
                     modifier = Modifier
                         .padding(horizontal = 32.dp)
                         .padding(top = 36.dp),
-                    budgetAmount = uiState.budgetAmount,
-                    expensesAmount = uiState.currentAmount?.expensesAmount.default()
+                    budgetAmount = uiState.thisMonthBudgetAmount,
+                    expensesAmount = uiState.thisMonthExpensesAmount
                 )
             }
 
