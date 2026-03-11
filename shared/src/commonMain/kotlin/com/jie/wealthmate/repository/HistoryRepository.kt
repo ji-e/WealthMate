@@ -41,4 +41,13 @@ interface HistoryRepository {
         limit: Int,
         offset: Int
     ): List<HistoryWithDetails>
+
+    suspend fun getSearchSummary(
+        query: String,
+        startDate: Long?,
+        endDate: Long?,
+        largeCategories: List<String>,
+        categoryIds: List<String>,
+        paymentMethodIds: List<String>
+    ): Map<String, Long>
 }
