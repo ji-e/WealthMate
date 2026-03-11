@@ -14,7 +14,9 @@ import com.jie.wealthmate.vo.HistoryVo.Companion.mapperToVo
 import com.jie.wealthmate.vo.PaymentMethodVo
 import com.jie.wealthmate.vo.PaymentMethodVo.Companion.mapperToVo
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.persistentMapOf
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.collections.immutable.toImmutableMap
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.Job
@@ -75,7 +77,7 @@ class SearchScreenModel(
     }
 
     fun clearQuery() {
-        reduceState { it.copy(query = TextFieldValue(""), searchResults = persistentListOf()) }
+        reduceState { it.copy(query = TextFieldValue(""), searchResults = persistentListOf(), summary = persistentMapOf()) }
         search(isFirstPage = true)
     }
 
@@ -90,6 +92,21 @@ class SearchScreenModel(
             val offset = if (isFirstPage) 0 else currentState.offset
 
             try {
+                // Fetch summary only on the first page load or when filters change
+                if (isFirstPage) {
+                    val summaryMap = historyRepository.getSearchSummary(
+                        query = currentState.query.text,
+                        startDate = currentState.startDate?.toEpochMilliseconds(),
+                        endDate = currentState.endDate?.toEpochMilliseconds(),
+                        largeCategories = currentState.selectedLargeCategories.map { it.name },
+                        categoryIds = currentState.selectedCategories.map { it.id },
+                        paymentMethodIds = currentState.selectedPaymentMethods.map { it.id }
+                    ).mapKeys { LargeCategoryEnum.creator(it.key) }
+                        .toImmutableMap()
+                    
+                    reduceState { it.copy(summary = summaryMap) }
+                }
+
                 val results = historyRepository.searchHistories(
                     query = currentState.query.text,
                     sortOrder = currentState.sortOrder.name,
@@ -176,7 +193,8 @@ class SearchScreenModel(
                 startDate = null,
                 endDate = null,
                 sortOrder = SearchSortOrder.LATEST,
-                query = TextFieldValue("")
+                query = TextFieldValue(""),
+                summary = persistentMapOf()
             )
         }
         search(isFirstPage = true)
