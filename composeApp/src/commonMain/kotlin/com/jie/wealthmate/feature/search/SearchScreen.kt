@@ -22,6 +22,7 @@ import com.jie.wealthmate.component.WMMultiListSelectionModalBottomSheet
 import com.jie.wealthmate.component.topbar.TopBarItem
 import com.jie.wealthmate.component.topbar.WMTopBar
 import com.jie.wealthmate.component.textField.WMSearchTextField
+import com.jie.wealthmate.feature.calendar.historyDetail.HistoryDetailScreen
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.feature.search.component.DateRangeSelectModalBottomSheet
 import com.jie.wealthmate.feature.search.component.SearchFilterRow
@@ -80,7 +81,14 @@ class SearchScreen : BaseScreen() {
                 isLoading = uiState.isLoading,
                 hasMore = uiState.hasMore,
                 onLoadMore = screenModel::loadMore,
-                onHistoryClick = { /* TODO: Navigate to detail */ }
+                onHistoryClick = { history ->
+                    navigator.push(
+                        HistoryDetailScreen(
+                            largeCategory = history.largeCategory,
+                            historyId = history.id
+                        )
+                    )
+                }
             )
         }
 
