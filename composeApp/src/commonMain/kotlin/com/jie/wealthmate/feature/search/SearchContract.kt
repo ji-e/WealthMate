@@ -22,6 +22,9 @@ data class SearchUiState(
     val selectedCategories: List<CategoryVo> = emptyList(),
     val selectedPaymentMethods: List<PaymentMethodVo> = emptyList(),
     val searchResults: ImmutableList<HistoryVo> = persistentListOf(),
+    val isLoading: Boolean = false,
+    val hasMore: Boolean = true,
+    val offset: Int = 0
 ) : BaseUiState
 
 enum class SearchSortOrder(val label: String) {

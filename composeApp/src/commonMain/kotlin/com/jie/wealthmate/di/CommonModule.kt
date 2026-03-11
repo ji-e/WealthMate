@@ -98,6 +98,6 @@ val commonModule = module {
     factory { GoogleCloudShareScreenModel(get(), get(), get()) }
 
     // 검색
-    factory { SearchScreenModel(get(), get()) }
+    factory { SearchScreenModel(get(), get(), get()) }
 
 }

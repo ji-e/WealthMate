@@ -43,7 +43,7 @@ data class HistoryVo(
             val parts = listOfNotNull(
                 categoryPart.takeIf { it.isNotBlank() },
                 paymentMethod?.label?.takeIf { it.isNotBlank() },
-                content?.takeIf { it.isNotBlank() },
+//                content?.takeIf { it.isNotBlank() },
                 installment?.let { "할부 $installmentTime/${it.count}회차" }
             )
 
