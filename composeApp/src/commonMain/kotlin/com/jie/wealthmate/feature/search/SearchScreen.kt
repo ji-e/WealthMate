@@ -2,6 +2,7 @@ package com.jie.wealthmate.feature.search
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -15,6 +16,7 @@ import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.jie.wealthmate.base.BaseScreen
+import com.jie.wealthmate.feature.search.component.CategoryMultiSelectModalBottomSheet
 import com.jie.wealthmate.component.WMListSelectionModalBottomSheet
 import com.jie.wealthmate.component.WMMultiListSelectionModalBottomSheet
 import com.jie.wealthmate.component.topbar.TopBarItem
@@ -40,7 +42,7 @@ class SearchScreen : BaseScreen() {
         var showCategoryBottomSheet by remember { mutableStateOf(false) }
         var showPaymentMethodBottomSheet by remember { mutableStateOf(false) }
 
-        Column(modifier = Modifier.fillMaxSize()) {
+        Column(modifier = Modifier.fillMaxSize().imePadding()) {
             WMTopBar(
                 title = TopBarItem.Title("내역 검색"),
                 readingItem = TopBarItem.ReadingItem().copy(action = { navigator.pop() }),
@@ -64,8 +66,6 @@ class SearchScreen : BaseScreen() {
                 selectedLargeCategories = uiState.selectedLargeCategories,
                 selectedCategories = uiState.selectedCategories,
                 selectedPaymentMethods = uiState.selectedPaymentMethods,
-                totalPaymentMethods = uiState.paymentMethods.size,
-                totalCategories = uiState.categories.size,
                 onSortClick = { showSortBottomSheet = true },
                 onPeriodClick = { showDateRangeBottomSheet = true },
                 onCategoryClick = { showCategoryBottomSheet = true },
@@ -116,19 +116,15 @@ class SearchScreen : BaseScreen() {
         }
 
         if (showCategoryBottomSheet) {
-            val filteredCategories = if (uiState.selectedLargeCategories.isNotEmpty()) {
-                uiState.categories.filter { uiState.selectedLargeCategories.contains(it.largeCategory) }
-            } else {
-                uiState.categories
-            }
-
-            WMMultiListSelectionModalBottomSheet(
+            CategoryMultiSelectModalBottomSheet(
                 title = "카테고리",
-                items = filteredCategories,
-                selectedItems = uiState.selectedCategories,
-                itemLabel = { "${it.largeCategory.label} > ${it.middleLabel} ${if (it.isFixed) "| 고정" else ""}" },
+                categories = uiState.filteredCategories,
+                selectedCategories = uiState.selectedCategories,
                 onItemsSelected = screenModel::updateCategories,
-                onDismissRequest = { showCategoryBottomSheet = false }
+                onDismissRequest = { showCategoryBottomSheet = false },
+                showHeaders = true,
+                showUnset = true,
+                largeCategoryFilter = uiState.selectedLargeCategories
             )
         }
 

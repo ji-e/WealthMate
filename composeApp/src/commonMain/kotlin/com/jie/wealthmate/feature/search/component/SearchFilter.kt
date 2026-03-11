@@ -13,6 +13,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -43,8 +44,6 @@ fun SearchFilterRow(
     selectedLargeCategories: List<LargeCategoryEnum> = emptyList(),
     selectedCategories: List<CategoryVo> = emptyList(),
     selectedPaymentMethods: List<PaymentMethodVo> = emptyList(),
-    totalCategories: Int = 0,
-    totalPaymentMethods: Int = 0,
     onSortClick: () -> Unit = {},
     onPeriodClick: () -> Unit = {},
     onLargeCategoryClick: () -> Unit = {},
@@ -52,54 +51,46 @@ fun SearchFilterRow(
     onPaymentMethodClick: () -> Unit = {},
     onResetClick: () -> Unit = {},
 ) {
-    val periodLabel = when {
-        startDate != null && endDate != null -> {
-            if (startDate == endDate) {
-                startDate.convertLocalDateToString(formatDateDotYYMD)
-            } else {
-                "${startDate.convertLocalDateToString(formatDateDotYYMD)}~${
-                    endDate.convertLocalDateToString(
-                        formatDateDotYYMD
-                    )
-                }"
+    val periodLabel = remember(startDate, endDate) {
+        val startStr = startDate?.convertLocalDateToString(formatDateDotYYMD)
+        val endStr = endDate?.convertLocalDateToString(formatDateDotYYMD)
+        when {
+            startStr != null && endStr != null -> if (startStr == endStr) startStr else "$startStr~$endStr"
+            startStr != null -> startStr
+            endStr != null -> endStr
+            else -> "기간"
+        }
+    }
+
+    val typeLabel = remember(selectedLargeCategories) {
+        // 기준 순서대로 정렬하여 라벨 생성
+        val sorted = selectedLargeCategories.sortedBy {
+            when (it) {
+                LargeCategoryEnum.INCOME -> 0
+                LargeCategoryEnum.SAVING -> 1
+                LargeCategoryEnum.EXPENSES -> 2
             }
         }
-
-        startDate != null -> startDate.convertLocalDateToString(formatDateDotYYMD)
-        endDate != null -> endDate.convertLocalDateToString(formatDateDotYYMD)
-        else -> "기간"
+        getFilterLabel(sorted, "거래구분") { it.label }
     }
 
-    val typeLabel = when {
-        selectedLargeCategories.isEmpty() ||
-                selectedLargeCategories.size == LargeCategoryEnum.entries.size -> "거래구분"
-
-        selectedLargeCategories.size == 1 -> selectedLargeCategories.first().label
-        else -> "${selectedLargeCategories.first().label} 외 ${selectedLargeCategories.size - 1}"
+    val categoryLabel = remember(selectedCategories) {
+        // 기준 순서대로 정렬하여 라벨 생성 (거래구분 우선, 그 다음 이름순)
+        val sorted = selectedCategories.sortedWith(
+            compareBy<CategoryVo> {
+                when (it.largeCategory) {
+                    LargeCategoryEnum.INCOME -> 0
+                    LargeCategoryEnum.SAVING -> 1
+                    LargeCategoryEnum.EXPENSES -> 2
+                }
+            }.thenBy { it.middleLabel }
+        )
+        getFilterLabel(sorted, "카테고리") { it.middleLabel }
     }
 
-    val categoryLabel = when {
-        selectedCategories.isEmpty() ||
-                (totalCategories > 0 && selectedCategories.size == totalCategories) -> "카테고리"
-
-        selectedCategories.size == 1 -> selectedCategories.first().middleLabel
-        else -> "${selectedCategories.first().middleLabel} 외 ${selectedCategories.size - 1}"
+    val paymentMethodLabel = remember(selectedPaymentMethods) {
+        getFilterLabel(selectedPaymentMethods, "결제수단") { it.label }
     }
-
-    val paymentMethodLabel = when {
-        selectedPaymentMethods.isEmpty() ||
-                (totalPaymentMethods > 0 && selectedPaymentMethods.size == totalPaymentMethods) -> "결제수단"
-
-        selectedPaymentMethods.size == 1 -> selectedPaymentMethods.first().label
-        else -> "${selectedPaymentMethods.first().label} 외 ${selectedPaymentMethods.size - 1}"
-    }
-
-    val isTypeSelected = selectedLargeCategories.isNotEmpty() &&
-            selectedLargeCategories.size != LargeCategoryEnum.entries.size
-    val isCategorySelected = (selectedCategories.isNotEmpty() &&
-            (totalCategories > 0 && selectedCategories.size != totalCategories))
-    val isPaymentMethodSelected = selectedPaymentMethods.isNotEmpty() &&
-            (totalPaymentMethods > 0 && selectedPaymentMethods.size != totalPaymentMethods)
 
     LazyRow(
         modifier = modifier,
@@ -107,13 +98,6 @@ fun SearchFilterRow(
         horizontalArrangement = Arrangement.spacedBy(4.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        item {
-            SearchFilterChip(
-                label = sortOrder.label,
-                isSelected = true,
-                onClick = onSortClick
-            )
-        }
         item {
             SearchFilterChip(
                 label = periodLabel,
@@ -124,22 +108,29 @@ fun SearchFilterRow(
         item {
             SearchFilterChip(
                 label = typeLabel,
-                isSelected = isTypeSelected,
+                isSelected = selectedLargeCategories.isNotEmpty(),
                 onClick = onLargeCategoryClick
             )
         }
         item {
             SearchFilterChip(
                 label = categoryLabel,
-                isSelected = isCategorySelected,
+                isSelected = selectedCategories.isNotEmpty(),
                 onClick = onCategoryClick
             )
         }
         item {
             SearchFilterChip(
                 label = paymentMethodLabel,
-                isSelected = isPaymentMethodSelected,
+                isSelected = selectedPaymentMethods.isNotEmpty(),
                 onClick = onPaymentMethodClick
+            )
+        }
+        item {
+            SearchFilterChip(
+                label = sortOrder.label,
+                isSelected = true,
+                onClick = onSortClick
             )
         }
         item {
@@ -148,18 +139,33 @@ fun SearchFilterRow(
     }
 }
 
+/**
+ * 필터 라벨 생성을 위한 공통 헬퍼 함수
+ */
+private fun <T> getFilterLabel(
+    items: List<T>,
+    defaultLabel: String,
+    labelSelector: (T) -> String
+): String {
+    return when {
+        items.isEmpty() -> defaultLabel
+        items.size == 1 -> labelSelector(items.first())
+        else -> "${labelSelector(items.first())} 외 ${items.size - 1}"
+    }
+}
+
 @Composable
 fun SearchFilterChip(
     label: String,
+    modifier: Modifier = Modifier,
     isSelected: Boolean = false,
     onClick: () -> Unit,
 ) {
     val backgroundColor = if (isSelected) ColorPrimary.Primary_500 else ColorGray.Gray_50
     val contentColor = if (isSelected) ColorGray.White else ColorGray.Gray_700
-    val typography = MaterialTheme.typography
 
     Row(
-        modifier = Modifier
+        modifier = modifier
             .clip(CircleShape)
             .background(backgroundColor)
             .clickable { onClick() }
@@ -170,7 +176,7 @@ fun SearchFilterChip(
     ) {
         WMText(
             text = label,
-            style = typography.bodyMedium.copy(
+            style = MaterialTheme.typography.bodyMedium.copy(
                 color = contentColor,
                 fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal
             )
@@ -186,22 +192,24 @@ fun SearchFilterChip(
 
 @Composable
 fun ResetFilterChip(
+    modifier: Modifier = Modifier,
     onClick: () -> Unit,
 ) {
     Row(
-        modifier = Modifier
+        modifier = modifier
             .clip(CircleShape)
             .background(Color.White)
             .border(1.dp, ColorGray.Gray_200, CircleShape)
             .clickable { onClick() }
-            .padding(vertical = 4.dp)
-            .padding(start = 12.dp, end = 4.dp),
+            .padding(vertical = 4.dp, horizontal = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center
     ) {
         WMText(
             text = "초기화",
-            style = MaterialTheme.typography.bodyMedium
+            style = MaterialTheme.typography.bodyMedium.copy(
+                color = ColorGray.Gray_700
+            )
         )
         Icon(
             painter = painterResource(Res.drawable.ic_refresh),

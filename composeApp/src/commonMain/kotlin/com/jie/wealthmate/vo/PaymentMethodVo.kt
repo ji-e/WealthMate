@@ -12,6 +12,15 @@ data class PaymentMethodVo(
     val sort: Long,
 ) {
     companion object {
+        val UNSET = PaymentMethodVo(
+            id = "unset",
+            label = "결제수단 없음",
+            groupId = null,
+            groupLabel = null,
+            assetId = null,
+            sort = -1L
+        )
+
         fun PaymentMethodEntity?.mapperToVo() = PaymentMethodVo(
             id = this?.id.default(),
             label = this?.label.default(),

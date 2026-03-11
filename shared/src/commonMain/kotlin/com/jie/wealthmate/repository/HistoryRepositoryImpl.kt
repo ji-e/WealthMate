@@ -2,6 +2,7 @@
 
 package com.jie.wealthmate.repository
 
+import androidx.room.RoomRawQuery
 import com.benasher44.uuid.uuid4
 import com.jie.wealthmate.database.DatabaseProvider
 import com.jie.wealthmate.database.eneity.HistoryEntity
@@ -53,12 +54,12 @@ class HistoryRepositoryImpl(private val databaseProvider: DatabaseProvider) : Hi
             methodName = "insertHistory",
             params = mapOf("history" to history)
         ) {
-            val history = history.copy(
+            val historyWithId = history.copy(
                 id = generateId(),
                 createdAt = Clock.System.now().toEpochMilliseconds(),
                 updatedAt = Clock.System.now().toEpochMilliseconds(),
             )
-            dao.insertHistory(history)
+            dao.insertHistory(historyWithId)
         }
     }
 
@@ -170,29 +171,113 @@ class HistoryRepositoryImpl(private val databaseProvider: DatabaseProvider) : Hi
         limit: Int,
         offset: Int
     ): List<HistoryWithDetails> = withContext(Dispatchers.Default) {
-        
-        val orderBy = when (sortOrder) {
-            "LATEST" -> "date DESC, createdAt DESC"
-            "HIGH_AMOUNT" -> "amount DESC"
-            "LOW_AMOUNT" -> "amount ASC"
-            else -> "date DESC, createdAt DESC"
-        }
+        loggedCall(
+            repositoryName = repoName,
+            methodName = "searchHistories",
+            params = mapOf(
+                "query" to query,
+                "sortOrder" to sortOrder,
+                "startDate" to startDate,
+                "endDate" to endDate,
+                "largeCategories" to largeCategories,
+                "categoryIds" to categoryIds,
+                "paymentMethodIds" to paymentMethodIds,
+                "limit" to limit,
+                "offset" to offset
+            )
+        ) {
+            val sql = StringBuilder("SELECT * FROM histories WHERE isDeleted = 0")
+            val binds = mutableListOf<Any?>()
 
-        // Note: Simple SQLite search implementation. 
-        // For production, consider using a dynamic query builder or Room's RawQuery if complex filtering is needed.
-        // Here we use a basic version that assumes filters are provided.
-        dao.searchHistories(
-            query = "%$query%",
-            startDate = startDate ?: 0L,
-            endDate = endDate ?: Long.MAX_VALUE,
-            largeCategories = largeCategories,
-            categoryIds = categoryIds,
-            categoryIdsSize = categoryIds.size,
-            paymentMethodIds = paymentMethodIds,
-            paymentMethodIdsSize = paymentMethodIds.size,
-            limit = limit,
-            offset = offset,
-            orderBy = orderBy
-        )
+            if (query.isNotBlank()) {
+                sql.append(" AND (content LIKE ? OR categoryId IN (SELECT id FROM categories WHERE middleLabel LIKE ?))")
+                val searchParam = "%$query%"
+                binds.add(searchParam)
+                binds.add(searchParam)
+            }
+
+            when {
+                startDate != null && endDate != null -> {
+                    sql.append(" AND date BETWEEN ? AND ?")
+                    binds.add(startDate)
+                    binds.add(endDate)
+                }
+                startDate != null -> {
+                    sql.append(" AND date >= ?")
+                    binds.add(startDate)
+                }
+                endDate != null -> {
+                    sql.append(" AND date <= ?")
+                    binds.add(endDate)
+                }
+            }
+
+            if (largeCategories.isNotEmpty()) {
+                val placeholders = largeCategories.joinToString(",") { "?" }
+                sql.append(" AND largeCategory IN ($placeholders)")
+                binds.addAll(largeCategories)
+            }
+
+            if (categoryIds.isNotEmpty()) {
+                val hasUnset = categoryIds.any { it.startsWith("unset") }
+                val realCategoryIds = categoryIds.filter { !it.startsWith("unset") }
+
+                if (hasUnset && realCategoryIds.isEmpty()) {
+                    sql.append(" AND categoryId IS NULL")
+                } else if (hasUnset && realCategoryIds.isNotEmpty()) {
+                    val placeholders = realCategoryIds.joinToString(",") { "?" }
+                    sql.append(" AND (categoryId IN ($placeholders) OR categoryId IS NULL)")
+                    binds.addAll(realCategoryIds)
+                } else {
+                    val placeholders = categoryIds.joinToString(",") { "?" }
+                    sql.append(" AND categoryId IN ($placeholders)")
+                    binds.addAll(categoryIds)
+                }
+            }
+
+            if (paymentMethodIds.isNotEmpty()) {
+                val hasUnset = paymentMethodIds.any { it.startsWith("unset") }
+                val realPaymentMethodIds = paymentMethodIds.filter { !it.startsWith("unset") }
+
+                if (hasUnset && realPaymentMethodIds.isEmpty()) {
+                    sql.append(" AND paymentMethodId IS NULL")
+                } else if (hasUnset && realPaymentMethodIds.isNotEmpty()) {
+                    val placeholders = realPaymentMethodIds.joinToString(",") { "?" }
+                    sql.append(" AND (paymentMethodId IN ($placeholders) OR paymentMethodId IS NULL)")
+                    binds.addAll(realPaymentMethodIds)
+                } else {
+                    val placeholders = paymentMethodIds.joinToString(",") { "?" }
+                    sql.append(" AND paymentMethodId IN ($placeholders)")
+                    binds.addAll(paymentMethodIds)
+                }
+            }
+
+            val orderBy = when (sortOrder) {
+                "LATEST" -> "date DESC, createdAt DESC"
+                "HIGH_AMOUNT" -> "amount DESC"
+                "LOW_AMOUNT" -> "amount ASC"
+                else -> "date DESC, createdAt DESC"
+            }
+            sql.append(" ORDER BY $orderBy")
+
+            sql.append(" LIMIT ? OFFSET ?")
+            binds.add(limit.toLong())
+            binds.add(offset.toLong())
+
+            val rawQuery = RoomRawQuery(sql.toString()) { statement ->
+                binds.forEachIndexed { index, value ->
+                    val bindIndex = index + 1
+                    when (value) {
+                        is String -> statement.bindText(bindIndex, value)
+                        is Long -> statement.bindLong(bindIndex, value)
+                        is Int -> statement.bindLong(bindIndex, value.toLong())
+                        is Double -> statement.bindDouble(bindIndex, value)
+                        null -> statement.bindNull(bindIndex)
+                        else -> statement.bindText(bindIndex, value.toString())
+                    }
+                }
+            }
+            dao.searchHistories(rawQuery)
+        }
     }
 }

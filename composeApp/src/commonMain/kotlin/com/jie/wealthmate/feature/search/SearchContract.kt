@@ -18,14 +18,21 @@ data class SearchUiState(
     val endDate: LocalDate? = null,
     val categories: ImmutableList<CategoryVo> = persistentListOf(),
     val paymentMethods: ImmutableList<PaymentMethodVo> = persistentListOf(),
-    val selectedLargeCategories: List<LargeCategoryEnum> = LargeCategoryEnum.entries,
+    val selectedLargeCategories: List<LargeCategoryEnum> = emptyList(),
     val selectedCategories: List<CategoryVo> = emptyList(),
     val selectedPaymentMethods: List<PaymentMethodVo> = emptyList(),
     val searchResults: ImmutableList<HistoryVo> = persistentListOf(),
     val isLoading: Boolean = false,
     val hasMore: Boolean = true,
     val offset: Int = 0
-) : BaseUiState
+) : BaseUiState {
+    val isFilteredByType = selectedLargeCategories.isNotEmpty()
+    val filteredCategories = if (isFilteredByType) {
+        categories.filter { selectedLargeCategories.contains(it.largeCategory) }
+    } else {
+        categories
+    }
+}
 
 enum class SearchSortOrder(val label: String) {
     LATEST("최신순"),

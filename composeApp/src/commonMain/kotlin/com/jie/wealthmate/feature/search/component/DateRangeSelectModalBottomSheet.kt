@@ -1,7 +1,8 @@
 package com.jie.wealthmate.feature.search.component
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DateRangePicker
@@ -14,6 +15,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.jie.wealthmate.component.ButtonSize
+import com.jie.wealthmate.component.ButtonStyle
 import com.jie.wealthmate.component.WMButton
 import com.jie.wealthmate.component.WMModalBottomSheet
 import com.jie.wealthmate.theme.ColorGray
@@ -82,17 +84,31 @@ fun DateRangeSelectModalBottomSheet(
             modifier = Modifier.fillMaxHeight(0.6f)
         )
 
-        WMButton(
-            text = "선택",
-            buttonSize = ButtonSize.LARGE,
+        Row(
             modifier = Modifier
                 .padding(horizontal = 28.dp)
-                .padding(top = 12.dp, bottom = 20.dp)
-                .fillMaxWidth(),
-            onClick = {
-                onSelectClick(selectedDates.first, selectedDates.second)
-                onDismissRequest()
-            }
-        )
+                .padding(top = 12.dp, bottom = 20.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            WMButton(
+                text = "초기화",
+                buttonSize = ButtonSize.LARGE,
+                buttonStyle = ButtonStyle.TONAL,
+                modifier = Modifier.weight(1f),
+                onClick = {
+                    onSelectClick(null, null)
+                    onDismissRequest()
+                }
+            )
+            WMButton(
+                text = "선택",
+                buttonSize = ButtonSize.LARGE,
+                modifier = Modifier.weight(3f),
+                onClick = {
+                    onSelectClick(selectedDates.first, selectedDates.second)
+                    onDismissRequest()
+                }
+            )
+        }
     }
 }

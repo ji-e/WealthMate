@@ -6,6 +6,7 @@ import com.jie.wealthmate.feature.menu.management.categoryManagement.component.L
 import com.jie.wealthmate.utils.default
 import com.jie.wealthmate.vo.CategoryTagVo.Companion.mapperToVo
 import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 
 @Immutable
@@ -18,7 +19,25 @@ data class CategoryVo(
     val isFixed: Boolean,
     val tags: ImmutableList<CategoryTagVo>,
 ) {
+    val isUnset: Boolean get() = id.startsWith(UNSET_ID_PREFIX)
+
     companion object {
+        const val UNSET_ID_PREFIX = "unset_"
+
+        /**
+         * 특정 거래구분에 대한 '카테고리 없음' 객체를 생성합니다.
+         * 인자가 없으면 기본값으로 지출(EXPENSES) 구분의 객체를 반환합니다.
+         */
+        fun unset(largeCategory: LargeCategoryEnum = LargeCategoryEnum.EXPENSES) = CategoryVo(
+            id = "${UNSET_ID_PREFIX}${largeCategory.name}",
+            icon = "❓",
+            largeCategory = largeCategory,
+            middleLabel = "카테고리 없음",
+            sort = -1L,
+            isFixed = false,
+            tags = persistentListOf()
+        )
+
         fun CategoryEntity?.mapperToVo() = CategoryVo(
             id = this?.id.default(),
             icon = this?.icon.default(),
