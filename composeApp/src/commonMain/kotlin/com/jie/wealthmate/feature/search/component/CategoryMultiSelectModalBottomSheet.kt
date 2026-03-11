@@ -48,27 +48,35 @@ fun CategoryMultiSelectModalBottomSheet(
 
     // 2. 카테고리 데이터 가공 및 그룹화 로직을 remember로 최적화
     val displayData = remember(categories, showUnset, largeCategoryFilter) {
+        // 기준 정렬 순서 정의
         val preferredOrder = listOf(
             LargeCategoryEnum.INCOME,
             LargeCategoryEnum.SAVING,
             LargeCategoryEnum.EXPENSES
         )
-        val activeLargeCategories = largeCategoryFilter.ifEmpty { preferredOrder }
+        
+        // 필터가 있으면 필터 항목들 중 기준 순서대로 정렬, 없으면 전체 기준 순서 사용
+        val activeLargeCategories = if (largeCategoryFilter.isEmpty()) {
+            preferredOrder
+        } else {
+            preferredOrder.filter { it in largeCategoryFilter }
+        }
+
         val grouped = categories.groupBy { it.largeCategory }
 
         activeLargeCategories.mapNotNull { largeCategory ->
             val itemsInGroup = grouped[largeCategory] ?: emptyList()
 
             val finalItems = if (showUnset) {
-                val hasUnset = itemsInGroup.any { it.id.startsWith(CategoryVo.UNSET_ID_PREFIX) }
+                val hasUnset = itemsInGroup.any { it.isUnset }
                 if (hasUnset) {
-                    val (unsets, normals) = itemsInGroup.partition { it.id.startsWith(CategoryVo.UNSET_ID_PREFIX) }
+                    val (unsets, normals) = itemsInGroup.partition { it.isUnset }
                     normals + unsets
                 } else {
                     itemsInGroup + CategoryVo.unset(largeCategory)
                 }
             } else {
-                itemsInGroup.filter { !it.id.startsWith(CategoryVo.UNSET_ID_PREFIX) && it.id != CategoryVo.UNSET.id }
+                itemsInGroup.filter { !it.isUnset }
             }
 
             if (finalItems.isNotEmpty() || (showUnset && showHeaders)) largeCategory to finalItems
@@ -136,9 +144,8 @@ fun CategoryMultiSelectModalBottomSheet(
                             key = { it.id }
                         ) { category ->
                             val isSelected = category.id in tempSelectedIds
-                            val isUnset = category.id.startsWith(CategoryVo.UNSET_ID_PREFIX)
                             val label =
-                                if (isUnset) category.middleLabel
+                                if (category.isUnset) category.middleLabel
                                 else "${category.middleLabel} ${if (category.isFixed) "| 고정" else ""}"
 
 

@@ -79,7 +79,7 @@ fun HistoryItem(
                 contentAlignment = Alignment.Center
             ) {
                 WMText(
-                    text = category?.icon ?: "？",
+                    text = category?.icon ?: "❓",
                     style = Typography().titleLarge,
                 )
             }
@@ -174,7 +174,7 @@ fun HistoryItem(
 //                contentAlignment = Alignment.Center
 //            ) {
 //                WMText(
-//                    text = category?.icon ?: "？",
+//                    text = category?.icon ?: "❓",
 //                    style = Typography().titleLarge,
 //                )
 //            }
