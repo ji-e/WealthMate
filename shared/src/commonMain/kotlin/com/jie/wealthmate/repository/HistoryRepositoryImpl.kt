@@ -158,4 +158,41 @@ class HistoryRepositoryImpl(private val databaseProvider: DatabaseProvider) : Hi
             dao.getHistoriesByInstallmentId(installmentId)
         }
     }
+
+    override suspend fun searchHistories(
+        query: String,
+        sortOrder: String,
+        startDate: Long?,
+        endDate: Long?,
+        largeCategories: List<String>,
+        categoryIds: List<String>,
+        paymentMethodIds: List<String>,
+        limit: Int,
+        offset: Int
+    ): List<HistoryWithDetails> = withContext(Dispatchers.Default) {
+        
+        val orderBy = when (sortOrder) {
+            "LATEST" -> "date DESC, createdAt DESC"
+            "HIGH_AMOUNT" -> "amount DESC"
+            "LOW_AMOUNT" -> "amount ASC"
+            else -> "date DESC, createdAt DESC"
+        }
+
+        // Note: Simple SQLite search implementation. 
+        // For production, consider using a dynamic query builder or Room's RawQuery if complex filtering is needed.
+        // Here we use a basic version that assumes filters are provided.
+        dao.searchHistories(
+            query = "%$query%",
+            startDate = startDate ?: 0L,
+            endDate = endDate ?: Long.MAX_VALUE,
+            largeCategories = largeCategories,
+            categoryIds = categoryIds,
+            categoryIdsSize = categoryIds.size,
+            paymentMethodIds = paymentMethodIds,
+            paymentMethodIdsSize = paymentMethodIds.size,
+            limit = limit,
+            offset = offset,
+            orderBy = orderBy
+        )
+    }
 }
