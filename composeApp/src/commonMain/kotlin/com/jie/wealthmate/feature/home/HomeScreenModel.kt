@@ -31,6 +31,12 @@ class HomeScreenModel(
         loadHomeData()
     }
 
+    fun updateStatusType(statusType: StatusType) {
+        reduceState { state ->
+            state.copy(statusType = statusType)
+        }
+    }
+
     private fun loadHomeData() {
         val currentMonthStart = today.firstDayOfMonth().toEpochMilliseconds()
         val currentMonthEnd = today.lastDayOfMonth().toEpochMilliseconds()

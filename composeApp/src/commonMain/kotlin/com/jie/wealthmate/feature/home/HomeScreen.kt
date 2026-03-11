@@ -15,6 +15,9 @@ import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -23,6 +26,7 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.jie.wealthmate.component.WMListSelectionModalBottomSheet
 import com.jie.wealthmate.component.WMText
 import com.jie.wealthmate.component.calculateAdjustedToastPadding
 import com.jie.wealthmate.feature.home.component.CategorySegmentedChart
@@ -32,6 +36,7 @@ import com.jie.wealthmate.feature.home.component.PaymentMethodSegmentedChart
 import com.jie.wealthmate.feature.home.component.RemainBudget
 import com.jie.wealthmate.feature.home.component.Today
 import com.jie.wealthmate.theme.ColorGray
+import com.jie.wealthmate.theme.noRippleClickable
 import com.jie.wealthmate.utils.default
 import org.jetbrains.compose.resources.painterResource
 import wealthmate.composeapp.generated.resources.Res
@@ -43,6 +48,8 @@ class HomeScreen() : Screen {
         val navigator = LocalNavigator.currentOrThrow
         val screenModel: HomeScreenModel = koinScreenModel()
         val uiState by screenModel.container.uiState.collectAsState()
+
+        var isShowStatusTypeModalBottomSheet by remember { mutableStateOf(false) }
 
         Column(
             modifier = Modifier
@@ -81,7 +88,10 @@ class HomeScreen() : Screen {
             Row(
                 modifier = Modifier
                     .padding(horizontal = 28.dp)
-                    .padding(top = 24.dp),
+                    .padding(top = 24.dp)
+                    .noRippleClickable(
+                        onClick = { isShowStatusTypeModalBottomSheet = true }
+                    ),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 WMText(
@@ -139,6 +149,17 @@ class HomeScreen() : Screen {
             )
 
             Spacer(modifier = Modifier.height(40.dp))
+        }
+
+        if (isShowStatusTypeModalBottomSheet) {
+            WMListSelectionModalBottomSheet(
+                title = "기간 선택",
+                items = StatusType.entries,
+                selectedItem = uiState.statusType,
+                itemLabel = { it.label },
+                onItemSelected = { screenModel.updateStatusType(it) },
+                onDismissRequest = { isShowStatusTypeModalBottomSheet = false }
+            )
         }
     }
 }
