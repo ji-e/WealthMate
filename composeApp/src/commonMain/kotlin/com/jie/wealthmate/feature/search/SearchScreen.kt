@@ -23,6 +23,7 @@ import com.jie.wealthmate.component.textField.WMSearchTextField
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.feature.search.component.DateRangeSelectModalBottomSheet
 import com.jie.wealthmate.feature.search.component.SearchFilterRow
+import com.jie.wealthmate.feature.search.component.SearchResult
 
 class SearchScreen : BaseScreen() {
     @Composable
@@ -51,7 +52,7 @@ class SearchScreen : BaseScreen() {
                     .padding(top = 4.dp, bottom = 20.dp),
                 value = uiState.query,
                 onValueChange = screenModel::updateQuery,
-                onSearch = { screenModel.search() },
+                onSearch = { screenModel.search(isFirstPage = true) },
                 onClear = { screenModel.clearQuery() },
                 placeholder = "검색할 카테고리, 내용을 입력해 주세요."
             )
@@ -73,7 +74,14 @@ class SearchScreen : BaseScreen() {
                 onResetClick = screenModel::resetFilters
             )
 
-            // TODO: Implement search results list
+            SearchResult(
+                searchResults = uiState.searchResults,
+                sortOrder = uiState.sortOrder,
+                isLoading = uiState.isLoading,
+                hasMore = uiState.hasMore,
+                onLoadMore = screenModel::loadMore,
+                onHistoryClick = { /* TODO: Navigate to detail */ }
+            )
         }
 
         if (showSortBottomSheet) {

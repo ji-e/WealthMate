@@ -3,7 +3,6 @@ package com.jie.wealthmate.feature.calendar.component.listCalendar
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -19,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.jie.wealthmate.component.InfoText
@@ -43,11 +43,14 @@ fun DateHeader(
 ) {
     WMText(
         text = "${date.day}일",
-        style = Typography().titleMedium.copy(fontWeight = FontWeight.SemiBold),
+        style = Typography().titleSmall.copy(
+            fontWeight = FontWeight.SemiBold,
+            color = ColorGray.Gray_500
+        ),
         modifier = Modifier
             .fillMaxWidth()
             .background(color = ColorGray.White)
-            .padding(horizontal = 20.dp)
+            .padding(horizontal = 28.dp)
             .padding(top = 12.dp, bottom = 4.dp)
     )
 }
@@ -62,7 +65,8 @@ fun HistoryItem(
         modifier = Modifier
             .fillMaxWidth()
             .clickable { onItemClick() }
-            .padding(horizontal = 20.dp, vertical = 8.dp),
+            .padding(vertical = 8.dp)
+            .padding(start = 20.dp, end = 28.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Box(modifier = Modifier.width(60.dp)) {
@@ -117,20 +121,11 @@ fun HistoryItem(
             else -> ""
         }
 
-        Column() {
-            Row(
-                modifier = Modifier
-                    .padding(bottom = 2.dp)
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
+        Column {
+            if (history.content.isNullOrBlank().not()) {
                 WMText(
-                    text = "$mark${formatWithCommas(history.amount.toString())}원",
-                    style = Typography().titleMedium.copy(
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.SemiBold
-                    ),
+                    text = history.content,
+                    style = Typography().bodyLarge.copy(fontWeight = FontWeight.Medium),
                     maxLines = 1
                 )
             }
@@ -142,5 +137,109 @@ fun HistoryItem(
                 )
             }
         }
+        WMText(
+            text = "$mark${formatWithCommas(history.amount.toString())}원",
+            style = Typography().titleMedium.copy(
+                fontSize = 18.sp,
+                fontWeight = FontWeight.SemiBold
+            ),
+            maxLines = 1,
+            modifier = Modifier.weight(1f),
+            textAlign = TextAlign.End
+        )
     }
 }
+
+//
+//@Composable
+//fun HistoryItem(
+//    history: HistoryVo,
+//    onItemClick: () -> Unit,
+//) {
+//    val category = history.category
+//    Row(
+//        modifier = Modifier
+//            .fillMaxWidth()
+//            .clickable { onItemClick() }
+//            .padding(horizontal = 20.dp, vertical = 8.dp),
+//        verticalAlignment = Alignment.CenterVertically
+//    ) {
+//        Box(modifier = Modifier.width(60.dp)) {
+//            Box(
+//                modifier = Modifier
+//                    .clip(CircleShape)
+//                    .background(history.largeCategory.backgroundColor)
+//                    .size(40.dp)
+//                    .align(Alignment.Center),
+//                contentAlignment = Alignment.Center
+//            ) {
+//                WMText(
+//                    text = category?.icon ?: "？",
+//                    style = Typography().titleLarge,
+//                )
+//            }
+//            if (category?.isFixed.default()) {
+//                Icon(
+//                    painter = painterResource(Res.drawable.ic_push_pin),
+//                    contentDescription = null,
+//                    tint = ColorRed.Red_300,
+//                    modifier = Modifier
+//                        .size(24.dp)
+//                        .align(Alignment.TopStart)
+//                )
+//            }
+//            history.repeatCycle?.let {
+//                Image(
+//                    painter = painterResource(Res.drawable.ic_repeat_on),
+//                    contentDescription = null,
+//                    modifier = Modifier
+//                        .padding(end = 4.dp)
+//                        .size(24.dp)
+//                        .align(Alignment.BottomEnd)
+//                )
+//            }
+//            history.installment?.let {
+//                Image(
+//                    painter = painterResource(Res.drawable.ic_percent_on),
+//                    contentDescription = null,
+//                    modifier = Modifier
+//                        .padding(end = 4.dp)
+//                        .size(24.dp)
+//                        .align(Alignment.BottomEnd)
+//                )
+//            }
+//        }
+//
+//        val mark = when (history.largeCategory) {
+//            LargeCategoryEnum.INCOME -> "+"
+//            LargeCategoryEnum.EXPENSES -> "-"
+//            else -> ""
+//        }
+//
+//        Column() {
+//            Row(
+//                modifier = Modifier
+//                    .padding(bottom = 2.dp)
+//                    .fillMaxWidth(),
+//                horizontalArrangement = Arrangement.spacedBy(8.dp),
+//                verticalAlignment = Alignment.CenterVertically
+//            ) {
+//                WMText(
+//                    text = "$mark${formatWithCommas(history.amount.toString())}원",
+//                    style = Typography().titleMedium.copy(
+//                        fontSize = 18.sp,
+//                        fontWeight = FontWeight.SemiBold
+//                    ),
+//                    maxLines = 1
+//                )
+//            }
+//
+//            if (history.historyInfo.isNotBlank()) {
+//                InfoText(
+//                    text = history.historyInfo,
+//                    maxLines = 2
+//                )
+//            }
+//        }
+//    }
+//}

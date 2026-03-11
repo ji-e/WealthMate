@@ -29,4 +29,16 @@ interface HistoryRepository {
     fun getSumByMonth(startDate: Long, endDate: Long, categoryType: String): Flow<Long>
 
     suspend fun getHistoriesByInstallmentId(installmentId: String): List<HistoryEntity>
+
+    suspend fun searchHistories(
+        query: String,
+        sortOrder: String,
+        startDate: Long?,
+        endDate: Long?,
+        largeCategories: List<String>,
+        categoryIds: List<String>,
+        paymentMethodIds: List<String>,
+        limit: Int,
+        offset: Int
+    ): List<HistoryWithDetails>
 }

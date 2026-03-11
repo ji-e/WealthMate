@@ -9,7 +9,6 @@ import androidx.room.Transaction
 import androidx.room.Update
 import com.jie.wealthmate.database.eneity.HistoryEntity
 import com.jie.wealthmate.database.eneity.HistoryWithDetails
-import com.jie.wealthmate.database.eneity.InstallmentEntity
 import kotlinx.coroutines.flow.Flow
 import kotlin.time.Clock
 
@@ -126,4 +125,34 @@ interface HistoryDao {
      */
     @Query("DELETE FROM histories")
     suspend fun deleteAll()
+
+    @Transaction
+    @Query("""
+        SELECT * FROM histories 
+        WHERE isDeleted = 0 
+        AND (content LIKE :query OR categoryId IN (SELECT id FROM categories WHERE middleLabel LIKE :query))
+        AND date BETWEEN :startDate AND :endDate
+        AND largeCategory IN (:largeCategories)
+        AND (:categoryIdsSize = 0 OR categoryId IN (:categoryIds))
+        AND (:paymentMethodIdsSize = 0 OR paymentMethodId IN (:paymentMethodIds))
+        ORDER BY 
+            CASE WHEN :orderBy = 'date DESC, createdAt DESC' THEN date END DESC,
+            CASE WHEN :orderBy = 'date DESC, createdAt DESC' THEN createdAt END DESC,
+            CASE WHEN :orderBy = 'amount DESC' THEN amount END DESC,
+            CASE WHEN :orderBy = 'amount ASC' THEN amount END ASC
+        LIMIT :limit OFFSET :offset
+    """)
+    suspend fun searchHistories(
+        query: String,
+        startDate: Long,
+        endDate: Long,
+        largeCategories: List<String>,
+        categoryIds: List<String>,
+        categoryIdsSize: Int,
+        paymentMethodIds: List<String>,
+        paymentMethodIdsSize: Int,
+        limit: Int,
+        offset: Int,
+        orderBy: String
+    ): List<HistoryWithDetails>
 }
