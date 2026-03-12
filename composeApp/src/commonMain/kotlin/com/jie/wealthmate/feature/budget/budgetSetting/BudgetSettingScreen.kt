@@ -20,10 +20,12 @@ import com.jie.wealthmate.base.BaseScreen
 import com.jie.wealthmate.component.topbar.TopBarItem
 import com.jie.wealthmate.component.topbar.WMTopBar
 import com.jie.wealthmate.feature.budget.addBudget.AddBudgetScreen
+import com.jie.wealthmate.feature.budget.budgetDetail.BudgetDetailScreen
 import com.jie.wealthmate.feature.budget.budgetSetting.component.BudgetMoreMenu
 import com.jie.wealthmate.feature.budget.budgetSetting.component.MonthBudgetList
 import com.jie.wealthmate.feature.budget.budgetSetting.component.MonthBudgetMoreModalBottomSheet
 import com.jie.wealthmate.feature.budget.budgetSetting.component.YearChips
+import kotlinx.datetime.LocalDate
 import wealthmate.composeapp.generated.resources.Res
 import wealthmate.composeapp.generated.resources.ic_add
 
@@ -46,7 +48,7 @@ class BudgetSettingScreen : BaseScreen() {
         ) {
             WMTopBar(
                 title = TopBarItem.Title("예산 관리"),
-                readingItem = TopBarItem.ReadingItem().copy(
+                readingItem = TopBarItem.ReadingItem(
                     action = { navigator.pop() }
                 ),
                 trailingItem = listOf(
@@ -77,12 +79,9 @@ class BudgetSettingScreen : BaseScreen() {
                     isShowMoreBottomSheet = true
                 },
                 onMonthClick = { yearMonth ->
-                    navigator.push(
-                        AddBudgetScreen(
-                            selectedYearMonth = yearMonth,
-                            isEditMode = true
-                        )
-                    )
+                    val parts = yearMonth.split("-")
+                    val date = LocalDate(parts[0].toInt(), parts[1].toInt(), 1)
+                    navigator.push(BudgetDetailScreen(date))
                 },
             )
         }
