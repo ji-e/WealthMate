@@ -43,6 +43,8 @@ import com.jie.wealthmate.feature.calendar.addHistory.component.LargeCategorySel
 import com.jie.wealthmate.feature.calendar.component.SelectedCalendarModalBottomSheet
 import com.jie.wealthmate.feature.calendar.startDate
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
+import com.jie.wealthmate.utils.convertDate
+import com.jie.wealthmate.utils.formatDateKorYM
 import com.jie.wealthmate.utils.today
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
@@ -51,6 +53,8 @@ import kotlinx.datetime.plus
 
 class AddBudgetScreen(
     val selectedYearMonth: String? = null,
+    val isEditMode: Boolean = false,
+    val isCopyMode: Boolean = false,
 ) : BaseScreen() {
     @Composable
     override fun Content() {
@@ -70,7 +74,6 @@ class AddBudgetScreen(
         val onMonthChanged = remember(screenModel) {
             { month: LocalDate -> screenModel.updateSelectedMonth(month) }
         }
-
 
         val onBack: () -> Unit = remember(uiState.isDataChanged) {
             {
@@ -133,7 +136,7 @@ class AddBudgetScreen(
         BackHandler(enabled = true, onBack = onBack)
 
         LaunchedEffect(Unit) {
-            screenModel.updateInit(selectedYearMonth)
+            screenModel.updateInit(selectedYearMonth, isCopyMode)
         }
 
         screenModel.collectSideEffect { sideEffect ->
@@ -142,11 +145,20 @@ class AddBudgetScreen(
             }
         }
 
+        val title = when {
+            isCopyMode -> {
+                val sourceMonth = selectedYearMonth.convertDate(formatDateKorYM)
+                if (sourceMonth.isNotEmpty()) "예산 복사 (복사한 달: $sourceMonth)" else "예산 복사"
+            }
+            isEditMode -> "예산 수정"
+            else -> "예산 추가"
+        }
+
         Column(
             modifier = Modifier.fillMaxSize().imePadding(),
         ) {
             WMTopBar(
-                title = TopBarItem.Title("예산 추가"),
+                title = TopBarItem.Title(title),
                 readingItem = TopBarItem.ReadingItem().copy(action = { onBack() }),
             )
 
@@ -157,7 +169,9 @@ class AddBudgetScreen(
                             selectedMonth = uiState.selectedMonth,
                             totalBudget = uiState.totalBudget,
                             onSelectedMonthClick = {
-                                isShowSelectedCalendarModalBottomSheet = true
+                                if (isCopyMode || !isEditMode) {
+                                    isShowSelectedCalendarModalBottomSheet = true
+                                }
                             },
                         )
 

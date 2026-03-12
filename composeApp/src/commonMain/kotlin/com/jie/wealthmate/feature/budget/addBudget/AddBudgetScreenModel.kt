@@ -14,6 +14,7 @@ import com.jie.wealthmate.vo.CategoryVo
 import com.jie.wealthmate.vo.CategoryVo.Companion.mapperToVo
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.collections.immutable.toImmutableMap
+import kotlinx.coroutines.flow.take
 import kotlinx.datetime.LocalDate
 
 class AddBudgetScreenModel(
@@ -28,20 +29,74 @@ class AddBudgetScreenModel(
         LargeCategoryEnum.entries.forEach { getCategories(it) }
     }
 
-    fun updateInit(yearMonth: String?) {
+    fun updateInit(yearMonth: String?, isCopyMode: Boolean = false) {
         yearMonth ?: return
 
         reduceState { state ->
             state.copy(
-                selectedMonth = yearMonth.convertDateToLocalDate() ?: today
+                selectedMonth = if (isCopyMode) today else (yearMonth.convertDateToLocalDate() ?: today)
             )
         }
+        loadBudgets(yearMonth, isCopyMode)
+    }
+
+    private fun loadBudgets(yearMonth: String, isCopyMode: Boolean = false) {
+        launchSafe(
+            block = {
+                budgetRepository.getBudgetsByMonth(yearMonth).take(1).collect { budgets ->
+                    reduceState { state ->
+                        var isCategoryTagInclude = false
+                        val incomeMap = state.incomeCategoryTextFieldMap.toMutableMap()
+                        val expenseMap = state.expensesCategoryTextFieldMap.toMutableMap()
+                        val savingMap = state.savingCategoryTextFieldMap.toMutableMap()
+
+                        budgets.forEach { budget ->
+                            val category = (state.incomeCategoryItems + state.expensesCategoryItems + state.savingCategoryItems)
+                                .find { it.id == budget.categoryId } ?: return@forEach
+
+                            val map = when (category.largeCategory) {
+                                LargeCategoryEnum.INCOME -> incomeMap
+                                LargeCategoryEnum.EXPENSES -> expenseMap
+                                LargeCategoryEnum.SAVING -> savingMap
+                            }
+
+                            if (map != null) {
+                                if (budget.categoryTagId != null) {
+                                    isCategoryTagInclude = true
+                                    map[budget.categoryTagId!!] = TextFieldValue(budget.amount.toString())
+
+                                    val sum = category.tags.sumOf { tag ->
+                                        map[tag.id]?.text?.toLongOrNull() ?: 0L
+                                    }
+                                    map[category.id] = TextFieldValue(sum.toString())
+                                } else {
+                                    map[budget.categoryId] = TextFieldValue(budget.amount.toString())
+                                }
+                            }
+                        }
+
+                        val newState = state.copy(
+                            isCategoryTagInclude = isCategoryTagInclude,
+                            incomeCategoryTextFieldMap = incomeMap.toImmutableMap(),
+                            expensesCategoryTextFieldMap = expenseMap.toImmutableMap(),
+                            savingCategoryTextFieldMap = savingMap.toImmutableMap(),
+                            isDataChanged = isCopyMode
+                        )
+                        newState.copy(remainBudget = calculateRemainBudget(newState))
+                    }
+                }
+            },
+            showLoading = true
+        )
     }
 
     fun updateSelectedMonth(month: LocalDate = today) {
         reduceState { state ->
             if (state.selectedMonth == month) return@reduceState state
-            state.copy(selectedMonth = month)
+            state.copy(
+                selectedMonth = month,
+                isDataChanged = true
+            )
         }
     }
 
@@ -303,12 +358,11 @@ class AddBudgetScreenModel(
         launchSafe(
             block = {
                 budgetRepository.saveBudgets(yearMonth, budgets)
+            },
+            onSuccess = {
+                showSnackbar("저장되었습니다.")
+                postSideEffect { AddBudgetUiSideEffect.OnSuccess }
             }
-        ) {
-
-            showSnackbar("저장되었습니다.")
-
-            postSideEffect { AddBudgetUiSideEffect.OnSuccess }
-        }
+        )
     }
 }

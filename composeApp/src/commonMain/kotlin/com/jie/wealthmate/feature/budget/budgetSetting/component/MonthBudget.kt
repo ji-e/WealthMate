@@ -56,6 +56,7 @@ fun MonthBudgetList(
     year: String,
     monthBudgetList: List<MonthBudgetGroup>,
     yearlySummary: YearlySummary,
+    onMoreClick: (String, Boolean) -> Unit,
     onMonthClick: (String) -> Unit,
 ) {
     val listState = rememberLazyListState()
@@ -75,6 +76,7 @@ fun MonthBudgetList(
         ) { group ->
             MonthBudgetItem(
                 group = group,
+                onMoreClick = { onMoreClick(group.yearMonth, group.budgets.isNotEmpty()) },
                 onClick = { onMonthClick(group.yearMonth) },
             )
         }
@@ -91,6 +93,7 @@ fun MonthBudgetList(
 @Composable
 fun MonthBudgetItem(
     group: MonthBudgetGroup,
+    onMoreClick: () -> Unit,
     onClick: () -> Unit,
 ) {
     val (year, month, isCurrentMonth) = remember(group.yearMonth) {
@@ -134,7 +137,8 @@ fun MonthBudgetItem(
             expenseAmount = expense,
             hasIncome = hasIncome,
             hasSaving = hasSaving,
-            hasExpense = hasExpense
+            hasExpense = hasExpense,
+            hasAnyBudget = group.budgets.isNotEmpty()
         )
     }
 
@@ -158,9 +162,12 @@ fun MonthBudgetItem(
                 style = typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
             )
 
-            if (isCurrentMonth) {
+            if (isCurrentMonth || !summary.hasAnyBudget) {
+                val badgeText = if (summary.hasAnyBudget) "진행중" else "미설정"
+                val badgeColor = if (summary.hasAnyBudget) ColorPrimary.Primary_500 else ColorRed.Red_300
+
                 WMText(
-                    text = "진행중",
+                    text = badgeText,
                     style = typography.labelSmall.copy(
                         fontWeight = FontWeight.SemiBold,
                         color = ColorGray.White
@@ -168,7 +175,7 @@ fun MonthBudgetItem(
                     modifier = Modifier
                         .padding(start = 4.dp)
                         .background(
-                            color = ColorPrimary.Primary_500,
+                            color = badgeColor,
                             shape = CircleShape
                         )
                         .padding(horizontal = 6.dp, vertical = 2.dp)
@@ -178,7 +185,7 @@ fun MonthBudgetItem(
 
             WMIconButton(
                 iconRes = Res.drawable.ic_more_vert,
-                onClick = { }
+                onClick = onMoreClick
             )
         }
 
@@ -317,7 +324,7 @@ fun MonthBudgetItem(
                     )
                 } else {
                     WMText(
-                        text = "예산 설정 필요",
+                        text = "지출 예산 설정 필요",
                         style = typography.bodySmall,
                     )
                 }
@@ -382,4 +389,5 @@ private data class BudgetSummary(
     val hasIncome: Boolean,
     val hasSaving: Boolean,
     val hasExpense: Boolean,
+    val hasAnyBudget: Boolean,
 )
