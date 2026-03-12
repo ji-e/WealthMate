@@ -4,12 +4,15 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import com.jie.wealthmate.base.BaseScreenModel
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.repository.BudgetRepository
+import com.jie.wealthmate.repository.CategoryRepository
 import com.jie.wealthmate.repository.HistoryRepository
 import com.jie.wealthmate.utils.convertLocalDateToString
 import com.jie.wealthmate.utils.firstDayOfMonth
 import com.jie.wealthmate.utils.formatDateHyphenYM
 import com.jie.wealthmate.utils.lastDayOfMonth
 import com.jie.wealthmate.utils.toEpochMilliseconds
+import com.jie.wealthmate.vo.CategoryTagVo
+import com.jie.wealthmate.vo.CategoryVo
 import com.jie.wealthmate.vo.CategoryVo.Companion.mapperToVo
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.combine
@@ -19,6 +22,7 @@ import kotlinx.datetime.LocalDate
 class BudgetDetailScreenModel(
     private val budgetRepository: BudgetRepository,
     private val historyRepository: HistoryRepository,
+    private val categoryRepository: CategoryRepository,
     private val initialMonth: LocalDate,
 ) : BaseScreenModel<BudgetDetailUiState>() {
     override val initialState: BudgetDetailUiState
@@ -35,35 +39,97 @@ class BudgetDetailScreenModel(
 
         combine(
             budgetRepository.getBudgetsByMonthWithDetails(monthStr),
-            historyRepository.getHistoriesByMonth(start, end)
-        ) { budgets, histories ->
-            val historiesByLargeCategory = histories.groupBy { it.history.largeCategory }
-            val historiesByCategoryId = histories.groupBy { it.history.categoryId }
+            historyRepository.getHistoriesByMonth(start, end),
+            categoryRepository.getAllCategories()
+        ) { budgets, histories, allCategories ->
             val budgetsByLargeCategory = budgets.groupBy { it.category?.largeCategory }
+            val categoriesByLargeCategory = allCategories.groupBy { it.largeCategory }
 
             val sections = LargeCategoryEnum.entries.map { largeCategory ->
                 val categoryName = largeCategory.name
                 val filteredBudgets = budgetsByLargeCategory[categoryName] ?: emptyList()
-                
-                val categoryBudgets = filteredBudgets.map { budgetWithDetail ->
-                    val usedAmount = historiesByCategoryId[budgetWithDetail.budget.categoryId]?.sumOf { it.history.amount } ?: 0L
-                    val percentage = if (budgetWithDetail.budget.amount > 0) {
-                        (usedAmount.toDouble() / budgetWithDetail.budget.amount * 100).toInt()
-                    } else 0
-                    
-                    CategoryBudgetVo(
-                        category = budgetWithDetail.category.mapperToVo(largeCategory),
-                        budgetAmount = budgetWithDetail.budget.amount,
-                        usedAmount = usedAmount,
-                        percentage = percentage
+                val filteredHistories = histories.filter { it.history.largeCategory == categoryName }
+                val filteredCategories = categoriesByLargeCategory[categoryName] ?: emptyList()
+
+                val budgetsWithVo = filteredBudgets.map { it to it.category.mapperToVo(largeCategory) }
+                val historiesWithVo = filteredHistories.map { it to it.category.mapperToVo(largeCategory) }
+                val allCategoriesVo = filteredCategories.map { it.mapperToVo(largeCategory) }
+
+                val allCategoryIds = (allCategoriesVo.map { it.id } + budgetsWithVo.map { it.second.id } + historiesWithVo.map { it.second.id }).distinct()
+
+                val groups = allCategoryIds.map { categoryId ->
+                    val budgetsInCategory = budgetsWithVo.filter { it.second.id == categoryId }
+                    val historiesInCategory = historiesWithVo.filter { it.second.id == categoryId }
+
+                    val categoryVo = allCategoriesVo.find { it.id == categoryId }
+                        ?: budgetsInCategory.firstOrNull()?.second
+                        ?: historiesInCategory.firstOrNull()?.second
+                        ?: CategoryVo.unset(largeCategory)
+
+                    val totalCategoryBudget = budgetsInCategory.sumOf { it.first.budget.amount }
+                    val totalCategoryUsed = historiesInCategory.sumOf { it.first.history.amount }
+
+                    val totalPercentage = if (totalCategoryBudget > 0) {
+                        (totalCategoryUsed.toDouble() / totalCategoryBudget * 100).toInt()
+                    } else if (totalCategoryUsed > 0) 100 else 0
+
+                    val tagBudgets = (categoryVo.tags.map { tagVo ->
+                        val budgetForTag = budgetsInCategory.find { it.first.budget.categoryTagId == tagVo.id }?.first?.budget?.amount ?: 0L
+                        val usedAmountForTag = historiesInCategory
+                            .filter { it.first.history.categoryTagId == tagVo.id }
+                            .sumOf { it.first.history.amount }
+
+                        val percentage = if (budgetForTag > 0) {
+                            (usedAmountForTag.toDouble() / budgetForTag * 100).toInt()
+                        } else if (usedAmountForTag > 0) 100 else 0
+
+                        CategoryBudgetVo(
+                            category = categoryVo,
+                            tag = tagVo,
+                            budgetAmount = budgetForTag,
+                            usedAmount = usedAmountForTag,
+                            percentage = percentage
+                        )
+                    } + run {
+                        if (categoryVo.tags.isNotEmpty()) {
+                            val budgetForNoTag = budgetsInCategory
+                                .filter { b -> b.first.budget.categoryTagId.isNullOrEmpty() || categoryVo.tags.none { it.id == b.first.budget.categoryTagId } }
+                                .sumOf { it.first.budget.amount }
+                            val usedAmountForNoTag = historiesInCategory
+                                .filter { h -> h.first.history.categoryTagId.isNullOrEmpty() || categoryVo.tags.none { it.id == h.first.history.categoryTagId } }
+                                .sumOf { it.first.history.amount }
+
+                            if (budgetForNoTag > 0 || usedAmountForNoTag > 0) {
+                                val percentage = if (budgetForNoTag > 0) {
+                                    (usedAmountForNoTag.toDouble() / budgetForNoTag * 100).toInt()
+                                } else if (usedAmountForNoTag > 0) 100 else 0
+                                listOf(
+                                    CategoryBudgetVo(
+                                        category = categoryVo,
+                                        tag = CategoryTagVo(id = null, label = "태그 없음"),
+                                        budgetAmount = budgetForNoTag,
+                                        usedAmount = usedAmountForNoTag,
+                                        percentage = percentage
+                                    )
+                                )
+                            } else emptyList()
+                        } else emptyList()
+                    }).sortedByDescending { it.usedAmount }.toImmutableList()
+
+                    CategoryBudgetGroupVo(
+                        category = categoryVo,
+                        totalBudget = totalCategoryBudget,
+                        totalUsed = totalCategoryUsed,
+                        percentage = totalPercentage,
+                        tagBudgets = tagBudgets
                     )
-                }.sortedByDescending { it.usedAmount }.toImmutableList()
+                }.sortedBy { it.category.sort }.toImmutableList()
 
                 BudgetSectionVo(
                     largeCategory = largeCategory,
                     totalBudget = filteredBudgets.sumOf { it.budget.amount },
-                    totalUsed = (historiesByLargeCategory[categoryName] ?: emptyList()).sumOf { it.history.amount },
-                    items = categoryBudgets
+                    totalUsed = filteredHistories.sumOf { it.history.amount },
+                    groups = groups
                 )
             }.toImmutableList()
 
