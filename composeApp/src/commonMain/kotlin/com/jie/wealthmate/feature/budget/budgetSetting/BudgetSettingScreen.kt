@@ -8,6 +8,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.koin.koinScreenModel
@@ -17,7 +20,9 @@ import com.jie.wealthmate.base.BaseScreen
 import com.jie.wealthmate.component.topbar.TopBarItem
 import com.jie.wealthmate.component.topbar.WMTopBar
 import com.jie.wealthmate.feature.budget.addBudget.AddBudgetScreen
+import com.jie.wealthmate.feature.budget.budgetSetting.component.BudgetMoreMenu
 import com.jie.wealthmate.feature.budget.budgetSetting.component.MonthBudgetList
+import com.jie.wealthmate.feature.budget.budgetSetting.component.MonthBudgetMoreModalBottomSheet
 import com.jie.wealthmate.feature.budget.budgetSetting.component.YearChips
 import wealthmate.composeapp.generated.resources.Res
 import wealthmate.composeapp.generated.resources.ic_add
@@ -31,6 +36,10 @@ class BudgetSettingScreen : BaseScreen() {
         val navigator = LocalNavigator.currentOrThrow
         val screenModel: BudgetSettingScreenModel = koinScreenModel()
         val uiState by screenModel.container.uiState.collectAsState()
+
+        var isShowMoreBottomSheet by remember { mutableStateOf(false) }
+        var targetYearMonth by remember { mutableStateOf("") }
+        var hasBudgetByTarget by remember { mutableStateOf(false) }
 
         Column(
             modifier = Modifier.fillMaxSize()
@@ -62,9 +71,66 @@ class BudgetSettingScreen : BaseScreen() {
                 year = uiState.selectedYear,
                 monthBudgetList = uiState.monthBudgets,
                 yearlySummary = uiState.yearlySummary,
-                onMonthClick = { yearMonth ->
-                    navigator.push(AddBudgetScreen(selectedYearMonth = yearMonth))
+                onMoreClick = { yearMonth, hasBudget ->
+                    targetYearMonth = yearMonth
+                    hasBudgetByTarget = hasBudget
+                    isShowMoreBottomSheet = true
                 },
+                onMonthClick = { yearMonth ->
+                    navigator.push(
+                        AddBudgetScreen(
+                            selectedYearMonth = yearMonth,
+                            isEditMode = true
+                        )
+                    )
+                },
+            )
+        }
+
+        if (isShowMoreBottomSheet) {
+            MonthBudgetMoreModalBottomSheet(
+                targetYearMonth = targetYearMonth,
+                hasBudgetByTarget = hasBudgetByTarget,
+                onItemSelected = { menu ->
+                    when (menu) {
+                        BudgetMoreMenu.ADD -> {
+                            navigator.push(
+                                AddBudgetScreen(
+                                    selectedYearMonth = targetYearMonth,
+                                    isEditMode = false
+                                )
+                            )
+                        }
+
+                        BudgetMoreMenu.MODIFY -> {
+                            navigator.push(
+                                AddBudgetScreen(
+                                    selectedYearMonth = targetYearMonth,
+                                    isEditMode = true
+                                )
+                            )
+                        }
+
+                        BudgetMoreMenu.COPY -> {
+                            screenModel.showSnackbar("$targetYearMonth 예산이 복사되었습니다.")
+                            navigator.push(
+                                AddBudgetScreen(
+                                    selectedYearMonth = targetYearMonth,
+                                    isEditMode = true,
+                                    isCopyMode = true
+                                )
+                            )
+                        }
+
+                        BudgetMoreMenu.DELETE -> {
+                            showRemoveDialog {
+                                screenModel.deleteBudget(targetYearMonth)
+                            }
+                        }
+                    }
+                    isShowMoreBottomSheet = false
+                },
+                onDismissRequest = { isShowMoreBottomSheet = false }
             )
         }
     }

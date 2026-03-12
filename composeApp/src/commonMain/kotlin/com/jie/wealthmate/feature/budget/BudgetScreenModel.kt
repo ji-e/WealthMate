@@ -14,6 +14,9 @@ import com.jie.wealthmate.utils.lastDayOfMonth
 import com.jie.wealthmate.utils.toEpochMilliseconds
 import com.jie.wealthmate.utils.today
 import com.jie.wealthmate.vo.CategoryVo.Companion.mapperToVo
+import com.jie.wealthmate.vo.HistoryVo
+import com.jie.wealthmate.vo.HistoryVo.Companion.mapperToVo
+import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -54,11 +57,19 @@ class BudgetScreenModel(
                         }
                         .sumOf { it.budget.amount }
 
-                    val totalUsed = historiesWithDetails
+                    val expenses = historiesWithDetails
                         .filter {
                             it.history.largeCategory == LargeCategoryEnum.EXPENSES.name
                         }
-                        .sumOf { it.history.amount }
+
+                    val totalUsed = expenses.sumOf { it.history.amount }
+
+                    val topExpenses = expenses
+                        .filter { it.category?.isFixed != true }
+                        .sortedByDescending { it.history.amount }
+                        .take(3)
+                        .map { it.mapperToVo() }
+                        .toImmutableList()
 
                     // 카테고리별 예산 초과 아이템 계산 (지출 카테고리만 대상)
                     val overItems = budgetsWithDetails
@@ -72,13 +83,16 @@ class BudgetScreenModel(
                                 val categoryHistories = historiesWithDetails
                                     .filter { it.history.categoryId == budgetWithDetail.budget.categoryId }
 
+                                val topExpense = categoryHistories.maxByOrNull { it.history.amount }
+
                                 BudgetOverUsageVo(
                                     category = budgetWithDetail.category.mapperToVo(),
                                     spentAmount = categorySpent,
                                     budgetAmount = budgetWithDetail.budget.amount,
                                     overAmount = categorySpent - budgetWithDetail.budget.amount,
                                     transactionCount = categoryHistories.size,
-                                    topExpenseTitle = categoryHistories.maxByOrNull { it.history.amount }?.history?.content
+                                    topExpenseTitle = topExpense?.history?.content,
+                                    topExpenseAmount = topExpense?.history?.amount
                                 )
                             } else null
                         }.toImmutableList()
@@ -106,19 +120,28 @@ class BudgetScreenModel(
                             )
                         }.toImmutableList()
 
-                    Triple(totalBudget, totalUsed, overItems to summaryItems)
+                    BudgetResult(totalBudget, totalUsed, overItems, summaryItems, topExpenses)
                 }
-            }.onEach { (totalBudget, totalUsed, items) ->
+            }.onEach { result ->
                 reduceState { state ->
                     state.copy(
-                        totalBudgetAmount = totalBudget,
-                        usedAmount = totalUsed,
-                        budgetOverItems = items.first,
-                        budgetSummaryItems = items.second
+                        totalBudgetAmount = result.totalBudget,
+                        usedAmount = result.totalUsed,
+                        budgetOverItems = result.overItems,
+                        budgetSummaryItems = result.summaryItems,
+                        topExpenses = result.topExpenses
                     )
                 }
             }.launchIn(screenModelScope)
     }
+
+    private data class BudgetResult(
+        val totalBudget: Long,
+        val totalUsed: Long,
+        val overItems: ImmutableList<BudgetOverUsageVo>,
+        val summaryItems: ImmutableList<BudgetSummaryVo>,
+        val topExpenses: ImmutableList<HistoryVo>
+    )
 
     fun updateSelectedMonth(month: LocalDate = today) {
         reduceState { state ->
