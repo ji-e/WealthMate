@@ -19,7 +19,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -41,6 +40,7 @@ import com.jie.wealthmate.vo.PaymentMethodVo
 import org.jetbrains.compose.resources.painterResource
 import wealthmate.composeapp.generated.resources.Res
 import wealthmate.composeapp.generated.resources.ic_keyboard_arrow_right
+import kotlin.math.roundToInt
 
 
 @Composable
@@ -53,10 +53,31 @@ fun PaymentMethodSegmentedChart(
 ) {
     val typography = MaterialTheme.typography
     var isStarted by remember { mutableStateOf(false) }
-    val totalAmount = expensesAmount.toFloat()
-    val colors = remember { ColorChart.getPaymentMethodChartColors() }
 
-    // 전체 애니메이션 진행도 (0.0 -> 1.0)
+    // 1. 전체 데이터 구성 (미지정 항목 포함 및 금액 내림차순 정렬)
+    val displayItems = remember(paymentMethodSegmentChartItems, expensesAmount) {
+        val assignedSum = paymentMethodSegmentChartItems.sumOf { it.amount }
+        val unassignedAmount = (expensesAmount - assignedSum).coerceAtLeast(0L)
+
+        val allItems = if (unassignedAmount > 0) {
+            paymentMethodSegmentChartItems + PaymentMethodSegmentChartData(
+                paymentMethod = null, // null을 결제수단 없음으로 처리
+                amount = unassignedAmount
+            )
+        } else {
+            paymentMethodSegmentChartItems
+        }
+        
+        allItems.sortedByDescending { it.amount }
+    }
+
+    // 2. 분모는 expensesAmount와 실제 항목 합 중 큰 값을 사용하여 100%를 초과하지 않도록 함
+    val totalAmountForCalc = remember(displayItems, expensesAmount) {
+        displayItems.sumOf { it.amount }.coerceAtLeast(expensesAmount).toFloat()
+    }
+
+    val chartColors = remember { ColorChart.getPaymentMethodChartColors() }
+
     val animProgress by animateFloatAsState(
         targetValue = if (isStarted) 1f else 0f,
         animationSpec = tween(1000, easing = FastOutSlowInEasing),
@@ -84,23 +105,23 @@ fun PaymentMethodSegmentedChart(
             )
         }
 
-        if (paymentMethodSegmentChartItems.isEmpty()) {
+        if (displayItems.isEmpty()) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(80.dp)
                     .background(color = ColorGray.Gray_50, shape = RoundedCornerShape(8.dp)),
-
                 contentAlignment = Alignment.Center
             ) {
                 WMText(
-                    text = "결제수단이 없습니다.",
-                    style = Typography().bodySmall.copy(color = ColorGray.Gray_400)
+                    text = "결제 내역이 없습니다.",
+                    style = MaterialTheme.typography.bodySmall.copy(color = ColorGray.Gray_400)
                 )
             }
             return
         }
 
+        // 차트 영역
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -108,17 +129,20 @@ fun PaymentMethodSegmentedChart(
                 .clip(RoundedCornerShape(8.dp))
                 .background(ColorGray.Gray_50)
         ) {
-            if (totalAmount > 0) {
-                paymentMethodSegmentChartItems.forEachIndexed { index, data ->
-                    val proportion = data.amount / totalAmount
+            if (totalAmountForCalc > 0) {
+                displayItems.forEachIndexed { index, data ->
+                    val proportion = data.amount / totalAmountForCalc
                     val currentWeight = proportion * animProgress
 
                     if (currentWeight > 0f) {
+                        val color = if (data.paymentMethod == null) ColorGray.Gray_200
+                        else chartColors[index % chartColors.size]
+
                         Box(
                             modifier = Modifier
                                 .weight(currentWeight)
                                 .fillMaxHeight()
-                                .background(colors[index % colors.size])
+                                .background(color)
                         )
                     }
                 }
@@ -135,11 +159,15 @@ fun PaymentMethodSegmentedChart(
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        paymentMethodSegmentChartItems.forEachIndexed { index, item ->
+        // 리스트 영역
+        displayItems.forEachIndexed { index, item ->
+            val color = if (item.paymentMethod == null) ColorGray.Gray_200
+            else chartColors[index % chartColors.size]
+
             PaymentMethodSegmentedItem(
-                expensesAmount = expensesAmount,
+                totalAmount = totalAmountForCalc.toLong(),
                 paymentMethodSegment = item,
-                color = colors[index % colors.size]
+                color = color
             )
         }
     }
@@ -147,12 +175,12 @@ fun PaymentMethodSegmentedChart(
 
 @Composable
 private fun PaymentMethodSegmentedItem(
-    expensesAmount: Long,
+    totalAmount: Long,
     paymentMethodSegment: PaymentMethodSegmentChartData,
     color: Color,
 ) {
     val typography = MaterialTheme.typography
-    val paymentMethod = paymentMethodSegment.paymentMethod
+    val label = paymentMethodSegment.paymentMethod?.label ?: "결제수단 없음"
 
     Row(
         modifier = Modifier
@@ -164,11 +192,8 @@ private fun PaymentMethodSegmentedItem(
             modifier = Modifier
                 .clip(CircleShape)
                 .background(color)
-                .size(20.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            // 결제수단 아이콘이 있다면 여기에 추가 가능
-        }
+                .size(20.dp)
+        )
 
         Row(
             modifier = Modifier
@@ -179,13 +204,14 @@ private fun PaymentMethodSegmentedItem(
         ) {
             Row(modifier = Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically) {
                 WMText(
-                    text = paymentMethod.label,
+                    text = label,
                     style = typography.bodyLarge.copy(fontWeight = FontWeight.Medium),
                     maxLines = 1,
                 )
 
-                val rate = remember(expensesAmount, paymentMethodSegment.amount) {
-                    calculateRate(expensesAmount, paymentMethodSegment.amount)
+                val rate = remember(totalAmount, paymentMethodSegment.amount) {
+                    if (totalAmount == 0L) 0
+                    else (paymentMethodSegment.amount.toDouble() / totalAmount.toDouble() * 100.0).roundToInt()
                 }
 
                 WMText(
@@ -205,6 +231,6 @@ private fun PaymentMethodSegmentedItem(
 }
 
 data class PaymentMethodSegmentChartData(
-    val paymentMethod: PaymentMethodVo,
+    val paymentMethod: PaymentMethodVo?, // null 허용으로 변경
     val amount: Long,
 )

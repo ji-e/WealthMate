@@ -13,6 +13,8 @@ import kotlinx.collections.immutable.toImmutableList
 data class HomeUiState(
     val statusType: StatusType = StatusType.MONTH,
     val todayAmount: Long = 0,
+    val thisMonthBudgetAmount: Long = 0,
+    val thisMonthExpensesAmount: Long = 0,
     val budgetAmount: Long = 0,
     val currentAmount: Amount? = null,
     val lastAmount: Amount? = null,

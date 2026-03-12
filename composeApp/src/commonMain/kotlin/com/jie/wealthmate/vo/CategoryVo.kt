@@ -38,14 +38,17 @@ data class CategoryVo(
             tags = persistentListOf()
         )
 
-        fun CategoryEntity?.mapperToVo() = CategoryVo(
-            id = this?.id.default(),
-            icon = this?.icon.default(),
-            largeCategory = LargeCategoryEnum.creator(this?.largeCategory),
-            middleLabel = this?.middleLabel.default(),
-            sort = this?.sort.default(),
-            isFixed = this?.isFixed.default(),
-            tags = this?.tags?.map { it.mapperToVo() }.orEmpty().toImmutableList()
-        )
+        fun CategoryEntity?.mapperToVo(largeCategory: LargeCategoryEnum = LargeCategoryEnum.EXPENSES): CategoryVo {
+            if (this == null) return unset(largeCategory)
+            return CategoryVo(
+                id = id.default(),
+                icon = icon.default(),
+                largeCategory = LargeCategoryEnum.creator(this.largeCategory),
+                middleLabel = middleLabel.default(),
+                sort = sort.default(),
+                isFixed = isFixed.default(),
+                tags = tags?.map { it.mapperToVo() }.orEmpty().toImmutableList()
+            )
+        }
     }
 }
