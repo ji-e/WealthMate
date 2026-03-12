@@ -8,7 +8,9 @@ import com.jie.wealthmate.vo.CategoryVo
 import com.jie.wealthmate.vo.HistoryVo
 import com.jie.wealthmate.vo.PaymentMethodVo
 import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.persistentMapOf
 import kotlinx.datetime.LocalDate
 
 data class SearchUiState(
@@ -22,6 +24,7 @@ data class SearchUiState(
     val selectedCategories: List<CategoryVo> = emptyList(),
     val selectedPaymentMethods: List<PaymentMethodVo> = emptyList(),
     val searchResults: ImmutableList<HistoryVo> = persistentListOf(),
+    val summary: ImmutableMap<LargeCategoryEnum, Long> = persistentMapOf(),
     val isLoading: Boolean = false,
     val hasMore: Boolean = true,
     val offset: Int = 0

@@ -76,6 +76,10 @@ class SearchScreen : BaseScreen() {
             )
 
             SearchResult(
+                startDate = uiState.startDate,
+                endDate = uiState.endDate,
+                summary = uiState.summary,
+                selectedLargeCategories = uiState.selectedLargeCategories,
                 searchResults = uiState.searchResults,
                 sortOrder = uiState.sortOrder,
                 isLoading = uiState.isLoading,

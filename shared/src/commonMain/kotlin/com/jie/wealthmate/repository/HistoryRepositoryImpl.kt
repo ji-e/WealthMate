@@ -186,85 +186,10 @@ class HistoryRepositoryImpl(private val databaseProvider: DatabaseProvider) : Hi
                 "offset" to offset
             )
         ) {
-            val sql = StringBuilder("SELECT * FROM histories WHERE isDeleted = 0")
-            val binds = mutableListOf<Any?>()
-
-            if (query.isNotBlank()) {
-                sql.append(" AND (content LIKE ? OR categoryId IN (SELECT id FROM categories WHERE middleLabel LIKE ?))")
-                val searchParam = "%$query%"
-                binds.add(searchParam)
-                binds.add(searchParam)
-            }
-
-            when {
-                startDate != null && endDate != null -> {
-                    sql.append(" AND date BETWEEN ? AND ?")
-                    binds.add(startDate)
-                    binds.add(endDate)
-                }
-                startDate != null -> {
-                    sql.append(" AND date >= ?")
-                    binds.add(startDate)
-                }
-                endDate != null -> {
-                    sql.append(" AND date <= ?")
-                    binds.add(endDate)
-                }
-            }
-
-            if (largeCategories.isNotEmpty()) {
-                val placeholders = largeCategories.joinToString(",") { "?" }
-                sql.append(" AND largeCategory IN ($placeholders)")
-                binds.addAll(largeCategories)
-            }
-
-            if (categoryIds.isNotEmpty()) {
-                val hasUnset = categoryIds.any { it.startsWith("unset") }
-                val realCategoryIds = categoryIds.filter { !it.startsWith("unset") }
-
-                if (hasUnset && realCategoryIds.isEmpty()) {
-                    sql.append(" AND categoryId IS NULL")
-                } else if (hasUnset && realCategoryIds.isNotEmpty()) {
-                    val placeholders = realCategoryIds.joinToString(",") { "?" }
-                    sql.append(" AND (categoryId IN ($placeholders) OR categoryId IS NULL)")
-                    binds.addAll(realCategoryIds)
-                } else {
-                    val placeholders = categoryIds.joinToString(",") { "?" }
-                    sql.append(" AND categoryId IN ($placeholders)")
-                    binds.addAll(categoryIds)
-                }
-            }
-
-            if (paymentMethodIds.isNotEmpty()) {
-                val hasUnset = paymentMethodIds.any { it.startsWith("unset") }
-                val realPaymentMethodIds = paymentMethodIds.filter { !it.startsWith("unset") }
-
-                if (hasUnset && realPaymentMethodIds.isEmpty()) {
-                    sql.append(" AND paymentMethodId IS NULL")
-                } else if (hasUnset && realPaymentMethodIds.isNotEmpty()) {
-                    val placeholders = realPaymentMethodIds.joinToString(",") { "?" }
-                    sql.append(" AND (paymentMethodId IN ($placeholders) OR paymentMethodId IS NULL)")
-                    binds.addAll(realPaymentMethodIds)
-                } else {
-                    val placeholders = paymentMethodIds.joinToString(",") { "?" }
-                    sql.append(" AND paymentMethodId IN ($placeholders)")
-                    binds.addAll(paymentMethodIds)
-                }
-            }
-
-            val orderBy = when (sortOrder) {
-                "LATEST" -> "date DESC, createdAt DESC"
-                "HIGH_AMOUNT" -> "amount DESC"
-                "LOW_AMOUNT" -> "amount ASC"
-                else -> "date DESC, createdAt DESC"
-            }
-            sql.append(" ORDER BY $orderBy")
-
-            sql.append(" LIMIT ? OFFSET ?")
-            binds.add(limit.toLong())
-            binds.add(offset.toLong())
-
-            val rawQuery = RoomRawQuery(sql.toString()) { statement ->
+            val (sql, binds) = buildSearchQuery(
+                query, startDate, endDate, largeCategories, categoryIds, paymentMethodIds, isSummary = false, sortOrder, limit, offset
+            )
+            val rawQuery = RoomRawQuery(sql) { statement ->
                 binds.forEachIndexed { index, value ->
                     val bindIndex = index + 1
                     when (value) {
@@ -279,5 +204,154 @@ class HistoryRepositoryImpl(private val databaseProvider: DatabaseProvider) : Hi
             }
             dao.searchHistories(rawQuery)
         }
+    }
+
+    override suspend fun getSearchSummary(
+        query: String,
+        startDate: Long?,
+        endDate: Long?,
+        largeCategories: List<String>,
+        categoryIds: List<String>,
+        paymentMethodIds: List<String>
+    ): Map<String, Long> = withContext(Dispatchers.Default) {
+        loggedCall(
+            repositoryName = repoName,
+            methodName = "getSearchSummary",
+            params = mapOf(
+                "query" to query,
+                "startDate" to startDate,
+                "endDate" to endDate,
+                "largeCategories" to largeCategories,
+                "categoryIds" to categoryIds,
+                "paymentMethodIds" to paymentMethodIds
+            )
+        ) {
+            val (sql, binds) = buildSearchQuery(
+                query, startDate, endDate, largeCategories, categoryIds, paymentMethodIds, isSummary = true
+            )
+            val rawQuery = RoomRawQuery(sql) { statement ->
+                binds.forEachIndexed { index, value ->
+                    val bindIndex = index + 1
+                    when (value) {
+                        is String -> statement.bindText(bindIndex, value)
+                        is Long -> statement.bindLong(bindIndex, value)
+                        is Int -> statement.bindLong(bindIndex, value.toLong())
+                        is Double -> statement.bindDouble(bindIndex, value)
+                        null -> statement.bindNull(bindIndex)
+                        else -> statement.bindText(bindIndex, value.toString())
+                    }
+                }
+            }
+            
+            // Note: Since searchHistories returns List<HistoryWithDetails>, we can't directly use it for SUM.
+            // But we need to use RawQuery for dynamic WHERE clause.
+            // I'll reuse the logic but return a Map. I need a way to execute this.
+            // For now, I'll fetch IDs or just the fields I need if possible, but the DAO is limited.
+            // Actually, I should probably add a specific RawQuery method for summary if needed, 
+            // but let's see if I can get away with fetching enough info.
+            // Actually, fetching all items just for summary is bad if there are many.
+            // I will add a method to Dao that returns summary info.
+            
+            val result = dao.searchHistories(rawQuery)
+            result.groupBy { it.history.largeCategory }
+                .mapValues { entry -> entry.value.sumOf { it.history.amount } }
+        }
+    }
+
+    private fun buildSearchQuery(
+        query: String,
+        startDate: Long?,
+        endDate: Long?,
+        largeCategories: List<String>,
+        categoryIds: List<String>,
+        paymentMethodIds: List<String>,
+        isSummary: Boolean,
+        sortOrder: String? = null,
+        limit: Int? = null,
+        offset: Int? = null
+    ): Pair<String, List<Any?>> {
+        val sql = StringBuilder(if (isSummary) "SELECT * FROM histories WHERE isDeleted = 0" else "SELECT * FROM histories WHERE isDeleted = 0")
+        val binds = mutableListOf<Any?>()
+
+        if (query.isNotBlank()) {
+            sql.append(" AND (content LIKE ? OR categoryId IN (SELECT id FROM categories WHERE middleLabel LIKE ?))")
+            val searchParam = "%$query%"
+            binds.add(searchParam)
+            binds.add(searchParam)
+        }
+
+        when {
+            startDate != null && endDate != null -> {
+                sql.append(" AND date BETWEEN ? AND ?")
+                binds.add(startDate)
+                binds.add(endDate)
+            }
+            startDate != null -> {
+                sql.append(" AND date >= ?")
+                binds.add(startDate)
+            }
+            endDate != null -> {
+                sql.append(" AND date <= ?")
+                binds.add(endDate)
+            }
+        }
+
+        if (largeCategories.isNotEmpty()) {
+            val placeholders = largeCategories.joinToString(",") { "?" }
+            sql.append(" AND largeCategory IN ($placeholders)")
+            binds.addAll(largeCategories)
+        }
+
+        if (categoryIds.isNotEmpty()) {
+            val hasUnset = categoryIds.any { it.startsWith("unset") }
+            val realCategoryIds = categoryIds.filter { !it.startsWith("unset") }
+
+            if (hasUnset && realCategoryIds.isEmpty()) {
+                sql.append(" AND categoryId IS NULL")
+            } else if (hasUnset && realCategoryIds.isNotEmpty()) {
+                val placeholders = realCategoryIds.joinToString(",") { "?" }
+                sql.append(" AND (categoryId IN ($placeholders) OR categoryId IS NULL)")
+                binds.addAll(realCategoryIds)
+            } else {
+                val placeholders = categoryIds.joinToString(",") { "?" }
+                sql.append(" AND categoryId IN ($placeholders)")
+                binds.addAll(categoryIds)
+            }
+        }
+
+        if (paymentMethodIds.isNotEmpty()) {
+            val hasUnset = paymentMethodIds.any { it.startsWith("unset") }
+            val realPaymentMethodIds = paymentMethodIds.filter { !it.startsWith("unset") }
+
+            if (hasUnset && realPaymentMethodIds.isEmpty()) {
+                sql.append(" AND paymentMethodId IS NULL")
+            } else if (hasUnset && realPaymentMethodIds.isNotEmpty()) {
+                val placeholders = realPaymentMethodIds.joinToString(",") { "?" }
+                sql.append(" AND (paymentMethodId IN ($placeholders) OR paymentMethodId IS NULL)")
+                binds.addAll(realPaymentMethodIds)
+            } else {
+                val placeholders = paymentMethodIds.joinToString(",") { "?" }
+                sql.append(" AND paymentMethodId IN ($placeholders)")
+                binds.addAll(paymentMethodIds)
+            }
+        }
+
+        if (!isSummary) {
+            val orderBy = when (sortOrder) {
+                "LATEST" -> "date DESC, createdAt DESC"
+                "HIGH_AMOUNT" -> "amount DESC"
+                "LOW_AMOUNT" -> "amount ASC"
+                else -> "date DESC, createdAt DESC"
+            }
+            sql.append(" ORDER BY $orderBy")
+
+            if (limit != null && offset != null) {
+                sql.append(" LIMIT ? OFFSET ?")
+                binds.add(limit.toLong())
+                binds.add(offset.toLong())
+            }
+        }
+
+        return sql.toString() to binds
     }
 }
