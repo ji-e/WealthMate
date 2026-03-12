@@ -50,64 +50,51 @@ class BudgetScreenModel(
                     budgetRepository.getBudgetsByMonthWithDetails(monthStr),
                     historyRepository.getHistoriesByMonth(start, end)
                 ) { budgetsWithDetails, historiesWithDetails ->
-                    // 예산 상단 헤더용: 지출 합계만 포함 (수입, 저축 제외)
-                    val totalBudget = budgetsWithDetails
-                        .filter {
-                            it.category?.largeCategory == LargeCategoryEnum.EXPENSES.name
-                        }
-                        .sumOf { it.budget.amount }
+                    // 1. 데이터 그룹화하여 중복 순회 최소화
+                    val historiesByCategoryId = historiesWithDetails.groupBy { it.history.categoryId }
+                    val historiesByLargeCategory = historiesWithDetails.groupBy { it.history.largeCategory }
+                    val budgetsByLargeCategory = budgetsWithDetails.groupBy { it.category?.largeCategory }
 
-                    val expenses = historiesWithDetails
-                        .filter {
-                            it.history.largeCategory == LargeCategoryEnum.EXPENSES.name
-                        }
+                    // 2. 지출 관련 데이터 추출
+                    val expenseKey = LargeCategoryEnum.EXPENSES.name
+                    val expenseHistories = historiesByLargeCategory[expenseKey] ?: emptyList()
+                    val expenseBudgets = budgetsByLargeCategory[expenseKey] ?: emptyList()
 
-                    val totalUsed = expenses.sumOf { it.history.amount }
+                    val totalBudget = expenseBudgets.sumOf { it.budget.amount }
+                    val totalUsed = expenseHistories.sumOf { it.history.amount }
 
-                    val topExpenses = expenses
+                    // 3. 상위 지출 항목 (고정 지출 제외)
+                    val topExpenses = expenseHistories
                         .filter { it.category?.isFixed != true }
                         .sortedByDescending { it.history.amount }
                         .take(3)
                         .map { it.mapperToVo() }
                         .toImmutableList()
 
-                    // 카테고리별 예산 초과 아이템 계산 (지출 카테고리만 대상)
-                    val overItems = budgetsWithDetails
-                        .filter { it.category?.largeCategory == LargeCategoryEnum.EXPENSES.name }
-                        .mapNotNull { budgetWithDetail ->
-                            val categorySpent = historiesWithDetails
-                                .filter { it.history.categoryId == budgetWithDetail.budget.categoryId }
-                                .sumOf { it.history.amount }
+                    // 4. 카테고리별 예산 초과 아이템 계산
+                    val overItems = expenseBudgets.mapNotNull { budgetWithDetail ->
+                        val categoryHistories = historiesByCategoryId[budgetWithDetail.budget.categoryId] ?: emptyList()
+                        val categorySpent = categoryHistories.sumOf { it.history.amount }
 
-                            if (categorySpent > budgetWithDetail.budget.amount) {
-                                val categoryHistories = historiesWithDetails
-                                    .filter { it.history.categoryId == budgetWithDetail.budget.categoryId }
+                        if (categorySpent > budgetWithDetail.budget.amount) {
+                            val topExpense = categoryHistories.maxByOrNull { it.history.amount }
 
-                                val topExpense = categoryHistories.maxByOrNull { it.history.amount }
+                            BudgetOverUsageVo(
+                                category = budgetWithDetail.category.mapperToVo(),
+                                spentAmount = categorySpent,
+                                budgetAmount = budgetWithDetail.budget.amount,
+                                overAmount = categorySpent - budgetWithDetail.budget.amount,
+                                transactionCount = categoryHistories.size,
+                                topExpenseTitle = topExpense?.history?.content,
+                                topExpenseAmount = topExpense?.history?.amount
+                            )
+                        } else null
+                    }.toImmutableList()
 
-                                BudgetOverUsageVo(
-                                    category = budgetWithDetail.category.mapperToVo(),
-                                    spentAmount = categorySpent,
-                                    budgetAmount = budgetWithDetail.budget.amount,
-                                    overAmount = categorySpent - budgetWithDetail.budget.amount,
-                                    transactionCount = categoryHistories.size,
-                                    topExpenseTitle = topExpense?.history?.content,
-                                    topExpenseAmount = topExpense?.history?.amount
-                                )
-                            } else null
-                        }.toImmutableList()
-
-                    // 요약 정보 계산 (수입, 지출, 저축 각각 표시)
+                    // 5. 대분류별 요약 정보 정보 계산
                     val summaryItems = LargeCategoryEnum.entries
                         .map { largeCategory ->
-                            val categoryBudget = budgetsWithDetails
-                                .filter { it.category?.largeCategory == largeCategory.name }
-                                .sumOf { it.budget.amount }
-
-                            val categorySpent = historiesWithDetails
-                                .filter { it.history.largeCategory == largeCategory.name }
-                                .sumOf { it.history.amount }
-
+                            val categoryName = largeCategory.name
                             BudgetSummaryVo(
                                 largeCategory = largeCategory,
                                 icon = when (largeCategory) {
@@ -115,8 +102,8 @@ class BudgetScreenModel(
                                     LargeCategoryEnum.EXPENSES -> "💸"
                                     LargeCategoryEnum.SAVING -> "🏦"
                                 },
-                                budgetAmount = categoryBudget,
-                                currentAmount = categorySpent
+                                budgetAmount = budgetsByLargeCategory[categoryName]?.sumOf { it.budget.amount } ?: 0L,
+                                currentAmount = historiesByLargeCategory[categoryName]?.sumOf { it.history.amount } ?: 0L
                             )
                         }.toImmutableList()
 
