@@ -274,7 +274,7 @@ fun MonthBudgetItem(
                     }
                 }
                 WMText(
-                    text = "지출률",
+                    text = "지출 예산 사용률",
                     style = typography.titleSmall.copy(
                         color = if (hasExpenseBudget) ColorGray.Gray_700 else ColorGray.Gray_200
                     ),

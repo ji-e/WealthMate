@@ -85,6 +85,7 @@ class BudgetDetailScreen(
 
                         item {
                             AnimatedVisibility(
+                                modifier = Modifier.padding(start = 12.dp),
                                 visible = isExpanded,
                                 enter = fadeIn() + expandVertically(),
                                 exit = fadeOut() + shrinkVertically()
@@ -108,7 +109,7 @@ class BudgetDetailScreen(
                 }
 
                 item {
-                    Spacer(modifier = Modifier.height(32.dp))
+                    Spacer(modifier = Modifier.height(40.dp))
                 }
             }
         }

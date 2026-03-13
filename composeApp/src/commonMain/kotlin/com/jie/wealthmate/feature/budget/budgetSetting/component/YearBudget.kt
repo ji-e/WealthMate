@@ -82,7 +82,7 @@ fun YearBudget(
                 modifier = Modifier.weight(1f),
                 label = "수입 - 지출",
                 value = summary.balance,
-                bottomLabel = "지출률",
+                bottomLabel = "지출 예산 사용률",
                 bottomValue = summary.expenseRate?.let { "$it%" } ?: "-%"
             )
         }

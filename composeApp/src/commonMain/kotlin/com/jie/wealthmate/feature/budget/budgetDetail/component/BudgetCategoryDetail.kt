@@ -49,6 +49,10 @@ import org.jetbrains.compose.resources.painterResource
 import wealthmate.composeapp.generated.resources.Res
 import wealthmate.composeapp.generated.resources.ic_arrow_drop_down
 
+/**
+ * 대분류(수입, 지출, 저축)별 예산 섹션의 헤더를 표시합니다.
+ * 전체 사용 금액, 예산 및 진행 상태 바를 포함합니다.
+ */
 @Composable
 fun SectionHeader(
     section: BudgetSectionVo,
@@ -58,6 +62,13 @@ fun SectionHeader(
 ) {
     val rotation by animateFloatAsState(targetValue = if (isExpanded) 180f else 0f)
 
+    // 사용량 퍼센트 계산
+    val percentage = remember(section.totalBudget, section.totalUsed) {
+        if (section.totalBudget > 0) {
+            ((section.totalUsed.toDouble() / section.totalBudget) * 100).toInt()
+        } else 0
+    }
+
     Column(
         modifier = modifier.fillMaxWidth()
     ) {
@@ -65,6 +76,7 @@ fun SectionHeader(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
+            // 대분류 제목 및 토글 아이콘
             Row(
                 modifier = Modifier.noRippleClickable { onToggle() },
                 verticalAlignment = Alignment.CenterVertically,
@@ -72,9 +84,16 @@ fun SectionHeader(
                 WMText(
                     text = section.largeCategory.label,
                     style = MaterialTheme.typography.titleMedium.copy(
-                        color = ColorPrimary.Primary_500,
                         fontWeight = FontWeight.SemiBold
                     ),
+                )
+
+                WMText(
+                    text = if (section.totalBudget > 0) "$percentage%" else "-",
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        fontWeight = FontWeight.SemiBold
+                    ),
+                    modifier = Modifier.padding(start = 4.dp)
                 )
 
                 Icon(
@@ -83,11 +102,12 @@ fun SectionHeader(
                     modifier = Modifier
                         .size(24.dp)
                         .rotate(rotation),
-                    tint = ColorPrimary.Primary_500,
                 )
             }
+
             Spacer(modifier = Modifier.weight(1f))
 
+            // 사용 금액 및 예산 정보 (퍼센트 포함)
             val budgetText = remember(section.totalUsed, section.totalBudget) {
                 val used = section.totalUsed.formatWithCommas()
                 val budget =
@@ -101,15 +121,63 @@ fun SectionHeader(
                 text = budgetText,
                 style = MaterialTheme.typography.bodySmall.copy(color = ColorGray.Gray_500)
             )
+
+        }
+
+        // 그래프 비율 계산
+        val barRatio = remember(section.totalBudget, section.totalUsed) {
+            if (section.totalBudget > 0) (section.totalUsed.toFloat() / section.totalBudget).coerceIn(
+                0f,
+                1f
+            )
+            else if (section.totalUsed > 0) 1f
+            else 0f
+        }
+
+        // 상태에 따른 바 색상 (80% 초과 시 강조 등)
+        val barColor = remember(section.largeCategory, percentage) {
+            when {
+                section.totalBudget == 0L && section.totalUsed > 0 -> ColorGray.Gray_300
+                percentage > 80 -> when (section.largeCategory) {
+                    LargeCategoryEnum.INCOME -> ColorBlue.Blue_300
+                    LargeCategoryEnum.EXPENSES -> ColorRed.Red_300
+                    LargeCategoryEnum.SAVING -> ColorPrimary.Primary_500
+                }
+
+                else -> section.largeCategory.backgroundColor
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // 예산 사용률 진행 바
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(12.dp)
+                .clip(CircleShape)
+                .background(ColorGray.Gray_100)
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(barRatio)
+                    .fillMaxHeight()
+                    .clip(CircleShape)
+                    .background(barColor)
+            )
         }
 
         HorizontalDivider(
-            modifier = Modifier.padding(top = 8.dp),
+            modifier = Modifier.padding(top = 20.dp),
             color = ColorGray.Gray_100
         )
     }
 }
 
+/**
+ * 중분류 카테고리 그룹을 표시합니다.
+ * 하위 태그가 있을 경우 확장하여 상세 내역을 보여줄 수 있습니다.
+ */
 @Composable
 fun CategoryBudgetGroup(
     group: CategoryBudgetGroupVo,
@@ -138,7 +206,7 @@ fun CategoryBudgetGroup(
             onToggleTags = { isTagsExpanded = !isTagsExpanded }
         )
 
-        // 태그(상세) 정보가 있는 경우
+        // 태그(상세) 정보가 있는 경우 애니메이션과 함께 표시
         AnimatedVisibility(
             visible = isTagsExpanded && group.tagBudgets.isNotEmpty(),
             enter = fadeIn() + expandVertically(),
@@ -184,6 +252,9 @@ fun CategoryBudgetGroup(
     }
 }
 
+/**
+ * 카테고리 또는 태그의 개별 예산 항목을 표시하는 컴포넌트입니다.
+ */
 @Composable
 private fun CategoryBudgetItem(
     icon: String?,
@@ -209,14 +280,17 @@ private fun CategoryBudgetItem(
     val statusColor = remember(largeCategory, percentage, isMain, budgetAmount, usedAmount) {
         when {
             budgetAmount == 0L && usedAmount > 0 -> ColorGray.Gray_300
-            percentage > 80 -> when (largeCategory) {
+            isMain && percentage > 80 -> when (largeCategory) {
                 LargeCategoryEnum.INCOME -> ColorBlue.Blue_300
                 LargeCategoryEnum.EXPENSES -> ColorRed.Red_300
                 LargeCategoryEnum.SAVING -> ColorPrimary.Primary_500
             }
 
-            isMain -> largeCategory.backgroundColor
-            else -> ColorPrimary.Primary_300
+            else -> when (largeCategory) {
+                LargeCategoryEnum.INCOME -> ColorBlue.Blue_200
+                LargeCategoryEnum.EXPENSES -> ColorRed.Red_200
+                LargeCategoryEnum.SAVING -> ColorPrimary.Primary_400
+            }
         }
     }
 
