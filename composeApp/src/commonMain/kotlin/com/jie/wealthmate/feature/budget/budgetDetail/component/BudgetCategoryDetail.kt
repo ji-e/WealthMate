@@ -137,7 +137,7 @@ fun SectionHeader(
         // 상태에 따른 바 색상 (80% 초과 시 강조 등)
         val barColor = remember(section.largeCategory, percentage) {
             when {
-                section.totalBudget == 0L && section.totalUsed > 0 -> ColorGray.Gray_300
+                section.totalBudget == 0L && section.totalUsed > 0 -> ColorGray.Gray_50
                 percentage > 80 -> when (section.largeCategory) {
                     LargeCategoryEnum.INCOME -> ColorBlue.Blue_300
                     LargeCategoryEnum.EXPENSES -> ColorRed.Red_300
@@ -279,7 +279,7 @@ private fun CategoryBudgetItem(
 
     val statusColor = remember(largeCategory, percentage, isMain, budgetAmount, usedAmount) {
         when {
-            budgetAmount == 0L && usedAmount > 0 -> ColorGray.Gray_300
+            budgetAmount == 0L && usedAmount > 0 -> ColorGray.Gray_50
             isMain && percentage > 80 -> when (largeCategory) {
                 LargeCategoryEnum.INCOME -> ColorBlue.Blue_300
                 LargeCategoryEnum.EXPENSES -> ColorRed.Red_300
