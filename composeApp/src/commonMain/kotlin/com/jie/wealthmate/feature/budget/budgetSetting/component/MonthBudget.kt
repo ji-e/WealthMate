@@ -58,6 +58,7 @@ fun MonthBudgetList(
     yearlySummary: YearlySummary,
     onMoreClick: (String, Boolean) -> Unit,
     onMonthClick: (String) -> Unit,
+    onYearClick: (String) -> Unit,
 ) {
     val listState = rememberLazyListState()
 
@@ -84,7 +85,8 @@ fun MonthBudgetList(
         item {
             YearBudget(
                 year = year,
-                summary = yearlySummary
+                summary = yearlySummary,
+                onYearClick = { onYearClick(year) }
             )
         }
     }

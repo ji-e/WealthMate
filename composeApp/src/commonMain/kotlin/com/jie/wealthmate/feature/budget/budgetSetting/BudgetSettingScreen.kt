@@ -25,6 +25,7 @@ import com.jie.wealthmate.feature.budget.budgetSetting.component.BudgetMoreMenu
 import com.jie.wealthmate.feature.budget.budgetSetting.component.MonthBudgetList
 import com.jie.wealthmate.feature.budget.budgetSetting.component.MonthBudgetMoreModalBottomSheet
 import com.jie.wealthmate.feature.budget.budgetSetting.component.YearChips
+import com.jie.wealthmate.feature.budget.budgetYearDetail.BudgetYearDetailScreen
 import kotlinx.datetime.LocalDate
 import wealthmate.composeapp.generated.resources.Res
 import wealthmate.composeapp.generated.resources.ic_add
@@ -83,6 +84,9 @@ class BudgetSettingScreen : BaseScreen() {
                     val date = LocalDate(parts[0].toInt(), parts[1].toInt(), 1)
                     navigator.push(BudgetDetailScreen(date))
                 },
+                onYearClick = { year ->
+                    navigator.push(BudgetYearDetailScreen(year))
+                }
             )
         }
 
