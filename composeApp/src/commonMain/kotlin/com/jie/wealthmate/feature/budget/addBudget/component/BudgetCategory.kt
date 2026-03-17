@@ -30,6 +30,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.jie.wealthmate.component.WMText
 import com.jie.wealthmate.component.textField.WMTextField
@@ -46,7 +47,7 @@ import wealthmate.composeapp.generated.resources.ic_push_pin
 import kotlin.math.roundToLong
 
 @Composable
-private fun CategoryIcon(
+fun CategoryIcon(
     icon: String,
     backgroundColor: Color,
     isFixed: Boolean,
@@ -87,6 +88,8 @@ private fun BudgetSlider(
     value: Float,
     onValueChange: (Float) -> Unit,
     enabled: Boolean = true,
+    sliderHeight: Dp = 16.dp,
+    thumbTopPadding: Float = 0f,
     thumbStartPadding: Float = 0f,
     thumbEndPadding: Float = 0f,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
@@ -106,7 +109,7 @@ private fun BudgetSlider(
             track = { state ->
                 Box(contentAlignment = Alignment.Center) {
                     SliderDefaults.Track(
-                        modifier = Modifier.height(16.dp),
+                        modifier = Modifier.height(sliderHeight),
                         sliderState = state,
                         colors = SliderDefaults.colors(
                             activeTrackColor = ColorPrimary.Primary_400,
@@ -121,8 +124,12 @@ private fun BudgetSlider(
             thumb = {
                 Box(
                     modifier = Modifier
-                        .padding(start = thumbStartPadding.dp, end = thumbEndPadding.dp)
-                        .size(16.dp)
+                        .padding(
+                            start = thumbStartPadding.dp,
+                            end = thumbEndPadding.dp,
+                            top = thumbTopPadding.dp
+                        )
+                        .size(sliderHeight)
                         .background(
                             if (enabled) ColorPrimary.Primary_500 else ColorGray.Gray_100,
                             CircleShape
@@ -263,12 +270,12 @@ fun BudgetCategorySliderItem(
                                 Column(modifier = Modifier.weight(1f)) {
                                     WMText(
                                         text = tag.label,
-                                        style = typography.titleMedium.copy(fontWeight = FontWeight.Medium),
+                                        style = typography.titleSmall.copy(fontWeight = FontWeight.Medium),
                                         maxLines = 1,
                                     )
                                     WMText(
                                         text = "${(tagPercent * 100).toInt()}%",
-                                        style = typography.bodySmall.copy(color = ColorGray.Gray_500),
+                                        style = typography.labelMedium.copy(color = ColorGray.Gray_500),
                                     )
                                 }
 
@@ -306,8 +313,10 @@ fun BudgetCategorySliderItem(
                                         val newAmount = roundedAmount.coerceAtMost(tagMaxAllowed)
                                         onValueChange(tagId, TextFieldValue(newAmount.toString()))
                                     },
+                                    sliderHeight = 12.dp,
                                     thumbStartPadding = 12f,
                                     thumbEndPadding = 8f,
+                                    thumbTopPadding = 2f,
                                     modifier = Modifier.padding(top = 12.dp, bottom = 10.dp)
                                 )
                             }

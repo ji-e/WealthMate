@@ -25,6 +25,7 @@ import com.jie.wealthmate.component.EmptyListView
 import com.jie.wealthmate.component.calculateAdjustedToastPadding
 import com.jie.wealthmate.component.topbar.TopBarItem
 import com.jie.wealthmate.component.topbar.WMTopBar
+import com.jie.wealthmate.feature.budget.budgetDetail.BudgetDetailScreen
 import com.jie.wealthmate.feature.budget.budgetSetting.BudgetSettingScreen
 import com.jie.wealthmate.feature.budget.component.BudgetHeader
 import com.jie.wealthmate.feature.budget.component.BudgetInfo
@@ -122,7 +123,12 @@ class BudgetScreen : BaseScreen() {
                     }
 
                     Spacer(modifier = Modifier.height(32.dp))
-                    BudgetSummary(items = uiState.budgetSummaryItems)
+                    BudgetSummary(
+                        items = uiState.budgetSummaryItems,
+                        onDetailClick = {
+                            navigator.push(BudgetDetailScreen(uiState.selectedMonth))
+                        }
+                    )
                     Spacer(modifier = Modifier.height(32.dp))
                 }
             }
