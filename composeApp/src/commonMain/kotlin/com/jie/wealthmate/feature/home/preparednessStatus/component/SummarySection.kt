@@ -1,10 +1,11 @@
 package com.jie.wealthmate.feature.home.preparednessStatus.component
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -31,6 +32,7 @@ fun SummarySection(
 ) {
     val isExpenses = largeCategory == LargeCategoryEnum.EXPENSES
 
+    // 텍스트 컬러 결정 로직 최적화
     val textColor = remember(diffPercentage, isExpenses) {
         when {
             diffPercentage == null || diffPercentage == 0 -> ColorGray.Gray_400
@@ -39,27 +41,46 @@ fun SummarySection(
         }
     }
 
+    // 비교 문구 계산 로직 최적화
+    val comparisonText = remember(statusType, diffPercentage) {
+        diffPercentage?.let {
+            val typePrefix = when (statusType) {
+                StatusType.WEEK -> "지난주와"
+                StatusType.MONTH -> "지난달과"
+                StatusType.YEAR -> "지난해와"
+            }
+            if (it == 0) "$typePrefix 동일"
+            else "${if (it > 0) "+" else ""}$it%"
+        }
+    }
+
+    val diffActionText = remember(largeCategory, diffAmount) {
+        val isPositive = diffAmount >= 0
+        when (largeCategory) {
+            LargeCategoryEnum.INCOME -> if (isPositive) "늘었어요" else "줄었어요"
+            LargeCategoryEnum.EXPENSES -> if (isPositive) "더 썼어요" else "덜 썼어요"
+            LargeCategoryEnum.SAVING -> if (isPositive) "더 했어요" else "덜 했어요"
+        }
+    }
+
     Column(
         modifier = modifier.fillMaxWidth()
+            .background(ColorGray.White)
+            .padding(horizontal = 28.dp, vertical = 12.dp),
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             WMText(
                 text = "${statusType.label} 총 ${largeCategory.label}",
-                style = MaterialTheme.typography.titleSmall.copy(color = ColorGray.Gray_500)
+                style = typography.titleSmall.copy(
+                    color = ColorGray.Gray_500,
+                    fontWeight = FontWeight.SemiBold
+                ),
             )
 
-            diffPercentage?.let {
-                val sign = if (it > 0) "+" else ""
-                val typeText = when (statusType) {
-                    StatusType.WEEK -> "지난주와"
-                    StatusType.MONTH -> "지난달과"
-                    StatusType.YEAR -> "지난해와"
-                }
-                val displayText = if (it == 0) "$typeText 동일" else "$sign$it%"
-
+            comparisonText?.let {
                 WMText(
-                    text = displayText,
-                    style = MaterialTheme.typography.bodySmall.copy(color = textColor),
+                    text = it,
+                    style = typography.bodySmall.copy(color = textColor),
                     modifier = Modifier.padding(start = 4.dp)
                 )
             }
@@ -67,33 +88,28 @@ fun SummarySection(
 
         WMText(
             text = "${formatWithCommas(currentAmount.toString())}원",
-            style = MaterialTheme.typography.displaySmall.copy(fontWeight = FontWeight.SemiBold),
+            style = typography.displaySmall.copy(fontWeight = FontWeight.SemiBold),
             modifier = Modifier.padding(vertical = 8.dp)
         )
 
-        val diffActionText = when (largeCategory) {
-            LargeCategoryEnum.INCOME -> if (diffAmount >= 0) "늘었어요" else "줄었어요"
-            LargeCategoryEnum.EXPENSES -> if (diffAmount >= 0) "더 썼어요" else "덜 썼어요"
-            LargeCategoryEnum.SAVING -> if (diffAmount >= 0) "더 했어요" else "덜 했어요"
-        }
-
-        Row(verticalAlignment = Alignment.CenterVertically) {
-
-
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(bottom = 16.dp)
+        ) {
             WMText(
                 text = "${statusType.lastLabel} 대비 ",
-                style = MaterialTheme.typography.bodyMedium.copy(color = ColorGray.Gray_500)
+                style = typography.bodyMedium.copy(color = ColorGray.Gray_500)
             )
             WMText(
                 text = "${formatWithCommas(diffAmount.absoluteValue.toString())}원 ",
-                style = MaterialTheme.typography.bodyMedium.copy(
+                style = typography.bodyMedium.copy(
                     color = textColor,
                     fontWeight = FontWeight.Bold
                 )
             )
             WMText(
                 text = diffActionText,
-                style = MaterialTheme.typography.bodyMedium.copy(color = ColorGray.Gray_500)
+                style = typography.bodyMedium.copy(color = ColorGray.Gray_500)
             )
         }
     }
