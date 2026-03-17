@@ -48,7 +48,6 @@ fun MonthCompare(
     monthlyData: List<MonthlyComparison>,
     modifier: Modifier = Modifier,
 ) {
-    val typography = MaterialTheme.typography
     val scrollState = rememberScrollState()
 
     val currentDateTime = remember {
@@ -245,7 +244,7 @@ private fun Bar(
 }
 
 @Composable
-private fun LegendItem(label: String, color: Color) {
+fun LegendItem(label: String, color: Color) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         Box(
             modifier = Modifier

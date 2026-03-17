@@ -78,8 +78,8 @@ class BudgetYearDetailScreenModel(
                     val amount = h.history.amount
                     val largeCategory = h.history.largeCategory
                     val isFixed = h.history.repeatCycleId != null
-                    val categoryLabel = h.category?.middleLabel ?: "기타"
-                    val icon = h.category?.icon ?: "💸"
+                    val categoryLabel = h.category?.middleLabel ?: "카테고리 없음"
+                    val icon = h.category?.icon ?: "❓"
 
                     val acc = monthlySummary[month - 1]
                     when (largeCategory) {
