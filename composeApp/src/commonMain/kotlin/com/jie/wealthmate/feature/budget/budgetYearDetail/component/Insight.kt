@@ -59,7 +59,10 @@ fun Insight(
     ) {
         WMText(
             text = "인사이트",
-            style = typography.titleSmall.copy(fontWeight = FontWeight.SemiBold),
+            style = MaterialTheme.typography.titleSmall.copy(
+                color = ColorGray.Gray_500,
+                fontWeight = FontWeight.SemiBold
+            ),
             modifier = Modifier.padding(bottom = 4.dp)
         )
 

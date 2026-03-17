@@ -17,7 +17,9 @@ import com.jie.wealthmate.vo.CategoryVo.Companion.mapperToVo
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.minus
 
 class BudgetDetailScreenModel(
     private val budgetRepository: BudgetRepository,
@@ -37,11 +39,23 @@ class BudgetDetailScreenModel(
         val start = initialMonth.firstDayOfMonth().toEpochMilliseconds()
         val end = initialMonth.lastDayOfMonth().toEpochMilliseconds()
 
+        val lastMonth = initialMonth.minus(1, DateTimeUnit.MONTH)
+        val lastStart = lastMonth.firstDayOfMonth().toEpochMilliseconds()
+        val lastEnd = lastMonth.lastDayOfMonth().toEpochMilliseconds()
+
+        val lastMonthSumsFlow = combine(
+            historyRepository.getSumByMonth(lastStart, lastEnd, LargeCategoryEnum.INCOME.name),
+            historyRepository.getSumByMonth(lastStart, lastEnd, LargeCategoryEnum.EXPENSES.name),
+            historyRepository.getSumByMonth(lastStart, lastEnd, LargeCategoryEnum.SAVING.name)
+        ) { income, expense, saving -> Triple(income, expense, saving) }
+
         combine(
             budgetRepository.getBudgetsByMonthWithDetails(monthStr),
             historyRepository.getHistoriesByMonth(start, end),
-            categoryRepository.getAllCategories()
-        ) { budgets, histories, allCategories ->
+            categoryRepository.getAllCategories(),
+            lastMonthSumsFlow
+        ) { budgets, histories, allCategories, lastMonthSums ->
+            val (lastIncome, lastExpense, lastSaving) = lastMonthSums
             val budgetsByLargeCategory = budgets.groupBy { it.category?.largeCategory }
             val categoriesByLargeCategory = allCategories.groupBy { it.largeCategory }
 
@@ -138,6 +152,9 @@ class BudgetDetailScreenModel(
                     totalIncome = sections.find { it.largeCategory == LargeCategoryEnum.INCOME }?.totalUsed ?: 0L,
                     totalExpense = sections.find { it.largeCategory == LargeCategoryEnum.EXPENSES }?.totalUsed ?: 0L,
                     totalSaving = sections.find { it.largeCategory == LargeCategoryEnum.SAVING }?.totalUsed ?: 0L,
+                    lastTotalIncome = lastIncome,
+                    lastTotalExpense = lastExpense,
+                    lastTotalSaving = lastSaving,
                     sections = sections
                 )
             }

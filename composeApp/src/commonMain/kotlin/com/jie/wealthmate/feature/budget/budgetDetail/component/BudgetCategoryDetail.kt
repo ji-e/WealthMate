@@ -18,7 +18,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.typography
@@ -167,10 +166,7 @@ fun SectionHeader(
             )
         }
 
-        HorizontalDivider(
-            modifier = Modifier.padding(top = 20.dp),
-            color = ColorGray.Gray_100
-        )
+        Spacer(modifier = Modifier.height(4.dp))
     }
 }
 
@@ -214,14 +210,14 @@ fun CategoryBudgetGroup(
         ) {
             Column(
                 modifier = Modifier
-                    .padding(horizontal = 28.dp)
+                    .padding(start = 4.dp)
                     .fillMaxWidth()
             ) {
                 Spacer(modifier = Modifier.height(16.dp))
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clip(RoundedCornerShape(12.dp))
+                        .clip(RoundedCornerShape(8.dp))
                         .background(ColorGray.Gray_50)
                         .padding(16.dp)
                 ) {
@@ -279,7 +275,7 @@ private fun CategoryBudgetItem(
 
     val statusColor = remember(largeCategory, percentage, isMain, budgetAmount, usedAmount) {
         when {
-            budgetAmount == 0L && usedAmount > 0 -> ColorGray.Gray_50
+            budgetAmount == 0L && usedAmount > 0 -> ColorGray.Gray_100
             isMain && percentage > 80 -> when (largeCategory) {
                 LargeCategoryEnum.INCOME -> ColorBlue.Blue_300
                 LargeCategoryEnum.EXPENSES -> ColorRed.Red_300
@@ -296,7 +292,7 @@ private fun CategoryBudgetItem(
 
     Column(
         modifier = Modifier
-            .padding(start = if (isMain) 20.dp else 0.dp, end = if (isMain) 28.dp else 0.dp)
+//            .padding(start = if (isMain) 20.dp else 0.dp, end = if (isMain) 28.dp else 0.dp)
             .fillMaxWidth()
     ) {
         Row(

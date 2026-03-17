@@ -56,7 +56,10 @@ fun ExpenseFixed(
     ) {
         WMText(
             text = "고정지출",
-            style = typography.titleSmall.copy(fontWeight = FontWeight.SemiBold),
+            style = MaterialTheme.typography.titleSmall.copy(
+                color = ColorGray.Gray_500,
+                fontWeight = FontWeight.SemiBold
+            ),
             modifier = Modifier.padding(bottom = 12.dp)
         )
 
