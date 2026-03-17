@@ -58,8 +58,8 @@ fun SummarySection(
         val isPositive = diffAmount >= 0
         when (largeCategory) {
             LargeCategoryEnum.INCOME -> if (isPositive) "늘었어요" else "줄었어요"
-            LargeCategoryEnum.EXPENSES -> if (isPositive) "더 썼어요" else "덜 썼어요"
-            LargeCategoryEnum.SAVING -> if (isPositive) "더 했어요" else "덜 했어요"
+            LargeCategoryEnum.EXPENSES -> if (isPositive) "더 지출했어요" else "덜 지출헸어요"
+            LargeCategoryEnum.SAVING -> if (isPositive) "더 저축했어요" else "덜 저축했어요"
         }
     }
 
