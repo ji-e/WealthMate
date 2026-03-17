@@ -112,7 +112,7 @@ fun SavingGoal(
                 modifier = Modifier
                     .padding(bottom = 4.dp)
                     .fillMaxWidth()
-                    .clip(RoundedCornerShape(12.dp))
+                    .clip(RoundedCornerShape(8.dp))
                     .background(ColorGray.Gray_50)
                     .padding(vertical = 12.dp),
                 contentAlignment = Alignment.Center
