@@ -65,6 +65,7 @@ fun LargeCategoryStatus(
         StatusItem(
             largeCategory = LargeCategoryEnum.INCOME,
             icon = "💰",
+            statusType = statusType,
             currentAmount = currentAmount?.incomeAmount.default(),
             lastAmount = lastAmount?.incomeAmount.default(),
             onClick = { onCategoryClick(LargeCategoryEnum.INCOME) }
@@ -73,6 +74,7 @@ fun LargeCategoryStatus(
         StatusItem(
             largeCategory = LargeCategoryEnum.EXPENSES,
             icon = "💸",
+            statusType = statusType,
             currentAmount = currentAmount?.expensesAmount.default(),
             lastAmount = lastAmount?.expensesAmount.default(),
             comparedToIncomePercent = expensesRate,
@@ -82,6 +84,7 @@ fun LargeCategoryStatus(
         StatusItem(
             largeCategory = LargeCategoryEnum.SAVING,
             icon = "🏦",
+            statusType = statusType,
             currentAmount = currentAmount?.savingAmount.default(),
             lastAmount = lastAmount?.savingAmount.default(),
             comparedToIncomePercent = savingRate,
@@ -94,14 +97,15 @@ fun LargeCategoryStatus(
 private fun StatusItem(
     largeCategory: LargeCategoryEnum,
     icon: String,
+    statusType: StatusType,
     currentAmount: Long,
     lastAmount: Long,
     comparedToIncomePercent: Int? = null,
     onClick: () -> Unit,
 ) {
     val typography = MaterialTheme.typography
-    val changeMessage = remember(currentAmount, lastAmount) {
-        getChangeMessage(currentAmount, lastAmount)
+    val changeMessage = remember(currentAmount, lastAmount, statusType) {
+        getChangeMessage(currentAmount, lastAmount, statusType)
     }
 
     Row(
@@ -189,12 +193,13 @@ fun calculateRate(
 private fun getChangeMessage(
     current: Long,
     last: Long,
+    statusType: StatusType
 ): String {
     val percentage = calculateContrastPercentage(current, last) ?: return "데이터가 없어요"
 
     return when {
         percentage > 0 -> "${percentage}% 증가 ▲"
         percentage < 0 -> "${percentage.absoluteValue}% 감소 ▼"
-        else -> "지난달과 동일해요"
+        else -> "${statusType.lastLabel}과 동일해요"
     }
 }

@@ -10,11 +10,14 @@ import com.jie.wealthmate.feature.calendar.CalendarScreenModel
 import com.jie.wealthmate.feature.calendar.addHistory.AddHistoryScreenModel
 import com.jie.wealthmate.feature.calendar.historyDetail.HistoryDetailScreenModel
 import com.jie.wealthmate.feature.home.HomeScreenModel
+import com.jie.wealthmate.feature.home.StatusType
+import com.jie.wealthmate.feature.home.preparednessStatus.PreparednessStatusScreenModel
 import com.jie.wealthmate.feature.menu.MenuScreenModel
 import com.jie.wealthmate.feature.menu.data.googleCloudShare.GoogleCloudShareScreenModel
 import com.jie.wealthmate.feature.menu.data.googleCloudSync.GoogleCloudSyncScreenModel
 import com.jie.wealthmate.feature.menu.management.categoryManagement.CategoryManagementScreenModel
 import com.jie.wealthmate.feature.menu.management.categoryManagement.addCategory.AddCategoryScreenModel
+import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.feature.menu.management.categoryManagement.modifyCategory.ModifyCategoryScreenModel
 import com.jie.wealthmate.feature.menu.management.paymentMethodManagement.PaymentMethodManagementScreenModel
 import com.jie.wealthmate.feature.menu.management.paymentMethodManagement.addPaymentMethod.AddPaymentMethodScreenModel
@@ -71,6 +74,9 @@ val commonModule = module {
 
     // 홈
     factory { HomeScreenModel(get(), get()) }
+    factory { (initialStatusType: StatusType, initialLargeCategory: LargeCategoryEnum) ->
+        PreparednessStatusScreenModel(get(), initialStatusType, initialLargeCategory)
+    }
 
     // 캘린더
     factory { CalendarScreenModel(get(), get()) }

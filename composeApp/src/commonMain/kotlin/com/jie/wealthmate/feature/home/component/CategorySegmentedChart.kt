@@ -4,7 +4,6 @@ import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -35,6 +34,7 @@ import com.jie.wealthmate.component.WMText
 import com.jie.wealthmate.feature.home.StatusType
 import com.jie.wealthmate.theme.ColorChart
 import com.jie.wealthmate.theme.ColorGray
+import com.jie.wealthmate.theme.noRippleClickable
 import com.jie.wealthmate.utils.formatWithCommas
 import com.jie.wealthmate.vo.CategoryVo
 import org.jetbrains.compose.resources.painterResource
@@ -90,7 +90,7 @@ fun CategorySegmentedChart(
     Column(modifier = modifier.fillMaxWidth()) {
         Row(
             modifier = Modifier
-                .clickable(onClick = onCategoryChartClick)
+                .noRippleClickable(onClick = onCategoryChartClick)
                 .padding(bottom = 12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
