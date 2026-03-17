@@ -72,24 +72,28 @@ class BudgetScreenModel(
                         .toImmutableList()
 
                     // 4. 카테고리별 예산 초과 아이템 계산
-                    val overItems = expenseBudgets.mapNotNull { budgetWithDetail ->
-                        val categoryHistories = historiesByCategoryId[budgetWithDetail.budget.categoryId] ?: emptyList()
-                        val categorySpent = categoryHistories.sumOf { it.history.amount }
+                    val overItems = expenseBudgets
+                        .groupBy { it.budget.categoryId }
+                        .mapNotNull { (categoryId, budgets) ->
+                            val totalCategoryBudget = budgets.sumOf { it.budget.amount }
+                            val categoryHistories = historiesByCategoryId[categoryId] ?: emptyList()
+                            val categorySpent = categoryHistories.sumOf { it.history.amount }
 
-                        if (categorySpent > budgetWithDetail.budget.amount) {
-                            val topExpense = categoryHistories.maxByOrNull { it.history.amount }
+                            if (categorySpent > totalCategoryBudget) {
+                                val firstBudgetWithDetail = budgets.first()
+                                val topExpense = categoryHistories.maxByOrNull { it.history.amount }
 
-                            BudgetOverUsageVo(
-                                category = budgetWithDetail.category.mapperToVo(),
-                                spentAmount = categorySpent,
-                                budgetAmount = budgetWithDetail.budget.amount,
-                                overAmount = categorySpent - budgetWithDetail.budget.amount,
-                                transactionCount = categoryHistories.size,
-                                topExpenseTitle = topExpense?.history?.content,
-                                topExpenseAmount = topExpense?.history?.amount
-                            )
-                        } else null
-                    }.toImmutableList()
+                                BudgetOverUsageVo(
+                                    category = firstBudgetWithDetail.category.mapperToVo(),
+                                    spentAmount = categorySpent,
+                                    budgetAmount = totalCategoryBudget,
+                                    overAmount = categorySpent - totalCategoryBudget,
+                                    transactionCount = categoryHistories.size,
+                                    topExpenseTitle = topExpense?.history?.content,
+                                    topExpenseAmount = topExpense?.history?.amount
+                                )
+                            } else null
+                        }.toImmutableList()
 
                     // 5. 대분류별 요약 정보 정보 계산
                     val summaryItems = LargeCategoryEnum.entries

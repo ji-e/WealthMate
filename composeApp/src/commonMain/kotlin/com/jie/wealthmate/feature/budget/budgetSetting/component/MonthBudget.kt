@@ -58,6 +58,7 @@ fun MonthBudgetList(
     yearlySummary: YearlySummary,
     onMoreClick: (String, Boolean) -> Unit,
     onMonthClick: (String) -> Unit,
+    onYearClick: (String) -> Unit,
 ) {
     val listState = rememberLazyListState()
 
@@ -84,7 +85,8 @@ fun MonthBudgetList(
         item {
             YearBudget(
                 year = year,
-                summary = yearlySummary
+                summary = yearlySummary,
+                onYearClick = { onYearClick(year) }
             )
         }
     }
@@ -274,7 +276,7 @@ fun MonthBudgetItem(
                     }
                 }
                 WMText(
-                    text = "지출률",
+                    text = "지출 예산 사용률",
                     style = typography.titleSmall.copy(
                         color = if (hasExpenseBudget) ColorGray.Gray_700 else ColorGray.Gray_200
                     ),

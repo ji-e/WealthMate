@@ -5,6 +5,7 @@ import com.jie.wealthmate.feature.budget.BudgetScreenModel
 import com.jie.wealthmate.feature.budget.addBudget.AddBudgetScreenModel
 import com.jie.wealthmate.feature.budget.budgetDetail.BudgetDetailScreenModel
 import com.jie.wealthmate.feature.budget.budgetSetting.BudgetSettingScreenModel
+import com.jie.wealthmate.feature.budget.budgetYearDetail.BudgetYearDetailScreenModel
 import com.jie.wealthmate.feature.calendar.CalendarScreenModel
 import com.jie.wealthmate.feature.calendar.addHistory.AddHistoryScreenModel
 import com.jie.wealthmate.feature.calendar.historyDetail.HistoryDetailScreenModel
@@ -82,7 +83,10 @@ val commonModule = module {
     factory { BudgetSettingScreenModel(get(), get()) }
     factory { AddBudgetScreenModel(get(), get()) }
     factory { (selectedMonth: LocalDate) ->
-        BudgetDetailScreenModel(get(), get(), selectedMonth)
+        BudgetDetailScreenModel(get(), get(), get(), selectedMonth)
+    }
+    factory { (selectedYear: String) ->
+        BudgetYearDetailScreenModel(selectedYear, get(), get(), get())
     }
 
 
