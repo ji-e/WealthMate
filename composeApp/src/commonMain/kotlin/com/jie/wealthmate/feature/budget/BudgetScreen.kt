@@ -25,9 +25,12 @@ import com.jie.wealthmate.component.EmptyListView
 import com.jie.wealthmate.component.calculateAdjustedToastPadding
 import com.jie.wealthmate.component.topbar.TopBarItem
 import com.jie.wealthmate.component.topbar.WMTopBar
+import com.jie.wealthmate.feature.budget.budgetDetail.BudgetDetailScreen
 import com.jie.wealthmate.feature.budget.budgetSetting.BudgetSettingScreen
 import com.jie.wealthmate.feature.budget.component.BudgetHeader
+import com.jie.wealthmate.feature.budget.component.BudgetInfo
 import com.jie.wealthmate.feature.budget.component.BudgetOverPager
+import com.jie.wealthmate.feature.budget.component.BudgetSuccess
 import com.jie.wealthmate.feature.budget.component.BudgetSummary
 import com.jie.wealthmate.feature.calendar.component.SelectedCalendarModalBottomSheet
 import com.jie.wealthmate.feature.calendar.startDate
@@ -39,19 +42,17 @@ import kotlinx.datetime.plus
 import wealthmate.composeapp.generated.resources.Res
 import wealthmate.composeapp.generated.resources.ic_setting
 
-
-class BudgetScreen() : BaseScreen() {
+class BudgetScreen : BaseScreen() {
     @Composable
     override fun Content() {
-        super.Content()
-
         val navigator = LocalNavigator.currentOrThrow
         val screenModel: BudgetScreenModel = koinScreenModel()
         val uiState by screenModel.container.uiState.collectAsState()
 
         var isShowSelectedCalendarModalBottomSheet by remember { mutableStateOf(false) }
 
-        val monthItems = remember {
+        // 시작일이 바뀔 때만 재계산
+        val monthItems = remember(startDate) {
             val totalMonths = (today.year - startDate.year) * 12 + 12
             List(totalMonths) { startDate.plus(it, DateTimeUnit.MONTH) }
         }
@@ -67,7 +68,6 @@ class BudgetScreen() : BaseScreen() {
         ) {
             WMTopBar(
                 title = TopBarItem.Title("예산"),
-                readingItem = null,
                 trailingItem = listOf(
                     TopBarItem.TrailingItem(
                         iconRes = Res.drawable.ic_setting,
@@ -76,50 +76,61 @@ class BudgetScreen() : BaseScreen() {
                 )
             )
 
-
-
             Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .verticalScroll(rememberScrollState())
             ) {
-
                 BudgetHeader(
-                    modifier = Modifier.padding(horizontal = 28.dp),
+                    modifier = Modifier.padding(horizontal = 28.dp, vertical = 16.dp),
                     selectedMonth = uiState.selectedMonth,
                     onSelectedMonthClick = { isShowSelectedCalendarModalBottomSheet = true },
                     usedAmount = uiState.usedAmount,
                     budgetAmount = uiState.totalBudgetAmount
                 )
 
-                // 해당 년월에 예산이 없을 때
-                if (uiState.totalBudgetAmount == 0L) {
+                // 전체 카테고리 중 설정된 예산이 하나도 없는 경우 확인
+                val hasAnyBudget = uiState.budgetSummaryItems.any { it.budgetAmount > 0L }
+
+                if (hasAnyBudget.not()) {
                     EmptyListView(
                         modifier = Modifier
                             .fillMaxWidth()
                             .weight(1f),
                         contentText = "설정된 예산이 없습니다."
                     )
-                    return@Column
+                } else {
+                    HorizontalDivider(
+                        modifier = Modifier.padding(vertical = 24.dp),
+                        color = ColorGray.Gray_50,
+                        thickness = 12.dp
+                    )
+
+                    // 상태별 예산 정보 섹션
+                    when {
+                        uiState.budgetOverItems.isNotEmpty() -> {
+                            BudgetOverPager(items = uiState.budgetOverItems)
+                        }
+                        uiState.totalBudgetAmount > 0L && (uiState.totalBudgetAmount - uiState.usedAmount) > 0 -> {
+                            BudgetSuccess()
+                        }
+                        else -> {
+                            BudgetInfo(
+                                isNotBudgetSetting = uiState.totalBudgetAmount == 0L,
+                                topExpenses = uiState.topExpenses
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(32.dp))
+                    BudgetSummary(
+                        items = uiState.budgetSummaryItems,
+                        onDetailClick = {
+                            navigator.push(BudgetDetailScreen(uiState.selectedMonth))
+                        }
+                    )
+                    Spacer(modifier = Modifier.height(32.dp))
                 }
-
-                HorizontalDivider(
-                    modifier = Modifier.padding(vertical = 24.dp),
-                    color = ColorGray.Gray_50,
-                    thickness = 12.dp
-                )
-
-                BudgetOverPager(
-                    items = uiState.budgetOverItems
-                )
-
-                BudgetSummary(
-                    modifier = Modifier.padding(top = 32.dp),
-                    items = uiState.budgetSummaryItems
-                )
-
-                Spacer(modifier = Modifier.height(32.dp))
-
             }
         }
 

@@ -1,7 +1,6 @@
 package com.jie.wealthmate.feature.budget.component
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -34,9 +33,9 @@ import com.jie.wealthmate.theme.ColorBlue
 import com.jie.wealthmate.theme.ColorGray
 import com.jie.wealthmate.theme.ColorPrimary
 import com.jie.wealthmate.theme.ColorRed
+import com.jie.wealthmate.theme.noRippleClickable
 import com.jie.wealthmate.utils.formatWithCommas
 import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.persistentListOf
 import org.jetbrains.compose.resources.painterResource
 import wealthmate.composeapp.generated.resources.Res
 import wealthmate.composeapp.generated.resources.ic_keyboard_arrow_right
@@ -46,26 +45,38 @@ data class BudgetSummaryVo(
     val largeCategory: LargeCategoryEnum,
     val icon: String,
     val budgetAmount: Long,
-    val currentAmount: Long
+    val currentAmount: Long,
 )
 
 @Composable
 fun BudgetSummary(
     modifier: Modifier = Modifier,
-    onCategoryClick: (LargeCategoryEnum) -> Unit = {},
-    items: ImmutableList<BudgetSummaryVo> = defaultSummaryItems,
+    onDetailClick: () -> Unit = {},
+    items: ImmutableList<BudgetSummaryVo>,
 ) {
     Column(modifier = modifier) {
-        WMText(
-            text = "요약",
-            style = MaterialTheme.typography.titleSmall.copy(color = ColorGray.Gray_500),
-            modifier = Modifier.padding(start = 28.dp, bottom = 8.dp),
-        )
+        Row(
+            modifier
+                .noRippleClickable(onClick = { onDetailClick() })
+                .padding(start = 28.dp, bottom = 8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            WMText(
+                text = "요약",
+                style = MaterialTheme.typography.titleSmall.copy(color = ColorGray.Gray_500),
+            )
+
+            Icon(
+                painter = painterResource(Res.drawable.ic_keyboard_arrow_right),
+                contentDescription = null,
+                tint = ColorGray.Gray_500,
+                modifier = Modifier.padding(start = 2.dp).size(16.dp)
+            )
+        }
 
         items.forEach { item ->
             StatusItem(
                 item = item,
-                onClick = { onCategoryClick(item.largeCategory) }
             )
         }
     }
@@ -74,13 +85,15 @@ fun BudgetSummary(
 @Composable
 private fun StatusItem(
     item: BudgetSummaryVo,
-    onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     // 상태 연산 최적화
     val barRatio by remember(item.budgetAmount, item.currentAmount) {
         derivedStateOf {
-            if (item.budgetAmount > 0) (item.currentAmount.toFloat() / item.budgetAmount).coerceIn(0f, 1f) else 0f
+            if (item.budgetAmount > 0) (item.currentAmount.toFloat() / item.budgetAmount).coerceIn(
+                0f,
+                1f
+            ) else 0f
         }
     }
 
@@ -109,7 +122,6 @@ private fun StatusItem(
         modifier = modifier
             .fillMaxWidth()
             .height(60.dp)
-            .clickable(onClick = onClick)
             .padding(horizontal = 28.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -182,18 +194,5 @@ private fun StatusItem(
                 )
             }
         }
-
-        Icon(
-            painter = painterResource(Res.drawable.ic_keyboard_arrow_right),
-            contentDescription = null,
-            tint = ColorGray.Gray_500,
-            modifier = Modifier.padding(start = 8.dp).size(24.dp)
-        )
     }
 }
-
-private val defaultSummaryItems = persistentListOf(
-    BudgetSummaryVo(LargeCategoryEnum.INCOME, "💰", 3000000, 1000000),
-    BudgetSummaryVo(LargeCategoryEnum.EXPENSES, "💸", 2400000, 2000000),
-    BudgetSummaryVo(LargeCategoryEnum.SAVING, "🏦", 1000000, 1000000)
-)

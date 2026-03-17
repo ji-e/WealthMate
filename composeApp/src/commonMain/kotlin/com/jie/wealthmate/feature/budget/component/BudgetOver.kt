@@ -18,7 +18,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
@@ -30,7 +29,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.jie.wealthmate.component.WMText
-import com.jie.wealthmate.theme.ColorBlue
 import com.jie.wealthmate.theme.ColorGray
 import com.jie.wealthmate.theme.ColorRed
 import com.jie.wealthmate.utils.formatWithCommas
@@ -49,6 +47,7 @@ data class BudgetOverUsageVo(
     val overAmount: Long,
     val transactionCount: Int,
     val topExpenseTitle: String? = null,
+    val topExpenseAmount: Long? = null,
 )
 
 @Composable
@@ -68,42 +67,20 @@ fun BudgetOverPager(
             style = typography.titleSmall.copy(color = ColorGray.Gray_500),
             modifier = Modifier.padding(start = 28.dp, bottom = 12.dp),
         )
-        if (items.isEmpty()) {
-            Column(
-                modifier = modifier
-                    .padding(horizontal = 28.dp)
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(ColorBlue.Blue_50)
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                WMText(
-                    text = "🎉",
-                    style = MaterialTheme.typography.headlineMedium
+
+        HorizontalPager(
+            state = pagerState,
+            contentPadding = PaddingValues(horizontal = 28.dp),
+            pageSpacing = 12.dp,
+            modifier = Modifier.fillMaxWidth()
+        ) { page ->
+            Box {
+                BudgetOverItem(
+                    modifier = Modifier.fillMaxWidth(),
+                    totalSize = items.size,
+                    index = page + 1,
+                    item = items[page]
                 )
-                Spacer(modifier = Modifier.height(8.dp))
-                WMText(
-                    text = "모든 예산이 잘 지켜지고 있어요.",
-                    style = MaterialTheme.typography.titleSmall
-                )
-            }
-        } else {
-            HorizontalPager(
-                state = pagerState,
-                contentPadding = PaddingValues(horizontal = 28.dp),
-                pageSpacing = 12.dp,
-                modifier = Modifier.fillMaxWidth()
-            ) { page ->
-                Box {
-                    BudgetOverItem(
-                        modifier = Modifier.fillMaxWidth(),
-                        totalSize = items.size,
-                        index = page + 1,
-                        item = items[page]
-                    )
-                }
             }
         }
     }
@@ -182,14 +159,12 @@ fun BudgetOverItem(
             )
         }
 
-        item.topExpenseTitle?.let { title ->
-            WMText(
-                text = "가장 많이 쓴 내역: $title",
-                style = typography.bodySmall.copy(color = ColorGray.Gray_500),
-                modifier = Modifier.padding(top = 4.dp),
-                maxLines = 1,
-            )
-        }
+        WMText(
+            text = "가장 많이 쓴 내역: ${item.topExpenseTitle?.ifEmpty { "미입력" }} (${item.topExpenseAmount?.formatWithCommas()}원)",
+            style = typography.bodySmall.copy(color = ColorGray.Gray_500),
+            modifier = Modifier.padding(top = 4.dp),
+            maxLines = 1,
+        )
 
         Spacer(modifier = Modifier.height(12.dp))
 
