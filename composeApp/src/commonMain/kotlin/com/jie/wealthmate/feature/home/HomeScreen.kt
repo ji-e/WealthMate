@@ -35,6 +35,7 @@ import com.jie.wealthmate.feature.home.component.LargeCategoryStatus
 import com.jie.wealthmate.feature.home.component.PaymentMethodSegmentedChart
 import com.jie.wealthmate.feature.home.component.RemainBudget
 import com.jie.wealthmate.feature.home.component.Today
+import com.jie.wealthmate.feature.home.preparednessStatus.PreparednessStatusScreen
 import com.jie.wealthmate.theme.ColorGray
 import com.jie.wealthmate.theme.noRippleClickable
 import com.jie.wealthmate.utils.default
@@ -110,8 +111,13 @@ class HomeScreen() : Screen {
                 statusType = uiState.statusType,
                 currentAmount = uiState.currentAmount,
                 lastAmount = uiState.lastAmount,
-                onCategoryClick = {
-                    // todo 카테고리 클릭 시 이동
+                onCategoryClick = { largeCategory ->
+                    navigator.push(
+                        PreparednessStatusScreen(
+                            initialStatusType = uiState.statusType,
+                            initialLargeCategory = largeCategory
+                        )
+                    )
                 }
             )
 
@@ -132,7 +138,13 @@ class HomeScreen() : Screen {
                 expensesAmount = uiState.currentAmount?.expensesAmount.default(),
                 categorySegmentChartItems = uiState.categorySegmentChartItems,
                 onCategoryChartClick = {
-                    // todo 카테고리 차트 클릭 시 이동
+                    // 카테고리 차트 클릭 시에도 지출 대비 현황으로 이동
+                    navigator.push(
+                        PreparednessStatusScreen(
+                            initialStatusType = uiState.statusType,
+                            initialLargeCategory = com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum.EXPENSES
+                        )
+                    )
                 }
             )
 

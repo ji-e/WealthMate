@@ -128,7 +128,7 @@ fun PaymentMethodItem(
         verticalAlignment = Alignment.CenterVertically,
     ) {
 
-        if (data.groupLabel != null) {
+        if (data.groupLabel.isNullOrBlank().not()) {
             WMText(
                 text = data.groupLabel,
                 style = Typography().bodySmall.copy(fontWeight = FontWeight.SemiBold),
