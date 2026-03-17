@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -53,17 +55,22 @@ class BudgetDetailScreen(
             )
 
             LazyColumn(
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(ColorGray.Gray_50)
             ) {
                 item {
-                    Spacer(modifier = Modifier.height(4.dp))
+                    Spacer(modifier = Modifier.height(24.dp))
                     BudgetMonthlyHeader(
-                        income = uiState.totalIncome,
-                        expense = uiState.totalExpense,
-                        saving = uiState.totalSaving,
+                        actualIncome = uiState.totalIncome,
+                        lastActualIncome = uiState.lastTotalIncome,
+                        actualExpense = uiState.totalExpense,
+                        lastActualExpense = uiState.lastTotalExpense,
+                        actualSaving = uiState.totalSaving,
+                        lastActualSaving = uiState.lastTotalSaving,
                         modifier = Modifier
                             .padding(horizontal = 28.dp)
-                            .padding(top = 4.dp, bottom = 32.dp)
+                            .padding(top = 4.dp, bottom = 24.dp)
                     )
                 }
 
@@ -72,34 +79,47 @@ class BudgetDetailScreen(
                         val isExpanded = expandedStates[section.largeCategory] ?: true
 
                         item {
-
-                            SectionHeader(
-                                section = section,
-                                isExpanded = isExpanded,
-                                onToggle = {
-                                    expandedStates[section.largeCategory] = !isExpanded
-                                },
-                                modifier = Modifier.padding(horizontal = 28.dp, vertical = 12.dp)
-                            )
-                        }
-
-                        item {
-                            AnimatedVisibility(
-                                modifier = Modifier.padding(start = 12.dp),
-                                visible = isExpanded,
-                                enter = fadeIn() + expandVertically(),
-                                exit = fadeOut() + shrinkVertically()
+                            Column(
+                                modifier = Modifier
+                                    .padding(horizontal = 28.dp)
+                                    .background(ColorGray.White, RoundedCornerShape(8.dp))
+                                    .padding(vertical = 4.dp)
                             ) {
-                                Column {
-                                    section.groups.forEach { group ->
-                                        CategoryBudgetGroup(
-                                            group = group,
-                                            largeCategory = section.largeCategory,
-                                            modifier = Modifier.padding(vertical = 12.dp)
+                                SectionHeader(
+                                    section = section,
+                                    isExpanded = isExpanded,
+                                    onToggle = {
+                                        expandedStates[section.largeCategory] = !isExpanded
+                                    },
+                                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
+                                )
+                                AnimatedVisibility(
+//                                    modifier = Modifier.padding(start = 12.dp),
+                                    visible = isExpanded,
+                                    enter = fadeIn() + expandVertically(),
+                                    exit = fadeOut() + shrinkVertically()
+                                ) {
+                                    Column {
+                                        HorizontalDivider(
+                                            modifier = Modifier.padding(top = 4.dp, bottom = 12.dp),
+                                            color = ColorGray.Gray_100
                                         )
+                                        section.groups.forEach { group ->
+                                            CategoryBudgetGroup(
+                                                group = group,
+                                                largeCategory = section.largeCategory,
+                                                modifier = Modifier
+                                                    .padding(start = 10.dp, end = 16.dp)
+                                                    .padding(vertical = 12.dp)
+                                            )
+                                        }
                                     }
                                 }
                             }
+                        }
+
+                        item {
+
                         }
 
                         item {
@@ -109,7 +129,7 @@ class BudgetDetailScreen(
                 }
 
                 item {
-                    Spacer(modifier = Modifier.height(40.dp))
+                    Spacer(modifier = Modifier.height(20.dp))
                 }
             }
         }

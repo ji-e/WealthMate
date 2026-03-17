@@ -13,6 +13,10 @@ data class BudgetDetailUiState(
     val totalIncome: Long = 0L,
     val totalExpense: Long = 0L,
     val totalSaving: Long = 0L,
+    // 지난달 금액 (비율 계산용)
+    val lastTotalIncome: Long = 0L,
+    val lastTotalExpense: Long = 0L,
+    val lastTotalSaving: Long = 0L,
     val sections: ImmutableList<BudgetSectionVo> = persistentListOf(),
 ) : BaseUiState
 

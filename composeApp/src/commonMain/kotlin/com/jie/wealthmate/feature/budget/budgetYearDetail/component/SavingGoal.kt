@@ -53,7 +53,10 @@ fun SavingGoal(
     ) {
         WMText(
             text = "저축 목표 달성률 $percentageText%",
-            style = typography.titleSmall.copy(fontWeight = FontWeight.SemiBold),
+            style = MaterialTheme.typography.titleSmall.copy(
+                color = ColorGray.Gray_500,
+                fontWeight = FontWeight.SemiBold
+            ),
             modifier = Modifier.padding(bottom = 12.dp)
         )
 

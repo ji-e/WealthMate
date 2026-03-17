@@ -56,22 +56,28 @@ fun BudgetYearsHeader(
     ) {
         WMText(
             text = "재정 요약",
-            style = typography.titleSmall.copy(fontWeight = FontWeight.SemiBold),
+            style = typography.titleSmall.copy(
+                color = ColorGray.Gray_500,
+                fontWeight = FontWeight.SemiBold
+            ),
             modifier = Modifier.padding(bottom = 6.dp)
         )
 
         SummaryRow(
+            type = "지난해와",
             label = "총 수입",
             actualAmount = actualIncome,
             lastActualAmount = lastActualIncome,
         )
         SummaryRow(
+            type = "지난해와",
             label = "총 지출",
             actualAmount = actualExpense,
             lastActualAmount = lastActualExpense,
             isInverseColor = true
         )
         SummaryRow(
+            type = "지난해와",
             label = "총 저축",
             actualAmount = actualSaving,
             lastActualAmount = lastActualSaving,
@@ -83,6 +89,7 @@ fun BudgetYearsHeader(
         )
 
         SummaryRow(
+            type = "지난해와",
             label = "잔액",
             actualAmount = summary.actualRemain,
             lastActualAmount = summary.lastActualRemain,
@@ -93,7 +100,8 @@ fun BudgetYearsHeader(
 }
 
 @Composable
-private fun SummaryRow(
+fun SummaryRow(
+    type: String,
     label: String,
     actualAmount: Long,
     lastActualAmount: Long,
@@ -114,7 +122,7 @@ private fun SummaryRow(
         }
 
         val sign = if (percentage > 0) "+" else ""
-        val displayText = if (percentage == 0) "지난해와 동일" else "$sign$percentage%"
+        val displayText = if (percentage == 0) "$type 동일" else "$sign$percentage%"
 
         displayText to textColor
     }

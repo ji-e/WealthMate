@@ -50,7 +50,10 @@ fun ExpenseDonutChart(
     ) {
         WMText(
             text = "최다 변동지출 카테고리",
-            style = typography.titleSmall.copy(fontWeight = FontWeight.SemiBold),
+            style = MaterialTheme.typography.titleSmall.copy(
+                color = ColorGray.Gray_500,
+                fontWeight = FontWeight.SemiBold
+            ),
             modifier = Modifier.padding(bottom = 24.dp)
         )
 

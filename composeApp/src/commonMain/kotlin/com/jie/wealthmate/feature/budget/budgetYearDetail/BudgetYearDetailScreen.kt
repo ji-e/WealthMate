@@ -64,6 +64,7 @@ class BudgetYearDetailScreen(
 
                 item {
                     MonthCompare(
+                        year = selectedYear,
                         monthlyData = uiState.monthlyData,
                         modifier = Modifier
                             .padding(horizontal = 28.dp)
