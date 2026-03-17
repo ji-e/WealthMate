@@ -28,7 +28,6 @@ import com.jie.wealthmate.utils.formatWithCommas
 
 @Composable
 fun SavingGoal(
-    year: String,
     budgetSaving: Long,
     actualSaving: Long,
     modifier: Modifier = Modifier,
@@ -53,7 +52,7 @@ fun SavingGoal(
             .padding(horizontal = 16.dp, vertical = 12.dp)
     ) {
         WMText(
-            text = "${year}년 저축 목표 달성률 $percentageText%",
+            text = "저축 목표 달성률 $percentageText%",
             style = typography.titleSmall.copy(fontWeight = FontWeight.SemiBold),
             modifier = Modifier.padding(bottom = 12.dp)
         )

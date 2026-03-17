@@ -35,7 +35,6 @@ import kotlin.math.roundToInt
 
 @Composable
 fun ExpenseDonutChart(
-    year: String,
     categories: List<CategoryExpense>,
     totalExpense: Long,
     modifier: Modifier = Modifier,
@@ -50,7 +49,7 @@ fun ExpenseDonutChart(
             .padding(horizontal = 16.dp, vertical = 12.dp)
     ) {
         WMText(
-            text = "${year}년 최다 변동지출 카테고리",
+            text = "최다 변동지출 카테고리",
             style = typography.titleSmall.copy(fontWeight = FontWeight.SemiBold),
             modifier = Modifier.padding(bottom = 24.dp)
         )

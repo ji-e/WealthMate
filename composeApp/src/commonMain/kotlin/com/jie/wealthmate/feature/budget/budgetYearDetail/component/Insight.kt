@@ -25,7 +25,6 @@ import com.jie.wealthmate.utils.formatWithCommas
 
 @Composable
 fun Insight(
-    year: String,
     totalIncome: Long,
     totalExpense: Long,
     totalSaving: Long,
@@ -59,7 +58,7 @@ fun Insight(
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         WMText(
-            text = "${year}년 인사이트",
+            text = "인사이트",
             style = typography.titleSmall.copy(fontWeight = FontWeight.SemiBold),
             modifier = Modifier.padding(bottom = 4.dp)
         )

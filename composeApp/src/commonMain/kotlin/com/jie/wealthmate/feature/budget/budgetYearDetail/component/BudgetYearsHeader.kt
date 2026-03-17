@@ -26,7 +26,6 @@ import kotlin.math.roundToInt
 
 @Composable
 fun BudgetYearsHeader(
-    year: String,
     actualIncome: Long,
     lastActualIncome: Long,
     actualExpense: Long,
@@ -56,7 +55,7 @@ fun BudgetYearsHeader(
             .padding(horizontal = 16.dp, vertical = 12.dp)
     ) {
         WMText(
-            text = "${year}년 재정 요약",
+            text = "재정 요약",
             style = typography.titleSmall.copy(fontWeight = FontWeight.SemiBold),
             modifier = Modifier.padding(bottom = 6.dp)
         )

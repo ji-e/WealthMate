@@ -44,7 +44,6 @@ import kotlin.time.Clock
 
 @Composable
 fun MonthCompare(
-    year: String,
     monthlyData: List<MonthlyComparison>,
     modifier: Modifier = Modifier,
 ) {
@@ -76,7 +75,7 @@ fun MonthCompare(
             .padding(horizontal = 16.dp, vertical = 12.dp)
     ) {
         WMText(
-            text = "${year}년 월별 추이",
+            text = "월별 추이",
             style = typography.titleSmall.copy(fontWeight = FontWeight.SemiBold),
             modifier = Modifier.padding(bottom = 12.dp)
         )

@@ -29,7 +29,6 @@ import com.jie.wealthmate.utils.formatWithCommas
 
 @Composable
 fun ExpenseFixed(
-    year: String,
     fixedExpenses: List<FixedExpense>,
     totalExpense: Long,
     modifier: Modifier = Modifier,
@@ -56,7 +55,7 @@ fun ExpenseFixed(
             .padding(horizontal = 16.dp, vertical = 12.dp)
     ) {
         WMText(
-            text = "${year}년 고정지출",
+            text = "고정지출",
             style = typography.titleSmall.copy(fontWeight = FontWeight.SemiBold),
             modifier = Modifier.padding(bottom = 12.dp)
         )
