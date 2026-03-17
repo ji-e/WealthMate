@@ -6,10 +6,13 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.TextAutoSize
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -23,13 +26,18 @@ import com.jie.wealthmate.theme.ColorBlue
 import com.jie.wealthmate.theme.ColorGray
 import com.jie.wealthmate.theme.ColorPrimary
 import com.jie.wealthmate.theme.ColorRed
+import com.jie.wealthmate.theme.noRippleClickable
 import com.jie.wealthmate.utils.formatWithCommas
+import org.jetbrains.compose.resources.painterResource
+import wealthmate.composeapp.generated.resources.Res
+import wealthmate.composeapp.generated.resources.ic_keyboard_arrow_right
 
 @Composable
 fun YearBudget(
     modifier: Modifier = Modifier,
     year: String,
     summary: YearlySummary,
+    onYearClick: () -> Unit = {},
 ) {
     Column(
         modifier = modifier
@@ -38,7 +46,20 @@ fun YearBudget(
             .padding(horizontal = 32.dp)
             .padding(top = 24.dp, bottom = 32.dp)
     ) {
-        LabelText(text = "${year}년 요약")
+        Row(
+            modifier = Modifier.noRippleClickable { onYearClick() },
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            LabelText(
+                text = "${year}년 요약",
+            )
+
+            Icon(
+                painter = painterResource(Res.drawable.ic_keyboard_arrow_right),
+                contentDescription = null,
+                modifier = Modifier.padding(start = 4.dp).size(16.dp)
+            )
+        }
 
         Row(
             modifier = Modifier
@@ -96,7 +117,7 @@ private fun SummaryCard(
     value: Long,
     valueColor: Color = Color.Unspecified,
     bottomLabel: String,
-    bottomValue: String
+    bottomValue: String,
 ) {
     Column(
         modifier = modifier
