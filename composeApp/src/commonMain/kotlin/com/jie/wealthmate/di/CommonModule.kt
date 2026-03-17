@@ -86,7 +86,7 @@ val commonModule = module {
         BudgetDetailScreenModel(get(), get(), get(), selectedMonth)
     }
     factory { (selectedYear: String) ->
-        BudgetYearDetailScreenModel(selectedYear, get(), get())
+        BudgetYearDetailScreenModel(selectedYear, get(), get(), get())
     }
 
 
