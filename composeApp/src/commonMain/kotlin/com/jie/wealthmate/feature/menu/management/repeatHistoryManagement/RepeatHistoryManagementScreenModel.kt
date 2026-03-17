@@ -2,6 +2,7 @@ package com.jie.wealthmate.feature.menu.management.repeatHistoryManagement
 
 import com.jie.wealthmate.base.BaseScreenModel
 import com.jie.wealthmate.database.eneity.RepeatCycleEntity
+import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.repository.RepeatCycleRepository
 
 class RepeatHistoryManagementScreenModel(
@@ -24,6 +25,12 @@ class RepeatHistoryManagementScreenModel(
                     )
                 }
             }
+    }
+
+    fun changeTab(tab: LargeCategoryEnum) {
+        reduceState { state ->
+            state.copy(currentTab = tab)
+        }
     }
 
     fun modifyRepeatCycle(repeatCycle: RepeatCycleEntity, isActive: Boolean) {

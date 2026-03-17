@@ -49,7 +49,7 @@ fun ColumnScope.RepeatHistoryList(
 ) {
     LazyColumn(
         modifier = modifier.fillMaxSize(),
-        contentPadding = PaddingValues(bottom = 20.dp)
+        contentPadding = PaddingValues(vertical = 20.dp)
     ) {
         items(
             count = repeatHistoryItems.size,
