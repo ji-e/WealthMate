@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -36,6 +37,9 @@ import com.jie.wealthmate.theme.ColorGray
 import com.jie.wealthmate.theme.noRippleClickable
 import com.jie.wealthmate.utils.formatWithCommas
 import com.jie.wealthmate.vo.CategoryVo
+import org.jetbrains.compose.resources.painterResource
+import wealthmate.composeapp.generated.resources.Res
+import wealthmate.composeapp.generated.resources.ic_keyboard_arrow_right
 import kotlin.math.roundToInt
 
 
@@ -94,6 +98,13 @@ fun CategorySegmentedChart(
             WMText(
                 text = "${statusType.label} 카테고리별 지출",
                 style = typography.titleSmall.copy(color = ColorGray.Gray_500),
+            )
+
+            Icon(
+                painter = painterResource(Res.drawable.ic_keyboard_arrow_right),
+                contentDescription = null,
+                tint = ColorGray.Gray_500,
+                modifier = Modifier.size(16.dp)
             )
         }
 

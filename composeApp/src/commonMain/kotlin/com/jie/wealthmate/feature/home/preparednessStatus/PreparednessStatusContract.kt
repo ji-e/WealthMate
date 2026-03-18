@@ -5,6 +5,7 @@ import com.jie.wealthmate.database.eneity.HistoryWithDetails
 import com.jie.wealthmate.feature.home.StatusType
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.vo.CategoryDiffInfoVo
+import com.jie.wealthmate.vo.PaymentMethodDiffInfoVo
 import kotlin.math.roundToInt
 
 data class PreparednessStatusUiState(
@@ -18,6 +19,7 @@ data class PreparednessStatusUiState(
     val maxDecreaseCategory: CategoryDiffInfoVo? = null,
     val categoryComparisons: List<CategoryDiffInfoVo> = emptyList(),
     val fixedCategoryComparisons: List<CategoryDiffInfoVo> = emptyList(),
+    val paymentMethodComparisons: List<PaymentMethodDiffInfoVo> = emptyList(),
     val isLoading: Boolean = false,
 ) : BaseUiState {
     val diffAmount: Long = currentAmount - lastAmount
@@ -25,4 +27,3 @@ data class PreparednessStatusUiState(
         (((currentAmount - lastAmount).toFloat() / lastAmount) * 100f).roundToInt()
     } else null
 }
-

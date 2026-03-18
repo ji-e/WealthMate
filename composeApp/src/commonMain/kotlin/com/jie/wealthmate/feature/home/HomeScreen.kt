@@ -140,11 +140,12 @@ class HomeScreen() : Screen {
                 expensesAmount = uiState.currentAmount?.expensesAmount.default(),
                 categorySegmentChartItems = uiState.categorySegmentChartItems,
                 onCategoryChartClick = {
-                    // 카테고리 차트 전체 클릭 시 지출 현황 화면으로 이동
+                    // 카테고리 차트 전체 클릭 시 지출 현황 화면으로 이동 (비교 섹션으로 스크롤)
                     navigator.push(
                         PreparednessStatusScreen(
                             initialStatusType = uiState.statusType,
-                            initialLargeCategory = LargeCategoryEnum.EXPENSES
+                            initialLargeCategory = LargeCategoryEnum.EXPENSES,
+                            scrollToPosition = 2
                         )
                     )
                 },
@@ -168,7 +169,14 @@ class HomeScreen() : Screen {
                 expensesAmount = uiState.currentAmount?.expensesAmount.default(),
                 paymentMethodSegmentChartItems = uiState.paymentMethodSegmentChartItems,
                 onPaymentMethodChartClick = {
-                    // todo 결제수단 차트 클릭 시 이동
+                    // 카테고리 차트 전체 클릭 시 지출 현황 화면으로 이동
+                    navigator.push(
+                        PreparednessStatusScreen(
+                            initialStatusType = uiState.statusType,
+                            initialLargeCategory = LargeCategoryEnum.EXPENSES,
+                            scrollToPosition = 5
+                        )
+                    )
                 }
             )
 

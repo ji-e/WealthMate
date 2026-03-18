@@ -14,8 +14,7 @@ data class CategoryExpensesUiState(
     val totalAmount: Long = 0,
     val lastTotalAmount: Long = 0,
     val histories: List<HistoryWithDetails> = emptyList(),
-    val groupedHistories: List<Pair<LocalDate, List<HistoryWithDetails>>> = emptyList(),
-    val isLoading: Boolean = false
+    val groupedHistories: List<Pair<LocalDate, List<HistoryWithDetails>>> = emptyList()
 ) : BaseUiState {
     val diffAmount: Long = totalAmount - lastTotalAmount
 }
