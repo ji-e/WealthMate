@@ -28,12 +28,8 @@ fun CategoryExpensesItem(
     history: HistoryWithDetails,
     onClickHistory: (String) -> Unit = {},
 ) {
-    // historyInfo 계산을 remember로 최적화하여 불필요한 재계산을 방지합니다.
-    val infoText = remember(history) {
+    val categoryInfoText = remember(history) {
         val category = history.category
-        val paymentMethod = history.paymentMethod
-        val installment = history.installment
-
         val categoryPart = buildString {
             category?.middleLabel?.takeIf { it.isNotBlank() }?.let { append(it) }
 
@@ -44,13 +40,21 @@ fun CategoryExpensesItem(
                     append(tag)
                 }
         }
+        categoryPart
+    }
+
+    val infoText = remember(history) {
+        val paymentMethod = history.paymentMethod
+        val installment = history.installment
 
         listOfNotNull(
-            categoryPart.takeIf { it.isNotBlank() },
+            categoryInfoText.takeIf { it.isNotBlank() },
             paymentMethod?.label?.takeIf { it.isNotBlank() },
             installment?.let { "할부 ${history.history.installment?.installmentTime}/${it.count}회차" }
         ).joinToString(" | ")
     }
+
+
 
     Row(
         modifier = Modifier
@@ -61,9 +65,12 @@ fun CategoryExpensesItem(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Column(modifier = Modifier.weight(1f)) {
-            val content = history.history.content
+            val content = history.history.content.default()
+                .ifEmpty {
+                    history.category?.tags?.find { it.id == history.history.categoryTagId }?.tagLabel
+                }
             WMText(
-                text = content.default().ifEmpty { "미입력" },
+                text = content.default().ifEmpty { "내용 미입력" },
                 style = MaterialTheme.typography.bodyLarge.copy(
                     fontWeight = FontWeight.Medium,
                     color = if (content.isNullOrBlank()) ColorGray.Gray_300 else ColorGray.Gray_700

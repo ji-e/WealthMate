@@ -19,6 +19,7 @@ fun SavingSection(
     budgetAmount: Long,
     categoryComparisons: List<CategoryDiffInfoVo> = emptyList(),
     fixedCategoryComparisons: List<CategoryDiffInfoVo> = emptyList(),
+    onCategoryClick: (String) -> Unit,
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
         if (statusType == StatusType.MONTH && budgetAmount > 0) {
@@ -43,7 +44,8 @@ fun SavingSection(
                 title = "변동저축 카테고리별 비교",
                 statusType = statusType,
                 largeCategory = LargeCategoryEnum.SAVING,
-                comparisons = categoryComparisons
+                comparisons = categoryComparisons,
+                onCategoryClick = onCategoryClick
             )
         }
 
@@ -54,7 +56,8 @@ fun SavingSection(
                 title = "고정저축 카테고리별 비교",
                 statusType = statusType,
                 largeCategory = LargeCategoryEnum.SAVING,
-                comparisons = fixedCategoryComparisons
+                comparisons = fixedCategoryComparisons,
+                onCategoryClick = onCategoryClick
             )
         }
     }

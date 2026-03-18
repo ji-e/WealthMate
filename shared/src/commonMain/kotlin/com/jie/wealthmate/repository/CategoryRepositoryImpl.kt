@@ -9,6 +9,7 @@ import com.jie.wealthmate.database.eneity.CategoryTagEntity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
@@ -104,6 +105,9 @@ class CategoryRepositoryImpl(private val databaseProvider: DatabaseProvider) : C
                 dao.getById(categoryId)
             }
         }
+
+    override fun getCategoryByIdFlow(categoryId: String): Flow<CategoryEntity?> =
+        dao.getAll().map { list -> list.find { it.id == categoryId } }.flowOn(Dispatchers.Default)
 
     override fun getAllCategories(): Flow<List<CategoryEntity>> =
         loggedFlow(

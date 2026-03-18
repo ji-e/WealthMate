@@ -20,9 +20,9 @@ import wealthmate.composeapp.generated.resources.ic_arrow_drop_down
 fun PreparednessStatusFilter(
     modifier: Modifier = Modifier,
     statusTypeLabel: String,
-    largeCategoryLabel: String,
+    largeCategoryLabel: String?,
     onStatusTypeClick: () -> Unit,
-    onLargeCategoryClick: () -> Unit,
+    onLargeCategoryClick: (() -> Unit)?,
 ) {
     Row(
         modifier = modifier,
@@ -33,10 +33,12 @@ fun PreparednessStatusFilter(
             onClick = onStatusTypeClick
         )
         Spacer(modifier = Modifier.size(12.dp))
-        FilterItem(
-            text = largeCategoryLabel,
-            onClick = onLargeCategoryClick
-        )
+        if (largeCategoryLabel.isNullOrBlank().not() && onLargeCategoryClick != null) {
+            FilterItem(
+                text = largeCategoryLabel,
+                onClick = onLargeCategoryClick
+            )
+        }
     }
 }
 

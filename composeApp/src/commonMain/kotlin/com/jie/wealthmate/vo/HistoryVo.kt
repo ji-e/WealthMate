@@ -28,6 +28,19 @@ data class HistoryVo(
 ) {
     val historyInfo: String
         get() {
+            val categoryPart = categoryInfo
+
+            val parts = listOfNotNull(
+                categoryPart.takeIf { it.isNotBlank() },
+                paymentMethod?.label?.takeIf { it.isNotBlank() },
+                installment?.let { "할부 $installmentTime/${it.count}회차" }
+            )
+
+            return parts.joinToString(" | ")
+        }
+
+    val categoryInfo: String
+        get() {
             val categoryPart = buildString {
                 val middleLabel = category?.middleLabel
                 val tagLabel = categoryTag?.label
@@ -39,17 +52,8 @@ data class HistoryVo(
                     append(tagLabel)
                 }
             }
-
-            val parts = listOfNotNull(
-                categoryPart.takeIf { it.isNotBlank() },
-                paymentMethod?.label?.takeIf { it.isNotBlank() },
-//                content?.takeIf { it.isNotBlank() },
-                installment?.let { "할부 $installmentTime/${it.count}회차" }
-            )
-
-            return parts.joinToString(" | ")
+            return categoryPart
         }
-
 
     companion object {
         fun HistoryWithDetails?.mapperToVo() = HistoryVo(

@@ -23,49 +23,62 @@ data class HomeUiState(
     val currentExpensesData: List<Float?> = emptyList(),
     val lastExpensesData: List<Float> = emptyList(),
 ) : BaseUiState {
-    val ectCategorySegmentChartData = CategorySegmentChartData(
-        category = CategoryVo(
-            id = "",
-            icon = "•••",
-            largeCategory = LargeCategoryEnum.EXPENSES,
-            middleLabel = "그 외",
-            sort = 0,
-            isFixed = false,
-            tags = emptyList<CategoryTagVo>().toImmutableList(),
-        ),
-        amount = currentAmount?.expensesAmount.default() - categorySegment.sumOf { it.amount }
-    )
-
-    val ectPaymentMethodSegmentChartData = PaymentMethodSegmentChartData(
-        paymentMethod = PaymentMethodVo(
-            id = "",
-            label = "그 외",
-            groupId = "",
-            groupLabel = "",
-            assetId = "",
-            sort = 0,
-        ),
-        amount = currentAmount?.expensesAmount.default() - paymentMethodSegment.sumOf { it.amount }
-    )
 
     val categorySegmentChartItems: List<CategorySegmentChartData>
         get() {
-            return if (categorySegment.size >= 5) {
-                (categorySegment.take(5).toMutableList() +
-                        ectCategorySegmentChartData).sortedByDescending { it.amount }
-            } else {
-                categorySegment
-            }
+            val totalExpenses = currentAmount?.expensesAmount.default()
+            if (totalExpenses <= 0L || categorySegment.isEmpty()) return emptyList()
+
+            val limit = 5
+            if (categorySegment.size <= limit) return categorySegment
+
+            val topItems = categorySegment.take(limit)
+            val othersCount = categorySegment.size - limit
+            val othersAmount = totalExpenses - topItems.sumOf { it.amount }
+
+            if (othersAmount <= 0L) return topItems
+
+            val othersItem = CategorySegmentChartData(
+                category = CategoryVo(
+                    id = "others",
+                    icon = "•••",
+                    largeCategory = LargeCategoryEnum.EXPENSES,
+                    middleLabel = "그 외 ${othersCount}개",
+                    sort = 0,
+                    isFixed = false,
+                    tags = emptyList<CategoryTagVo>().toImmutableList(),
+                ),
+                amount = othersAmount
+            )
+            return topItems + othersItem
         }
 
     val paymentMethodSegmentChartItems: List<PaymentMethodSegmentChartData>
         get() {
-            return if (paymentMethodSegment.size >= 3) {
-                (paymentMethodSegment.take(3).toMutableList() +
-                        ectPaymentMethodSegmentChartData).sortedByDescending { it.amount }
-            } else {
-                paymentMethodSegment
-            }
+            val totalExpenses = currentAmount?.expensesAmount.default()
+            if (totalExpenses <= 0L || paymentMethodSegment.isEmpty()) return emptyList()
+
+            val limit = 3
+            if (paymentMethodSegment.size <= limit) return paymentMethodSegment
+
+            val topItems = paymentMethodSegment.take(limit)
+            val othersCount = paymentMethodSegment.size - limit
+            val othersAmount = totalExpenses - topItems.sumOf { it.amount }
+
+            if (othersAmount <= 0L) return topItems
+
+            val othersItem = PaymentMethodSegmentChartData(
+                paymentMethod = PaymentMethodVo(
+                    id = "others",
+                    label = "그 외 ${othersCount}개",
+                    groupId = "",
+                    groupLabel = "",
+                    assetId = "",
+                    sort = 0,
+                ),
+                amount = othersAmount
+            )
+            return topItems + othersItem
         }
 }
 

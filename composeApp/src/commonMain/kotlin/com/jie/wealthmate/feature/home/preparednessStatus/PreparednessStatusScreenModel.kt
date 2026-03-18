@@ -75,22 +75,20 @@ class PreparednessStatusScreenModel(
                 val currentAmount = filteredCurrent.sumOf { it.history.amount }
                 val lastAmount = filteredLast.sumOf { it.history.amount }
 
-                val currentGrouped = filteredCurrent.groupBy { it.history.categoryId }
-                val lastGrouped = filteredLast.groupBy { it.history.categoryId }
+                // categoryId가 null이거나 빈 값인 경우를 통일하여 그룹화
+                val currentGrouped = filteredCurrent.groupBy { if (it.history.categoryId.isNullOrBlank()) null else it.history.categoryId }
+                val lastGrouped = filteredLast.groupBy { if (it.history.categoryId.isNullOrBlank()) null else it.history.categoryId }
 
                 val budgetAmount = if (largeCategory == LargeCategoryEnum.SAVING) {
                     val savingCategoryIds = allCategories.map { it.id }.toSet()
                     budgets.filter { it.categoryId in savingCategoryIds }.sumOf { it.amount }
                 } else 0L
 
-                val isSplitRequired = largeCategory == LargeCategoryEnum.EXPENSES || largeCategory == LargeCategoryEnum.SAVING
-
-                val (variableComparisons, fixedComparisons) = if (isSplitRequired) {
+                // 모든 카테고리 타입(INCOME, EXPENSES, SAVING)에 대해 고정/변동 분리 적용
+                val (variableComparisons, fixedComparisons) = run {
                     val (fixed, variable) = allCategories.partition { it.isFixed }
                     calculateCategoryComparisons(currentGrouped, lastGrouped, variable, currentAmount, true, largeCategory) to
                             calculateCategoryComparisons(currentGrouped, lastGrouped, fixed, currentAmount, false, largeCategory)
-                } else {
-                    calculateCategoryComparisons(currentGrouped, lastGrouped, allCategories, currentAmount, true, largeCategory) to emptyList()
                 }
 
                 PreparednessStatusUiState(
@@ -125,6 +123,7 @@ class PreparednessStatusScreenModel(
             val last = lastGrouped[category.id]?.sumOf { it.history.amount } ?: 0L
 
             CategoryDiffInfoVo(
+                categoryId = category.id,
                 categoryIcon = category.icon,
                 categoryName = category.middleLabel,
                 currentAmount = current,
@@ -141,6 +140,7 @@ class PreparednessStatusScreenModel(
                 val unsetCategory = CategoryVo.unset(largeCategory)
                 comparisons.add(
                     CategoryDiffInfoVo(
+                        categoryId = null,
                         categoryIcon = unsetCategory.icon,
                         categoryName = unsetCategory.middleLabel,
                         currentAmount = unsetCurrent,

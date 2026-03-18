@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -37,9 +36,6 @@ import com.jie.wealthmate.theme.ColorGray
 import com.jie.wealthmate.theme.noRippleClickable
 import com.jie.wealthmate.utils.formatWithCommas
 import com.jie.wealthmate.vo.CategoryVo
-import org.jetbrains.compose.resources.painterResource
-import wealthmate.composeapp.generated.resources.Res
-import wealthmate.composeapp.generated.resources.ic_keyboard_arrow_right
 import kotlin.math.roundToInt
 
 
@@ -50,6 +46,7 @@ fun CategorySegmentedChart(
     expensesAmount: Long,
     categorySegmentChartItems: List<CategorySegmentChartData>,
     onCategoryChartClick: () -> Unit = {},
+    onCategoryItemClick: (String?) -> Unit = {},
 ) {
     val typography = MaterialTheme.typography
     var isStarted by remember { mutableStateOf(false) }
@@ -98,12 +95,6 @@ fun CategorySegmentedChart(
                 text = "${statusType.label} 카테고리별 지출",
                 style = typography.titleSmall.copy(color = ColorGray.Gray_500),
             )
-            Icon(
-                painter = painterResource(Res.drawable.ic_keyboard_arrow_right),
-                contentDescription = null,
-                tint = ColorGray.Gray_500,
-                modifier = Modifier.size(16.dp)
-            )
         }
 
         if (displayItems.isEmpty()) {
@@ -136,14 +127,16 @@ fun CategorySegmentedChart(
                     val currentWeight = proportion * animProgress
 
                     if (currentWeight > 0f) {
-                        val color = if (data.category.isUnset) ColorGray.Gray_200
-                        else colors[index % colors.size]
+                        val color = colors[index % colors.size]
 
                         Box(
                             modifier = Modifier
                                 .weight(currentWeight)
                                 .fillMaxHeight()
                                 .background(color)
+                                .noRippleClickable {
+                                    onCategoryItemClick(if (data.category.isUnset) null else data.category.id)
+                                }
                         )
                     }
                 }
@@ -162,13 +155,15 @@ fun CategorySegmentedChart(
 
         // 리스트 아이템 영역
         displayItems.forEachIndexed { index, item ->
-            val color = if (item.category.isUnset) ColorGray.Gray_200
-            else colors[index % colors.size]
+            val color = colors[index % colors.size]
 
             CategorySegmentedItem(
                 totalAmount = totalAmountForCalc.toLong(),
                 categorySegment = item,
-                color = color
+                color = color,
+                onClick = {
+                    onCategoryItemClick(if (item.category.isUnset) null else item.category.id)
+                }
             )
         }
     }
@@ -179,6 +174,7 @@ private fun CategorySegmentedItem(
     totalAmount: Long,
     categorySegment: CategorySegmentChartData,
     color: Color,
+    onClick: () -> Unit = {}
 ) {
     val typography = MaterialTheme.typography
     val category = categorySegment.category
@@ -186,6 +182,7 @@ private fun CategorySegmentedItem(
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .noRippleClickable(onClick = onClick)
             .padding(vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {

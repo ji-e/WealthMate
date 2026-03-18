@@ -23,6 +23,7 @@ import com.jie.wealthmate.component.WMListSelectionModalBottomSheet
 import com.jie.wealthmate.component.topbar.TopBarItem
 import com.jie.wealthmate.component.topbar.WMTopBar
 import com.jie.wealthmate.feature.home.StatusType
+import com.jie.wealthmate.feature.home.categoryExpenses.CategoryExpensesScreen
 import com.jie.wealthmate.feature.home.preparednessStatus.component.ExpensesSection
 import com.jie.wealthmate.feature.home.preparednessStatus.component.IncomeSection
 import com.jie.wealthmate.feature.home.preparednessStatus.component.PreparednessStatusFilter
@@ -89,6 +90,9 @@ class PreparednessStatusScreen(
                                 totalAmount = uiState.currentAmount,
                                 categoryComparisons = uiState.categoryComparisons,
                                 fixedCategoryComparisons = uiState.fixedCategoryComparisons,
+                                onCategoryClick = { categoryId ->
+                                    navigator.push(CategoryExpensesScreen(uiState.statusType, uiState.largeCategory, categoryId))
+                                }
                             )
                         }
 
@@ -101,7 +105,10 @@ class PreparednessStatusScreen(
                                 maxIncreaseCategory = uiState.maxIncreaseCategory,
                                 maxDecreaseCategory = uiState.maxDecreaseCategory,
                                 categoryComparisons = uiState.categoryComparisons,
-                                fixedCategoryComparisons = uiState.fixedCategoryComparisons
+                                fixedCategoryComparisons = uiState.fixedCategoryComparisons,
+                                onCategoryClick = { categoryId ->
+                                    navigator.push(CategoryExpensesScreen(uiState.statusType, uiState.largeCategory, categoryId))
+                                }
                             )
                         }
 
@@ -115,6 +122,9 @@ class PreparednessStatusScreen(
                                 budgetAmount = uiState.budgetAmount,
                                 categoryComparisons = uiState.categoryComparisons,
                                 fixedCategoryComparisons = uiState.fixedCategoryComparisons,
+                                onCategoryClick = { categoryId ->
+                                    navigator.push(CategoryExpensesScreen(uiState.statusType, uiState.largeCategory, categoryId))
+                                }
                             )
                         }
                     }

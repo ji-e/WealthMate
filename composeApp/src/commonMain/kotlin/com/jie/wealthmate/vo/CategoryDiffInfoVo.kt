@@ -1,6 +1,7 @@
 package com.jie.wealthmate.vo
 
 data class CategoryDiffInfoVo(
+    val categoryId: String?,
     val categoryIcon: String,
     val categoryName: String,
     val currentAmount: Long,

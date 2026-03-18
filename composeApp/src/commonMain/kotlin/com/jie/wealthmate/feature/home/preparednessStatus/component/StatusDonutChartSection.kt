@@ -57,6 +57,7 @@ fun StatusDonutChartSection(
             val otherRatio = otherCategories.sumOf { it.ratio.toDouble() }.toFloat()
 
             topCategories + CategoryDiffInfoVo(
+                categoryId = null,
                 categoryIcon = "···",
                 categoryName = "그 외 ${otherCategories.size}개",
                 currentAmount = otherAmount,

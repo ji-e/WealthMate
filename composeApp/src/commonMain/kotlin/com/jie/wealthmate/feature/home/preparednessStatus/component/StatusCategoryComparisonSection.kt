@@ -22,7 +22,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.jie.wealthmate.component.WMText
 import com.jie.wealthmate.feature.budget.budgetYearDetail.component.LegendItem
@@ -31,10 +30,13 @@ import com.jie.wealthmate.feature.menu.management.categoryManagement.component.L
 import com.jie.wealthmate.theme.ColorBlue
 import com.jie.wealthmate.theme.ColorGray
 import com.jie.wealthmate.theme.ColorRed
+import com.jie.wealthmate.theme.noRippleClickable
+import com.jie.wealthmate.utils.default
 import com.jie.wealthmate.utils.formatWithCommas
 import com.jie.wealthmate.vo.CategoryDiffInfoVo
 import org.jetbrains.compose.resources.painterResource
 import wealthmate.composeapp.generated.resources.Res
+import wealthmate.composeapp.generated.resources.ic_keyboard_arrow_right
 import wealthmate.composeapp.generated.resources.ic_push_pin
 import kotlin.math.max
 import kotlin.math.roundToInt
@@ -49,6 +51,7 @@ fun StatusCategoryComparisonSection(
     statusType: StatusType,
     largeCategory: LargeCategoryEnum,
     comparisons: List<CategoryDiffInfoVo>,
+    onCategoryClick: (String) -> Unit,
 ) {
     val typography = MaterialTheme.typography
     val maxAmount = remember(comparisons) {
@@ -90,7 +93,8 @@ fun StatusCategoryComparisonSection(
                     largeCategory = largeCategory,
                     info = info,
                     maxAmount = maxAmount,
-                    iconBackgroundColor = largeCategory.backgroundColor
+                    iconBackgroundColor = largeCategory.backgroundColor,
+                    onCategoryClick = onCategoryClick
                 )
             }
         }
@@ -108,6 +112,7 @@ fun StatusFixedCategoryComparisonSection(
     statusType: StatusType,
     largeCategory: LargeCategoryEnum,
     comparisons: List<CategoryDiffInfoVo>,
+    onCategoryClick: (String) -> Unit,
 ) {
     val typography = MaterialTheme.typography
     val maxAmount = remember(comparisons) {
@@ -151,7 +156,8 @@ fun StatusFixedCategoryComparisonSection(
                     info = info,
                     isFixed = true,
                     maxAmount = maxAmount,
-                    iconBackgroundColor = largeCategory.backgroundColor
+                    iconBackgroundColor = largeCategory.backgroundColor,
+                    onCategoryClick = onCategoryClick
                 )
             }
         }
@@ -165,6 +171,7 @@ private fun StatusCategoryComparisonItem(
     isFixed: Boolean = false,
     maxAmount: Long,
     iconBackgroundColor: Color,
+    onCategoryClick: (String) -> Unit,
 ) {
     val typography = MaterialTheme.typography
     val percentage = remember(info.currentAmount, info.lastAmount) {
@@ -175,9 +182,11 @@ private fun StatusCategoryComparisonItem(
         }
     }
 
-    Column {
+    Column() {
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .noRippleClickable { onCategoryClick(info.categoryId.default()) },
             verticalAlignment = Alignment.CenterVertically
         ) {
             Row(
@@ -191,17 +200,27 @@ private fun StatusCategoryComparisonItem(
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Column(modifier = Modifier.weight(1f)) {
-                    WMText(
-                        text = info.categoryName,
-                        style = typography.titleMedium.copy(fontWeight = FontWeight.Medium),
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        WMText(
+                            text = info.categoryName,
+                            modifier = Modifier.weight(1f, fill = false),
+                            style = typography.titleMedium.copy(fontWeight = FontWeight.Medium),
+                            maxLines = 1,
+                        )
+                        Icon(
+                            painter = painterResource(Res.drawable.ic_keyboard_arrow_right),
+                            contentDescription = null,
+                            tint = ColorGray.Gray_500,
+                            modifier = Modifier
+                                .padding(start = 2.dp)
+                                .size(16.dp)
+                        )
+                    }
+
                     WMText(
                         text = if (percentage >= 0) "+$percentage%" else "$percentage%",
                         style = typography.labelSmall.copy(color = ColorGray.Gray_500),
                         maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
                     )
                 }
             }
