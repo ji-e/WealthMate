@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -31,6 +32,8 @@ import kotlinx.datetime.plus
 val startDate = LocalDate(2025, 1, 1)
 
 class CalendarScreen() : BaseScreen() {
+
+    private val listState = LazyListState()
 
     @Composable
     override fun Content() {
@@ -88,6 +91,7 @@ class CalendarScreen() : BaseScreen() {
                             historyItems = uiState.histories,
                             onDateSelected = onDateChanged,
                             onHistoryClick = onHistoryClick,
+                            listState = listState,
                         )
                     }
                 )

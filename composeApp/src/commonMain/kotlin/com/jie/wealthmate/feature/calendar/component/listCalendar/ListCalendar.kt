@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
@@ -33,6 +34,7 @@ fun ListCalendar(
     historyItems: List<HistoryVo>,
     onDateSelected: (LocalDate) -> Unit,
     onHistoryClick: (HistoryVo) -> Unit,
+    listState: LazyListState = rememberLazyListState(),
 ) {
     // 1. 데이터 가공: selectedDate를 포함하여 내역이 없어도 해당 날짜 섹션이 생성되도록 함
     val groupedItems = remember(historyItems, selectedDate) {
@@ -56,7 +58,6 @@ fun ListCalendar(
         }
     }
 
-    val listState = rememberLazyListState()
     var isProgrammaticScroll by remember { mutableStateOf(false) }
     var isInitialScroll by remember { mutableStateOf(true) }
 
@@ -64,18 +65,21 @@ fun ListCalendar(
     LaunchedEffect(selectedDate, groupStartIndices) {
         if (groupStartIndices.isEmpty()) return@LaunchedEffect
 
-        // 사용자가 직접 스크롤 중인 경우, 외부 신호에 의한 강제 스크롤을 차단합니다.
-        if (listState.isScrollInProgress && !isInitialScroll) return@LaunchedEffect
+        // 현재 리스트의 최상단에 보이는 아이템의 날짜를 확인
+        val currentVisibleDate = groupStartIndices.lastOrNull { it.first <= listState.firstVisibleItemIndex }?.second
 
-        // 데이터 가공 단계에서 selectedDate가 포함되었으므로 정확한 매칭만 수행
-        val targetEntry = groupStartIndices.find { it.second == selectedDate } ?: return@LaunchedEffect
-        val targetIndex = targetEntry.first
-
-        // 타겟 인덱스에 정확히 위치해 있고 상단 오프셋이 없다면 스크롤 불필요
-        if (listState.firstVisibleItemIndex == targetIndex && listState.firstVisibleItemScrollOffset == 0) {
+        // 만약 이미 선택된 날짜가 화면에 보이고 있다면 (다른 화면에서 돌아온 경우 포함), 
+        // 강제로 스크롤 위치를 조정하지 않고 그대로 둡니다.
+        if (currentVisibleDate == selectedDate) {
             isInitialScroll = false
             return@LaunchedEffect
         }
+
+        // 사용자가 직접 스크롤 중인 경우, 외부 신호에 의한 강제 스크롤을 차단합니다.
+        if (listState.isScrollInProgress && !isInitialScroll) return@LaunchedEffect
+
+        val targetEntry = groupStartIndices.find { it.second == selectedDate } ?: return@LaunchedEffect
+        val targetIndex = targetEntry.first
 
         try {
             isProgrammaticScroll = true
@@ -98,8 +102,6 @@ fun ListCalendar(
             val canScrollBackward = listState.canScrollBackward
             val isScrollInProgress = listState.isScrollInProgress
 
-            // 리스트 하단에 도달하여 더 이상 내려갈 수 없는 경우, 마지막 섹션(가장 과거 날짜)을 강제 선택
-            // (내역이 적어 1일 헤더가 상단에 닿지 못하는 경우 대응)
             val date = if (!canScrollForward && canScrollBackward) {
                 groupStartIndices.lastOrNull()?.second
             } else {
@@ -107,7 +109,6 @@ fun ListCalendar(
             }
             Triple(date, isScrollInProgress, isProgrammaticScroll)
         }
-        // 사용자가 실제로 스크롤 중일 때만 날짜를 업데이트하여 의도치 않은 점프 방지
         .filter { (_, isScrolling, isProgrammatic) -> isScrolling && !isProgrammatic }
         .map { it.first }
         .distinctUntilChanged()
