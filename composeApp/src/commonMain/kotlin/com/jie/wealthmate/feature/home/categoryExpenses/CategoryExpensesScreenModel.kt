@@ -8,15 +8,12 @@ import com.jie.wealthmate.repository.HistoryRepository
 import com.jie.wealthmate.utils.firstDayOfMonth
 import com.jie.wealthmate.utils.lastDayOfMonth
 import com.jie.wealthmate.utils.toEpochMilliseconds
-import com.jie.wealthmate.utils.toLocalDate
 import com.jie.wealthmate.utils.today
 import com.jie.wealthmate.vo.CategoryVo
 import com.jie.wealthmate.vo.CategoryVo.Companion.mapperToVo
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.isoDayNumber
@@ -39,7 +36,9 @@ class CategoryExpensesScreenModel(
     private val filterFlow = MutableStateFlow(initialStatusType to initialLargeCategory)
 
     init {
-        observeData()
+        filterFlow.onEach {
+            loadHistories(isRefresh = true)
+        }.launchIn(screenScope)
     }
 
     fun updateStatusType(statusType: StatusType) {
@@ -47,53 +46,86 @@ class CategoryExpensesScreenModel(
         filterFlow.value = statusType to filterFlow.value.second
     }
 
-    fun updateLargeCategory(largeCategory: LargeCategoryEnum) {
-        if (container.uiState.value.largeCategory == largeCategory) return
-        filterFlow.value = filterFlow.value.first to largeCategory
+    fun loadNextPage() {
+        loadHistories(isRefresh = false)
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    private fun observeData() {
-        filterFlow.flatMapLatest { (statusType, largeCategory) ->
-            val periods = getPeriods(statusType)
-            val isUnsetSearch = categoryId.isNullOrBlank() || categoryId.startsWith(CategoryVo.UNSET_ID_PREFIX)
-            val effectiveCategoryId = if (isUnsetSearch) null else categoryId
+    private fun loadHistories(isRefresh: Boolean) {
+        val (statusType, largeCategory) = filterFlow.value
+        val periods = getPeriods(statusType)
+        val isUnsetSearch = categoryId.isNullOrBlank() || categoryId.startsWith(CategoryVo.UNSET_ID_PREFIX)
 
-            combine(
-                historyRepository.getHistoriesByMonth(periods.currentStart, periods.currentEnd),
-                historyRepository.getHistoriesByMonth(periods.lastStart, periods.lastEnd),
-                if (effectiveCategoryId != null) categoryRepository.getCategoryByIdFlow(effectiveCategoryId) else flowOf(null)
-            ) { currentHistories, lastHistories, categoryEntity ->
-                val categoryVo = categoryEntity?.mapperToVo(largeCategory) ?: CategoryVo.unset(largeCategory)
-                
-                val filteredCurrent = currentHistories.filter { 
-                    it.history.largeCategory == largeCategory.name && 
-                    if (isUnsetSearch) it.history.categoryId.isNullOrBlank() else it.history.categoryId == effectiveCategoryId
-                }
-                val filteredLast = lastHistories.filter { 
-                    it.history.largeCategory == largeCategory.name && 
-                    if (isUnsetSearch) it.history.categoryId.isNullOrBlank() else it.history.categoryId == effectiveCategoryId
-                }
+        val currentState = container.uiState.value
+        val currentPage = if (isRefresh) 0 else currentState.page
+        val limit = 20
 
-                val histories = filteredCurrent.sortedByDescending { it.history.date }
-                val groupedHistories = histories
-                    .groupBy { it.history.date.toLocalDate() }
-                    .toList()
-                    .sortedByDescending { it.first }
+        if (!isRefresh && (currentState.isPagingLoading || currentState.isLastPage)) return
 
-                CategoryExpensesUiState(
-                    statusType = statusType,
-                    largeCategory = largeCategory,
-                    category = categoryVo,
-                    totalAmount = filteredCurrent.sumOf { it.history.amount },
-                    lastTotalAmount = filteredLast.sumOf { it.history.amount },
-                    histories = histories,
-                    groupedHistories = groupedHistories
+        reduceState { it.copy(isPagingLoading = true) }
+
+        launchSafe(
+            block = {
+                val histories = historyRepository.searchHistories(
+                    query = "",
+                    sortOrder = "LATEST",
+                    startDate = periods.currentStart,
+                    endDate = periods.currentEnd,
+                    largeCategories = listOf(largeCategory.name),
+                    categoryIds = if (isUnsetSearch) listOf(CategoryVo.UNSET_ID_PREFIX) else listOfNotNull(categoryId),
+                    paymentMethodIds = emptyList(),
+                    limit = limit,
+                    offset = currentPage * limit
                 )
+
+                val summary = if (isRefresh) {
+                    val currentSum = historyRepository.getSearchSummary(
+                        query = "",
+                        startDate = periods.currentStart,
+                        endDate = periods.currentEnd,
+                        largeCategories = listOf(largeCategory.name),
+                        categoryIds = if (isUnsetSearch) listOf(CategoryVo.UNSET_ID_PREFIX) else listOfNotNull(categoryId),
+                        paymentMethodIds = emptyList()
+                    )[largeCategory.name] ?: 0L
+
+                    val lastSum = historyRepository.getSearchSummary(
+                        query = "",
+                        startDate = periods.lastStart,
+                        endDate = periods.lastEnd,
+                        largeCategories = listOf(largeCategory.name),
+                        categoryIds = if (isUnsetSearch) listOf(CategoryVo.UNSET_ID_PREFIX) else listOfNotNull(categoryId),
+                        paymentMethodIds = emptyList()
+                    )[largeCategory.name] ?: 0L
+
+                    val categoryVo = if (!isUnsetSearch && categoryId != null) {
+                        categoryRepository.getCategoryById(categoryId)?.mapperToVo(largeCategory)
+                    } else {
+                        CategoryVo.unset(largeCategory)
+                    }
+                    Triple(currentSum, lastSum, categoryVo)
+                } else null
+
+                histories to summary
+            },
+            showLoading = isRefresh && currentPage == 0,
+            onSuccess = { (newHistories, summary) ->
+                reduceState { state ->
+                    state.copy(
+                        statusType = statusType,
+                        largeCategory = largeCategory,
+                        category = summary?.third ?: state.category,
+                        totalAmount = summary?.first ?: state.totalAmount,
+                        lastTotalAmount = summary?.second ?: state.lastTotalAmount,
+                        histories = if (isRefresh) newHistories else state.histories + newHistories,
+                        isPagingLoading = false,
+                        isLastPage = newHistories.size < limit,
+                        page = if (isRefresh) 1 else state.page + 1
+                    )
+                }
+            },
+            onError = {
+                reduceState { it.copy(isPagingLoading = false) }
             }
-        }.apiFlow { newState ->
-            reduceState { newState }
-        }
+        )
     }
 
     private fun getPeriods(statusType: StatusType): Periods {
