@@ -12,6 +12,7 @@ import com.jie.wealthmate.feature.calendar.historyDetail.HistoryDetailScreenMode
 import com.jie.wealthmate.feature.home.HomeScreenModel
 import com.jie.wealthmate.feature.home.StatusType
 import com.jie.wealthmate.feature.home.categoryExpenses.CategoryExpensesScreenModel
+import com.jie.wealthmate.feature.home.paymentMethodExpenses.PaymentMethodExpensesScreenModel
 import com.jie.wealthmate.feature.home.preparednessStatus.PreparednessStatusScreenModel
 import com.jie.wealthmate.feature.menu.MenuScreenModel
 import com.jie.wealthmate.feature.menu.data.googleCloudShare.GoogleCloudShareScreenModel
@@ -80,6 +81,9 @@ val commonModule = module {
     }
     factory { (initialStatusType: StatusType, initialLargeCategory: LargeCategoryEnum, categoryId: String?) ->
         CategoryExpensesScreenModel(get(), get(), initialStatusType, initialLargeCategory, categoryId)
+    }
+    factory { (initialStatusType: StatusType, initialLargeCategory: LargeCategoryEnum, paymentMethodId: String?) ->
+        PaymentMethodExpensesScreenModel(get(), get(), initialStatusType, initialLargeCategory, paymentMethodId)
     }
 
     // 캘린더
