@@ -4,6 +4,7 @@ import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -91,6 +92,7 @@ fun CategorySegmentedChart(
     Column(modifier = modifier.fillMaxWidth()) {
         Row(
             modifier = Modifier
+                .padding(horizontal = 28.dp)
                 .noRippleClickable(onClick = onCategoryChartClick)
                 .padding(bottom = 12.dp),
             verticalAlignment = Alignment.CenterVertically
@@ -127,6 +129,7 @@ fun CategorySegmentedChart(
         // 차트 바 영역
         Row(
             modifier = Modifier
+                .padding(horizontal = 28.dp)
                 .fillMaxWidth()
                 .height(24.dp)
                 .clip(RoundedCornerShape(8.dp))
@@ -193,8 +196,8 @@ private fun CategorySegmentedItem(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .noRippleClickable(onClick = onClick)
-            .padding(vertical = 8.dp),
+            .clickable(onClick = onClick)
+            .padding(vertical = 8.dp, horizontal = 28.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Box(

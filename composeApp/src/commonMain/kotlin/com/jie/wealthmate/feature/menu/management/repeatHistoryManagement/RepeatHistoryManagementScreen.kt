@@ -32,7 +32,9 @@ import kotlinx.coroutines.launch
 import wealthmate.composeapp.generated.resources.Res
 import wealthmate.composeapp.generated.resources.ic_add
 
-class RepeatHistoryManagementScreen : BaseScreen() {
+class RepeatHistoryManagementScreen(
+    private val initialLargeCategory: LargeCategoryEnum = LargeCategoryEnum.INCOME
+) : BaseScreen() {
     private val largeCategoryItems = LargeCategoryEnum.entries
 
     @Composable
@@ -43,7 +45,12 @@ class RepeatHistoryManagementScreen : BaseScreen() {
         val screenModel: RepeatHistoryManagementScreenModel = koinScreenModel()
         val uiState by screenModel.container.uiState.collectAsState()
         val coroutineScope = rememberCoroutineScope()
-        val pagerState = rememberPagerState(pageCount = { largeCategoryItems.size })
+
+        val initialPage = remember { largeCategoryItems.indexOf(initialLargeCategory).coerceAtLeast(0) }
+        val pagerState = rememberPagerState(
+            initialPage = initialPage,
+            pageCount = { largeCategoryItems.size }
+        )
 
         val isAddItemEnabled by remember { derivedStateOf { uiState.repeatHistoryItems.size < 15 } }
 

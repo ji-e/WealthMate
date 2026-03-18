@@ -69,7 +69,7 @@ fun PaymentMethodSegmentedChart(
         } else {
             paymentMethodSegmentChartItems
         }
-        
+
         allItems.sortedByDescending { it.amount }
     }
 
@@ -91,6 +91,7 @@ fun PaymentMethodSegmentedChart(
     Column(modifier = modifier.fillMaxWidth()) {
         Row(
             modifier = Modifier
+                .padding(horizontal = 28.dp)
                 .noRippleClickable(onClick = onPaymentMethodChartClick)
                 .padding(bottom = 12.dp),
             verticalAlignment = Alignment.CenterVertically
@@ -127,6 +128,7 @@ fun PaymentMethodSegmentedChart(
         // 차트 영역
         Row(
             modifier = Modifier
+                .padding(horizontal = 28.dp)
                 .fillMaxWidth()
                 .height(24.dp)
                 .clip(RoundedCornerShape(8.dp))
@@ -191,7 +193,7 @@ private fun PaymentMethodSegmentedItem(
         modifier = Modifier
             .clickable { onClick() }
             .fillMaxWidth()
-            .padding(vertical = 8.dp),
+            .padding(horizontal = 28.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Box(
