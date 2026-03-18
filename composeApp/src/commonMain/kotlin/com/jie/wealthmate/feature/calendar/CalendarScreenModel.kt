@@ -14,6 +14,8 @@ import com.jie.wealthmate.utils.toEpochMilliseconds
 import com.jie.wealthmate.utils.toLocalDate
 import com.jie.wealthmate.utils.today
 import com.jie.wealthmate.vo.HistoryVo.Companion.mapperToVo
+import com.russhwolf.settings.Settings
+import com.russhwolf.settings.set
 import kotlinx.coroutines.flow.first
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
@@ -25,12 +27,35 @@ import kotlinx.datetime.plus
 class CalendarScreenModel(
     private val historyRepository: HistoryRepository,
     private val repeatCycleRepository: RepeatCycleRepository,
+    private val settings: Settings,
 ) : BaseScreenModel<CalendarUiState>() {
+
+    companion object {
+        private const val KEY_CALENDAR_FILTER_OPTIONS = "calendar_filter_options"
+    }
+
     override val initialState: CalendarUiState
-        get() = CalendarUiState(
-            selectedDate = MainUiManager.uiState.value.selectedDate,
-            selectedMonth = MainUiManager.uiState.value.selectedDate
-        )
+        get() {
+            // 로컬에 저장된 필터 옵션 로드 (없으면 전체 선택이 기본값)
+            val savedOptions = settings.getStringOrNull(KEY_CALENDAR_FILTER_OPTIONS)
+            val initialFilters = if (savedOptions != null) {
+                savedOptions.split(",").mapNotNull { name ->
+                    try {
+                        CalendarFilterOption.valueOf(name)
+                    } catch (e: Exception) {
+                        null
+                    }
+                }.toSet()
+            } else {
+                CalendarFilterOption.entries.toSet()
+            }
+
+            return CalendarUiState(
+                selectedDate = MainUiManager.uiState.value.selectedDate,
+                selectedMonth = MainUiManager.uiState.value.selectedDate,
+                filterOptions = initialFilters
+            )
+        }
 
     init {
         getHistoriesByMonth()
@@ -62,6 +87,9 @@ class CalendarScreenModel(
     }
 
     fun updateFilterOptions(options: Set<CalendarFilterOption>) {
+        // 로컬에 저장
+        settings[KEY_CALENDAR_FILTER_OPTIONS] = options.joinToString(",") { it.name }
+
         reduceState { state ->
             state.copy(filterOptions = options)
         }
