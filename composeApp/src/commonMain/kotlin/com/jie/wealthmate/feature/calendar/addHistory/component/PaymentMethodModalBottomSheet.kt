@@ -138,7 +138,7 @@ fun PaymentMethodItem(
             .clickable { onClick() },
         contentAlignment = Alignment.Center
     ) {
-        Row {
+        Row(modifier = Modifier.padding(horizontal = 12.dp)) {
 
             WMText(
                 text = label,
@@ -147,6 +147,7 @@ fun PaymentMethodItem(
                     color = if (isSelected) ColorPrimary.Primary_700 else ColorGray.Gray_700,
                     fontSize = if (isSelected) 18.sp else 16.sp
                 ),
+                maxLines = 1
             )
 
             if (groupLabel.isNullOrBlank().not()) {
@@ -157,7 +158,8 @@ fun PaymentMethodItem(
                         .padding(horizontal = 6.dp)
                         .clip(CircleShape)
                         .background(groupBackgroundColor)
-                        .padding(horizontal = 8.dp, vertical = 4.dp)
+                        .padding(horizontal = 8.dp, vertical = 4.dp),
+                    maxLines = 1
                 )
             }
         }
