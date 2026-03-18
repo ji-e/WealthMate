@@ -18,6 +18,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.jie.wealthmate.base.BaseScreen
 import com.jie.wealthmate.component.calculateAdjustedToastPadding
+import com.jie.wealthmate.feature.calendar.component.CalendarFilterModalBottomSheet
 import com.jie.wealthmate.feature.calendar.component.SelectedCalendarModalBottomSheet
 import com.jie.wealthmate.feature.calendar.component.listCalendar.ListCalendar
 import com.jie.wealthmate.feature.calendar.component.monthCalendar.MonthCalendar
@@ -44,6 +45,7 @@ class CalendarScreen() : BaseScreen() {
         val uiState by screenModel.container.uiState.collectAsState()
 
         var isShowSelectedCalendarModalBottomSheet by remember { mutableStateOf(false) }
+        var isShowFilterBottomSheet by remember { mutableStateOf(false) }
 
         val monthItems = remember {
             mutableListOf<LocalDate>().apply {
@@ -53,7 +55,6 @@ class CalendarScreen() : BaseScreen() {
             }
         }
 
-        // 람다 정의를 Box 외부(상단)로 이동하여 하단 시트에서도 접근 가능하게 함
         val onMonthChanged =
             remember { { month: LocalDate -> screenModel.updateSelectedMonth(month) } }
         val onDateChanged = remember { { date: LocalDate -> screenModel.updateSelectedDate(date) } }
@@ -83,8 +84,10 @@ class CalendarScreen() : BaseScreen() {
                     onMonthChanged = onMonthChanged,
                     onTodayClick = { screenModel.updateSelectedMonth() },
                     onSearchClick = { navigator.push(SearchScreen()) },
+                    onMoreClick = { isShowFilterBottomSheet = true },
                     onSelectedMonthClick = { isShowSelectedCalendarModalBottomSheet = true },
                     onDateClick = onDateChanged,
+                    filterOptions = uiState.filterOptions,
                     bottomContent = {
                         ListCalendar(
                             selectedDate = uiState.selectedDate,
@@ -107,6 +110,17 @@ class CalendarScreen() : BaseScreen() {
                     isShowSelectedCalendarModalBottomSheet = false
                 },
                 onDismissRequest = { isShowSelectedCalendarModalBottomSheet = false }
+            )
+        }
+
+        if (isShowFilterBottomSheet) {
+            CalendarFilterModalBottomSheet(
+                title = "캘린더 관리",
+                selectedOptions = uiState.filterOptions,
+                onOptionsSelected = { options ->
+                    screenModel.updateFilterOptions(options)
+                },
+                onDismissRequest = { isShowFilterBottomSheet = false }
             )
         }
     }

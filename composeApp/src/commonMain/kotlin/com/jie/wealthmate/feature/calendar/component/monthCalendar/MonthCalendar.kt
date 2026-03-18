@@ -45,6 +45,7 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import com.jie.wealthmate.component.WMIconButton
 import com.jie.wealthmate.component.WMText
+import com.jie.wealthmate.feature.calendar.CalendarFilterOption
 import com.jie.wealthmate.feature.calendar.startDate
 import com.jie.wealthmate.theme.ColorGray
 import com.jie.wealthmate.utils.convertLocalDateToString
@@ -77,6 +78,7 @@ fun MonthCalendar(
     onMoreClick: () -> Unit = {},
     onSelectedMonthClick: () -> Unit = {},
     onDateClick: (LocalDate) -> Unit = {},
+    filterOptions: Set<CalendarFilterOption> = CalendarFilterOption.entries.toSet(),
     bottomContent: @Composable () -> Unit = {},
 ) {
     var displaySelectedMonth by remember {
@@ -124,6 +126,7 @@ fun MonthCalendar(
             selectedDate = selectedDate,
             historyByMonth = historyByMonth,
             onDateClick = onDateClick,
+            filterOptions = filterOptions,
             bottomContent = bottomContent
         )
     }
@@ -136,6 +139,7 @@ private fun CollapsibleCalendarContent(
     selectedDate: LocalDate,
     historyByMonth: Map<String, List<HistoryVo>>,
     onDateClick: (LocalDate) -> Unit,
+    filterOptions: Set<CalendarFilterOption>,
     bottomContent: @Composable () -> Unit,
 ) {
     BoxWithConstraints(
@@ -205,6 +209,7 @@ private fun CollapsibleCalendarContent(
                         dayMaxHeight = dayMaxHeight,
                         expansionProgress = expansionProgress,
                         collapseProgress = collapseProgress,
+                        filterOptions = filterOptions,
                         onClickDate = onDateClick
                     )
                 }
@@ -294,6 +299,7 @@ private fun MonthCalendarContent(
     dayMaxHeight: Dp,
     expansionProgress: Float,
     collapseProgress: Float,
+    filterOptions: Set<CalendarFilterOption>,
     onClickDate: (LocalDate) -> Unit,
 ) {
     DayGrid(
@@ -304,6 +310,7 @@ private fun MonthCalendarContent(
         dayMaxHeight = dayMaxHeight,
         expansionProgress = expansionProgress,
         collapseProgress = collapseProgress,
+        filterOptions = filterOptions,
         onClickDate = onClickDate
     )
 }

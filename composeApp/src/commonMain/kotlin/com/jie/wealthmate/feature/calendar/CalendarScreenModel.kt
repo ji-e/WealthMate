@@ -61,6 +61,12 @@ class CalendarScreenModel(
         }
     }
 
+    fun updateFilterOptions(options: Set<CalendarFilterOption>) {
+        reduceState { state ->
+            state.copy(filterOptions = options)
+        }
+    }
+
     fun getHistoriesByMonth() {
         val selectedMonth = container.uiState.value.selectedMonth
         historyRepository.getHistoriesByMonth(
