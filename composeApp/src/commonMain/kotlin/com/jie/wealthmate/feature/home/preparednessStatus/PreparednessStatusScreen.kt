@@ -7,7 +7,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -24,10 +26,12 @@ import com.jie.wealthmate.component.topbar.TopBarItem
 import com.jie.wealthmate.component.topbar.WMTopBar
 import com.jie.wealthmate.feature.home.StatusType
 import com.jie.wealthmate.feature.home.categoryExpenses.CategoryExpensesScreen
-import com.jie.wealthmate.feature.home.preparednessStatus.component.ExpensesSection
-import com.jie.wealthmate.feature.home.preparednessStatus.component.IncomeSection
 import com.jie.wealthmate.feature.home.preparednessStatus.component.PreparednessStatusFilter
-import com.jie.wealthmate.feature.home.preparednessStatus.component.SavingSection
+import com.jie.wealthmate.feature.home.preparednessStatus.component.StatusCategoryComparisonSection
+import com.jie.wealthmate.feature.home.preparednessStatus.component.StatusDonutChartSection
+import com.jie.wealthmate.feature.home.preparednessStatus.component.StatusFixedCategoryComparisonSection
+import com.jie.wealthmate.feature.home.preparednessStatus.component.StatusPaymentMethodSection
+import com.jie.wealthmate.feature.home.preparednessStatus.component.StatusSummaryCards
 import com.jie.wealthmate.feature.home.preparednessStatus.component.SummarySection
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.theme.ColorGray
@@ -36,6 +40,7 @@ import org.koin.core.parameter.parametersOf
 class PreparednessStatusScreen(
     private val initialStatusType: StatusType,
     private val initialLargeCategory: LargeCategoryEnum,
+    private val scrollToPosition: Int = 0,
 ) : Screen {
     @Composable
     override fun Content() {
@@ -47,6 +52,14 @@ class PreparednessStatusScreen(
 
         var isShowStatusTypeModal by remember { mutableStateOf(false) }
         var isShowLargeCategoryModal by remember { mutableStateOf(false) }
+
+        val listState = rememberLazyListState()
+
+        LaunchedEffect(scrollToPosition) {
+            if (scrollToPosition > 0) {
+                listState.animateScrollToItem(scrollToPosition)
+            }
+        }
 
         Column(modifier = Modifier.fillMaxSize()) {
             WMTopBar(
@@ -64,6 +77,7 @@ class PreparednessStatusScreen(
                 }
             )
             LazyColumn(
+                state = listState,
                 modifier = Modifier
                     .fillMaxSize()
                     .background(ColorGray.Gray_50)
@@ -81,52 +95,88 @@ class PreparednessStatusScreen(
                 }
                 item {
                     when (uiState.largeCategory) {
-                        LargeCategoryEnum.INCOME -> {
-                            IncomeSection(
-                                modifier = Modifier
-                                    .padding(top = 24.dp)
-                                    .padding(horizontal = 28.dp),
-                                statusType = uiState.statusType,
-                                totalAmount = uiState.currentAmount,
-                                categoryComparisons = uiState.categoryComparisons,
-                                fixedCategoryComparisons = uiState.fixedCategoryComparisons,
-                                onCategoryClick = { categoryId ->
-                                    navigator.push(CategoryExpensesScreen(uiState.statusType, uiState.largeCategory, categoryId))
-                                }
-                            )
+                        LargeCategoryEnum.INCOME, LargeCategoryEnum.SAVING -> {
+                            if (uiState.currentAmount > 0) {
+                                StatusDonutChartSection(
+                                    modifier = Modifier
+                                        .padding(top = 24.dp)
+                                        .padding(horizontal = 28.dp),
+                                    title = "카테고리별 수입 비중",
+                                    totalLabel = "수입",
+                                    categories = uiState.categoryComparisons + uiState.fixedCategoryComparisons
+                                )
+                            }
                         }
 
                         LargeCategoryEnum.EXPENSES -> {
-                            ExpensesSection(
+                            StatusSummaryCards(
                                 modifier = Modifier
                                     .padding(top = 24.dp)
                                     .padding(horizontal = 28.dp),
-                                statusType = uiState.statusType,
                                 maxIncreaseCategory = uiState.maxIncreaseCategory,
                                 maxDecreaseCategory = uiState.maxDecreaseCategory,
-                                categoryComparisons = uiState.categoryComparisons,
-                                fixedCategoryComparisons = uiState.fixedCategoryComparisons,
-                                onCategoryClick = { categoryId ->
-                                    navigator.push(CategoryExpensesScreen(uiState.statusType, uiState.largeCategory, categoryId))
-                                }
+                                largeCategory = LargeCategoryEnum.EXPENSES
                             )
                         }
+                    }
+                }
 
-                        LargeCategoryEnum.SAVING -> {
-                            SavingSection(
-                                modifier = Modifier
-                                    .padding(top = 24.dp)
-                                    .padding(horizontal = 28.dp),
-                                statusType = uiState.statusType,
-                                totalAmount = uiState.currentAmount,
-                                budgetAmount = uiState.budgetAmount,
-                                categoryComparisons = uiState.categoryComparisons,
-                                fixedCategoryComparisons = uiState.fixedCategoryComparisons,
-                                onCategoryClick = { categoryId ->
-                                    navigator.push(CategoryExpensesScreen(uiState.statusType, uiState.largeCategory, categoryId))
-                                }
-                            )
-                        }
+                item {
+                    if (uiState.categoryComparisons.isNotEmpty()) {
+                        StatusCategoryComparisonSection(
+                            modifier = Modifier
+                                .padding(top = 24.dp)
+                                .padding(horizontal = 28.dp),
+                            title = "변동지출 카테고리별 비교",
+                            statusType = uiState.statusType,
+                            largeCategory = uiState.largeCategory,
+                            comparisons = uiState.categoryComparisons,
+                            onCategoryClick = { categoryId ->
+                                navigator.push(
+                                    CategoryExpensesScreen(
+                                        uiState.statusType,
+                                        uiState.largeCategory,
+                                        categoryId
+                                    )
+                                )
+                            }
+                        )
+                    }
+
+                    if (uiState.fixedCategoryComparisons.isNotEmpty()) {
+                        StatusFixedCategoryComparisonSection(
+                            modifier = Modifier
+                                .padding(top = 24.dp)
+                                .padding(horizontal = 28.dp),
+                            title = "고정지출 카테고리별 비교",
+                            statusType = uiState.statusType,
+                            largeCategory = uiState.largeCategory,
+                            comparisons = uiState.fixedCategoryComparisons,
+                            onCategoryClick = { categoryId ->
+                                navigator.push(
+                                    CategoryExpensesScreen(
+                                        uiState.statusType,
+                                        uiState.largeCategory,
+                                        categoryId
+                                    )
+                                )
+                            }
+                        )
+                    }
+                }
+
+                if (uiState.largeCategory == LargeCategoryEnum.EXPENSES
+                    && uiState.paymentMethodComparisons.isNotEmpty()
+                ) {
+                    item {
+                        StatusPaymentMethodSection(
+                            modifier = Modifier
+                                .padding(top = 24.dp)
+                                .padding(horizontal = 28.dp),
+                            statusType = uiState.statusType,
+                            largeCategory = LargeCategoryEnum.EXPENSES,
+                            comparisons = uiState.paymentMethodComparisons
+                        )
                     }
                 }
 

@@ -88,8 +88,7 @@ class CategoryExpensesScreenModel(
                     totalAmount = filteredCurrent.sumOf { it.history.amount },
                     lastTotalAmount = filteredLast.sumOf { it.history.amount },
                     histories = histories,
-                    groupedHistories = groupedHistories,
-                    isLoading = false
+                    groupedHistories = groupedHistories
                 )
             }
         }.apiFlow { newState ->

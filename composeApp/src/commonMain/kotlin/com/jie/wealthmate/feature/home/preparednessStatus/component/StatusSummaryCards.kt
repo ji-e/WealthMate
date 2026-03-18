@@ -35,13 +35,14 @@ import com.jie.wealthmate.vo.CategoryDiffInfoVo
  */
 @Composable
 fun StatusSummaryCards(
+    modifier: Modifier = Modifier,
     maxIncreaseCategory: CategoryDiffInfoVo?,
     maxDecreaseCategory: CategoryDiffInfoVo?,
     largeCategory: LargeCategoryEnum,
 ) {
     if (maxIncreaseCategory != null || maxDecreaseCategory != null) {
         Row(
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxWidth()
                 .height(IntrinsicSize.Min) // VerticalDivider가 보이기 위해 높이 최소화 설정 필요
                 .clip(RoundedCornerShape(8.dp))

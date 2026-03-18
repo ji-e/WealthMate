@@ -3,11 +3,13 @@ package com.jie.wealthmate.feature.home.preparednessStatus
 import com.jie.wealthmate.base.BaseScreenModel
 import com.jie.wealthmate.database.eneity.CategoryEntity
 import com.jie.wealthmate.database.eneity.HistoryWithDetails
+import com.jie.wealthmate.database.eneity.PaymentMethodEntity
 import com.jie.wealthmate.feature.home.StatusType
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.repository.BudgetRepository
 import com.jie.wealthmate.repository.CategoryRepository
 import com.jie.wealthmate.repository.HistoryRepository
+import com.jie.wealthmate.repository.PaymentMethodRepository
 import com.jie.wealthmate.utils.convertLocalDateToString
 import com.jie.wealthmate.utils.firstDayOfMonth
 import com.jie.wealthmate.utils.formatDateHyphenYM
@@ -16,6 +18,8 @@ import com.jie.wealthmate.utils.toEpochMilliseconds
 import com.jie.wealthmate.utils.today
 import com.jie.wealthmate.vo.CategoryDiffInfoVo
 import com.jie.wealthmate.vo.CategoryVo
+import com.jie.wealthmate.vo.PaymentMethodDiffInfoVo
+import com.jie.wealthmate.vo.PaymentMethodVo
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
@@ -31,6 +35,7 @@ class PreparednessStatusScreenModel(
     private val historyRepository: HistoryRepository,
     private val categoryRepository: CategoryRepository,
     private val budgetRepository: BudgetRepository,
+    private val paymentMethodRepository: PaymentMethodRepository,
     initialStatusType: StatusType,
     initialLargeCategory: LargeCategoryEnum
 ) : BaseScreenModel<PreparednessStatusUiState>() {
@@ -67,8 +72,9 @@ class PreparednessStatusScreenModel(
                 historyRepository.getHistoriesByMonth(periods.currentStart, periods.currentEnd),
                 historyRepository.getHistoriesByMonth(periods.lastStart, periods.lastEnd),
                 categoryRepository.getCategoriesByLargeCategory(largeCategory.name),
-                budgetRepository.getBudgetsByMonth(today.convertLocalDateToString(formatDateHyphenYM))
-            ) { currentHistories, lastHistories, allCategories, budgets ->
+                budgetRepository.getBudgetsByMonth(today.convertLocalDateToString(formatDateHyphenYM)),
+                paymentMethodRepository.getPaymentMethods()
+            ) { currentHistories, lastHistories, allCategories, budgets, allPaymentMethods ->
                 val filteredCurrent = currentHistories.filter { it.history.largeCategory == largeCategory.name }
                 val filteredLast = lastHistories.filter { it.history.largeCategory == largeCategory.name }
 
@@ -91,6 +97,16 @@ class PreparednessStatusScreenModel(
                             calculateCategoryComparisons(currentGrouped, lastGrouped, fixed, currentAmount, false, largeCategory)
                 }
 
+                // 결제수단별 비교 계산
+                val currentPaymentGrouped = filteredCurrent.groupBy { if (it.history.paymentMethodId.isNullOrBlank()) null else it.history.paymentMethodId }
+                val lastPaymentGrouped = filteredLast.groupBy { if (it.history.paymentMethodId.isNullOrBlank()) null else it.history.paymentMethodId }
+                val paymentMethodComparisons = calculatePaymentMethodComparisons(
+                    currentPaymentGrouped,
+                    lastPaymentGrouped,
+                    allPaymentMethods.map { it.paymentMethod },
+                    currentAmount
+                )
+
                 PreparednessStatusUiState(
                     statusType = statusType,
                     largeCategory = largeCategory,
@@ -102,6 +118,7 @@ class PreparednessStatusScreenModel(
                     maxDecreaseCategory = variableComparisons.filter { it.diffAmount < 0 }.minByOrNull { it.diffAmount },
                     categoryComparisons = variableComparisons,
                     fixedCategoryComparisons = fixedComparisons,
+                    paymentMethodComparisons = paymentMethodComparisons,
                     isLoading = false
                 )
             }
@@ -152,6 +169,46 @@ class PreparednessStatusScreenModel(
         }
 
         return comparisons.sortedByDescending { it.currentAmount }
+    }
+
+    private fun calculatePaymentMethodComparisons(
+        currentGrouped: Map<String?, List<HistoryWithDetails>>,
+        lastGrouped: Map<String?, List<HistoryWithDetails>>,
+        targetPaymentMethods: List<PaymentMethodEntity>,
+        totalAmount: Long
+    ): List<PaymentMethodDiffInfoVo> {
+        val comparisons = targetPaymentMethods.map { method ->
+            val current = currentGrouped[method.id]?.sumOf { it.history.amount } ?: 0L
+            val last = lastGrouped[method.id]?.sumOf { it.history.amount } ?: 0L
+
+            PaymentMethodDiffInfoVo(
+                id = method.id,
+                label = method.label,
+                groupLabel = method.groupLabel,
+                currentAmount = current,
+                diffAmount = current - last,
+                ratio = if (totalAmount > 0) current.toFloat() / totalAmount else 0f
+            )
+        }.toMutableList()
+
+        val unsetCurrent = currentGrouped[null]?.sumOf { it.history.amount } ?: 0L
+        val unsetLast = lastGrouped[null]?.sumOf { it.history.amount } ?: 0L
+
+        if (unsetCurrent > 0 || unsetLast > 0) {
+            comparisons.add(
+                PaymentMethodDiffInfoVo(
+                    id = null,
+                    label = PaymentMethodVo.UNSET.label,
+                    groupLabel = null,
+                    currentAmount = unsetCurrent,
+                    diffAmount = unsetCurrent - unsetLast,
+                    ratio = if (totalAmount > 0) unsetCurrent.toFloat() / totalAmount else 0f
+                )
+            )
+        }
+
+        return comparisons.filter { it.currentAmount > 0 || it.lastAmount > 0 }
+            .sortedByDescending { it.currentAmount }
     }
 
     private fun getPeriods(statusType: StatusType): Periods {
