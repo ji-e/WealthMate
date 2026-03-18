@@ -1,6 +1,7 @@
 package com.jie.wealthmate.feature.home.preparednessStatus.component
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -41,6 +42,7 @@ fun StatusPaymentMethodSection(
     statusType: StatusType,
     largeCategory: LargeCategoryEnum,
     comparisons: List<PaymentMethodDiffInfoVo>,
+    onPaymentMethodClick: (String?) -> Unit = {},
 ) {
     val typography = MaterialTheme.typography
     val maxAmount = remember(comparisons) {
@@ -93,7 +95,8 @@ fun StatusPaymentMethodSection(
                     largeCategory = largeCategory,
                     info = info,
                     maxAmount = maxAmount,
-                    groupBackgroundColor = groupColorMap[info.groupLabel] ?: ColorGray.Gray_200
+                    groupBackgroundColor = groupColorMap[info.groupLabel] ?: ColorGray.Gray_200,
+                    onClick = { onPaymentMethodClick(info.id) }
                 )
             }
         }
@@ -106,6 +109,7 @@ private fun StatusPaymentMethodItem(
     info: PaymentMethodDiffInfoVo,
     maxAmount: Long,
     groupBackgroundColor: Color,
+    onClick: () -> Unit,
 ) {
     val typography = MaterialTheme.typography
     val percentage = remember(info.currentAmount, info.lastAmount) {
@@ -116,7 +120,9 @@ private fun StatusPaymentMethodItem(
         }
     }
 
-    Column {
+    Column(
+        modifier = Modifier.clickable { onClick() }
+    ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
