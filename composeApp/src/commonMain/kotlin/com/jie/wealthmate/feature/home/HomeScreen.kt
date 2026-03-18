@@ -34,11 +34,14 @@ import com.jie.wealthmate.feature.home.component.CategorySegmentedChart
 import com.jie.wealthmate.feature.home.component.ExpensesLineChart
 import com.jie.wealthmate.feature.home.component.LargeCategoryStatus
 import com.jie.wealthmate.feature.home.component.PaymentMethodSegmentedChart
+import com.jie.wealthmate.feature.home.component.RecurringHistory
 import com.jie.wealthmate.feature.home.component.RemainBudget
 import com.jie.wealthmate.feature.home.component.Today
 import com.jie.wealthmate.feature.home.paymentMethodExpenses.PaymentMethodExpensesScreen
 import com.jie.wealthmate.feature.home.preparednessStatus.PreparednessStatusScreen
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
+import com.jie.wealthmate.feature.menu.management.repeatHistoryManagement.RepeatHistoryManagementScreen
+import com.jie.wealthmate.feature.menu.management.repeatHistoryManagement.repeatHistoryDetail.RepeatHistoryDetailScreen
 import com.jie.wealthmate.theme.ColorGray
 import com.jie.wealthmate.theme.noRippleClickable
 import com.jie.wealthmate.utils.default
@@ -134,9 +137,7 @@ class HomeScreen() : Screen {
             )
 
             CategorySegmentedChart(
-                modifier = Modifier
-                    .padding(horizontal = 28.dp)
-                    .padding(top = 32.dp),
+                modifier = Modifier.padding(top = 32.dp),
                 statusType = uiState.statusType,
                 expensesAmount = uiState.currentAmount?.expensesAmount.default(),
                 categorySegmentChartItems = uiState.categorySegmentChartItems,
@@ -163,9 +164,7 @@ class HomeScreen() : Screen {
             )
 
             PaymentMethodSegmentedChart(
-                modifier = Modifier
-                    .padding(horizontal = 28.dp)
-                    .padding(top = 32.dp),
+                modifier = Modifier.padding(top = 32.dp),
                 statusType = uiState.statusType,
                 expensesAmount = uiState.currentAmount?.expensesAmount.default(),
                 paymentMethodSegmentChartItems = uiState.paymentMethodSegmentChartItems,
@@ -188,6 +187,24 @@ class HomeScreen() : Screen {
                             paymentMethodId = paymentMethodId
                         )
                     )
+                }
+            )
+
+            HorizontalDivider(
+                modifier = Modifier.padding(vertical = 32.dp),
+                color = ColorGray.Gray_50,
+                thickness = 12.dp
+            )
+
+            RecurringHistory(
+                recurringHistories = uiState.sortedRecurringHistories,
+                totalAmount = uiState.totalRecurringAmount,
+                passedAmount = uiState.passedRecurringAmount,
+                onHeaderClick = {
+                    navigator.push(RepeatHistoryManagementScreen(initialLargeCategory = LargeCategoryEnum.EXPENSES))
+                },
+                onItemClick = { id ->
+                    navigator.push(RepeatHistoryDetailScreen(id))
                 }
             )
 

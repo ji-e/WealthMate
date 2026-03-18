@@ -75,7 +75,7 @@ val commonModule = module {
 
 
     // 홈
-    factory { HomeScreenModel(get(), get()) }
+    factory { HomeScreenModel(get(), get(), get()) }
     factory { (initialStatusType: StatusType, initialLargeCategory: LargeCategoryEnum) ->
         PreparednessStatusScreenModel(get(), get(), get(), get(), initialStatusType, initialLargeCategory)
     }

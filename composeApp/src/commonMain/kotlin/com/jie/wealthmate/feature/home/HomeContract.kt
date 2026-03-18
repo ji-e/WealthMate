@@ -22,6 +22,7 @@ data class HomeUiState(
     val paymentMethodSegment: List<PaymentMethodSegmentChartData> = emptyList(),
     val currentExpensesData: List<Float?> = emptyList(),
     val lastExpensesData: List<Float> = emptyList(),
+    val recurringHistories: List<RecurringHistoryUiModel> = emptyList(),
 ) : BaseUiState {
 
     val categorySegmentChartItems: List<CategorySegmentChartData>
@@ -80,7 +81,34 @@ data class HomeUiState(
             )
             return topItems + othersItem
         }
+
+    val passedRecurringAmount: Long
+        get() = recurringHistories.filter { it.isPassed || it.isToday }.sumOf { it.monthlyTotalAmount }
+
+    val totalRecurringAmount: Long
+        get() = recurringHistories.sumOf { it.monthlyTotalAmount }
+
+    val sortedRecurringHistories: List<RecurringHistoryUiModel>
+        get() = recurringHistories.sortedWith(
+            compareBy<RecurringHistoryUiModel> { it.isPassed }
+                .thenByDescending { it.isToday }
+                .thenBy { it.sortOrder }
+        )
 }
+
+data class RecurringHistoryUiModel(
+    val id: String,
+    val categoryIcon: String,
+    val largeCategory: LargeCategoryEnum,
+    val content: String,
+    val singleAmount: Long,
+    val monthlyTotalAmount: Long,
+    val recurringDateText: String,
+    val isPassed: Boolean,
+    val isToday: Boolean = false,
+    val isFixed: Boolean = false,
+    val sortOrder: Int = 0,
+)
 
 data class Amount(
     val expensesAmount: Long,

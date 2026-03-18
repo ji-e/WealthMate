@@ -1,12 +1,16 @@
 package com.jie.wealthmate.feature.home
 
 import com.jie.wealthmate.base.BaseScreenModel
+import com.jie.wealthmate.feature.calendar.addHistory.component.RepeatCycleEnum
+import com.jie.wealthmate.feature.calendar.addHistory.component.formattedShortDescription
 import com.jie.wealthmate.feature.home.component.CategorySegmentChartData
 import com.jie.wealthmate.feature.home.component.PaymentMethodSegmentChartData
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.repository.BudgetRepository
 import com.jie.wealthmate.repository.HistoryRepository
+import com.jie.wealthmate.repository.RepeatCycleRepository
 import com.jie.wealthmate.utils.convertLocalDateToString
+import com.jie.wealthmate.utils.default
 import com.jie.wealthmate.utils.firstDayOfMonth
 import com.jie.wealthmate.utils.formatDateHyphenYM
 import com.jie.wealthmate.utils.lastDayOfMonth
@@ -29,6 +33,7 @@ import kotlinx.datetime.plus
 class HomeScreenModel(
     private val historyRepository: HistoryRepository,
     private val budgetRepository: BudgetRepository,
+    private val repeatCycleRepository: RepeatCycleRepository,
 ) : BaseScreenModel<HomeUiState>() {
 
     override val initialState: HomeUiState
@@ -61,8 +66,9 @@ class HomeScreenModel(
                 budgetRepository.getBudgetsByMonthWithDetails(yearMonth),
                 historyRepository.getHistoriesByMonth(thisMonthStart, thisMonthEnd), // Today용
                 historyRepository.getHistoriesByMonth(currentStart, currentEnd),    // 선택 기간용
-                historyRepository.getHistoriesByMonth(lastStart, lastEnd)          // 이전 기간용
-            ) { budgets, thisMonthHistories, currentHistories, lastHistories ->
+                historyRepository.getHistoriesByMonth(lastStart, lastEnd),          // 이전 기간용
+                repeatCycleRepository.getRepeatCycleWithDetails()
+            ) { budgets, thisMonthHistories, currentHistories, lastHistories, repeatCycles ->
 
                 // 1. Today 섹션 데이터 (무조건 이번 달 기준)
                 val thisMonthExpenses = thisMonthHistories
@@ -196,6 +202,76 @@ class HomeScreenModel(
                     lastList.lastOrNull() ?: 0f
                 ).coerceAtLeast(1f)
 
+                // 반복 내역 처리 (이번 달 기준)
+                val historiesGroupedByRepeatId = thisMonthHistories.groupBy { it.history.repeatCycleId }
+
+                val recurringHistories = repeatCycles
+                    .filter { it.repeatCycle.isActive && it.repeatCycle.largeCategory == LargeCategoryEnum.EXPENSES.name }
+                    .mapNotNull { item ->
+                        val repeatCycle = item.repeatCycle
+                        val repeatCycleEnum = RepeatCycleEnum.create(repeatCycle.repeatCycle)
+                        val actualHistories = historiesGroupedByRepeatId[repeatCycle.id] ?: emptyList()
+                        
+                        var isPassed = false
+                        var isToday = false
+                        val dateText: String
+                        val sortOrder: Int
+                        
+                        when (repeatCycleEnum) {
+                            RepeatCycleEnum.MONTHLY -> {
+                                val dayOfMonth = repeatCycle.dayOfMonth ?: 1
+                                isPassed = today.day > dayOfMonth
+                                isToday = today.day == dayOfMonth
+                                dateText = repeatCycleEnum.formattedShortDescription(dayOfMonth)
+                                sortOrder = dayOfMonth
+                            }
+                            RepeatCycleEnum.WEEKLY -> {
+                                val dayOfWeek = repeatCycle.dayOfWeek ?: 1
+                                isPassed = today.dayOfWeek.isoDayNumber > dayOfWeek
+                                isToday = today.dayOfWeek.isoDayNumber == dayOfWeek
+                                dateText = repeatCycleEnum.formattedShortDescription(dayOfWeek)
+                                sortOrder = dayOfWeek
+                            }
+                            RepeatCycleEnum.DAILY, RepeatCycleEnum.WEEKDAY, RepeatCycleEnum.WEEKEND -> {
+                                isPassed = false
+                                isToday = true
+                                dateText = repeatCycleEnum.shortDescription
+                                sortOrder = 0
+                            }
+                            RepeatCycleEnum.MONTH_END -> {
+                                val lastDay = today.lastDayOfMonth()
+                                isPassed = today > lastDay
+                                isToday = today == lastDay
+                                dateText = repeatCycleEnum.shortDescription
+                                sortOrder = 32
+                            }
+                            else -> return@mapNotNull null
+                        }
+
+                        // 실제 내역이 있으면 지났음 처리에 우선권 부여
+                        val finalPassed = if (actualHistories.isNotEmpty()) {
+                            actualHistories.any { it.history.date.toLocalDate() >= today }.not()
+                        } else isPassed
+
+                        val finalToday = if (actualHistories.isNotEmpty()) {
+                            actualHistories.any { it.history.date.toLocalDate() == today }
+                        } else isToday
+
+                        RecurringHistoryUiModel(
+                            id = repeatCycle.id,
+                            categoryIcon = item.category?.icon ?: "❓",
+                            largeCategory = LargeCategoryEnum.creator(repeatCycle.largeCategory),
+                            content = repeatCycle.content ?: item.category?.middleLabel ?: "내역 없음",
+                            singleAmount = repeatCycle.amount,
+                            monthlyTotalAmount = if (actualHistories.isNotEmpty()) actualHistories.sumOf { it.history.amount } else repeatCycle.amount,
+                            recurringDateText = dateText,
+                            isPassed = finalPassed,
+                            isToday = finalToday,
+                            isFixed = item.category?.isFixed.default(),
+                            sortOrder = sortOrder
+                        )
+                    }
+
                 HomeUiState(
                     statusType = statusType,
                     todayAmount = todayAmount,
@@ -215,7 +291,8 @@ class HomeScreenModel(
                     categorySegment = categorySegments,
                     paymentMethodSegment = paymentMethodSegments,
                     currentExpensesData = currentList.map { it?.div(maxAmount) },
-                    lastExpensesData = lastList.map { it / maxAmount }
+                    lastExpensesData = lastList.map { it / maxAmount },
+                    recurringHistories = recurringHistories
                 )
             }
         }.apiFlow { state ->
