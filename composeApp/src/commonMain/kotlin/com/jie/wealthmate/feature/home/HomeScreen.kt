@@ -29,7 +29,7 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import com.jie.wealthmate.component.WMListSelectionModalBottomSheet
 import com.jie.wealthmate.component.WMText
 import com.jie.wealthmate.component.calculateAdjustedToastPadding
-import com.jie.wealthmate.feature.home.categoryExpense.CategoryExpenseScreen
+import com.jie.wealthmate.feature.home.categoryExpenses.CategoryExpensesScreen
 import com.jie.wealthmate.feature.home.component.CategorySegmentedChart
 import com.jie.wealthmate.feature.home.component.ExpensesLineChart
 import com.jie.wealthmate.feature.home.component.LargeCategoryStatus
@@ -140,11 +140,21 @@ class HomeScreen() : Screen {
                 expensesAmount = uiState.currentAmount?.expensesAmount.default(),
                 categorySegmentChartItems = uiState.categorySegmentChartItems,
                 onCategoryChartClick = {
-                    // 카테고리 차트 클릭 시에도 지출 대비 현황으로 이동
+                    // 카테고리 차트 전체 클릭 시 지출 현황 화면으로 이동
                     navigator.push(
-                        CategoryExpenseScreen(
+                        PreparednessStatusScreen(
                             initialStatusType = uiState.statusType,
                             initialLargeCategory = LargeCategoryEnum.EXPENSES
+                        )
+                    )
+                },
+                onCategoryItemClick = { categoryId ->
+                    // 개별 카테고리 클릭 시 상세 지출 내역 화면으로 이동
+                    navigator.push(
+                        CategoryExpensesScreen(
+                            initialStatusType = uiState.statusType,
+                            initialLargeCategory = LargeCategoryEnum.EXPENSES,
+                            categoryId = categoryId
                         )
                     )
                 }

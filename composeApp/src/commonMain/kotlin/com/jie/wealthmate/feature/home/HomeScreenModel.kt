@@ -103,25 +103,20 @@ class HomeScreenModel(
 
                 // 차트 데이터 (Category / Payment Method) - currentExpenses(선택기간) 기준
                 val categorySegments = currentExpenses
-                    .mapNotNull { it.category?.let { cat -> it.history.amount to cat } }
-                    .groupBy({ it.second.id }, { it.first })
-                    .map { (id, amounts) ->
-                        val firstHistoryWithCat = currentExpenses.first { it.category?.id == id }
+                    .groupBy { it.category?.id }
+                    .map { (_, histories) ->
                         CategorySegmentChartData(
-                            category = firstHistoryWithCat.category!!.mapperToVo(),
-                            amount = amounts.sum()
+                            category = histories.first().category.mapperToVo(LargeCategoryEnum.EXPENSES),
+                            amount = histories.sumOf { it.history.amount }
                         )
                     }.sortedByDescending { it.amount }
 
                 val paymentMethodSegments = currentExpenses
-                    .mapNotNull { it.paymentMethod?.let { pm -> it.history.amount to pm } }
-                    .groupBy({ it.second.id }, { it.first })
-                    .map { (id, amounts) ->
-                        val firstHistoryWithPm =
-                            currentExpenses.first { it.paymentMethod?.id == id }
+                    .groupBy { it.paymentMethod?.id }
+                    .map { (_, histories) ->
                         PaymentMethodSegmentChartData(
-                            paymentMethod = firstHistoryWithPm.paymentMethod!!.mapperToVo(),
-                            amount = amounts.sum()
+                            paymentMethod = histories.first().paymentMethod?.mapperToVo(),
+                            amount = histories.sumOf { it.history.amount }
                         )
                     }.sortedByDescending { it.amount }
 

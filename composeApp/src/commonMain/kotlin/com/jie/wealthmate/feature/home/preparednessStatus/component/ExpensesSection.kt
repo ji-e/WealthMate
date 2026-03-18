@@ -18,6 +18,7 @@ fun ExpensesSection(
     maxDecreaseCategory: CategoryDiffInfoVo?,
     categoryComparisons: List<CategoryDiffInfoVo> = emptyList(),
     fixedCategoryComparisons: List<CategoryDiffInfoVo> = emptyList(),
+    onCategoryClick: (String) -> Unit,
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
         StatusSummaryCards(
@@ -32,7 +33,8 @@ fun ExpensesSection(
                 title = "변동지출 카테고리별 비교",
                 statusType = statusType,
                 largeCategory = LargeCategoryEnum.EXPENSES,
-                comparisons = categoryComparisons
+                comparisons = categoryComparisons,
+                onCategoryClick = onCategoryClick
             )
         }
 
@@ -42,7 +44,8 @@ fun ExpensesSection(
                 title = "고정지출 카테고리별 비교",
                 statusType = statusType,
                 largeCategory = LargeCategoryEnum.EXPENSES,
-                comparisons = fixedCategoryComparisons
+                comparisons = fixedCategoryComparisons,
+                onCategoryClick = onCategoryClick
             )
         }
     }

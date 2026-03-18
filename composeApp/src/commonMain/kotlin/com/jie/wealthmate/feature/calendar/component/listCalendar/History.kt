@@ -122,13 +122,16 @@ fun HistoryItem(
         }
 
         Column {
-            if (history.content.isNullOrBlank().not()) {
-                WMText(
-                    text = history.content,
-                    style = Typography().bodyLarge.copy(fontWeight = FontWeight.Medium),
-                    maxLines = 1
-                )
-            }
+            val content = history.content.default()
+                .ifEmpty { history.categoryInfo.default() }
+            WMText(
+                text = content.ifEmpty { "내용 미입력" },
+                style = Typography().bodyLarge.copy(
+                    fontWeight = FontWeight.Medium,
+                    color = if (content.isBlank()) ColorGray.Gray_300 else ColorGray.Gray_700
+                ),
+                maxLines = 1
+            )
 
             if (history.historyInfo.isNotBlank()) {
                 InfoText(
@@ -149,97 +152,3 @@ fun HistoryItem(
         )
     }
 }
-
-//
-//@Composable
-//fun HistoryItem(
-//    history: HistoryVo,
-//    onItemClick: () -> Unit,
-//) {
-//    val category = history.category
-//    Row(
-//        modifier = Modifier
-//            .fillMaxWidth()
-//            .clickable { onItemClick() }
-//            .padding(horizontal = 20.dp, vertical = 8.dp),
-//        verticalAlignment = Alignment.CenterVertically
-//    ) {
-//        Box(modifier = Modifier.width(60.dp)) {
-//            Box(
-//                modifier = Modifier
-//                    .clip(CircleShape)
-//                    .background(history.largeCategory.backgroundColor)
-//                    .size(40.dp)
-//                    .align(Alignment.Center),
-//                contentAlignment = Alignment.Center
-//            ) {
-//                WMText(
-//                    text = category?.icon ?: "❓",
-//                    style = Typography().titleLarge,
-//                )
-//            }
-//            if (category?.isFixed.default()) {
-//                Icon(
-//                    painter = painterResource(Res.drawable.ic_push_pin),
-//                    contentDescription = null,
-//                    tint = ColorRed.Red_300,
-//                    modifier = Modifier
-//                        .size(24.dp)
-//                        .align(Alignment.TopStart)
-//                )
-//            }
-//            history.repeatCycle?.let {
-//                Image(
-//                    painter = painterResource(Res.drawable.ic_repeat_on),
-//                    contentDescription = null,
-//                    modifier = Modifier
-//                        .padding(end = 4.dp)
-//                        .size(24.dp)
-//                        .align(Alignment.BottomEnd)
-//                )
-//            }
-//            history.installment?.let {
-//                Image(
-//                    painter = painterResource(Res.drawable.ic_percent_on),
-//                    contentDescription = null,
-//                    modifier = Modifier
-//                        .padding(end = 4.dp)
-//                        .size(24.dp)
-//                        .align(Alignment.BottomEnd)
-//                )
-//            }
-//        }
-//
-//        val mark = when (history.largeCategory) {
-//            LargeCategoryEnum.INCOME -> "+"
-//            LargeCategoryEnum.EXPENSES -> "-"
-//            else -> ""
-//        }
-//
-//        Column() {
-//            Row(
-//                modifier = Modifier
-//                    .padding(bottom = 2.dp)
-//                    .fillMaxWidth(),
-//                horizontalArrangement = Arrangement.spacedBy(8.dp),
-//                verticalAlignment = Alignment.CenterVertically
-//            ) {
-//                WMText(
-//                    text = "$mark${formatWithCommas(history.amount.toString())}원",
-//                    style = Typography().titleMedium.copy(
-//                        fontSize = 18.sp,
-//                        fontWeight = FontWeight.SemiBold
-//                    ),
-//                    maxLines = 1
-//                )
-//            }
-//
-//            if (history.historyInfo.isNotBlank()) {
-//                InfoText(
-//                    text = history.historyInfo,
-//                    maxLines = 2
-//                )
-//            }
-//        }
-//    }
-//}

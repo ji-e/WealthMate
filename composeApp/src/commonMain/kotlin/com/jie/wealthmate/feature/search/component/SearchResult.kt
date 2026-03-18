@@ -166,9 +166,10 @@ fun SearchResult(
 @Composable
 fun DateHeader(
     date: LocalDate,
+    format: String = formatDateDotYYMDE
 ) {
     WMText(
-        text = date.convertLocalDateToString(formatDateDotYYMDE),
+        text = date.convertLocalDateToString(format),
         style = MaterialTheme.typography.titleSmall.copy(
             fontWeight = FontWeight.SemiBold,
             color = ColorGray.Gray_500

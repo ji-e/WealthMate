@@ -17,6 +17,7 @@ fun IncomeSection(
     totalAmount: Long,
     categoryComparisons: List<CategoryDiffInfoVo> = emptyList(),
     fixedCategoryComparisons: List<CategoryDiffInfoVo> = emptyList(),
+    onCategoryClick: (String) -> Unit,
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
         if (totalAmount > 0) {
@@ -33,7 +34,8 @@ fun IncomeSection(
                 title = "변동수입 카테고리별 비교",
                 statusType = statusType,
                 largeCategory = LargeCategoryEnum.INCOME,
-                comparisons = categoryComparisons
+                comparisons = categoryComparisons,
+                onCategoryClick = onCategoryClick
             )
         }
 
@@ -43,7 +45,8 @@ fun IncomeSection(
                 title = "고정수입 카테고리별 비교",
                 statusType = statusType,
                 largeCategory = LargeCategoryEnum.INCOME,
-                comparisons = fixedCategoryComparisons
+                comparisons = fixedCategoryComparisons,
+                onCategoryClick = onCategoryClick
             )
         }
     }
