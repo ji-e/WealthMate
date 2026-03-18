@@ -11,6 +11,7 @@ import com.jie.wealthmate.feature.calendar.addHistory.AddHistoryScreenModel
 import com.jie.wealthmate.feature.calendar.historyDetail.HistoryDetailScreenModel
 import com.jie.wealthmate.feature.home.HomeScreenModel
 import com.jie.wealthmate.feature.home.StatusType
+import com.jie.wealthmate.feature.home.categoryExpense.CategoryExpenseScreenModel
 import com.jie.wealthmate.feature.home.preparednessStatus.PreparednessStatusScreenModel
 import com.jie.wealthmate.feature.menu.MenuScreenModel
 import com.jie.wealthmate.feature.menu.data.googleCloudShare.GoogleCloudShareScreenModel
@@ -76,6 +77,9 @@ val commonModule = module {
     factory { HomeScreenModel(get(), get()) }
     factory { (initialStatusType: StatusType, initialLargeCategory: LargeCategoryEnum) ->
         PreparednessStatusScreenModel(get(), get(), get(), initialStatusType, initialLargeCategory)
+    }
+    factory { (initialStatusType: StatusType, initialLargeCategory: LargeCategoryEnum) ->
+        CategoryExpenseScreenModel(get(), get(), initialStatusType, initialLargeCategory)
     }
 
     // 캘린더
