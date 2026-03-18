@@ -149,7 +149,7 @@ fun PaymentMethodItem(
                 ),
             )
 
-            if (groupLabel != null) {
+            if (groupLabel.isNullOrBlank().not()) {
                 WMText(
                     text = groupLabel,
                     style = Typography().labelMedium.copy(fontWeight = FontWeight.SemiBold),
