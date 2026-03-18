@@ -16,14 +16,14 @@ import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.jie.wealthmate.base.BaseScreen
-import com.jie.wealthmate.feature.search.component.CategoryMultiSelectModalBottomSheet
 import com.jie.wealthmate.component.WMListSelectionModalBottomSheet
 import com.jie.wealthmate.component.WMMultiListSelectionModalBottomSheet
+import com.jie.wealthmate.component.textField.WMSearchTextField
 import com.jie.wealthmate.component.topbar.TopBarItem
 import com.jie.wealthmate.component.topbar.WMTopBar
-import com.jie.wealthmate.component.textField.WMSearchTextField
 import com.jie.wealthmate.feature.calendar.historyDetail.HistoryDetailScreen
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
+import com.jie.wealthmate.feature.search.component.CategoryMultiSelectModalBottomSheet
 import com.jie.wealthmate.feature.search.component.DateRangeSelectModalBottomSheet
 import com.jie.wealthmate.feature.search.component.SearchFilterRow
 import com.jie.wealthmate.feature.search.component.SearchResult
@@ -145,7 +145,7 @@ class SearchScreen : BaseScreen() {
                 title = "결제수단",
                 items = uiState.paymentMethods,
                 selectedItems = uiState.selectedPaymentMethods,
-                itemLabel = { it.label },
+                itemLabel = { "${it.label}${if (it.groupLabel.isNullOrBlank().not()) " | " + it.groupLabel else ""}" },
                 onItemsSelected = screenModel::updatePaymentMethods,
                 onDismissRequest = { showPaymentMethodBottomSheet = false }
             )

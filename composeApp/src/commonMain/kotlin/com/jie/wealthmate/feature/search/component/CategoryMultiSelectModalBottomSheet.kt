@@ -12,6 +12,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -156,6 +157,7 @@ fun CategoryMultiSelectModalBottomSheet(
                                     .padding(horizontal = 28.dp),
                                 iconModifier = Modifier.size(28.dp),
                                 label = label,
+                                labelStyle = Typography().bodyLarge,
                                 checked = isSelected,
                                 onCheckedChange = { checked ->
                                     tempSelectedIds =
