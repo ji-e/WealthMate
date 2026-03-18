@@ -26,6 +26,7 @@ import com.jie.wealthmate.component.topbar.TopBarItem
 import com.jie.wealthmate.component.topbar.WMTopBar
 import com.jie.wealthmate.feature.home.StatusType
 import com.jie.wealthmate.feature.home.categoryExpenses.CategoryExpensesScreen
+import com.jie.wealthmate.feature.home.paymentMethodExpenses.PaymentMethodExpensesScreen
 import com.jie.wealthmate.feature.home.preparednessStatus.component.PreparednessStatusFilter
 import com.jie.wealthmate.feature.home.preparednessStatus.component.StatusCategoryComparisonSection
 import com.jie.wealthmate.feature.home.preparednessStatus.component.StatusDonutChartSection
@@ -175,7 +176,16 @@ class PreparednessStatusScreen(
                                 .padding(horizontal = 28.dp),
                             statusType = uiState.statusType,
                             largeCategory = LargeCategoryEnum.EXPENSES,
-                            comparisons = uiState.paymentMethodComparisons
+                            comparisons = uiState.paymentMethodComparisons,
+                            onPaymentMethodClick = { paymentMethodId ->
+                                navigator.push(
+                                    PaymentMethodExpensesScreen(
+                                        uiState.statusType,
+                                        uiState.largeCategory,
+                                        paymentMethodId
+                                    )
+                                )
+                            }
                         )
                     }
                 }

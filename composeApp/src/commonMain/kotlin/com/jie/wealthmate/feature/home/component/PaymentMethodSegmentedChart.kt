@@ -4,6 +4,7 @@ import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -50,6 +51,7 @@ fun PaymentMethodSegmentedChart(
     expensesAmount: Long,
     paymentMethodSegmentChartItems: List<PaymentMethodSegmentChartData>,
     onPaymentMethodChartClick: () -> Unit = {},
+    onPaymentMethodItemClick: (String?) -> Unit = {},
 ) {
     val typography = MaterialTheme.typography
     var isStarted by remember { mutableStateOf(false) }
@@ -168,7 +170,8 @@ fun PaymentMethodSegmentedChart(
             PaymentMethodSegmentedItem(
                 totalAmount = totalAmountForCalc.toLong(),
                 paymentMethodSegment = item,
-                color = color
+                color = color,
+                onClick = { onPaymentMethodItemClick(item.paymentMethod?.id) }
             )
         }
     }
@@ -179,12 +182,14 @@ private fun PaymentMethodSegmentedItem(
     totalAmount: Long,
     paymentMethodSegment: PaymentMethodSegmentChartData,
     color: Color,
+    onClick: () -> Unit,
 ) {
     val typography = MaterialTheme.typography
     val label = paymentMethodSegment.paymentMethod?.label ?: "결제수단 없음"
 
     Row(
         modifier = Modifier
+            .clickable { onClick() }
             .fillMaxWidth()
             .padding(vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically

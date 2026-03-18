@@ -36,6 +36,7 @@ import com.jie.wealthmate.feature.home.component.LargeCategoryStatus
 import com.jie.wealthmate.feature.home.component.PaymentMethodSegmentedChart
 import com.jie.wealthmate.feature.home.component.RemainBudget
 import com.jie.wealthmate.feature.home.component.Today
+import com.jie.wealthmate.feature.home.paymentMethodExpenses.PaymentMethodExpensesScreen
 import com.jie.wealthmate.feature.home.preparednessStatus.PreparednessStatusScreen
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.theme.ColorGray
@@ -175,6 +176,16 @@ class HomeScreen() : Screen {
                             initialStatusType = uiState.statusType,
                             initialLargeCategory = LargeCategoryEnum.EXPENSES,
                             scrollToPosition = 5
+                        )
+                    )
+                },
+                onPaymentMethodItemClick = { paymentMethodId ->
+                    // 개별 결제수단 클릭 시 상세 지출 내역 화면으로 이동
+                    navigator.push(
+                        PaymentMethodExpensesScreen(
+                            initialStatusType = uiState.statusType,
+                            initialLargeCategory = LargeCategoryEnum.EXPENSES,
+                            paymentMethodId = paymentMethodId
                         )
                     )
                 }
