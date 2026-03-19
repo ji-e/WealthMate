@@ -4,10 +4,13 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
@@ -17,32 +20,32 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.jie.wealthmate.component.WMText
+import com.jie.wealthmate.feature.home.component.vo.DailyInsightVo
 import com.jie.wealthmate.theme.ColorBlue
 import com.jie.wealthmate.theme.ColorGray
 import com.jie.wealthmate.theme.ColorRed
+import com.jie.wealthmate.theme.ColorSetting
+import com.jie.wealthmate.theme.WMTheme
 import com.jie.wealthmate.utils.formatWithCommas
+import com.jie.wealthmate.utils.lastDayOfMonth
 import com.jie.wealthmate.utils.today
-import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
-import kotlinx.datetime.minus
-import kotlinx.datetime.number
-import kotlin.math.absoluteValue
 
 @Composable
 fun Today(
-    modifier: Modifier = Modifier,
     todayAmount: Long,
     budgetAmount: Long,
     expensesAmount: Long,
+    modifier: Modifier = Modifier,
 ) {
     val typography = MaterialTheme.typography
 
@@ -50,10 +53,12 @@ fun Today(
     val dailyInsight = remember(remainBudget, todayAmount) {
         calculateDailyInsight(
             remainingBudget = remainBudget,
-            todayAmount = todayAmount
+            todayAmount = todayAmount,
+            now = today
         )
     }
-    val (titleText, amount, infoText) = remember(
+
+    val (titleText, displayAmount, infoText) = remember(
         budgetAmount,
         remainBudget,
         todayAmount,
@@ -82,10 +87,11 @@ fun Today(
         }
     }
 
-    Column(modifier = modifier) {
+    Column(modifier = modifier.fillMaxWidth()) {
         WMText(
             text = titleText,
-            style = typography.titleSmall.copy(color = ColorGray.Gray_500),
+            style = typography.titleSmall,
+            color = ColorSetting.Info,
         )
 
         Row(
@@ -93,20 +99,21 @@ fun Today(
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 WMText(
-                    text = "${formatWithCommas(amount.toString())}원",
-                    style = typography.displaySmall.copy(fontWeight = FontWeight.SemiBold),
+                    text = "${displayAmount.formatWithCommas()}원",
+                    style = typography.displaySmall,
+                    fontWeight = FontWeight.SemiBold,
                     modifier = Modifier.padding(vertical = 8.dp)
                 )
 
                 WMText(
                     text = infoText,
-                    style = typography.bodyMedium,
                 )
 
                 if (budgetAmount > 0 && remainBudget > 0) {
                     WMText(
-                        text = "오늘 지출 금액: ${formatWithCommas(todayAmount.toString())}원",
-                        style = typography.bodySmall.copy(color = ColorGray.Gray_500),
+                        text = "오늘 지출 금액: ${todayAmount.formatWithCommas()}원",
+                        style = typography.bodySmall,
+                        color = ColorSetting.Info,
                         modifier = Modifier.padding(top = 2.dp)
                     )
                 }
@@ -131,75 +138,68 @@ private fun AnimatedDonutChart(
     isRemainBudgetZero: Boolean,
 ) {
     val typography = MaterialTheme.typography
-
-    val strokeWidth = 16.dp
+    val strokeWidth = 12.dp
     val animatedProgress = remember { Animatable(0f) }
-    val remainingPercentage =
+
+    val remainingPercentage = remember(isRemainBudgetZero, total, chartData) {
         if (isRemainBudgetZero || total <= 0f) 0f
-        else ((total - chartData) / total) * 100f
-    val isLowBudget = remainingPercentage < 10f
+        else ((total - chartData) / total * 100f).coerceIn(0f, 100f)
+    }
+
     val remainingPercentageText = remember(isRemainBudgetZero, remainingPercentage) {
         when {
             isRemainBudgetZero -> "예산\n초과"
-            remainingPercentage > 0 -> "${remainingPercentage.toInt()}%\n남음"
-            else -> "${remainingPercentage.toInt().absoluteValue}%\n초과"
+            else -> "${remainingPercentage.toInt()}%\n남음"
         }
     }
+
     val animatedColor by animateColorAsState(
-        targetValue = if (isLowBudget) ColorRed.Red_300 else ColorBlue.Blue_200,
+        targetValue = if (remainingPercentage < 10f || isRemainBudgetZero) ColorRed.Red_300 else ColorBlue.Blue_200,
         animationSpec = tween(500),
         label = "ChartColorAnimation"
     )
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(chartData, total) {
+        animatedProgress.snapTo(0f)
         animatedProgress.animateTo(
             targetValue = 1f,
-            animationSpec = tween(durationMillis = 1000)
+            animationSpec = tween(durationMillis = 800)
         )
     }
 
     Box(
-        modifier = modifier.size(80.dp),
+        modifier = modifier.size(84.dp),
         contentAlignment = Alignment.Center
     ) {
-        Canvas(modifier = Modifier.fillMaxSize()) {
-            val canvasSize = size.minDimension
-            val radius = (canvasSize - strokeWidth.toPx()) / 2
-            val centerX = size.width / 2
-            val centerY = size.height / 2
-
+        Canvas(modifier = Modifier.fillMaxSize().padding(strokeWidth / 2)) {
             val startAngle = -90f
-            // total이 0일 경우 대비
-            val sweepAngle = if (total > 0) (chartData / total) * 360f else 360f
+            val sweepAngle = if (total > 0) (chartData / total).coerceIn(0f, 1f) * 360f else 360f
             val animatedSweepAngle = -sweepAngle * animatedProgress.value
 
+            // 배경 원
             drawArc(
                 color = animatedColor,
                 startAngle = 0f,
                 sweepAngle = 360f,
                 useCenter = false,
-                topLeft = Offset(centerX - radius, centerY - radius),
-                size = Size(radius * 2, radius * 2),
-                style = Stroke(width = strokeWidth.toPx(), cap = StrokeCap.Butt)
+                style = Stroke(width = strokeWidth.toPx(), cap = StrokeCap.Round)
             )
 
+            // 지출 표시 (어두운 회색으로 덮어씀)
             drawArc(
                 color = ColorGray.Gray_200,
                 startAngle = startAngle,
                 sweepAngle = animatedSweepAngle,
                 useCenter = false,
-                topLeft = Offset(centerX - radius, centerY - radius),
-                size = Size(radius * 2, radius * 2),
-                style = Stroke(width = strokeWidth.toPx(), cap = StrokeCap.Butt)
+                style = Stroke(width = strokeWidth.toPx(), cap = StrokeCap.Round)
             )
         }
 
         WMText(
             text = remainingPercentageText,
-            style = typography.labelSmall.copy(
-                color = ColorGray.Gray_500,
-                lineHeight = 14.sp
-            ),
+            style = typography.labelSmall.copy(lineHeight = 14.sp),
+            color = ColorSetting.Info,
+            fontWeight = FontWeight.Medium,
             textAlign = TextAlign.Center,
         )
     }
@@ -208,20 +208,17 @@ private fun AnimatedDonutChart(
 private fun calculateDailyInsight(
     remainingBudget: Long,
     todayAmount: Long,
-): DailyInsight {
-    val nextMonth = if (today.month.number == 12) 1 else today.month.number + 1
-    val nextMonthYear = if (today.month.number == 12) today.year + 1 else today.year
-    val firstDayOfNextMonth = LocalDate(nextMonthYear, nextMonth, 1)
-    val lastDayOfMonth = firstDayOfNextMonth.minus(1, DateTimeUnit.DAY)
-
-    val remainingDays = (lastDayOfMonth.day - today.day + 1).coerceAtLeast(1)
-    val dailyLimit = remainingBudget / remainingDays
+    now: LocalDate,
+): DailyInsightVo {
+    val lastDayOfMonth = now.lastDayOfMonth()
+    val remainingDays = (lastDayOfMonth.day - now.day + 1).coerceAtLeast(1)
+    val dailyLimit = (remainingBudget / remainingDays).coerceAtLeast(0L)
     val remainDailyAmount = dailyLimit - todayAmount
 
     val budgetStatusMessage = when {
         remainDailyAmount > 100000 -> "여유로워요! 맛있는 걸 먹을 수 있어요. 🍕"
         remainDailyAmount in 30000..100000 -> "좋은 페이스예요! 이대로 유지하세요. 😊"
-        remainDailyAmount in 10000..29999 -> "지갑이 가벼워지고 있어요. ⚠️"
+        remainDailyAmount in 1..29999 -> "지갑이 가벼워지고 있어요. ⚠️"
         else -> "다 썼어요. 내일을 위해 지갑을 닫아요. 🚨"
     }
 
@@ -233,7 +230,7 @@ private fun calculateDailyInsight(
         else -> "지출 없는 하루예요.\n완벽한 무지출 챌린지! 🎯"
     }
 
-    return DailyInsight(
+    return DailyInsightVo(
         dailyLimit = dailyLimit,
         remainDailyAmount = remainDailyAmount,
         remainingDays = remainingDays,
@@ -242,10 +239,44 @@ private fun calculateDailyInsight(
     )
 }
 
-private data class DailyInsight(
-    val dailyLimit: Long,
-    val remainDailyAmount: Long,
-    val remainingDays: Int,
-    val budgetStatusMessage: String,
-    val statusMessage: String,
-)
+
+@Preview
+@Composable
+private fun TodayPreview() {
+    WMTheme {
+        Column(
+            modifier = Modifier
+                .background(Color.White)
+                .padding(20.dp),
+            verticalArrangement = Arrangement.spacedBy(32.dp)
+        ) {
+            // 예산 설정된 경우 - 여유
+            Today(
+                todayAmount = 0,
+                budgetAmount = 500000,
+                expensesAmount = 200000
+            )
+
+            // 예산 설정된 경우 - 초과 임박
+            Today(
+                todayAmount = 23000,
+                budgetAmount = 500000,
+                expensesAmount = 200000
+            )
+
+            // 예산 설정된 경우 - 예산 초과
+            Today(
+                todayAmount = 30000,
+                budgetAmount = 500000,
+                expensesAmount = 200000
+            )
+
+            // 예산 미설정
+            Today(
+                todayAmount = 25000,
+                budgetAmount = 0,
+                expensesAmount = 200000
+            )
+        }
+    }
+}
