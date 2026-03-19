@@ -85,7 +85,7 @@ fun CategoryIcon(
                     .size(24.dp)
             )
             WMIconButton(
-                modifier = Modifier.size(30.dp),
+                iconModifier = Modifier.size(30.dp),
                 iconRes = Res.drawable.ic_change_circle,
                 tint = ColorGray.Gray_100,
                 onClick = onClickChange,

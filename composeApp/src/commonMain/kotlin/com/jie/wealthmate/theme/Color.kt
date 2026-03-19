@@ -3,6 +3,17 @@ package com.jie.wealthmate.theme
 import androidx.compose.ui.graphics.Color
 
 
+object ColorSetting {
+    val DisabledBackground = ColorGray.Gray_100
+    val DisabledContent = ColorGray.Gray_300
+    val Default = ColorGray.Gray_700
+    val Info = ColorGray.Gray_500
+    val Empty = ColorGray.Gray_400
+    val Error = ColorRed.Red_300
+    val Success = ColorBlue.Blue_300
+    val Primary = ColorPrimary.Primary_500
+}
+
 object ColorGray {
     val Gray_700 = Color(0xFF444444)
     val Gray_600 = Color(0xFF44464B)

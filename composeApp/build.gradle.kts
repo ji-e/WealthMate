@@ -55,6 +55,8 @@ kotlin {
             implementation(libs.kotlinx.atomicfu)
             implementation(libs.kotlinx.collections.immutable)
 
+            implementation(libs.navigation.compose)
+            implementation(libs.koin.compose.viewmodel)
             implementation(libs.voyager.navigator)
             implementation(libs.voyager.screenmodel)
             implementation(libs.voyager.transitions)
@@ -106,5 +108,6 @@ android {
 }
 
 dependencies {
+    debugImplementation(libs.compose.ui.tooling)
     debugImplementation(libs.compose.ui.tooling.preview)
 }

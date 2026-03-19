@@ -85,7 +85,7 @@ fun DateTextField(
 
                     if (supportingText.isNotEmpty()) {
                         WMIconButton(
-                            iconButtonModifier = Modifier.size(20.dp),
+                            modifier = Modifier.size(20.dp),
                             iconRes = Res.drawable.ic_close_circle,
                             tint = ColorGray.Gray_400,
                             onClick = onResetClick

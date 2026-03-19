@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
@@ -18,9 +17,10 @@ import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,13 +31,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.jie.wealthmate.theme.ColorGray
+import com.jie.wealthmate.theme.ColorSetting
+import com.jie.wealthmate.theme.Padding
+import com.jie.wealthmate.theme.Shapes
 import com.jie.wealthmate.theme.WMTheme
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import wealthmate.composeapp.generated.resources.Res
 import wealthmate.composeapp.generated.resources.ic_keyboard_arrow_right
 
+/**
+ * WealthMate 공통 버튼 컴포넌트
+ */
 @Composable
 fun WMButton(
     modifier: Modifier = Modifier,
@@ -51,129 +56,145 @@ fun WMButton(
 ) {
     val focusManager = LocalFocusManager.current
 
-    val defaultColor = ColorGray.Gray_700
-    val disabledColor = ColorGray.Gray_300
+    val shape =
+        if (isRounded) {
+            when (buttonStyle) {
+                ButtonStyle.ELEVATED -> ButtonDefaults.elevatedShape
+                ButtonStyle.FILLED -> ButtonDefaults.shape
+                ButtonStyle.TONAL -> ButtonDefaults.filledTonalShape
+                ButtonStyle.OUTLINED -> ButtonDefaults.outlinedShape
+                ButtonStyle.TEXT -> ButtonDefaults.textShape
+            }
+        } else {
+            Shapes.medium
+        }
+
+    val wrappedOnClick = {
+        focusManager.clearFocus()
+        onClick()
+    }
+
+    val contentPadding = PaddingValues(horizontal = 12.dp)
+    val buttonModifier = modifier.height(buttonSize.buttonHeight)
+    val textStyle = buttonSize.toTextStyle()
 
     when (buttonStyle) {
         ButtonStyle.ELEVATED -> {
             ElevatedButton(
-                onClick = {
-                    focusManager.clearFocus()
-                    onClick()
-                },
+                onClick = wrappedOnClick,
                 enabled = enabled,
-                contentPadding = PaddingValues(horizontal = 12.dp),
-                modifier = modifier.height(buttonSize.buttonHeight),
-                shape = if (isRounded) ButtonDefaults.elevatedShape else RoundedCornerShape(8.dp),
-                colors = colors ?: ButtonDefaults.elevatedButtonColors().copy(
-                    contentColor = defaultColor,
-                    disabledContentColor = disabledColor
+                contentPadding = contentPadding,
+                modifier = buttonModifier,
+                shape = shape,
+                colors = colors ?: ButtonDefaults.elevatedButtonColors(
+                    contentColor = ColorSetting.Default,
+                    disabledContentColor = ColorSetting.DisabledContent
                 )
             ) {
                 WMText(
                     text = text,
-                    style = buttonSize.textStyle,
+                    style = textStyle,
+                    color = LocalContentColor.current
                 )
             }
         }
 
         ButtonStyle.FILLED -> {
             Button(
-                onClick = {
-                    focusManager.clearFocus()
-                    onClick()
-                },
+                onClick = wrappedOnClick,
                 enabled = enabled,
-                contentPadding = PaddingValues(horizontal = 12.dp),
-                modifier = modifier.height(buttonSize.buttonHeight),
-                shape = if (isRounded) ButtonDefaults.shape else RoundedCornerShape(8.dp),
-                colors = colors ?: ButtonDefaults.buttonColors().copy(
-                    contentColor = ColorGray.White,
-                    disabledContentColor = disabledColor
+                contentPadding = contentPadding,
+                modifier = buttonModifier,
+                shape = shape,
+                colors = colors ?: ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = Color.White,
+                    disabledContentColor = ColorSetting.DisabledContent
                 )
             ) {
                 WMText(
                     text = text,
-                    style = buttonSize.textStyle,
+                    style = textStyle,
+                    color = LocalContentColor.current
                 )
             }
         }
 
         ButtonStyle.TONAL -> {
             FilledTonalButton(
-                onClick = {
-                    focusManager.clearFocus()
-                    onClick()
-                },
+                onClick = wrappedOnClick,
                 enabled = enabled,
-                contentPadding = PaddingValues(horizontal = 12.dp),
-                modifier = modifier.height(buttonSize.buttonHeight),
-                shape = if (isRounded) ButtonDefaults.filledTonalShape else RoundedCornerShape(8.dp),
-                colors = colors ?: ButtonDefaults.filledTonalButtonColors().copy(
-                    contentColor = defaultColor,
-                    disabledContentColor = disabledColor
+                contentPadding = contentPadding,
+                modifier = buttonModifier,
+                shape = shape,
+                colors = colors ?: ButtonDefaults.filledTonalButtonColors(
+                    contentColor = ColorSetting.Default,
+                    disabledContentColor = ColorSetting.DisabledContent
                 )
             ) {
                 WMText(
                     text = text,
-                    style = buttonSize.textStyle,
+                    style = textStyle,
+                    color = LocalContentColor.current
                 )
             }
         }
 
         ButtonStyle.OUTLINED -> {
             OutlinedButton(
-                onClick = {
-                    focusManager.clearFocus()
-                    onClick()
-                },
+                onClick = wrappedOnClick,
                 enabled = enabled,
-                contentPadding = PaddingValues(horizontal = 12.dp),
-                modifier = modifier.height(buttonSize.buttonHeight),
-                shape = if (isRounded) ButtonDefaults.outlinedShape else RoundedCornerShape(8.dp),
-                colors = colors ?: ButtonDefaults.outlinedButtonColors().copy(
-                    contentColor = defaultColor,
-                    disabledContentColor = disabledColor
+                contentPadding = contentPadding,
+                modifier = buttonModifier,
+                shape = shape,
+                colors = colors ?: ButtonDefaults.outlinedButtonColors(
+                    contentColor = ColorSetting.Default,
+                    disabledContentColor = ColorSetting.DisabledContent
                 )
             ) {
                 WMText(
                     text = text,
-                    style = buttonSize.textStyle,
+                    style = textStyle,
+                    color = LocalContentColor.current
                 )
             }
         }
 
         ButtonStyle.TEXT -> {
             TextButton(
-                onClick = {
-                    focusManager.clearFocus()
-                    onClick()
-                },
+                onClick = wrappedOnClick,
                 enabled = enabled,
-                contentPadding = PaddingValues(horizontal = 12.dp),
-                modifier = modifier.height(buttonSize.buttonHeight),
-                colors = colors ?: ButtonDefaults.textButtonColors().copy(
-                    contentColor = defaultColor,
-                    disabledContentColor = disabledColor
+                contentPadding = contentPadding,
+                modifier = buttonModifier,
+                shape = shape,
+                colors = colors ?: ButtonDefaults.textButtonColors(
+                    contentColor = ColorSetting.Default,
+                    disabledContentColor = ColorSetting.DisabledContent
                 )
             ) {
                 WMText(
                     text = text,
-                    style = buttonSize.textStyle,
+                    style = textStyle,
+                    color = LocalContentColor.current
                 )
             }
         }
     }
 }
 
+/**
+ * 아이콘 버튼 컴포넌트
+ * @param modifier IconButton 에 적용될 modifier
+ * @param iconModifier Icon 에 적용될 modifier
+ */
 @Composable
 fun WMIconButton(
-    iconButtonModifier: Modifier = Modifier,
     modifier: Modifier = Modifier,
+    iconModifier: Modifier = Modifier,
     iconRes: DrawableResource,
     contentDescription: String? = null,
     enabled: Boolean = true,
-    tint: Color = ColorGray.Gray_700,
+    tint: Color = ColorSetting.Default,
     onClick: () -> Unit,
 ) {
     val focusManager = LocalFocusManager.current
@@ -183,19 +204,21 @@ fun WMIconButton(
             focusManager.clearFocus()
             onClick()
         },
-        modifier = iconButtonModifier,
+        modifier = modifier,
         enabled = enabled
     ) {
         Icon(
             painter = painterResource(iconRes),
-            modifier = modifier.size(24.dp),
+            modifier = iconModifier.size(24.dp),
             contentDescription = contentDescription,
-            tint = tint
+            tint = if (enabled) tint else ColorSetting.DisabledContent
         )
     }
-
 }
 
+/**
+ * 화면 하단에 고정되는 형태의 버튼 (구분선 포함)
+ */
 @Composable
 fun WMFloatingButton(
     modifier: Modifier = Modifier.fillMaxWidth(),
@@ -206,9 +229,7 @@ fun WMFloatingButton(
     isRounded: Boolean = false,
     onClick: () -> Unit,
 ) {
-    val focusManager = LocalFocusManager.current
-
-    Column() {
+    Column(modifier = Modifier.fillMaxWidth()) {
         WMShadowDivider()
 
         Spacer(modifier = Modifier.height(20.dp))
@@ -220,14 +241,14 @@ fun WMFloatingButton(
             buttonSize = buttonSize,
             enabled = enabled,
             isRounded = isRounded,
-            onClick = {
-                focusManager.clearFocus()
-                onClick()
-            }
+            onClick = onClick
         )
     }
 }
 
+/**
+ * 메뉴 리스트 등에서 사용되는 화살표가 포함된 버튼
+ */
 @Composable
 fun WMMenuButton(
     modifier: Modifier = Modifier,
@@ -239,12 +260,13 @@ fun WMMenuButton(
             .fillMaxWidth()
             .height(48.dp)
             .clickable { onClick() }
-            .padding(horizontal = 28.dp),
+            .padding(horizontal = Padding.BackgroundHorizontal),
         verticalAlignment = Alignment.CenterVertically
     ) {
         WMText(
             text = label,
-            style = Typography().titleMedium.copy(fontWeight = FontWeight.Medium),
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Medium,
             modifier = Modifier.weight(1f)
         )
 
@@ -252,143 +274,74 @@ fun WMMenuButton(
             painter = painterResource(Res.drawable.ic_keyboard_arrow_right),
             contentDescription = label,
             modifier = Modifier.size(24.dp),
-            tint = ColorGray.Gray_300,
+            tint = ColorSetting.DisabledContent,
         )
     }
 }
 
+enum class ButtonStyle {
+    ELEVATED, FILLED, TONAL, OUTLINED, TEXT
+}
+
+enum class ButtonSize(val buttonHeight: Dp) {
+    X_SMALL(24.dp),
+    SMALL(32.dp),
+    MEDIUM(40.dp),
+    LARGE(48.dp),
+    X_LARGE(56.dp)
+}
+
 @Composable
+private fun ButtonSize.toTextStyle(): TextStyle {
+    val baseStyle = when (this) {
+        ButtonSize.X_SMALL -> MaterialTheme.typography.bodySmall
+        ButtonSize.SMALL, ButtonSize.MEDIUM, ButtonSize.LARGE -> MaterialTheme.typography.bodyMedium
+        ButtonSize.X_LARGE -> MaterialTheme.typography.bodyLarge
+    }
+    return baseStyle.copy(
+        fontWeight = FontWeight.Medium,
+        fontFamily = baseStyle.fontFamily
+    )
+}
+
 @Preview(showBackground = true)
-fun WMButtonPreview() {
-    WMTheme() {
-        Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            Column(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(10.dp)
-            ) {
-                WMButton(
-                    text = "ELEVATED",
-                    buttonStyle = ButtonStyle.ELEVATED,
-                    buttonSize = ButtonSize.X_SMALL,
-                    onClick = {}
-                )
-                WMButton(
-                    text = "FILLED",
-                    buttonStyle = ButtonStyle.FILLED,
-                    buttonSize = ButtonSize.SMALL,
-                    onClick = {}
-                )
-                WMButton(
-                    text = "TONAL",
-                    buttonStyle = ButtonStyle.TONAL,
-                    buttonSize = ButtonSize.MEDIUM,
-                    onClick = {}
-                )
-                WMButton(
-                    text = "OUTLINED",
-                    buttonStyle = ButtonStyle.OUTLINED,
-                    buttonSize = ButtonSize.LARGE,
-                    onClick = {}
-                )
-                WMButton(
-                    text = "FILLED",
-                    buttonStyle = ButtonStyle.FILLED,
-                    buttonSize = ButtonSize.X_LARGE,
-                    onClick = {}
-                )
-                WMButton(
-                    text = "TEXT",
-                    buttonStyle = ButtonStyle.TEXT,
-                    onClick = {}
-                )
+@Composable
+private fun WMButtonPreview() {
+    WMTheme {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            WMText("Button Styles", fontWeight = FontWeight.Bold)
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                WMButton(text = "Filled", onClick = {})
+                WMButton(text = "Tonal", buttonStyle = ButtonStyle.TONAL, onClick = {})
+                WMButton(text = "Outlined", buttonStyle = ButtonStyle.OUTLINED, onClick = {})
             }
-            Column(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(10.dp)
-            ) {
-                WMButton(
-                    text = "ELEVATED",
-                    buttonStyle = ButtonStyle.ELEVATED,
-                    buttonSize = ButtonSize.X_SMALL,
-                    enabled = false,
-                    isRounded = true,
-                    onClick = {}
-                )
-                WMButton(
-                    text = "FILLED",
-                    buttonStyle = ButtonStyle.FILLED,
-                    buttonSize = ButtonSize.SMALL,
-                    enabled = false,
-                    isRounded = true,
-                    onClick = {}
-                )
-                WMButton(
-                    text = "TONAL",
-                    buttonStyle = ButtonStyle.TONAL,
-                    buttonSize = ButtonSize.MEDIUM,
-                    enabled = false,
-                    isRounded = true,
-                    onClick = {}
-                )
-                WMButton(
-                    text = "OUTLINED",
-                    buttonStyle = ButtonStyle.OUTLINED,
-                    buttonSize = ButtonSize.LARGE,
-                    enabled = false,
-                    isRounded = true,
-                    onClick = {}
-                )
-                WMButton(
-                    text = "FILLED",
-                    buttonStyle = ButtonStyle.FILLED,
-                    buttonSize = ButtonSize.X_LARGE,
-                    enabled = false,
-                    isRounded = true,
-                    onClick = {}
-                )
-                WMButton(
-                    text = "TEXT",
-                    buttonStyle = ButtonStyle.TEXT,
-                    enabled = false,
-                    isRounded = true,
-                    onClick = {}
-                )
+
+            WMText("Button Sizes", fontWeight = FontWeight.Bold)
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                ButtonSize.entries.forEach { size ->
+                    WMButton(text = "Size ${size.name}", buttonSize = size, onClick = {})
+                }
+            }
+
+            WMText("Disabled & Rounded", fontWeight = FontWeight.Bold)
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                WMButton(text = "Disabled", enabled = false, onClick = {})
+                WMButton(text = "Rounded", isRounded = true, onClick = {})
             }
         }
     }
 }
 
-
-enum class ButtonStyle {
-    ELEVATED,
-    FILLED,
-    TONAL,
-    OUTLINED,
-    TEXT
-}
-
-enum class ButtonSize(
-    val buttonHeight: Dp,
-    val textStyle: TextStyle,
-) {
-    X_SMALL(
-        buttonHeight = 24.dp,
-        textStyle = Typography().bodySmall.copy(fontWeight = FontWeight.Medium)
-    ),
-    SMALL(
-        buttonHeight = 32.dp,
-        textStyle = Typography().bodyMedium.copy(fontWeight = FontWeight.Medium)
-    ),
-    MEDIUM(
-        buttonHeight = 40.dp,
-        textStyle = Typography().bodyMedium.copy(fontWeight = FontWeight.Medium)
-    ),
-    LARGE(
-        buttonHeight = 48.dp,
-        textStyle = Typography().bodyMedium.copy(fontWeight = FontWeight.Medium)
-    ),
-    X_LARGE(
-        buttonHeight = 56.dp,
-        textStyle = Typography().bodyLarge.copy(fontWeight = FontWeight.Medium)
-    )
+@Preview(showBackground = true)
+@Composable
+private fun WMMenuButtonPreview() {
+    WMTheme {
+        Column {
+            WMMenuButton(label = "메뉴 항목 1", onClick = {})
+            WMMenuButton(label = "메뉴 항목 2", onClick = {})
+        }
+    }
 }

@@ -84,8 +84,8 @@ fun RepeatCycle(
 
             WMIconButton(
                 iconRes = Res.drawable.ic_keyboard_arrow_right,
-                iconButtonModifier = Modifier.size(32.dp),
-                modifier = Modifier.size(24.dp),
+                modifier = Modifier.size(32.dp),
+                iconModifier = Modifier.size(24.dp),
                 onClick = onModifyRepeatCycleClick,
                 tint = contentColor
             )

@@ -1,5 +1,6 @@
 package com.jie.wealthmate.theme
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -61,19 +62,24 @@ fun WMTheme(
         )
     }
 
+    // 폰트 패밀리를 먼저 로드하고 Typography를 생성하여 주입합니다. (프리뷰 안정성 확보)
+    val fontFamily = wantedSansFontFamily()
+    val typography = remember(fontFamily) { getTypography(fontFamily) }
+
     MaterialTheme(
         colorScheme = colorScheme,
+        typography = typography
     ) {
         CompositionLocalProvider(
             LocalRippleConfiguration provides RippleConfiguration(color = ColorPrimary.Primary_400),
             LocalDensity provides fixedDensity,
         ) {
             Column(
-                modifier = Modifier.pointerInput(Unit) {
-                    detectTapGestures(onTap = {
-                        focusManager.clearFocus()
-                    })
-                }
+                modifier = Modifier
+                    .pointerInput(Unit) {
+                        detectTapGestures(onTap = { focusManager.clearFocus() })
+                    }
+                    .background(ColorGray.White)
             ) {
                 content()
             }
@@ -84,9 +90,9 @@ fun WMTheme(
 fun Modifier.noRippleClickable(
     enabled: Boolean = true,
     role: Role? = null,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) = composed {
-    clickable (
+    clickable(
         interactionSource = remember { MutableInteractionSource() },
         indication = null,
         enabled = enabled,
