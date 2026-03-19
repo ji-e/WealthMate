@@ -5,6 +5,8 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberUpdatedState
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -73,7 +75,6 @@ class ContainerContext<S>(
      */
     val state: S
         get() = initState()
-
 }
 
 /**
@@ -91,7 +92,6 @@ fun <S> ContainerHost<S>.event(
 /**
  * KMP 환경에 맞게 수정된 Composable 함수입니다.
  * 화면(Screen)의 생명주기에 맞춰 SideEffect를 수집하고 처리합니다.
- * Android의 Lifecycle 종속성을 제거하고 Compose의 Composition 생명주기를 사용합니다.
  *
  * @param STATE UI 상태의 타입
  * @param sideEffect 수신된 SideEffect를 처리할 suspend 람다 함수
@@ -101,18 +101,15 @@ fun <STATE : UiState> ContainerHost<STATE>.collectSideEffect(
     sideEffect: suspend (UiSideEffect) -> Unit,
 ) {
     val sideEffectFlow = container.uiSideEffect
+    // 콜백이 갱신되어도 코루틴 내에서 최신 값을 참조할 수 있도록 함
+    val currentSideEffect by rememberUpdatedState(sideEffect)
 
-    // LaunchedEffect는 Composable이 Composition에 추가될 때 코루틴을 실행하고,
-    // Composable이 제거될 때 코루틴을 취소하여 KMP 환경에서 생명주기를 안전하게 관리합니다.
-    // key로 sideEffectFlow를 사용하여 flow가 변경될 경우 기존 코루틴을 취소하고 새로 시작합니다.
     LaunchedEffect(sideEffectFlow) {
         sideEffectFlow.collect {
-            sideEffect(it)
+            currentSideEffect(it)
         }
     }
 
-    // DisposableEffect는 Composable이 Composition에서 제거될 때(화면 전환 등) 정리 로직을 수행합니다.
-    // onDispose 블록은 화면이 사라질 때 호출되어 SideEffect 관련 리소스를 정리합니다.
     DisposableEffect(Unit) {
         onDispose {
             // replay 버퍼를 초기화하여 이전 이펙트가 다시 발생하는 것을 방지
@@ -123,34 +120,18 @@ fun <STATE : UiState> ContainerHost<STATE>.collectSideEffect(
     }
 }
 
-
 /**
  * Container의 uiState를 Compose의 State로 변환합니다.
- * KMP 환경을 위해 Android Lifecycle 종속성을 제거하고, Compose의 `collectAsState`를 직접 사용합니다.
- * 이 Composable 함수가 활성화된 동안만 StateFlow를 구독합니다.
- *
  * @param STATE UI 상태의 타입
  * @return Compose에서 관찰 가능한 State 객체
  */
 @Composable
 fun <STATE : UiState> ContainerHost<STATE>.collectAsState(): State<STATE> {
-    // uiState(StateFlow)를 Compose가 인식할 수 있는 State<T>로 변환합니다.
-    // 별도의 생명주기 처리 없이, Composable의 생명주기에 자동으로 맞춰 구독 및 해제가 이루어집니다.
     return container.uiState.collectAsState()
 }
 
 /**
  * UI 상태가 '로딩' 상태일 때 주어진 Composable 블록을 실행합니다.
- *
- * 예시:
- * ```
- * uiState.onLoading {
- *     CircularProgressIndicator()
- * }
- * ```
- * @param T BaseUiState를 상속하는 상태 타입
- * @param block 로딩 상태일 때 표시할 Composable 컨텐츠
- * @return 원본 State 객체 (체이닝을 위해)
  */
 @Composable
 fun <T : BaseUiState> State<T>.onLoading(
@@ -164,26 +145,13 @@ fun <T : BaseUiState> State<T>.onLoading(
 
 /**
  * UI 상태가 특정 '성공' 상태일 때 주어진 Composable 블록을 실행합니다.
- * reified 제네릭을 사용하여 캐스팅을 간소화합니다.
- *
- * 예시:
- * ```
- * uiState.onSuccess<MyUiState.Success> { successData ->
- *     Text("Success: ${successData.data}")
- * }
- * ```
- * @param S UiState를 상속하는 상태 타입
- * @param SS BaseUiState.Success를 상속하는 특정 성공 상태 타입
- * @param block 성공 상태일 때 데이터를 받아 표시할 Composable 컨텐츠
- * @return 원본 State 객체 (체이닝을 위해)
  */
 @Composable
-inline fun <S : UiState, reified SS : BaseUiState.Success<SS>> State<S>.onSuccess(
+inline fun <S : UiState, reified SS : BaseUiState.Success<*>> State<S>.onSuccess(
     block: @Composable (data: SS) -> Unit,
 ): State<S> {
     val currentValue = value
-
-    if (currentValue is BaseUiState.Success<*> && currentValue is SS) {
+    if (currentValue is SS) {
         block(currentValue)
     }
     return this
@@ -191,21 +159,13 @@ inline fun <S : UiState, reified SS : BaseUiState.Success<SS>> State<S>.onSucces
 
 /**
  * UI 상태가 '에러' 상태일 때 주어진 Composable 블록을 실행합니다.
- *
- * 예시:
- * ```
- * uiState.onError { errorMessage ->
- *     Text("Error: $errorMessage", color = Color.Red)
- * }
- * ```
- * @param T BaseUiState를 상속하는 상태 타입
- * @param block 에러 상태일 때 메시지를 받아 표시할 Composable 컨텐츠
- * @return 원본 State 객체 (체이닝을 위해)
  */
 @Composable
 fun <T : BaseUiState> State<T>.onError(
-    block: @Composable (message: String) -> Unit,
+    block: @Composable (message: String, throwable: Throwable?) -> Unit,
 ): State<T> {
-    (value as? BaseUiState.Error)?.let { block(it.message) }
+    (value as? BaseUiState.Error)?.let {
+        block(it.message, it.throwable)
+    }
     return this
 }
