@@ -2,19 +2,26 @@ package com.jie.wealthmate.feature.home.categoryExpenses
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
@@ -34,7 +41,6 @@ import com.jie.wealthmate.feature.menu.management.categoryManagement.component.L
 import com.jie.wealthmate.feature.search.component.DateHeader
 import com.jie.wealthmate.theme.ColorGray
 import com.jie.wealthmate.utils.formatDateKorMDE
-import com.jie.wealthmate.utils.toLocalDate
 import org.koin.core.parameter.parametersOf
 
 class CategoryExpensesScreen(
@@ -53,11 +59,18 @@ class CategoryExpensesScreen(
 
         var isShowStatusTypeModal by remember { mutableStateOf(false) }
 
-        val groupedHistories = remember(uiState.histories) {
-            uiState.histories
-                .groupBy { it.history.date.toLocalDate() }
-                .toList()
-                .sortedByDescending { it.first }
+        val listState = rememberLazyListState()
+        val shouldLoadNextPage by remember {
+            derivedStateOf {
+                val lastVisibleItem = listState.layoutInfo.visibleItemsInfo.lastOrNull()
+                lastVisibleItem != null && lastVisibleItem.index >= listState.layoutInfo.totalItemsCount - 5
+            }
+        }
+
+        LaunchedEffect(shouldLoadNextPage) {
+            if (shouldLoadNextPage) {
+                screenModel.loadNextPage()
+            }
         }
 
         Column(
@@ -82,6 +95,7 @@ class CategoryExpensesScreen(
 
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
+                state = listState
             ) {
                 item {
                     CategoryExpensesHeader(
@@ -92,7 +106,7 @@ class CategoryExpensesScreen(
                     )
                 }
 
-                if (groupedHistories.isEmpty()) {
+                if (uiState.histories.isEmpty() && !uiState.isPagingLoading) {
                     item {
                         EmptyListView(
                             modifier = Modifier
@@ -102,7 +116,7 @@ class CategoryExpensesScreen(
                         )
                     }
                 } else {
-                    groupedHistories.forEach { (date, histories) ->
+                    uiState.groupedHistories.forEach { (date, histories) ->
                         stickyHeader(key = "header_$date") {
                             DateHeader(
                                 date = date,
@@ -126,6 +140,19 @@ class CategoryExpensesScreen(
 
                         item {
                             Spacer(modifier = Modifier.height(4.dp))
+                        }
+                    }
+
+                    if (uiState.isPagingLoading) {
+                        item {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                CircularProgressIndicator()
+                            }
                         }
                     }
 

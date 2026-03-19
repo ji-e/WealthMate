@@ -30,9 +30,10 @@ const val formatDateDotYYYYMDE: String = "yyyy.M.d (E)"
 
 
 @OptIn(ExperimentalTime::class)
-val today = Clock.System.todayIn(TimeZone.currentSystemDefault())
+val today: LocalDate get() = Clock.System.todayIn(TimeZone.currentSystemDefault())
+
 @OptIn(ExperimentalTime::class)
-val nowLocalDateTime = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+val nowLocalDateTime get() = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
 
 /**
  * only hyphen
@@ -125,7 +126,7 @@ fun LocalDate.firstDayOfMonth(): LocalDate {
  * toEpochMilliseconds
  */
 fun LocalDate.toEpochMilliseconds(): Long {
-    return this.atStartOfDayIn(TimeZone.UTC).toEpochMilliseconds()
+    return this.atStartOfDayIn(TimeZone.currentSystemDefault()).toEpochMilliseconds()
 }
 
 /**
@@ -134,7 +135,7 @@ fun LocalDate.toEpochMilliseconds(): Long {
 fun Long?.toLocalDate(): LocalDate {
     this ?: return today
     return Instant.fromEpochMilliseconds(this)
-        .toLocalDateTime(TimeZone.UTC)
+        .toLocalDateTime(TimeZone.currentSystemDefault())
         .date
 }
 

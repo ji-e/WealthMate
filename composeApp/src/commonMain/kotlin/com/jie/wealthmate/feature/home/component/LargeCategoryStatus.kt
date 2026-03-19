@@ -198,8 +198,8 @@ private fun getChangeMessage(
     val percentage = calculateContrastPercentage(current, last) ?: return "데이터가 없어요"
 
     return when {
-        percentage > 0 -> "${percentage}% 증가 ▲"
-        percentage < 0 -> "${percentage.absoluteValue}% 감소 ▼"
+        percentage > 0 -> "+${percentage}%"
+        percentage < 0 -> "-${percentage.absoluteValue}%"
         else -> "${statusType.lastLabel}과 동일해요"
     }
 }

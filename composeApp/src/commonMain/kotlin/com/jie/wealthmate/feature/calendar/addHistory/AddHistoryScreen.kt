@@ -212,7 +212,20 @@ class AddHistoryScreen(private val selectedDate: LocalDate) : BaseScreen() {
                     selectedLargeCategory = uiState.selectedLargeCategory,
                     selectedCategory = uiState.category,
                     selectedCategoryTag = uiState.categoryTag,
-                    onCategoryClick = screenModel::updateCategory,
+                    onCategoryClick = { category ->
+                        if (category.isFixed && uiState.repeatCycle == null) {
+                            showConfirmDialog(
+                                isShow = true,
+                                content = "고정 카테고리는 반복 설정이 필요합니다.\n반복 설정을 하시겠습니까?",
+                                callback = {
+                                    screenModel.updateCategory(category)
+                                    isShowRepeatCycleModalBottomSheet = true
+                                }
+                            )
+                        } else {
+                            screenModel.updateCategory(category)
+                        }
+                    },
                     onCategoryTagClick = screenModel::updateCategoryTag
                 )
 
@@ -249,7 +262,19 @@ class AddHistoryScreen(private val selectedDate: LocalDate) : BaseScreen() {
                     .padding(bottom = 20.dp)
                     .fillMaxWidth(),
                 enabled = uiState.isSaveButtonEnable,
-                onClick = screenModel::saveHistory
+                onClick = {
+                    if (uiState.category?.isFixed == true && uiState.repeatCycle == null) {
+                        showConfirmDialog(
+                            isShow = true,
+                            content = "고정 카테고리는 반복 설정이 필요합니다.\n반복 설정을 하시겠습니까?",
+                            callback = {
+                                isShowRepeatCycleModalBottomSheet = true
+                            }
+                        )
+                    } else {
+                        screenModel.saveHistory()
+                    }
+                }
             )
         }
 
