@@ -16,7 +16,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.jie.wealthmate.component.EmojiIcon
 import com.jie.wealthmate.component.EmojiIconSize
 import com.jie.wealthmate.component.SpacerSize
@@ -120,7 +119,7 @@ private fun StatusItem(
             .fillMaxWidth()
             .clickable(onClick = onClick)
             .padding(start = Padding.BackgroundHorizontal, end = 20.dp)
-            .padding(vertical = Padding.ContainerVertical),
+            .padding(vertical = Padding.SpacerXS),
         verticalAlignment = Alignment.CenterVertically
     ) {
         EmojiIcon(
@@ -156,7 +155,6 @@ private fun StatusItem(
             WMText(
                 text = "${currentAmount.formatWithCommas()}원",
                 style = typography.titleMedium,
-                fontSize = 18.sp,
                 fontWeight = FontWeight.SemiBold,
                 maxLines = 1,
                 textAlign = TextAlign.End,

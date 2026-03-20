@@ -9,14 +9,11 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -30,56 +27,46 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.jie.wealthmate.component.EmojiIcon
+import com.jie.wealthmate.component.EmojiIconSize
+import com.jie.wealthmate.component.EmptyBoxView
+import com.jie.wealthmate.component.SpacerSize
+import com.jie.wealthmate.component.WMSpacer
 import com.jie.wealthmate.component.WMText
 import com.jie.wealthmate.feature.home.StatusType
+import com.jie.wealthmate.feature.home.component.vo.CategorySegmentedChartVo
+import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.theme.ColorChart
-import com.jie.wealthmate.theme.ColorGray
+import com.jie.wealthmate.theme.ColorSetting
+import com.jie.wealthmate.theme.Padding
+import com.jie.wealthmate.theme.Shapes
+import com.jie.wealthmate.theme.WMTheme
 import com.jie.wealthmate.theme.noRippleClickable
 import com.jie.wealthmate.utils.formatWithCommas
 import com.jie.wealthmate.vo.CategoryVo
+import kotlinx.collections.immutable.persistentListOf
 import org.jetbrains.compose.resources.painterResource
 import wealthmate.composeapp.generated.resources.Res
 import wealthmate.composeapp.generated.resources.ic_keyboard_arrow_right
 import kotlin.math.roundToInt
 
-
 @Composable
 fun CategorySegmentedChart(
     statusType: StatusType,
-    modifier: Modifier = Modifier,
     expensesAmount: Long,
-    categorySegmentChartItems: List<CategorySegmentChartData>,
+    categorySegmentChartItems: List<CategorySegmentedChartVo>,
+    modifier: Modifier = Modifier,
     onCategoryChartClick: () -> Unit = {},
     onCategoryItemClick: (String?) -> Unit = {},
 ) {
     val typography = MaterialTheme.typography
     var isStarted by remember { mutableStateOf(false) }
 
-    // 1. 전체 데이터 구성 (미지정 항목 포함 및 금액 내림차순 정렬)
-    val displayItems = remember(categorySegmentChartItems, expensesAmount) {
-        val assignedSum = categorySegmentChartItems.sumOf { it.amount }
-        // 전체 지출(expensesAmount)에서 분류된 카테고리 합을 뺀 나머지가 '카테고리 없음'
-        val unassignedAmount = (expensesAmount - assignedSum).coerceAtLeast(0L)
-
-        val allItems = if (unassignedAmount > 0) {
-            categorySegmentChartItems + CategorySegmentChartData(
-                category = CategoryVo.unset(), // '카테고리 없음' 객체 생성
-                amount = unassignedAmount
-            )
-        } else {
-            categorySegmentChartItems
-        }
-
-        allItems.sortedByDescending { it.amount }
-    }
-
-    // 2. 분모 설정 (전체 지출을 기준으로 백분율 계산)
-    val totalAmountForCalc = remember(displayItems, expensesAmount) {
-        displayItems.sumOf { it.amount }.coerceAtLeast(expensesAmount).toFloat()
-    }
-
+    // UI State에서 가공된 데이터를 그대로 사용하며, 색상 및 총액 기준 설정
     val colors = remember { ColorChart.getCategoryChartColors() }
+    val totalAmount = expensesAmount.coerceAtLeast(1L)
 
     val animProgress by animateFloatAsState(
         targetValue = if (isStarted) 1f else 0f,
@@ -90,95 +77,80 @@ fun CategorySegmentedChart(
     LaunchedEffect(Unit) { isStarted = true }
 
     Column(modifier = modifier.fillMaxWidth()) {
+        // 헤더 영역
         Row(
             modifier = Modifier
-                .padding(horizontal = 28.dp)
-                .noRippleClickable(onClick = onCategoryChartClick)
-                .padding(bottom = 12.dp),
+                .padding(horizontal = Padding.BackgroundHorizontal)
+                .noRippleClickable(onClick = onCategoryChartClick),
             verticalAlignment = Alignment.CenterVertically
         ) {
             WMText(
                 text = "${statusType.label} 카테고리별 지출",
-                style = typography.titleSmall.copy(color = ColorGray.Gray_500),
+                style = typography.titleSmall,
+                color = ColorSetting.Info
             )
 
             Icon(
                 painter = painterResource(Res.drawable.ic_keyboard_arrow_right),
                 contentDescription = null,
-                tint = ColorGray.Gray_500,
+                tint = ColorSetting.Info,
                 modifier = Modifier.size(16.dp)
             )
         }
 
-        if (displayItems.isEmpty()) {
-            Box(
+        WMSpacer(size = SpacerSize.SMALL)
+
+        if (categorySegmentChartItems.isEmpty()) {
+            EmptyBoxView(
+                modifier = Modifier.padding(horizontal = Padding.BackgroundHorizontal),
+                contentText = "지출 내역이 없습니다.",
+            )
+        } else {
+            // 차트 바 영역
+            Row(
                 modifier = Modifier
+                    .padding(horizontal = Padding.BackgroundHorizontal)
                     .fillMaxWidth()
-                    .height(80.dp)
-                    .background(color = ColorGray.Gray_50, shape = RoundedCornerShape(8.dp)),
-                contentAlignment = Alignment.Center
+                    .height(24.dp)
+                    .clip(Shapes.medium)
             ) {
-                WMText(
-                    text = "카테고리가 없습니다.",
-                    style = MaterialTheme.typography.bodySmall.copy(color = ColorGray.Gray_400)
-                )
-            }
-            return
-        }
+                categorySegmentChartItems.forEachIndexed { index, data ->
+                    val proportion = data.amount.toFloat() / totalAmount.toFloat()
+                    val currentWeight = (proportion * animProgress).coerceAtLeast(0.0001f)
+                    val color = colors[index % colors.size]
 
-        // 차트 바 영역
-        Row(
-            modifier = Modifier
-                .padding(horizontal = 28.dp)
-                .fillMaxWidth()
-                .height(24.dp)
-                .clip(RoundedCornerShape(8.dp))
-                .background(ColorGray.Gray_50)
-        ) {
-            if (totalAmountForCalc > 0) {
-                displayItems.forEachIndexed { index, data ->
-                    val proportion = data.amount / totalAmountForCalc
-                    val currentWeight = proportion * animProgress
-
-                    if (currentWeight > 0f) {
-                        val color = colors[index % colors.size]
-
-                        Box(
-                            modifier = Modifier
-                                .weight(currentWeight)
-                                .fillMaxHeight()
-                                .background(color)
-                                .noRippleClickable {
-                                    onCategoryItemClick(if (data.category.isUnset) null else data.category.id)
-                                }
-                        )
-                    }
-                }
-
-                if (animProgress < 1f) {
                     Box(
                         modifier = Modifier
-                            .weight((1f - animProgress).coerceAtLeast(0.001f))
+                            .weight(currentWeight)
                             .fillMaxHeight()
+                            .background(color)
+                            .noRippleClickable {
+                                onCategoryItemClick(if (data.category.isUnset) null else data.category.id)
+                            }
                     )
                 }
-            }
-        }
 
-        Spacer(modifier = Modifier.height(12.dp))
-
-        // 리스트 아이템 영역
-        displayItems.forEachIndexed { index, item ->
-            val color = colors[index % colors.size]
-
-            CategorySegmentedItem(
-                totalAmount = totalAmountForCalc.toLong(),
-                categorySegment = item,
-                color = color,
-                onClick = {
-                    onCategoryItemClick(if (item.category.isUnset) null else item.category.id)
+                // 애니메이션 중 남은 공간 처리
+                if (animProgress < 1f) {
+                    val remainingWeight = (1f - animProgress).coerceAtLeast(0.0001f)
+                    Box(modifier = Modifier.weight(remainingWeight).fillMaxHeight())
                 }
-            )
+            }
+
+            WMSpacer(size = SpacerSize.X_SMALL)
+
+            // 리스트 아이템 영역
+            categorySegmentChartItems.forEachIndexed { index, item ->
+                val color = colors[index % colors.size]
+                CategorySegmentedItem(
+                    totalAmount = totalAmount,
+                    categorySegment = item,
+                    color = color,
+                    onClick = {
+                        onCategoryItemClick(if (item.category.isUnset) null else item.category.id)
+                    }
+                )
+            }
         }
     }
 }
@@ -186,9 +158,9 @@ fun CategorySegmentedChart(
 @Composable
 private fun CategorySegmentedItem(
     totalAmount: Long,
-    categorySegment: CategorySegmentChartData,
+    categorySegment: CategorySegmentedChartVo,
     color: Color,
-    onClick: () -> Unit = {}
+    onClick: () -> Unit = {},
 ) {
     val typography = MaterialTheme.typography
     val category = categorySegment.category
@@ -197,58 +169,141 @@ private fun CategorySegmentedItem(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick)
-            .padding(vertical = 8.dp, horizontal = 28.dp),
+            .padding(vertical = 8.dp, horizontal = Padding.BackgroundHorizontal),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Box(
-            modifier = Modifier
-                .clip(CircleShape)
-                .background(color)
-                .size(20.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            WMText(
-                text = category.icon,
-                style = typography.bodySmall,
-            )
-        }
+        EmojiIcon(
+            icon = category.icon,
+            color = color,
+            size = EmojiIconSize.SMALL
+        )
 
         Row(
             modifier = Modifier
-                .padding(start = 8.dp)
+                .padding(start = Padding.SpacerXS)
                 .fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalArrangement = Arrangement.spacedBy(Padding.SpacerXS),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Row(modifier = Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically) {
-                WMText(
-                    text = category.middleLabel,
-                    style = typography.bodyLarge.copy(fontWeight = FontWeight.Medium),
-                    maxLines = 1,
-                )
-
+            Row(
+                modifier = Modifier.weight(1f),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 val rate = remember(totalAmount, categorySegment.amount) {
-                    if (totalAmount == 0L) 0
+                    if (totalAmount <= 0L) 0
                     else (categorySegment.amount.toDouble() / totalAmount.toDouble() * 100.0).roundToInt()
                 }
 
                 WMText(
+                    text = category.middleLabel,
+                    modifier = Modifier.weight(1f, fill = false),
+                    style = typography.bodyLarge,
+                    fontWeight = FontWeight.Medium,
+                    maxLines = 1,
+                )
+
+                WMText(
                     text = "${rate}%",
-                    style = typography.bodySmall.copy(color = ColorGray.Gray_500),
-                    modifier = Modifier.padding(start = 6.dp)
+                    style = typography.bodySmall,
+                    color = ColorSetting.Info,
+                    modifier = Modifier.padding(start = Padding.SpacerXXS),
+                    maxLines = 1
                 )
             }
 
             WMText(
-                text = "${formatWithCommas(categorySegment.amount.toString())}원",
-                style = typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
+                text = "${categorySegment.amount.formatWithCommas()}원",
+                style = typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
                 maxLines = 1
             )
         }
     }
 }
 
-data class CategorySegmentChartData(
-    val category: CategoryVo,
-    val amount: Long,
-)
+@Preview
+@Composable
+private fun CategorySegmentedChartPreview() {
+    val mockItems = listOf(
+        CategorySegmentedChartVo(
+            category = CategoryVo(
+                id = "1",
+                icon = "🍔",
+                largeCategory = LargeCategoryEnum.EXPENSES,
+                middleLabel = "식비",
+                sort = 1,
+                isFixed = false,
+                tags = persistentListOf()
+            ),
+            amount = 500000
+        ),
+        CategorySegmentedChartVo(
+            category = CategoryVo(
+                id = "2",
+                icon = "🏠",
+                largeCategory = LargeCategoryEnum.EXPENSES,
+                middleLabel = "주거",
+                sort = 2,
+                isFixed = true,
+                tags = persistentListOf()
+            ),
+            amount = 300000
+        ),
+        CategorySegmentedChartVo(
+            category = CategoryVo(
+                id = "3",
+                icon = "🚗",
+                largeCategory = LargeCategoryEnum.EXPENSES,
+                middleLabel = "교통교통교통교통교통교통교통교통",
+                sort = 3,
+                isFixed = false,
+                tags = persistentListOf()
+            ),
+            amount = 150000
+        ),
+        CategorySegmentedChartVo(
+            category = CategoryVo(
+                id = "others",
+                icon = "•••",
+                largeCategory = LargeCategoryEnum.EXPENSES,
+                middleLabel = "그 외 3개",
+                sort = 0,
+                isFixed = false,
+                tags = persistentListOf()
+            ),
+            amount = 50000
+        )
+    )
+
+    WMTheme {
+        Column(
+            modifier = Modifier
+                .background(Color.White)
+                .padding(vertical = 16.dp)
+        ) {
+            CategorySegmentedChart(
+                statusType = StatusType.MONTH,
+                expensesAmount = 1000000,
+                categorySegmentChartItems = mockItems,
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun CategorySegmentedChartEmptyPreview() {
+    WMTheme {
+        Column(
+            modifier = Modifier
+                .background(Color.White)
+                .padding(vertical = 16.dp)
+        ) {
+            CategorySegmentedChart(
+                statusType = StatusType.MONTH,
+                expensesAmount = 0,
+                categorySegmentChartItems = emptyList(),
+            )
+        }
+    }
+}

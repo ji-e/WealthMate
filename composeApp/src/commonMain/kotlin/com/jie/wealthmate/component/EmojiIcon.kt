@@ -18,7 +18,7 @@ import androidx.compose.ui.unit.sp
 
 @Composable
 fun EmojiIcon(
-    icon: String,
+    icon: String?,
     color: Color,
     modifier: Modifier = Modifier,
     size: EmojiIconSize = EmojiIconSize.MEDIUM,
@@ -35,7 +35,7 @@ fun EmojiIcon(
             contentAlignment = Alignment.Center
         ) {
             WMText(
-                text = icon,
+                text = icon ?: "❓",
                 fontSize = size.iconSize
             )
         }
