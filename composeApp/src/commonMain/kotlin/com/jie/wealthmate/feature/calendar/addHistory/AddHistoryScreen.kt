@@ -24,7 +24,6 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.jie.wealthmate.base.BaseScreen
@@ -49,7 +48,6 @@ import com.jie.wealthmate.feature.calendar.addHistory.component.PaymentMethodTex
 import com.jie.wealthmate.feature.calendar.addHistory.component.RepeatCycleEnum
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.theme.ColorGray
-import com.jie.wealthmate.theme.WMTheme
 import com.jie.wealthmate.utils.default
 import com.jie.wealthmate.vo.CategoryTagVo
 import com.jie.wealthmate.vo.CategoryVo
@@ -61,6 +59,7 @@ import org.koin.compose.viewmodel.koinViewModel
 fun AddHistoryScreen(
     navController: NavController,
     selectedDate: LocalDate,
+    onBack: () -> Unit,
     viewModel: AddHistoryViewModel = koinViewModel(),
 ) {
     var isShowSaveBackDialog by remember { mutableStateOf(false) }
@@ -72,19 +71,27 @@ fun AddHistoryScreen(
         viewModel.updateInit(selectedDate)
     }
 
+//    BackHandler(enabled = true){
+//        if (viewModel.container.uiState.value.isDataChanged) {
+//            isShowSaveBackDialog = true
+//        } else {
+//            navController.popBackStack()
+//        }
+//    }
+
     BaseScreen(
         viewModel = viewModel,
         onBack = {
             if (viewModel.container.uiState.value.isDataChanged) {
                 isShowSaveBackDialog = true
             } else {
-                navController.popBackStack()
+                onBack()
             }
         },
         onSideEffect = { sideEffect ->
             when (sideEffect) {
                 is AddHistoryUiSideEffect.OnSuccessSave -> {
-                    navController.popBackStack()
+                    onBack()
                 }
             }
         }
@@ -95,7 +102,7 @@ fun AddHistoryScreen(
                 if (uiState.isDataChanged) {
                     isShowSaveBackDialog = true
                 } else {
-                    navController.popBackStack()
+                    onBack()
                 }
             },
             onUpdateLargeCategory = viewModel::updateLargeCategory,
@@ -120,7 +127,7 @@ fun AddHistoryScreen(
             WMSaveBackDialog(
                 onConfirm = {
                     isShowSaveBackDialog = false
-                    navController.popBackStack()
+                    onBack()
                 },
                 onDismiss = { isShowSaveBackDialog = false }
             )
@@ -187,11 +194,13 @@ fun AddHistoryContent(
                     val selectedLargeCategoryEnum = uiState.selectedLargeCategory
                     WMText(
                         text = selectedLargeCategoryEnum.label,
-                        style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.SemiBold),
+                        style = MaterialTheme.typography.labelMedium,
+                        fontWeight = FontWeight.SemiBold,
+                        color = ColorGray.White,
                         modifier = Modifier
                             .padding(horizontal = 16.dp)
                             .clip(CircleShape)
-                            .background(selectedLargeCategoryEnum.backgroundColor)
+                            .background(selectedLargeCategoryEnum.middleColor)
                             .padding(horizontal = 8.dp, vertical = 4.dp)
                     )
                 }
@@ -354,51 +363,6 @@ fun AddHistoryContent(
             onConfirmClick = onUpdatePaymentMethod,
             selectedPaymentMethod = uiState.paymentMethod,
             paymentMethodItems = uiState.paymentMethodItems
-        )
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun AddHistoryContentPreview() {
-    WMTheme {
-        AddHistoryContent(
-            uiState = AddHistoryUiState(
-                categoryItems = listOf(
-                    CategoryVo.unset(LargeCategoryEnum.EXPENSES)
-                        .copy(middleLabel = "식비", icon = "🍔"),
-                    CategoryVo.unset(LargeCategoryEnum.EXPENSES)
-                        .copy(middleLabel = "교통", icon = "🚌")
-                ),
-                paymentMethodItems = listOf(
-                    PaymentMethodVo(
-                        id = "1",
-                        label = "현금",
-                        groupId = null,
-                        groupLabel = null,
-                        sort = 1
-                    ),
-                    PaymentMethodVo(
-                        id = "2",
-                        label = "신용카드",
-                        groupId = null,
-                        groupLabel = null,
-                        sort = 2
-                    )
-                )
-            ),
-            onBack = {},
-            onUpdateLargeCategory = {},
-            onUpdateDate = {},
-            onUpdateRepeatCycle = {},
-            onUpdateTotalInstallmentCount = {},
-            onUpdateAmount = {},
-            onUpdateCategory = {},
-            onUpdateCategoryTag = {},
-            onUpdatePaymentMethod = {},
-            onUpdateContent = {},
-            onSaveHistory = {},
-            onShowConfirmDialog = { _, _ -> }
         )
     }
 }

@@ -94,7 +94,6 @@ class HomeViewModel(
         }.apiFlow { state ->
             reduceState { state }
             // DB Flow는 스트림이 종료되지 않아 onCompletion이 호출되지 않으므로, 첫 데이터 수신 시 로딩을 강제로 해제합니다.
-            showLoading(false)
         }
     }
 

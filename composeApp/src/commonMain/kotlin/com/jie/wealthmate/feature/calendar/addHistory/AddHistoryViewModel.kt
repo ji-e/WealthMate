@@ -78,8 +78,13 @@ class AddHistoryViewModel(
     }
 
     fun updateInit(selectedDate: LocalDate) {
+        largeCategoryFlow.value = initialState.selectedLargeCategory
         reduceState { state ->
-            state.copy(date = selectedDate)
+            initialState.copy(
+                date = selectedDate,
+                categoryItems = state.categoryItems,
+                paymentMethodItems = state.paymentMethodItems
+            )
         }
     }
 

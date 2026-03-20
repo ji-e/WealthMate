@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import cafe.adriel.voyager.core.annotation.InternalVoyagerApi
 import cafe.adriel.voyager.navigator.internal.BackHandler
+import com.jie.wealthmate.MainUiManager
 import com.jie.wealthmate.component.CustomSnackbarHost
 import com.jie.wealthmate.component.bottomNav.BottomNavItem
 import com.jie.wealthmate.component.bottomNav.BottomNavigation
@@ -31,7 +32,6 @@ import com.jie.wealthmate.feature.calendar.addHistory.AddHistoryScreen
 import com.jie.wealthmate.feature.home.HomeScreen
 import com.jie.wealthmate.feature.menu.MenuScreen
 import com.jie.wealthmate.getPlatform
-import com.jie.wealthmate.utils.today
 import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinViewModel
 import kotlin.time.Clock
@@ -43,6 +43,7 @@ fun MainScreen(
     viewModel: MainViewModel = koinViewModel(),
 ) {
     val uiState by viewModel.container.uiState.collectAsState()
+    val mainUiState by MainUiManager.uiState.collectAsState()
     val isBottomBarVisible by remember {
         derivedStateOf { uiState.selectedItem != BottomNavItem.Add }
     }
@@ -90,7 +91,8 @@ fun MainScreen(
                     BottomNavItem.Add -> {
                         AddHistoryScreen(
                             navController = navController,
-                            selectedDate = today
+                            selectedDate = mainUiState.selectedDate,
+                            onBack = { viewModel.navigateBackToPreviousTab() }
                         )
                     }
 

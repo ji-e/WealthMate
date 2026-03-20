@@ -169,6 +169,7 @@ abstract class BaseViewModel<S : UiState> : ViewModel(), ContainerHost<S> {
             }
             .onEach { data ->
                 successFunc(data)
+                if (showLoadingIndicator) showLoading(false)
             }
             .catch { e ->
                 logError(e)

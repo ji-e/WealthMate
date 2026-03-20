@@ -1,3 +1,5 @@
+@file:OptIn(InternalVoyagerApi::class)
+
 package com.jie.wealthmate.base
 
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -20,6 +22,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
+import cafe.adriel.voyager.core.annotation.InternalVoyagerApi
+import cafe.adriel.voyager.navigator.internal.BackHandler
 import com.jie.wealthmate.component.LoadingOverlay
 import kotlinx.coroutines.launch
 
@@ -48,6 +52,11 @@ fun <S : UiState> BaseScreen(
     // 콜백의 최신 상태를 유지하여 SideEffect 수집 루프에서 stale capture 방지
     val currentOnBack by rememberUpdatedState(onBack)
     val currentOnSideEffect by rememberUpdatedState(onSideEffect)
+
+    // 시스템 뒤로가기 버튼 처리
+    BackHandler(enabled = currentOnBack != null) {
+        currentOnBack?.invoke()
+    }
 
     // SideEffect 처리 통합
     viewModel.collectSideEffect { sideEffect ->

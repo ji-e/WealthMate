@@ -117,7 +117,7 @@ fun CalendarFilterModalBottomSheet(
                                     .padding(horizontal = 28.dp), // 들여쓰기 제거 (52.dp -> 28.dp)
                                 iconModifier = Modifier.size(28.dp),
                                 label = option.label,
-                                labelStyle = Typography().bodyLarge,
+                                labelStyle = MaterialTheme.typography.bodyLarge,
                                 checked = isSelected,
                                 onCheckedChange = { checked ->
                                     tempSelectedOptions = if (checked) {
