@@ -1,7 +1,6 @@
 package com.jie.wealthmate.component
 
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -14,9 +13,7 @@ fun WMSpacer(
     size: SpacerSize = SpacerSize.MEDIUM,
 ) {
     Spacer(
-        modifier = modifier
-            .fillMaxWidth()
-            .height(size.spacer)
+        modifier = modifier.height(size.spacer)
     )
 }
 

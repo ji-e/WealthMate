@@ -4,6 +4,7 @@ import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -58,6 +59,7 @@ fun CategorySegmentedChart(
     categorySegmentChartItems: List<CategorySegmentedChartVo>,
     modifier: Modifier = Modifier,
     onCategoryChartClick: () -> Unit = {},
+    onCategoryItemClick: (String) -> Unit = {},
 ) {
     val typography = MaterialTheme.typography
     var isStarted by remember { mutableStateOf(false) }
@@ -143,6 +145,9 @@ fun CategorySegmentedChart(
                     color = color,
                     totalAmount = totalAmount,
                     amount = item.amount,
+                    onItemClick = {
+                        onCategoryItemClick(item.category.id)
+                    }
                 )
             }
         }
@@ -156,12 +161,14 @@ fun SegmentedItem(
     color: Color,
     totalAmount: Long,
     amount: Long,
+    onItemClick: () -> Unit,
 ) {
     val typography = MaterialTheme.typography
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .clickable { onItemClick() }
             .padding(vertical = 8.dp, horizontal = Padding.BackgroundHorizontal),
         verticalAlignment = Alignment.CenterVertically
     ) {

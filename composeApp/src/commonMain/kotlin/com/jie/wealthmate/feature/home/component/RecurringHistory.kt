@@ -1,161 +1,150 @@
 package com.jie.wealthmate.feature.home.component
 
-import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.key
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.jie.wealthmate.component.EmojiIcon
+import com.jie.wealthmate.component.EmojiIconSize
+import com.jie.wealthmate.component.EmptyBoxView
+import com.jie.wealthmate.component.HorizontalBar
+import com.jie.wealthmate.component.SpacerSize
+import com.jie.wealthmate.component.WMSpacer
 import com.jie.wealthmate.component.WMText
 import com.jie.wealthmate.feature.home.RecurringHistoryUiModel
+import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.theme.ColorGray
 import com.jie.wealthmate.theme.ColorRed
+import com.jie.wealthmate.theme.ColorSetting
+import com.jie.wealthmate.theme.Padding
+import com.jie.wealthmate.theme.Shapes
+import com.jie.wealthmate.theme.WMTheme
 import com.jie.wealthmate.theme.noRippleClickable
 import com.jie.wealthmate.utils.formatWithCommas
 import org.jetbrains.compose.resources.painterResource
 import wealthmate.composeapp.generated.resources.Res
 import wealthmate.composeapp.generated.resources.ic_keyboard_arrow_right
-import wealthmate.composeapp.generated.resources.ic_push_pin
 
 @Composable
 fun RecurringHistory(
-    modifier: Modifier = Modifier,
     recurringHistories: List<RecurringHistoryUiModel>,
     totalAmount: Long,
     passedAmount: Long,
+    modifier: Modifier = Modifier,
     onHeaderClick: () -> Unit = {},
     onItemClick: (String) -> Unit = {},
 ) {
-    val typography = MaterialTheme.typography
-    var isStarted by remember { mutableStateOf(false) }
-
-    val progress = remember(totalAmount, passedAmount) {
-        if (totalAmount == 0L) 0f else passedAmount.toFloat() / totalAmount.toFloat()
-    }
-
-    val animProgress by animateFloatAsState(
-        targetValue = if (isStarted) progress else 0f,
-        animationSpec = tween(1000, easing = FastOutSlowInEasing),
-        label = "RecurringProgressAnimation"
-    )
-
-    LaunchedEffect(Unit) { isStarted = true }
-
     Column(modifier = modifier.fillMaxWidth()) {
+        RecurringHistoryHeader(onClick = onHeaderClick)
+
+        WMSpacer(size = SpacerSize.SMALL)
+
+        if (recurringHistories.isEmpty()) {
+            EmptyBoxView(
+                modifier = Modifier.padding(horizontal = Padding.BackgroundHorizontal),
+                contentText = "등록된 반복 지출 내역이 없습니다.",
+            )
+        } else {
+            RecurringStatusCard(
+                passedAmount = passedAmount,
+                totalAmount = totalAmount
+            )
+
+            WMSpacer(size = SpacerSize.X_SMALL)
+
+            recurringHistories.forEach { item ->
+                key(item.id) {
+                    RecurringHistoryItem(
+                        item = item,
+                        onClick = { onItemClick(item.id) }
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun RecurringHistoryHeader(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier = modifier
+            .padding(horizontal = Padding.BackgroundHorizontal)
+            .noRippleClickable(onClick = onClick),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        WMText(
+            text = "이번 달 반복 지출",
+            style = MaterialTheme.typography.titleSmall.copy(color = ColorSetting.Info),
+        )
+
+        Icon(
+            painter = painterResource(Res.drawable.ic_keyboard_arrow_right),
+            contentDescription = null,
+            tint = ColorSetting.Info,
+            modifier = Modifier.size(16.dp)
+        )
+    }
+}
+
+@Composable
+private fun RecurringStatusCard(
+    passedAmount: Long,
+    totalAmount: Long,
+    modifier: Modifier = Modifier,
+) {
+    val typography = MaterialTheme.typography
+    Column(
+        modifier = modifier
+            .padding(horizontal = Padding.BackgroundHorizontal)
+            .fillMaxWidth()
+            .background(ColorGray.Gray_50, Shapes.medium)
+            .padding(
+                horizontal = Padding.ContainerHorizontal,
+                vertical = Padding.ContainerVertical
+            )
+    ) {
         Row(
-            modifier = Modifier
-                .padding(bottom = 12.dp)
-                .padding(horizontal = 28.dp)
-                .noRippleClickable(onClick = onHeaderClick),
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
             WMText(
-                text = "이번 달 반복 지출",
-                style = typography.titleSmall.copy(color = ColorGray.Gray_500),
+                text = "이번 달 반복 지출 현황",
+                style = typography.bodyMedium,
+                fontWeight = FontWeight.Medium
             )
-
-            Icon(
-                painter = painterResource(Res.drawable.ic_keyboard_arrow_right),
-                contentDescription = null,
-                tint = ColorGray.Gray_500,
-                modifier = Modifier.size(16.dp)
+            WMText(
+                text = "${passedAmount.formatWithCommas()} / ${totalAmount.formatWithCommas()}원",
+                style = typography.bodySmall
             )
         }
 
-        if (recurringHistories.isEmpty()) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(80.dp)
-                    .background(color = ColorGray.Gray_50, shape = RoundedCornerShape(8.dp)),
-                contentAlignment = Alignment.Center
-            ) {
-                WMText(
-                    text = "등록된 반복 지출 내역이 없습니다.",
-                    style = typography.bodySmall.copy(color = ColorGray.Gray_400)
-                )
-            }
-            return
-        }
+        WMSpacer(size = SpacerSize.X_SMALL)
 
-        // Graph Section
-        Column(
-            modifier = Modifier
-                .padding(horizontal = 28.dp)
-                .fillMaxWidth()
-                .background(ColorGray.Gray_50, RoundedCornerShape(8.dp))
-                .padding(horizontal = 16.dp, vertical = 12.dp)
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                WMText(
-                    text = "이번 달 반복 지출 현황",
-                    style = typography.bodyMedium.copy(fontWeight = FontWeight.Medium)
-                )
-                WMText(
-                    text = "${formatWithCommas(passedAmount.toString())} " +
-                            "/ ${formatWithCommas(totalAmount.toString())}원",
-                    style = typography.bodySmall
-                )
-            }
+        HorizontalBar(
+            spent = passedAmount,
+            total = totalAmount,
+            firstBarColor = LargeCategoryEnum.EXPENSES.middleColor
+        )
 
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(8.dp)
-                    .clip(CircleShape)
-                    .background(ColorGray.Gray_200)
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth(animProgress)
-                        .fillMaxHeight()
-                        .background(ColorRed.Red_300)
-                )
-            }
-
-            Spacer(modifier = Modifier.height(4.dp))
-        }
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        // List Section
-        recurringHistories.forEach { item ->
-            RecurringHistoryItem(
-                item = item,
-                onClick = { onItemClick(item.id) }
-            )
-        }
+        WMSpacer(size = SpacerSize.XX_SMALL)
     }
 }
 
@@ -170,86 +159,138 @@ private fun RecurringHistoryItem(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick)
-            .padding(vertical = 8.dp)
-            .padding(start = 8.dp, end = 28.dp),
+            .padding(vertical = Padding.SpacerXS)
+            .padding(
+                start = Padding.BackgroundHorizontal - EmojiIconSize.MEDIUM.fixedIconSize / 3,
+                end = Padding.BackgroundHorizontal
+            ),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Box(modifier = Modifier.width(60.dp)) {
-            Box(
-                modifier = Modifier
-                    .size(40.dp)
-                    .clip(CircleShape)
-                    .background(item.largeCategory.backgroundColor)
-                    .align(Alignment.CenterEnd),
-                contentAlignment = Alignment.Center
-            ) {
-                WMText(
-                    text = item.categoryIcon,
-                    style = typography.titleLarge
-                )
-            }
-            if (item.isFixed) {
-                Icon(
-                    painter = painterResource(Res.drawable.ic_push_pin),
-                    contentDescription = null,
-                    tint = ColorRed.Red_300,
-                    modifier = Modifier
-                        .padding(start = 10.dp)
-                        .size(24.dp)
-                        .align(Alignment.TopStart)
-                )
-            }
-        }
+        // Icon Section
+        EmojiIcon(
+            icon = item.categoryIcon,
+            color = item.largeCategory.backgroundColor,
+            isFixed = item.isFixed,
+            isFixedUsed = true
+        )
 
-        Spacer(modifier = Modifier.width(12.dp))
-
-        Column(modifier = Modifier.weight(1f)) {
+        // Content Section
+        Column(
+            modifier = Modifier
+                .padding(horizontal = Padding.SpacerXS)
+                .weight(1f),
+            verticalArrangement = Arrangement.spacedBy(Padding.SpacerXXS)
+        ) {
             WMText(
                 text = item.content,
-                style = typography.bodyLarge.copy(fontWeight = FontWeight.Medium),
+                style = typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
                 maxLines = 1
             )
-            Row {
+            Row(verticalAlignment = Alignment.CenterVertically) {
                 WMText(
                     text = item.recurringDateText,
-                    style = typography.bodySmall.copy(color = ColorGray.Gray_500)
+                    style = typography.bodySmall,
+                    color = ColorSetting.Info
                 )
-                if (item.isPassed) {
+
+                val statusInfo = when {
+                    item.isPassed -> "지났음" to ColorSetting.Info
+                    item.isToday -> "오늘" to ColorRed.Red_300
+                    else -> null
+                }
+
+                statusInfo?.let { (text, color) ->
                     WMText(
                         text = " | ",
-                        style = typography.bodySmall.copy(color = ColorGray.Gray_500)
+                        style = typography.bodySmall,
+                        color = ColorSetting.Info
                     )
                     WMText(
-                        text = "지났음",
-                        style = typography.labelSmall.copy(
-                            color = ColorGray.Gray_500,
-                            fontWeight = FontWeight.SemiBold
-                        )
-                    )
-                } else if (item.isToday) {
-                    WMText(
-                        text = " | ",
-                        style = typography.bodySmall.copy(color = ColorGray.Gray_500)
-                    )
-                    WMText(
-                        text = "오늘",
-                        style = typography.labelSmall.copy(
-                            color = ColorRed.Red_300,
-                            fontWeight = FontWeight.SemiBold
-                        )
+                        text = text,
+                        style = typography.bodySmall,
+                        color = color,
                     )
                 }
             }
         }
 
-        Column(horizontalAlignment = Alignment.End) {
+        // Amount Section
+        Column(
+            horizontalAlignment = Alignment.End,
+            verticalArrangement = Arrangement.spacedBy(Padding.SpacerXXS)
+        ) {
             WMText(
-                text = "${formatWithCommas(item.singleAmount.toString())}원",
-                style = typography.titleMedium.copy(fontWeight = FontWeight.SemiBold)
+                text = "${item.singleAmount.formatWithCommas()}원",
+                style = typography.titleMedium,
+                fontWeight = FontWeight.SemiBold
             )
             WMText(
-                text = "/ ${formatWithCommas(item.monthlyTotalAmount.toString())}원",
-                style = typography.bodySmall.copy(color = ColorGray.Gray_500)
+                text = "/ ${item.monthlyTotalAmount.formatWithCommas()}원",
+                style = typography.bodySmall,
+                color = ColorSetting.Info
+            )
+        }
+    }
+}
+
+@Preview(name = "Data Exist", showBackground = true)
+@Composable
+private fun RecurringHistoryPreview() {
+    WMTheme {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color.White)
+                .padding(vertical = 16.dp)
+        ) {
+            RecurringHistory(
+                recurringHistories = listOf(
+                    RecurringHistoryUiModel(
+                        id = "1",
+                        categoryIcon = "🍔",
+                        largeCategory = LargeCategoryEnum.EXPENSES,
+                        content = "점심 식비가 얼마일까요?????!!?!?!?!?",
+                        singleAmount = 10000,
+                        monthlyTotalAmount = 200000,
+                        recurringDateText = "매월 10일",
+                        isPassed = true,
+                        isFixed = true
+                    ),
+                    RecurringHistoryUiModel(
+                        id = "2",
+                        categoryIcon = "🏠",
+                        largeCategory = LargeCategoryEnum.EXPENSES,
+                        content = "월세",
+                        singleAmount = 500000,
+                        monthlyTotalAmount = 500000,
+                        recurringDateText = "매월 25일",
+                        isPassed = false,
+                        isToday = true,
+                        isFixed = false
+                    )
+                ),
+                totalAmount = 700000,
+                passedAmount = 200000
+            )
+        }
+    }
+}
+
+@Preview(name = "Data Empty", showBackground = true)
+@Composable
+private fun RecurringHistoryEmptyPreview() {
+    WMTheme {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color.White)
+                .padding(vertical = 16.dp)
+        ) {
+            RecurringHistory(
+                recurringHistories = emptyList(),
+                totalAmount = 0,
+                passedAmount = 0
             )
         }
     }

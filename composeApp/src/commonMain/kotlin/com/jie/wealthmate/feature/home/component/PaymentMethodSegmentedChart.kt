@@ -51,6 +51,7 @@ fun PaymentMethodSegmentedChart(
     expensesAmount: Long,
     paymentMethodSegmentChartItems: List<PaymentMethodSegmentedChartVo>,
     onPaymentMethodChartClick: () -> Unit = {},
+    onPaymentMethodItemClick: (String?) -> Unit = {},
 ) {
     val typography = MaterialTheme.typography
     var isStarted by remember { mutableStateOf(false) }
@@ -160,6 +161,9 @@ fun PaymentMethodSegmentedChart(
                     color = color,
                     totalAmount = totalAmountForCalc,
                     amount = item.amount,
+                    onItemClick = {
+                        onPaymentMethodItemClick(item.paymentMethod?.id)
+                    }
                 )
             }
         }
