@@ -12,9 +12,11 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -45,6 +47,14 @@ fun <T> WMListSelectionModalBottomSheet(
     onDismissRequest: () -> Unit,
 ) {
     var tempSelectedItem by remember { mutableStateOf(selectedItem) }
+    val listState = rememberLazyListState()
+
+    LaunchedEffect(Unit) {
+        val movePosition = items.indexOf(selectedItem)
+            .run { if (this <= 0) 0 else this - 1 }
+
+        listState.scrollToItem(movePosition)
+    }
 
     WMModalBottomSheet(
         title = title,
@@ -55,7 +65,8 @@ fun <T> WMListSelectionModalBottomSheet(
                 modifier = Modifier
                     .fillMaxWidth()
                     .heightIn(min = maxHeight * 0.2f, max = maxHeight * 0.6f),
-                contentPadding = PaddingValues(bottom = Padding.SpacerS)
+                contentPadding = PaddingValues(bottom = Padding.SpacerS),
+                state = listState
             ) {
                 items(items) { item ->
                     val isSelected = item == tempSelectedItem

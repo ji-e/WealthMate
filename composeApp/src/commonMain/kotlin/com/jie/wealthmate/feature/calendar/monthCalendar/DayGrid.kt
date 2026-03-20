@@ -16,9 +16,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.TextAutoSize
-import androidx.compose.material3.Typography
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -26,19 +25,24 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.lerp
 import androidx.compose.ui.unit.sp
 import com.jie.wealthmate.component.WMText
 import com.jie.wealthmate.feature.calendar.CalendarFilterOption
+import com.jie.wealthmate.feature.calendar.component.vo.DayItemDataVo
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
-import com.jie.wealthmate.theme.ColorBlue
 import com.jie.wealthmate.theme.ColorGray
 import com.jie.wealthmate.theme.ColorPrimary
-import com.jie.wealthmate.theme.ColorRed
+import com.jie.wealthmate.theme.ColorSetting
+import com.jie.wealthmate.theme.Padding
+import com.jie.wealthmate.theme.Shapes
+import com.jie.wealthmate.theme.WMTheme
 import com.jie.wealthmate.utils.default
 import com.jie.wealthmate.utils.firstDayOfMonth
 import com.jie.wealthmate.utils.formatWithCommas
@@ -51,7 +55,7 @@ import kotlinx.datetime.isoDayNumber
 import kotlinx.datetime.minus
 import kotlinx.datetime.plus
 import kotlin.math.abs
-import kotlin.math.ceil
+
 
 @Composable
 fun DayGrid(
@@ -65,43 +69,96 @@ fun DayGrid(
     filterOptions: Set<CalendarFilterOption>,
     onClickDate: (LocalDate) -> Unit,
 ) {
-    val historyByDate = remember(historyItems) {
-        historyItems.groupBy { it.date }
+    // 1. 달력 날짜 생성 로직 최적화
+    val days = remember(selectedMonth) {
+        val firstDay = selectedMonth.firstDayOfMonth()
+        val startPadding = firstDay.dayOfWeek.isoDayNumber % 7
+        val lastDay = selectedMonth.lastDayOfMonth()
+
+        val list = mutableListOf<Pair<LocalDate, MonthPeriodEnum>>()
+        // 이전 달 채우기
+        repeat(startPadding) {
+            val date = firstDay.minus(startPadding - it, DateTimeUnit.DAY)
+            list.add(date to MonthPeriodEnum.LAST_MONTH)
+        }
+        // 이번 달 채우기
+        repeat(lastDay.day) {
+            val date = firstDay.plus(it, DateTimeUnit.DAY)
+            list.add(date to MonthPeriodEnum.THIS_MONTH)
+        }
+        // 다음 달 채우기 (그리드 균형을 위해 35 또는 42개로 고정)
+        val targetSize = if (list.size <= 35) 35 else 42
+        val nextDaysCount = targetSize - list.size
+        repeat(nextDaysCount) {
+            val date = lastDay.plus(it + 1, DateTimeUnit.DAY)
+            list.add(date to MonthPeriodEnum.NEXT_MONTH)
+        }
+        list
     }
 
-    val items = remember(selectedMonth) {
-        mutableListOf<Pair<LocalDate, MonthPeriodEnum>>().apply {
-            val firstDay = selectedMonth.firstDayOfMonth()
-            val startPadding = firstDay.dayOfWeek.isoDayNumber % 7
+    // 2. 일별 데이터(금액, 반복내역 등)를 미리 계산하여 렌더링 최적화
+    val dayItemDataList = remember(days, historyItems, filterOptions) {
+        val historyByDate = historyItems.groupBy { it.date }
+        days.mapIndexed { index, (date, period) ->
+            val dayHistory = historyByDate[date] ?: emptyList()
 
-            repeat(startPadding) {
-                add(
-                    firstDay.minus(
-                        startPadding - it,
-                        DateTimeUnit.DAY
-                    ) to MonthPeriodEnum.LAST_MONTH
-                )
-            }
-            repeat(selectedMonth.lastDayOfMonth().day) {
-                add(firstDay.plus(it, DateTimeUnit.DAY) to MonthPeriodEnum.THIS_MONTH)
-            }
-            val itemsSize = this.size
-            val targetSize = if (itemsSize <= 35) 35 else 42
-            repeat(targetSize - itemsSize) {
-                add(
-                    firstDay.lastDayOfMonth()
-                        .plus(it + 1, DateTimeUnit.DAY) to MonthPeriodEnum.NEXT_MONTH
-                )
-            }
+            // 수입 합계
+            val incomeAmount =
+                if (CalendarFilterOption.SHOW_INCOME in filterOptions) {
+                    dayHistory.sumOf { history ->
+                        val isEligible = history.largeCategory == LargeCategoryEnum.INCOME &&
+                                (history.category?.isFixed != true || CalendarFilterOption.INCLUDE_FIXED_INCOME in filterOptions)
+                        if (isEligible) history.amount else 0L
+                    }
+                } else {
+                    0L
+                }
+
+            // 지출 합계 (저축 포함 여부 체크)
+            val expenseAmount =
+                if (CalendarFilterOption.SHOW_EXPENSES in filterOptions) {
+                    dayHistory.sumOf { history ->
+                        val isEligible = when (history.largeCategory) {
+                            LargeCategoryEnum.EXPENSES -> {
+                                history.category?.isFixed != true || CalendarFilterOption.INCLUDE_FIXED_EXPENSES in filterOptions
+                            }
+
+                            LargeCategoryEnum.SAVING -> {
+                                CalendarFilterOption.SHOW_SAVINGS in filterOptions &&
+                                        (history.category?.isFixed != true || CalendarFilterOption.INCLUDE_FIXED_SAVINGS in filterOptions)
+                            }
+
+                            else -> false
+                        }
+                        if (isEligible) history.amount else 0L
+                    }
+                } else {
+                    0L
+                }
+
+            // 반복 내역 필터링
+            val repeatItems =
+                if (CalendarFilterOption.SHOW_REPEAT in filterOptions) {
+                    dayHistory.filter { it.repeatCycle != null }
+                } else {
+                    emptyList()
+                }
+
+            DayItemDataVo(
+                date = date,
+                period = period,
+                incomeAmount = incomeAmount,
+                expenseAmount = expenseAmount,
+                repeatItems = repeatItems,
+                rowIndex = index / 7
+            )
         }
     }
 
-    val numRowsForCurrentMonth = ceil(items.size / 7f)
-    val selectedItemIndex = remember(items, selectedDate) {
-        items.indexOfFirst { it.first == selectedDate }
-    }
-    val selectedRowIndex = remember(selectedItemIndex) {
-        if (selectedItemIndex < 0) 0 else selectedItemIndex / 7
+    val numRows = days.size / 7
+    val selectedRowIndex = remember(days, selectedDate) {
+        val index = days.indexOfFirst { it.first == selectedDate }
+        if (index < 0) 0 else index / 7
     }
 
     val animatedRowIndex by animateFloatAsState(
@@ -109,68 +166,27 @@ fun DayGrid(
         label = "selectedRowIndexAnimation"
     )
 
-    if (items.isNotEmpty()) {
-        LazyVerticalGrid(
-            modifier = Modifier.fillMaxSize(),
-            columns = GridCells.Fixed(7),
-            contentPadding = PaddingValues(horizontal = 4.dp),
-            userScrollEnabled = false
-        ) {
-            items(
-                count = items.size,
-                key = { index -> items[index].first.toString() }
-            ) { index ->
-                val date = items[index].first
-                val dayHistory = historyByDate[date] ?: emptyList()
-
-                val repeatItems =
-                    remember(dayHistory) { dayHistory.filter { it.repeatCycle != null } }
-                
-                // 1. 수입 합계 계산 (독립 필터링)
-                val incomeAmount = remember(dayHistory, filterOptions) {
-                    // '수입 노출' 스위치가 꺼져있으면 0
-                    if (!filterOptions.contains(CalendarFilterOption.SHOW_INCOME)) 0L
-                    else dayHistory.filter { it.largeCategory == LargeCategoryEnum.INCOME }
-                        .filter { it.category?.isFixed != true || filterOptions.contains(CalendarFilterOption.INCLUDE_FIXED_INCOME) }
-                        .sumOf { it.amount }
-                }
-                
-                // 2. 지출 합계 계산 (독립 필터링)
-                val expenseAmount = remember(dayHistory, filterOptions) {
-                    // '지출 노출' 스위치가 꺼져있으면 지출 및 저축 모두 합산 제외
-                    if (!filterOptions.contains(CalendarFilterOption.SHOW_EXPENSES)) 0L
-                    else dayHistory.filter { 
-                        when(it.largeCategory) {
-                            LargeCategoryEnum.EXPENSES -> {
-                                // 지출 고정 카테고리 포함 여부 확인
-                                it.category?.isFixed != true || filterOptions.contains(CalendarFilterOption.INCLUDE_FIXED_EXPENSES)
-                            }
-                            LargeCategoryEnum.SAVING -> {
-                                // 저축 포함 여부 및 저축 고정 카테고리 포함 여부 확인
-                                val isShowSavings = filterOptions.contains(CalendarFilterOption.SHOW_SAVINGS)
-                                isShowSavings && (it.category?.isFixed != true || filterOptions.contains(CalendarFilterOption.INCLUDE_FIXED_SAVINGS))
-                            }
-                            else -> false
-                        }
-                    }.sumOf { it.amount }
-                }
-
-                DayItem(
-                    day = items[index],
-                    isSelected = date == selectedDate,
-                    rowIndex = index / 7,
-                    animatedRowIndex = animatedRowIndex,
-                    incomeAmount = incomeAmount,
-                    expenseAmount = expenseAmount,
-                    repeatItems = repeatItems,
-                    dayNormalHeight = dayNormalHeight / numRowsForCurrentMonth,
-                    dayMaxHeight = dayMaxHeight / numRowsForCurrentMonth,
-                    expansionProgress = expansionProgress,
-                    collapseProgress = collapseProgress,
-                    showRepeatHistory = filterOptions.contains(CalendarFilterOption.SHOW_REPEAT),
-                    onClickDate = onClickDate
-                )
-            }
+    LazyVerticalGrid(
+        modifier = Modifier.fillMaxSize(),
+        columns = GridCells.Fixed(7),
+        contentPadding = PaddingValues(horizontal = Padding.SpacerXXS),
+        userScrollEnabled = false
+    ) {
+        items(
+            count = dayItemDataList.size,
+            key = { index -> dayItemDataList[index].date.toString() }
+        ) { index ->
+            val data = dayItemDataList[index]
+            DayItem(
+                data = data,
+                isSelected = data.date == selectedDate,
+                animatedRowIndex = animatedRowIndex,
+                dayNormalHeight = dayNormalHeight / numRows,
+                dayMaxHeight = dayMaxHeight / numRows,
+                expansionProgress = expansionProgress,
+                collapseProgress = collapseProgress,
+                onClickDate = onClickDate
+            )
         }
     }
 }
@@ -178,22 +194,18 @@ fun DayGrid(
 @Composable
 internal fun DayItem(
     modifier: Modifier = Modifier,
-    day: Pair<LocalDate, MonthPeriodEnum>,
+    data: DayItemDataVo,
     isSelected: Boolean,
-    rowIndex: Int,
     animatedRowIndex: Float,
-    incomeAmount: Long,
-    expenseAmount: Long,
-    repeatItems: List<HistoryVo>,
     dayNormalHeight: Dp,
     dayMaxHeight: Dp,
     expansionProgress: Float,
     collapseProgress: Float,
-    showRepeatHistory: Boolean,
     onClickDate: (LocalDate) -> Unit,
 ) {
-    val selectionFactor = (1f - abs(rowIndex - animatedRowIndex)).coerceIn(0f, 1f)
+    val selectionFactor = (1f - abs(data.rowIndex - animatedRowIndex)).coerceIn(0f, 1f)
 
+    // 애니메이션 상태에 따른 높이 계산
     val height = when {
         collapseProgress > 0f -> {
             val minHeight = 72.dp * selectionFactor
@@ -204,33 +216,35 @@ internal fun DayItem(
             lerp(start = dayNormalHeight, stop = dayMaxHeight, fraction = expansionProgress)
         }
 
-        else -> dayNormalHeight
+        else -> {
+            dayNormalHeight
+        }
     }
 
-    val alpha = if (collapseProgress > 0f) {
-        1f - (collapseProgress * (1f - selectionFactor))
-    } else 1f
+    // 주간 뷰 전환 시 비선택 행 투명도 조절
+    val alpha =
+        if (collapseProgress > 0f) 1f - (collapseProgress * (1f - selectionFactor))
+        else 1f
 
     Column(
         modifier = modifier
             .alpha(alpha)
             .fillMaxWidth()
             .height(height)
-            .clip(RoundedCornerShape(4.dp))
+            .clip(Shapes.small)
             .background(if (isSelected) ColorPrimary.Primary_200 else ColorGray.White)
-            .clickable { onClickDate(day.first) }
+            .clickable { onClickDate(data.date) }
             .padding(2.dp),
     ) {
-        val isToday = day.first == today
+        val isToday = data.date == today
         val dayColor = when {
             isToday -> ColorGray.White
-            day.second != MonthPeriodEnum.THIS_MONTH -> ColorGray.Gray_200
-            else -> WeekEnum.creator(day.first.dayOfWeek.isoDayNumber).color
+            data.period != MonthPeriodEnum.THIS_MONTH -> ColorGray.Gray_200
+            else -> ColorSetting.Info
         }
         val dayBackgroundColor = when {
-            isToday -> WeekEnum.creator(day.first.dayOfWeek.isoDayNumber).color
-            isSelected -> ColorPrimary.Primary_200
-            else -> ColorGray.White
+            isToday -> ColorSetting.Info
+            else -> Color.Transparent
         }
 
         WMText(
@@ -239,86 +253,152 @@ internal fun DayItem(
                 .background(color = dayBackgroundColor, shape = CircleShape)
                 .align(Alignment.CenterHorizontally)
                 .width(24.dp),
-            text = day.first.day.toString(),
-            style = Typography().bodySmall.copy(
-                color = dayColor,
-                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium
-            ),
+            text = data.date.day.toString(),
+            style = MaterialTheme.typography.bodySmall,
+            color = dayColor,
+            fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Medium,
             textAlign = TextAlign.Center
         )
 
-        if (incomeAmount > 0) {
-            WMText(
-                modifier = Modifier.fillMaxWidth().height(14.dp),
-                text = "+${formatWithCommas(incomeAmount.toString())}",
-                style = Typography().labelSmall.copy(color = ColorBlue.Blue_300),
-                textAlign = TextAlign.Center,
-                maxLines = 1,
-                autoSize = TextAutoSize.StepBased(
-                    minFontSize = 9.sp,
-                    maxFontSize = 11.sp,
-                    stepSize = 1.sp
-                )
+        if (data.incomeAmount > 0) {
+            AmountText(
+                amount = data.incomeAmount,
+                prefix = "+",
+                color = LargeCategoryEnum.INCOME.accentColor
             )
         }
-        if (expenseAmount > 0) {
-            WMText(
-                modifier = Modifier.fillMaxWidth().height(14.dp),
-                text = "-${formatWithCommas(expenseAmount.toString())}",
-                style = Typography().labelSmall.copy(color = ColorRed.Red_300),
-                textAlign = TextAlign.Center,
-                maxLines = 1,
-                autoSize = TextAutoSize.StepBased(
-                    minFontSize = 9.sp,
-                    maxFontSize = 11.sp,
-                    stepSize = 1.sp
-                )
+        if (data.expenseAmount > 0) {
+            AmountText(
+                amount = data.expenseAmount,
+                prefix = "-",
+                color = LargeCategoryEnum.EXPENSES.accentColor
             )
         }
 
-        if (showRepeatHistory && repeatItems.isNotEmpty() && height > 60.dp) {
-            val itemHeight = 14.dp
-            val availableHeight = height - 40.dp
-            val maxVisibleItems =
-                (availableHeight / itemHeight).toInt().coerceAtMost(repeatItems.size)
+        if (data.repeatItems.isNotEmpty() && height > 60.dp) {
+            RepeatHistoryList(
+                repeatItems = data.repeatItems,
+                availableHeight = height - 40.dp
+            )
+        }
+    }
+}
 
-            if (maxVisibleItems > 0) {
-                Column {
-                    repeatItems.take(maxVisibleItems).forEach { item ->
-                        Row(
-                            modifier = Modifier.fillMaxWidth().height(itemHeight),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .padding(horizontal = 2.dp)
-                                    .size(4.dp)
-                                    .clip(CircleShape)
-                                    .background(item.largeCategory.accentColor)
-                            )
-                            WMText(
-                                text = item.content.default(),
-                                style = Typography().labelSmall,
-                                maxLines = 1,
-                                modifier = Modifier.padding(start = 2.dp),
-                                autoSize = TextAutoSize.StepBased(
-                                    minFontSize = 9.sp,
-                                    maxFontSize = 11.sp,
-                                    stepSize = 1.sp
-                                )
-                            )
-                        }
-                    }
-                    if (repeatItems.size > maxVisibleItems) {
-                        WMText(
-                            modifier = Modifier.fillMaxWidth().height(14.dp),
-                            text = "...",
-                            style = Typography().labelSmall,
-                            textAlign = TextAlign.Center
+@Composable
+private fun AmountText(
+    amount: Long,
+    prefix: String,
+    color: Color,
+) {
+    WMText(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(14.dp),
+        text = "$prefix${amount.formatWithCommas()}",
+        style = MaterialTheme.typography.labelSmall,
+        color = color,
+        textAlign = TextAlign.Center,
+        maxLines = 1,
+        autoSize = TextAutoSize.StepBased(
+            minFontSize = 9.sp,
+            maxFontSize = 11.sp,
+            stepSize = 1.sp
+        )
+    )
+}
+
+@Composable
+private fun RepeatHistoryList(
+    repeatItems: List<HistoryVo>,
+    availableHeight: Dp,
+) {
+    val itemHeight = 14.dp
+    val maxVisibleItems = (availableHeight / itemHeight).toInt().coerceAtMost(repeatItems.size)
+
+    if (maxVisibleItems > 0) {
+        Column {
+            repeatItems.take(maxVisibleItems).forEach { item ->
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(itemHeight),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .padding(horizontal = 2.dp)
+                            .size(4.dp)
+                            .clip(CircleShape)
+                            .background(item.largeCategory.accentColor)
+                    )
+                    WMText(
+                        text = item.content.default(),
+                        style = MaterialTheme.typography.labelSmall,
+                        maxLines = 1,
+                        modifier = Modifier.padding(start = 2.dp),
+                        autoSize = TextAutoSize.StepBased(
+                            minFontSize = 9.sp,
+                            maxFontSize = 11.sp,
+                            stepSize = 1.sp
                         )
-                    }
+                    )
                 }
             }
+            if (repeatItems.size > maxVisibleItems) {
+                WMText(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(14.dp),
+                    text = "...",
+                    style = MaterialTheme.typography.labelSmall,
+                    textAlign = TextAlign.Center
+                )
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun DayGridPreview() {
+    val testDate = today
+    val history = listOf(
+        HistoryVo(
+            id = "1",
+            largeCategory = LargeCategoryEnum.INCOME,
+            date = testDate,
+            amount = 50000L,
+            content = "급여"
+        ),
+        HistoryVo(
+            id = "2",
+            largeCategory = LargeCategoryEnum.EXPENSES,
+            date = testDate,
+            amount = 12000L,
+            content = "점심"
+        ),
+        HistoryVo(
+            id = "3",
+            largeCategory = LargeCategoryEnum.EXPENSES,
+            date = testDate,
+            amount = 4500L,
+            content = "커피"
+        )
+    )
+
+    WMTheme {
+        Box(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+            DayGrid(
+                selectedDate = testDate,
+                selectedMonth = testDate,
+                historyItems = history,
+                dayNormalHeight = 400.dp,
+                dayMaxHeight = 600.dp,
+                expansionProgress = 0f,
+                collapseProgress = 0f,
+                filterOptions = CalendarFilterOption.entries.toSet(),
+                onClickDate = {}
+            )
         }
     }
 }

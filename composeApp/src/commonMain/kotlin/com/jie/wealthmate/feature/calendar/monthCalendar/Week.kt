@@ -11,13 +11,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.jie.wealthmate.component.WMText
+import com.jie.wealthmate.theme.Padding
 
 @Composable
 fun WeekHeader() {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 4.dp),
+            .padding(horizontal = Padding.SpacerXXS),
         horizontalArrangement = Arrangement.Center,
     ) {
         WeekEnum.entries.forEach { day ->

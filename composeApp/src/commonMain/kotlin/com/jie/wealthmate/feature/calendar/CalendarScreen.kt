@@ -15,12 +15,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.jie.wealthmate.base.BaseScreen
+import com.jie.wealthmate.component.WMListSelectionModalBottomSheet
 import com.jie.wealthmate.component.calculateAdjustedToastPadding
 import com.jie.wealthmate.feature.calendar.component.CalendarFilterModalBottomSheet
-import com.jie.wealthmate.feature.calendar.component.SelectedCalendarModalBottomSheet
 import com.jie.wealthmate.feature.calendar.listCalendar.ListCalendar
 import com.jie.wealthmate.feature.calendar.monthCalendar.MonthCalendar
 import com.jie.wealthmate.theme.WMTheme
+import com.jie.wealthmate.utils.convertLocalDateToString
+import com.jie.wealthmate.utils.formatDateKorYM
 import com.jie.wealthmate.utils.today
 import com.jie.wealthmate.vo.HistoryVo
 import kotlinx.datetime.DateTimeUnit
@@ -113,10 +115,12 @@ fun CalendarContent(
 
     // 월 선택 바텀시트
     if (isShowSelectedCalendarModalBottomSheet) {
-        SelectedCalendarModalBottomSheet(
-            monthItem = monthItems,
-            selectedMonth = uiState.selectedMonth,
-            onMonthChange = { month ->
+        WMListSelectionModalBottomSheet(
+            title = "월 선택",
+            items = monthItems,
+            selectedItem = uiState.selectedMonth,
+            itemLabel = { it.convertLocalDateToString(formatDateKorYM) },
+            onItemSelected = { month ->
                 onMonthChanged(month)
                 isShowSelectedCalendarModalBottomSheet = false
             },
