@@ -1,31 +1,32 @@
 package com.jie.wealthmate.feature.home.component
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.jie.wealthmate.component.EmojiIcon
+import com.jie.wealthmate.component.EmojiIconSize
+import com.jie.wealthmate.component.SpacerSize
+import com.jie.wealthmate.component.WMSpacer
 import com.jie.wealthmate.component.WMText
 import com.jie.wealthmate.feature.home.Amount
 import com.jie.wealthmate.feature.home.StatusType
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
-import com.jie.wealthmate.theme.ColorGray
+import com.jie.wealthmate.theme.ColorSetting
+import com.jie.wealthmate.theme.Padding
 import com.jie.wealthmate.utils.default
 import com.jie.wealthmate.utils.formatWithCommas
 import org.jetbrains.compose.resources.painterResource
@@ -47,20 +48,26 @@ fun LargeCategoryStatus(
     // 수입 대비 비율 미리 계산
     val expensesRate = remember(currentAmount) {
         calculateRate(
-            currentAmount?.incomeAmount.default(),
-            currentAmount?.expensesAmount.default()
+            total = currentAmount?.incomeAmount.default(),
+            target = currentAmount?.expensesAmount.default()
         )
     }
     val savingRate = remember(currentAmount) {
-        calculateRate(currentAmount?.incomeAmount.default(), currentAmount?.savingAmount.default())
+        calculateRate(
+            total = currentAmount?.incomeAmount.default(),
+            target = currentAmount?.savingAmount.default()
+        )
     }
 
     Column(modifier = modifier.fillMaxWidth()) {
         WMText(
             text = "${statusType.lastLabel} 대비 현황",
-            style = typography.titleSmall.copy(color = ColorGray.Gray_500),
-            modifier = Modifier.padding(start = 28.dp, bottom = 8.dp)
+            style = typography.titleSmall,
+            color = ColorSetting.Info,
+            modifier = Modifier.padding(start = Padding.BackgroundHorizontal)
         )
+
+        WMSpacer(size = SpacerSize.XX_SMALL)
 
         StatusItem(
             largeCategory = LargeCategoryEnum.INCOME,
@@ -111,48 +118,46 @@ private fun StatusItem(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(56.dp)
             .clickable(onClick = onClick)
-            .padding(start = 28.dp, end = 20.dp),
+            .padding(start = Padding.BackgroundHorizontal, end = 20.dp)
+            .padding(vertical = Padding.ContainerVertical),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Box(
-            modifier = Modifier
-                .padding(end = 10.dp)
-                .clip(CircleShape)
-                .background(largeCategory.backgroundColor)
-                .size(40.dp),
-            contentAlignment = Alignment.Center
+        EmojiIcon(
+            icon = icon,
+            color = largeCategory.backgroundColor,
+            size = EmojiIconSize.MEDIUM,
+            modifier = Modifier.padding(end = Padding.SpacerXS)
+        )
+
+        Column(
+            modifier = Modifier.padding(end = Padding.SpacerXS),
+            verticalArrangement = Arrangement.spacedBy(Padding.SpacerXXS)
         ) {
             WMText(
-                text = icon,
-                style = typography.titleLarge,
-            )
-        }
-
-        Column(modifier = Modifier.padding(end = 8.dp)) {
-            WMText(
                 text = largeCategory.label,
-                style = typography.titleMedium.copy(fontWeight = FontWeight.SemiBold)
+                style = typography.titleMedium,
+                fontWeight = FontWeight.SemiBold
             )
 
             WMText(
                 text = changeMessage,
-                style = typography.bodySmall.copy(color = ColorGray.Gray_500),
+                style = typography.bodySmall,
+                color = ColorSetting.Info,
                 maxLines = 1
             )
         }
 
         Column(
             modifier = Modifier.weight(1f),
-            horizontalAlignment = Alignment.End
+            horizontalAlignment = Alignment.End,
+            verticalArrangement = Arrangement.spacedBy(Padding.SpacerXXS)
         ) {
             WMText(
-                text = "${formatWithCommas(currentAmount.toString())}원",
-                style = typography.titleMedium.copy(
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.SemiBold
-                ),
+                text = "${currentAmount.formatWithCommas()}원",
+                style = typography.titleMedium,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.SemiBold,
                 maxLines = 1,
                 textAlign = TextAlign.End,
             )
@@ -160,7 +165,8 @@ private fun StatusItem(
             comparedToIncomePercent?.let {
                 WMText(
                     text = "수입 대비 ${it}%",
-                    style = typography.bodySmall.copy(color = ColorGray.Gray_500),
+                    style = typography.bodySmall,
+                    color = ColorSetting.Info,
                 )
             }
         }
@@ -168,8 +174,10 @@ private fun StatusItem(
         Icon(
             painter = painterResource(Res.drawable.ic_keyboard_arrow_right),
             contentDescription = null,
-            tint = ColorGray.Gray_500,
-            modifier = Modifier.size(24.dp).padding(start = 4.dp)
+            tint = ColorSetting.Info,
+            modifier = Modifier
+                .padding(start = Padding.SpacerXXS)
+                .size(24.dp)
         )
     }
 }
@@ -193,7 +201,7 @@ fun calculateRate(
 private fun getChangeMessage(
     current: Long,
     last: Long,
-    statusType: StatusType
+    statusType: StatusType,
 ): String {
     val percentage = calculateContrastPercentage(current, last) ?: return "데이터가 없어요"
 
