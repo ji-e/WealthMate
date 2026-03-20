@@ -33,7 +33,7 @@ import com.jie.wealthmate.feature.budget.component.BudgetOverPager
 import com.jie.wealthmate.feature.budget.component.BudgetSuccess
 import com.jie.wealthmate.feature.budget.component.BudgetSummary
 import com.jie.wealthmate.feature.calendar.component.SelectedCalendarModalBottomSheet
-import com.jie.wealthmate.feature.calendar.startDate
+import com.jie.wealthmate.feature.calendar.START_DATE
 import com.jie.wealthmate.theme.ColorGray
 import com.jie.wealthmate.utils.today
 import kotlinx.datetime.DateTimeUnit
@@ -52,9 +52,9 @@ class BudgetScreen : BaseScreen() {
         var isShowSelectedCalendarModalBottomSheet by remember { mutableStateOf(false) }
 
         // 시작일이 바뀔 때만 재계산
-        val monthItems = remember(startDate) {
-            val totalMonths = (today.year - startDate.year) * 12 + 12
-            List(totalMonths) { startDate.plus(it, DateTimeUnit.MONTH) }
+        val monthItems = remember(START_DATE) {
+            val totalMonths = (today.year - START_DATE.year) * 12 + 12
+            List(totalMonths) { START_DATE.plus(it, DateTimeUnit.MONTH) }
         }
 
         val onMonthChanged = remember(screenModel) {

@@ -41,7 +41,7 @@ import com.jie.wealthmate.feature.budget.addBudget.component.RemainBudget
 import com.jie.wealthmate.feature.budget.addBudget.component.TotalBudget
 import com.jie.wealthmate.feature.calendar.addHistory.component.LargeCategorySelectBox
 import com.jie.wealthmate.feature.calendar.component.SelectedCalendarModalBottomSheet
-import com.jie.wealthmate.feature.calendar.startDate
+import com.jie.wealthmate.feature.calendar.START_DATE
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.utils.convertDate
 import com.jie.wealthmate.utils.formatDateKorYM
@@ -67,8 +67,8 @@ class AddBudgetScreen(
         var isShowSelectedCalendarModalBottomSheet by remember { mutableStateOf(false) }
 
         val monthItems = remember {
-            val totalMonths = (today.year - startDate.year) * 12 + 12
-            List(totalMonths) { startDate.plus(it, DateTimeUnit.MONTH) }
+            val totalMonths = (today.year - START_DATE.year) * 12 + 12
+            List(totalMonths) { START_DATE.plus(it, DateTimeUnit.MONTH) }
         }
 
         val onMonthChanged = remember(screenModel) {

@@ -75,7 +75,7 @@ fun MainScreen(
 
                     BottomNavItem.Calendar -> {
                         CalendarScreen(
-
+                            navController = navController,
                         )
 
                     }

@@ -1,7 +1,7 @@
 package com.jie.wealthmate.feature.calendar
 
 import com.jie.wealthmate.MainUiManager
-import com.jie.wealthmate.base.BaseScreenModel
+import com.jie.wealthmate.base.BaseViewModel
 import com.jie.wealthmate.database.eneity.HistoryEntity
 import com.jie.wealthmate.database.eneity.RepeatCycleEntity
 import com.jie.wealthmate.database.eneity.RepeatCycleWithDetails
@@ -16,67 +16,93 @@ import com.jie.wealthmate.utils.today
 import com.jie.wealthmate.vo.HistoryVo.Companion.mapperToVo
 import com.russhwolf.settings.Settings
 import com.russhwolf.settings.set
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.isoDayNumber
 import kotlinx.datetime.number
 import kotlinx.datetime.plus
 
-
-class CalendarScreenModel(
+class CalendarViewModel(
     private val historyRepository: HistoryRepository,
     private val repeatCycleRepository: RepeatCycleRepository,
     private val settings: Settings,
-) : BaseScreenModel<CalendarUiState>() {
+) : BaseViewModel<CalendarUiState>() {
 
     companion object {
         private const val KEY_CALENDAR_FILTER_OPTIONS = "calendar_filter_options"
     }
 
-    override val initialState: CalendarUiState
-        get() {
-            // 로컬에 저장된 필터 옵션 로드 (없으면 전체 선택이 기본값)
-            val savedOptions = settings.getStringOrNull(KEY_CALENDAR_FILTER_OPTIONS)
-            val initialFilters = if (savedOptions != null) {
-                savedOptions.split(",").mapNotNull { name ->
-                    try {
-                        CalendarFilterOption.valueOf(name)
-                    } catch (e: Exception) {
-                        null
-                    }
-                }.toSet()
-            } else {
-                CalendarFilterOption.entries.toSet()
+    override val initialState: CalendarUiState = run {
+        // 로컬에 저장된 필터 옵션 로드
+        val savedOptions = settings.getStringOrNull(KEY_CALENDAR_FILTER_OPTIONS)
+        val initialFilters = savedOptions?.split(",")?.mapNotNull { name ->
+            try {
+                CalendarFilterOption.valueOf(name)
+            } catch (e: Exception) {
+                null
             }
+        }?.toSet()
+            ?: CalendarFilterOption.entries.toSet()
 
-            return CalendarUiState(
-                selectedDate = MainUiManager.uiState.value.selectedDate,
-                selectedMonth = MainUiManager.uiState.value.selectedDate,
-                filterOptions = initialFilters
-            )
-        }
+        CalendarUiState(
+            selectedDate = MainUiManager.uiState.value.selectedDate,
+            selectedMonth = MainUiManager.uiState.value.selectedDate.firstDayOfMonth(),
+            filterOptions = initialFilters
+        )
+    }
+
+    // 현재 선택된 월을 관리하는 Flow (데이터 로딩 트리거)
+    private val selectedMonthFlow = MutableStateFlow(initialState.selectedMonth)
 
     init {
-        getHistoriesByMonth()
+        observeCalendarData()
         observeRepeatCycles()
     }
 
+    /**
+     * 선택된 월에 따른 내역 데이터를 관찰합니다.
+     */
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private fun observeCalendarData() {
+        selectedMonthFlow.flatMapLatest { month ->
+            historyRepository.getHistoriesByMonth(
+                startDate = month.firstDayOfMonth().toEpochMilliseconds(),
+                endDate = month.lastDayOfMonth().toEpochMilliseconds()
+            )
+        }.apiFlow { response ->
+            reduceState { state ->
+                state.copy(histories = response.map { it.mapperToVo() })
+            }
+            // DB Flow는 스트림이 유지되므로 첫 데이터 수신 시 로딩 해제
+            showLoading(false)
+        }
+    }
+
+    /**
+     * 월을 변경하고 데이터를 갱신합니다.
+     */
     fun updateSelectedMonth(month: LocalDate = today) {
+        val currentDayOfMonth = container.uiState.value.selectedDate.day
+        val lastDayOfNewMonth = month.lastDayOfMonth()
+        val newDay = currentDayOfMonth.coerceAtMost(lastDayOfNewMonth.day)
+        val newSelectedDate =
+            if (month == today) today else LocalDate(month.year, month.month, newDay)
+
+        MainUiManager.updateSelectedDate(newSelectedDate)
+
+        // 트리거 업데이트
+        selectedMonthFlow.value = month.firstDayOfMonth()
+
         reduceState { state ->
-            val currentDayOfMonth = state.selectedDate.day
-            val lastDayOfNewMonth = month.lastDayOfMonth()
-            val newDay = currentDayOfMonth.coerceAtMost(lastDayOfNewMonth.day)
-            val newSelectedDate = if (month == today) today else LocalDate(month.year, month.month, newDay)
-
-            MainUiManager.updateSelectedDate(newSelectedDate)
-
             state.copy(
-                selectedMonth = month,
+                selectedMonth = month.firstDayOfMonth(),
                 selectedDate = newSelectedDate
             )
         }
-        getHistoriesByMonth()
     }
 
     fun updateSelectedDate(date: LocalDate) {
@@ -87,29 +113,15 @@ class CalendarScreenModel(
     }
 
     fun updateFilterOptions(options: Set<CalendarFilterOption>) {
-        // 로컬에 저장
         settings[KEY_CALENDAR_FILTER_OPTIONS] = options.joinToString(",") { it.name }
-
         reduceState { state ->
             state.copy(filterOptions = options)
         }
     }
 
-    fun getHistoriesByMonth() {
-        val selectedMonth = container.uiState.value.selectedMonth
-        historyRepository.getHistoriesByMonth(
-            startDate = selectedMonth.firstDayOfMonth().toEpochMilliseconds(),
-            endDate = selectedMonth.lastDayOfMonth().toEpochMilliseconds()
-        ).apiFlow { response ->
-            reduceState { state ->
-                state.copy(histories = response.map { it.mapperToVo() })
-            }
-        }
-    }
-
     private fun observeRepeatCycles() {
         repeatCycleRepository.getRepeatCycleWithDetails()
-            .apiFlow { response ->
+            .apiFlow(showLoadingIndicator = false) { response ->
                 checkAndCreateRepeatCycleHistories(response)
             }
     }
@@ -122,7 +134,6 @@ class CalendarScreenModel(
 
         try {
             val selectedMonth = container.uiState.value.selectedMonth
-            // 오늘이 포함된 달에 대해서만 반복 내역 생성 처리
             if (selectedMonth.year != today.year || selectedMonth.month.number != today.month.number) {
                 return
             }
@@ -139,9 +150,8 @@ class CalendarScreenModel(
 
             for (repeatCycleDetail in activeRepeatCycles) {
                 val repeatCycle = repeatCycleDetail.repeatCycle
-
-                // 수정된 데이터이고, 수정된 날짜가 현재 선택된 달과 같으면 이번 달은 반영하지 않음 (다음 달부터 반영)
                 val updatedDate = repeatCycle.updatedAt.toLocalDate()
+
                 if (repeatCycle.isModified &&
                     updatedDate.year == selectedMonth.year &&
                     updatedDate.month == selectedMonth.month
@@ -177,8 +187,7 @@ class CalendarScreenModel(
 
             if (newHistories.isNotEmpty()) {
                 historyRepository.insertHistories(newHistories)
-                // 삽입 후 UI 갱신을 위해 다시 조회
-                getHistoriesByMonth()
+                // insertHistories 호출 시 observeCalendarData의 Flow가 자동으로 반응하여 UI가 갱신됩니다.
             }
         } finally {
             isCreatingRepeatHistories = false
@@ -197,7 +206,6 @@ class CalendarScreenModel(
         val monthStart = month.firstDayOfMonth()
         val monthEnd = month.lastDayOfMonth()
 
-        // 실제 처리해야 할 기간 설정
         val start = if (startDate > monthStart) startDate else monthStart
         val end = if (endDate != null && endDate < monthEnd) endDate else monthEnd
 
@@ -220,7 +228,6 @@ class CalendarScreenModel(
             if (shouldAdd) dates.add(currentDate)
             currentDate = currentDate.plus(1, DateTimeUnit.DAY)
         }
-
         return dates
     }
 }

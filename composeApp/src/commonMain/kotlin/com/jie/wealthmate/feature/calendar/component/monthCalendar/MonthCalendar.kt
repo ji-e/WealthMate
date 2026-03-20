@@ -46,7 +46,7 @@ import androidx.compose.ui.unit.dp
 import com.jie.wealthmate.component.WMIconButton
 import com.jie.wealthmate.component.WMText
 import com.jie.wealthmate.feature.calendar.CalendarFilterOption
-import com.jie.wealthmate.feature.calendar.startDate
+import com.jie.wealthmate.feature.calendar.START_DATE
 import com.jie.wealthmate.theme.ColorGray
 import com.jie.wealthmate.utils.convertLocalDateToString
 import com.jie.wealthmate.utils.formatDateKorYM
@@ -86,13 +86,13 @@ fun MonthCalendar(
     }
 
     val pagerState = rememberPagerState(
-        initialPage = remember { startDate.monthsUntil(selectedMonth) },
-        pageCount = { (today.year - startDate.year) * 12 + 12 }
+        initialPage = remember { START_DATE.monthsUntil(selectedMonth) },
+        pageCount = { (today.year - START_DATE.year) * 12 + 12 }
     )
 
     LaunchedEffect(pagerState) {
         snapshotFlow { pagerState.settledPage }.collect { page ->
-            val newMonth = startDate.plus(value = page, unit = DateTimeUnit.MONTH)
+            val newMonth = START_DATE.plus(value = page, unit = DateTimeUnit.MONTH)
             if (displaySelectedMonth != newMonth.convertLocalDateToString(formatDateKorYM)) {
                 displaySelectedMonth = newMonth.convertLocalDateToString(formatDateKorYM)
                 onMonthChanged(newMonth)
@@ -101,7 +101,7 @@ fun MonthCalendar(
     }
 
     LaunchedEffect(selectedMonth) {
-        val targetPage = startDate.monthsUntil(selectedMonth)
+        val targetPage = START_DATE.monthsUntil(selectedMonth)
         if (targetPage != pagerState.currentPage) {
             pagerState.scrollToPage(targetPage)
         }
@@ -196,7 +196,7 @@ private fun CollapsibleCalendarContent(
                     beyondViewportPageCount = 0,
                     key = { it }
                 ) { page ->
-                    val month = remember(page) { startDate.plus(page, DateTimeUnit.MONTH) }
+                    val month = remember(page) { START_DATE.plus(page, DateTimeUnit.MONTH) }
                     val monthHistories = remember(historyByMonth, month) {
                         historyByMonth["${month.year}-${month.month.number}"] ?: emptyList()
                     }
