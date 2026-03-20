@@ -18,8 +18,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.jie.wealthmate.component.EmptyListView
+import com.jie.wealthmate.theme.WMTheme
 import com.jie.wealthmate.utils.today
 import com.jie.wealthmate.vo.HistoryVo
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -36,18 +38,21 @@ fun ListCalendar(
     onHistoryClick: (HistoryVo) -> Unit,
     listState: LazyListState = rememberLazyListState(),
 ) {
-    // 1. 데이터 가공: selectedDate를 포함하여 내역이 없어도 해당 날짜 섹션이 생성되도록 함
-    val groupedItems = remember(historyItems, selectedDate) {
-        val groups = historyItems.groupBy { it.date }.toMutableMap()
-        
-        // 오늘 날짜와 현재 선택된 날짜는 데이터가 없더라도 빈 그룹으로 추가하여 헤더가 나오게 함
-        if (!groups.containsKey(today)) groups[today] = emptyList()
-        if (!groups.containsKey(selectedDate)) groups[selectedDate] = emptyList()
-        
-        groups.toList()
-            .sortedByDescending { (date, _) -> date }
+    // 1. 데이터 가공 최적화: 전체 그룹화와 선택 날짜 병합 분리
+    val historyGroups = remember(historyItems) {
+        historyItems.groupBy { it.date }
     }
 
+    val groupedItems = remember(historyGroups, selectedDate) {
+        val groups = historyGroups.toMutableMap()
+        // 데이터가 없더라도 오늘과 선택된 날짜는 섹션을 생성함
+        if (!groups.containsKey(today)) groups[today] = emptyList()
+        if (!groups.containsKey(selectedDate)) groups[selectedDate] = emptyList()
+
+        groups.toList().sortedByDescending { it.first }
+    }
+
+    // 각 섹션의 시작 인덱스 계산 (스크롤 동기화용)
     val groupStartIndices = remember(groupedItems) {
         var cumulativeIndex = 0
         groupedItems.map { (date, items) ->
@@ -61,25 +66,25 @@ fun ListCalendar(
     var isProgrammaticScroll by remember { mutableStateOf(false) }
     var isInitialScroll by remember { mutableStateOf(true) }
 
-    // 2. 외부(캘린더 등)에서 날짜 변경 시 리스트 스크롤
+    // 2. 외부(상단 캘린더 등)에서 날짜 변경 시 리스트 스크롤 동기화
     LaunchedEffect(selectedDate, groupStartIndices) {
         if (groupStartIndices.isEmpty()) return@LaunchedEffect
 
-        // 현재 리스트의 최상단에 보이는 아이템의 날짜를 확인
-        val currentVisibleDate = groupStartIndices.lastOrNull { it.first <= listState.firstVisibleItemIndex }?.second
+        val firstVisibleIndex = listState.firstVisibleItemIndex
+        val currentVisibleDate =
+            groupStartIndices.lastOrNull { it.first <= firstVisibleIndex }?.second
 
-        // 만약 이미 선택된 날짜가 화면에 보이고 있다면 (다른 화면에서 돌아온 경우 포함), 
-        // 강제로 스크롤 위치를 조정하지 않고 그대로 둡니다.
+        // 이미 해당 날짜가 최상단이면 스크롤 불필요
         if (currentVisibleDate == selectedDate) {
             isInitialScroll = false
             return@LaunchedEffect
         }
 
-        // 사용자가 직접 스크롤 중인 경우, 외부 신호에 의한 강제 스크롤을 차단합니다.
+        // 사용자가 스크롤 중이면 외부 강제 스크롤 차단 (초기 스크롤 제외)
         if (listState.isScrollInProgress && !isInitialScroll) return@LaunchedEffect
 
-        val targetEntry = groupStartIndices.find { it.second == selectedDate } ?: return@LaunchedEffect
-        val targetIndex = targetEntry.first
+        val targetIndex =
+            groupStartIndices.find { it.second == selectedDate }?.first ?: return@LaunchedEffect
 
         try {
             isProgrammaticScroll = true
@@ -94,70 +99,84 @@ fun ListCalendar(
         }
     }
 
-    // 3. 리스트 스크롤 위치를 캘린더 상태로 동기화
-    LaunchedEffect(listState, groupStartIndices, selectedDate) {
+    // 3. 리스트 스크롤 위치를 외부 상태(selectedDate)로 동기화
+    LaunchedEffect(listState, groupStartIndices) {
         snapshotFlow {
             val firstIndex = listState.firstVisibleItemIndex
-            val canScrollForward = listState.canScrollForward
-            val canScrollBackward = listState.canScrollBackward
             val isScrollInProgress = listState.isScrollInProgress
 
-            val date = if (!canScrollForward && canScrollBackward) {
+            // 리스트 하단 끝에 도달했는지 확인
+            val isAtBottom = !listState.canScrollForward && listState.canScrollBackward
+
+            val dateAtTop = if (isAtBottom) {
                 groupStartIndices.lastOrNull()?.second
             } else {
                 groupStartIndices.lastOrNull { it.first <= firstIndex }?.second
             }
-            Triple(date, isScrollInProgress, isProgrammaticScroll)
+
+            dateAtTop to (isScrollInProgress && !isProgrammaticScroll)
         }
-        .filter { (_, isScrolling, isProgrammatic) -> isScrolling && !isProgrammatic }
-        .map { it.first }
-        .distinctUntilChanged()
-        .collect { date ->
-            if (date != null && date != selectedDate) {
-                onDateSelected(date)
+            .filter { it.second } // 사용자가 직접 스크롤 중일 때만
+            .map { it.first }
+            .distinctUntilChanged()
+            .collect { date ->
+                if (date != null && date != selectedDate) {
+                    onDateSelected(date)
+                }
             }
-        }
     }
 
     if (groupedItems.isEmpty()) {
         EmptyListView(
-            modifier = Modifier.fillMaxSize().padding(vertical = 20.dp, horizontal = 28.dp),
+            modifier = Modifier.fillMaxSize().padding(28.dp),
             contentText = "내역이 없습니다.",
         )
-        return
-    }
-
-    LazyColumn(
-        state = listState,
-        modifier = Modifier.fillMaxSize()
-    ) {
-        groupedItems.forEach { (date, items) ->
-            stickyHeader(key = "header_$date") {
-                DateHeader(date = date)
-            }
-
-            if (items.isEmpty()) {
-                item(key = "empty_$date") {
-                    EmptyListView(
-                        modifier = Modifier.fillMaxWidth().padding(vertical = 32.dp),
-                        contentText = "내역이 없습니다.",
-                    )
+    } else {
+        LazyColumn(
+            state = listState,
+            modifier = Modifier.fillMaxSize()
+        ) {
+            groupedItems.forEach { (date, items) ->
+                stickyHeader(key = "header_$date") {
+                    DateHeader(date = date)
                 }
-            } else {
-                items(
-                    items = items,
-                    key = { it.id }
-                ) { item ->
-                    HistoryItem(
-                        history = item,
-                        onItemClick = { onHistoryClick(item) }
-                    )
-                }
-            }
 
-            item {
-                Spacer(modifier = Modifier.height(4.dp))
+                if (items.isEmpty()) {
+                    item(key = "empty_$date") {
+                        EmptyListView(
+                            modifier = Modifier.fillMaxWidth().padding(vertical = 32.dp),
+                            contentText = "내역이 없습니다.",
+                        )
+                    }
+                } else {
+                    items(
+                        items = items,
+                        key = { it.id }
+                    ) { history ->
+                        HistoryItem(
+                            history = history,
+                            onItemClick = { onHistoryClick(history) }
+                        )
+                    }
+                }
+
+                item(key = "spacer_$date") {
+                    Spacer(modifier = Modifier.height(4.dp))
+                }
             }
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun ListCalendarPreview() {
+    WMTheme {
+        ListCalendar(
+            selectedDate = today,
+            historyItems = emptyList(),
+            onDateSelected = {},
+            onHistoryClick = {}
+        )
     }
 }
