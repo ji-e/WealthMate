@@ -8,7 +8,8 @@ object ColorSetting {
     val DisabledContent = ColorGray.Gray_300
     val Default = ColorGray.Gray_700
     val Info = ColorGray.Gray_500
-    val Empty = ColorGray.Gray_400
+    val EmptyBackground = ColorGray.Gray_50
+    val EmptyContent = ColorGray.Gray_400
     val Error = ColorRed.Red_300
     val Success = ColorBlue.Blue_300
     val Primary = ColorPrimary.Primary_500
