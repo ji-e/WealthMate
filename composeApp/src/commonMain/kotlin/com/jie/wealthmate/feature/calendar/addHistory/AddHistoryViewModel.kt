@@ -1,7 +1,8 @@
 package com.jie.wealthmate.feature.calendar.addHistory
 
 import androidx.compose.ui.text.input.TextFieldValue
-import com.jie.wealthmate.base.BaseScreenModel
+import androidx.lifecycle.viewModelScope
+import com.jie.wealthmate.base.BaseViewModel
 import com.jie.wealthmate.database.eneity.HistoryEntity
 import com.jie.wealthmate.feature.calendar.addHistory.component.RepeatCycleEnum
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
@@ -15,128 +16,51 @@ import com.jie.wealthmate.vo.CategoryTagVo
 import com.jie.wealthmate.vo.CategoryVo
 import com.jie.wealthmate.vo.CategoryVo.Companion.mapperToVo
 import com.jie.wealthmate.vo.PaymentMethodVo
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
 
-class AddHistoryScreenModel(
+class AddHistoryViewModel(
     private val categoryRepository: CategoryRepository,
     private val paymentMethodRepository: PaymentMethodRepository,
     private val historyRepository: HistoryRepository,
     private val saveHistoryUseCase: SaveHistoryUseCase,
-) : BaseScreenModel<AddHistoryUiState>() {
+) : BaseViewModel<AddHistoryUiState>() {
 
-    override val initialState: AddHistoryUiState
-        get() = AddHistoryUiState()
+    override val initialState: AddHistoryUiState = AddHistoryUiState()
+
+    // 대분류 상태를 관리하는 Flow (카테고리 목록 로딩 트리거)
+    private val largeCategoryFlow = MutableStateFlow(initialState.selectedLargeCategory)
 
     init {
-        getCategories(LargeCategoryEnum.EXPENSES)
-        getPaymentMethods()
+        observeCategories()
+        observePaymentMethods()
     }
 
-    fun updateInit(selectedDate: LocalDate) {
-        reduceState { state ->
-            state.copy(
-                date = selectedDate
-            )
-        }
-    }
-
-    fun updateLargeCategory(largeCategory: LargeCategoryEnum) {
-        reduceState { state ->
-            state.copy(
-                isDataChanged = true,
-                selectedLargeCategory = largeCategory
-            )
-        }
-        getCategories(largeCategory)
-    }
-
-    fun updateDate(date: LocalDate) {
-        reduceState { state ->
-            state.copy(
-                isDataChanged = true,
-                date = date
-            )
-        }
-    }
-
-    fun updateRepeatCycle(repeatCycle: RepeatCycleEnum?) {
-        reduceState { state ->
-            state.copy(
-                isDataChanged = true,
-                repeatCycle = repeatCycle
-            )
-        }
-    }
-
-    fun updateTotalInstallmentCount(totalInstallment: Long?) {
-        reduceState { state ->
-            state.copy(
-                isDataChanged = true,
-                totalInstallmentCount = totalInstallment
-            )
-        }
-    }
-
-    fun updateAmount(amount: TextFieldValue) {
-        reduceState { state ->
-            state.copy(
-                isDataChanged = true,
-                amount = amount
-            )
-        }
-    }
-
-    fun updateCategory(category: CategoryVo) {
-        reduceState { state ->
-            state.copy(
-                isDataChanged = true,
-                category = category
-            )
-        }
-    }
-
-    fun updateCategoryTag(categoryTag: CategoryTagVo) {
-        reduceState { state ->
-            state.copy(
-                isDataChanged = true,
-                categoryTag = categoryTag
-            )
-        }
-    }
-
-    fun updatePaymentMethod(paymentMethod: PaymentMethodVo?) {
-        reduceState { state ->
-            state.copy(
-                isDataChanged = true,
-                paymentMethod = paymentMethod
-            )
-        }
-    }
-
-    fun updateContent(content: TextFieldValue) {
-        reduceState { state ->
-            state.copy(
-                isDataChanged = true,
-                content = content
-            )
-        }
-    }
-
-    private fun getCategories(largeCategoryEnum: LargeCategoryEnum) {
-        categoryRepository.getCategoriesByLargeCategory(largeCategoryEnum.name)
-            .apiFlow { response ->
-                reduceState { state ->
-                    state.copy(
-                        categoryItems = response.map { it.mapperToVo() }
-                    )
-                }
+    /**
+     * 대분류 선택에 따른 카테고리 목록을 관찰합니다.
+     */
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private fun observeCategories() {
+        largeCategoryFlow.flatMapLatest { largeCategory ->
+            categoryRepository.getCategoriesByLargeCategory(largeCategory.name)
+        }.apiFlow { response ->
+            reduceState { state ->
+                state.copy(
+                    categoryItems = response.map { it.mapperToVo() }
+                )
             }
+        }
     }
 
-    private fun getPaymentMethods() {
+    /**
+     * 결제 수단 목록을 관찰합니다.
+     */
+    private fun observePaymentMethods() {
         paymentMethodRepository.getPaymentMethods()
             .apiFlow { response ->
-                println("response: $response")
                 reduceState { state ->
                     state.copy(
                         paymentMethodItems = response.map {
@@ -153,10 +77,78 @@ class AddHistoryScreenModel(
             }
     }
 
+    fun updateInit(selectedDate: LocalDate) {
+        reduceState { state ->
+            state.copy(date = selectedDate)
+        }
+    }
+
+    fun updateLargeCategory(largeCategory: LargeCategoryEnum) {
+        largeCategoryFlow.value = largeCategory
+        reduceState { state ->
+            state.copy(
+                isDataChanged = true,
+                selectedLargeCategory = largeCategory
+            )
+        }
+    }
+
+    fun updateDate(date: LocalDate) {
+        reduceState { state ->
+            state.copy(isDataChanged = true, date = date)
+        }
+    }
+
+    fun updateRepeatCycle(repeatCycle: RepeatCycleEnum?) {
+        reduceState { state ->
+            state.copy(isDataChanged = true, repeatCycle = repeatCycle)
+        }
+    }
+
+    fun updateTotalInstallmentCount(totalInstallment: Long?) {
+        reduceState { state ->
+            state.copy(isDataChanged = true, totalInstallmentCount = totalInstallment)
+        }
+    }
+
+    fun updateAmount(amount: TextFieldValue) {
+        reduceState { state ->
+            state.copy(isDataChanged = true, amount = amount)
+        }
+    }
+
+    fun updateCategory(category: CategoryVo) {
+        reduceState { state ->
+            state.copy(isDataChanged = true, category = category)
+        }
+    }
+
+    fun updateCategoryTag(categoryTag: CategoryTagVo) {
+        reduceState { state ->
+            state.copy(isDataChanged = true, categoryTag = categoryTag)
+        }
+    }
+
+    fun updatePaymentMethod(paymentMethod: PaymentMethodVo?) {
+        reduceState { state ->
+            state.copy(isDataChanged = true, paymentMethod = paymentMethod)
+        }
+    }
+
+    fun updateContent(content: TextFieldValue) {
+        reduceState { state ->
+            state.copy(isDataChanged = true, content = content)
+        }
+    }
+
+    /**
+     * 내역을 저장합니다.
+     */
     fun saveHistory() {
         val uiState = container.uiState.value
-        launchSafe(
-            block = {
+        viewModelScope.launch {
+            showLoading(true)
+            try {
                 saveHistoryUseCase(
                     history = HistoryEntity(
                         largeCategory = uiState.selectedLargeCategory.name,
@@ -170,10 +162,14 @@ class AddHistoryScreenModel(
                     repeatCycle = uiState.repeatCycle?.name,
                     totalInstallmentCount = uiState.totalInstallmentCount
                 )
+                showSnackbar("저장되었습니다.")
+                postSideEffect(AddHistoryUiSideEffect.OnSuccessSave)
+            } catch (e: Exception) {
+                logError(e)
+                showSnackbar(e.message ?: "저장 중 오류가 발생했습니다.")
+            } finally {
+                showLoading(false)
             }
-        ) {
-            showSnackbar("저장되었습니다.")
-            postSideEffect { AddHistoryUiSideEffect.OnSuccessSave }
         }
     }
 }

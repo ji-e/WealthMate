@@ -11,7 +11,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Typography
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -113,11 +113,10 @@ fun RepeatCycleItem(
     ) {
         WMText(
             text = label,
-            style = Typography().bodyLarge.copy(
-                fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
-                color = if (isSelected) ColorPrimary.Primary_700 else ColorGray.Gray_700,
-                fontSize = if (isSelected) 18.sp else 16.sp
-            ),
+            style = MaterialTheme.typography.bodyLarge,
+            fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
+            color = if (isSelected) ColorPrimary.Primary_700 else ColorGray.Gray_700,
+            fontSize = if (isSelected) 18.sp else 16.sp,
         )
     }
 }

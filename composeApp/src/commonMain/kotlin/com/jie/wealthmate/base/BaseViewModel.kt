@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /**
  * MVI 패턴을 적용한 ViewModel의 기본 클래스입니다.
@@ -94,18 +95,21 @@ abstract class BaseViewModel<S : UiState> : ViewModel(), ContainerHost<S> {
     /**
      * 로딩 인디케이터 표시 제어 (카운팅 방식)
      * 카운팅 방식을 사용하여 여러 비동기 작업이 동시에 실행될 때 로딩이 일찍 사라지는 것을 방지합니다.
+     * 스레드 안전을 위해 항상 메인 스레드에서 조작하도록 처리합니다.
      */
     fun showLoading(isShow: Boolean) {
-        if (isShow) {
-            loadingCount++
-            if (loadingCount == 1) {
-                postSideEffect(BaseUiSideEffect.ShowLoading(true))
-            }
-        } else {
-            loadingCount--
-            if (loadingCount <= 0) {
-                loadingCount = 0
-                postSideEffect(BaseUiSideEffect.ShowLoading(false))
+        viewModelScope.launch(Dispatchers.Main.immediate) {
+            if (isShow) {
+                loadingCount++
+                if (loadingCount == 1) {
+                    postSideEffect(BaseUiSideEffect.ShowLoading(true))
+                }
+            } else {
+                loadingCount--
+                if (loadingCount <= 0) {
+                    loadingCount = 0
+                    postSideEffect(BaseUiSideEffect.ShowLoading(false))
+                }
             }
         }
     }
@@ -163,8 +167,6 @@ abstract class BaseViewModel<S : UiState> : ViewModel(), ContainerHost<S> {
             .onStart {
                 if (showLoadingIndicator) showLoading(true)
             }
-            .flowOn(Dispatchers.Main.immediate) // 로딩 시작 처리는 Main 스레드에서 수행
-            .flowOn(Dispatchers.IO)             // API 호출(Upstream)은 IO 스레드에서 수행
             .onEach { data ->
                 successFunc(data)
             }
@@ -179,6 +181,7 @@ abstract class BaseViewModel<S : UiState> : ViewModel(), ContainerHost<S> {
             .onCompletion {
                 if (showLoadingIndicator) showLoading(false)
             }
+            .flowOn(Dispatchers.Main.immediate) // 전체 연산을 메인 스레드에서 수집하도록 보장 (로딩 카운트 안전)
             .launchIn(viewModelScope)
     }
 

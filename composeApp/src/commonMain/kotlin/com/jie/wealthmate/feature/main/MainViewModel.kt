@@ -9,7 +9,19 @@ class MainViewModel : BaseViewModel<MainUiState>() {
 
     fun onTabSelected(item: BottomNavItem) {
         reduceState { state ->
-            state.copy(selectedItem = item)
+            if (state.selectedItem == item) return@reduceState state
+            state.copy(
+                previousItem = state.selectedItem,
+                selectedItem = item
+            )
+        }
+    }
+
+    fun navigateBackToPreviousTab() {
+        reduceState { state ->
+            state.copy(
+                selectedItem = state.previousItem
+            )
         }
     }
 }

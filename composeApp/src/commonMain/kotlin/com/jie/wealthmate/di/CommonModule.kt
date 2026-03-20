@@ -7,7 +7,7 @@ import com.jie.wealthmate.feature.budget.budgetDetail.BudgetDetailScreenModel
 import com.jie.wealthmate.feature.budget.budgetSetting.BudgetSettingScreenModel
 import com.jie.wealthmate.feature.budget.budgetYearDetail.BudgetYearDetailScreenModel
 import com.jie.wealthmate.feature.calendar.CalendarViewModel
-import com.jie.wealthmate.feature.calendar.addHistory.AddHistoryScreenModel
+import com.jie.wealthmate.feature.calendar.addHistory.AddHistoryViewModel
 import com.jie.wealthmate.feature.calendar.historyDetail.HistoryDetailScreenModel
 import com.jie.wealthmate.feature.home.HomeViewModel
 import com.jie.wealthmate.feature.home.StatusType
@@ -59,6 +59,7 @@ val commonModule = module {
     viewModelOf(::MainViewModel)
     viewModelOf(::HomeViewModel)
     viewModelOf(::CalendarViewModel)
+    viewModelOf(::AddHistoryViewModel)
 
 
     single { DatabaseSyncManager(get(), get(), get()) }
@@ -94,7 +95,7 @@ val commonModule = module {
 
     // 캘린더
 
-    factory { AddHistoryScreenModel(get(), get(), get(), get()) }
+//    factory { AddHistoryViewModel(get(), get(), get(), get()) }
     factory { HistoryDetailScreenModel(get(), get(), get(), get(), get(), get()) }
 
 

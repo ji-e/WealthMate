@@ -129,7 +129,7 @@ abstract class BaseScreen : Screen {
     }
 
     @Composable
-    private fun BaseDialog(
+    fun BaseDialog(
         contentText: String,
         confirmLabel: String = "확인",
         cancelLabel: String? = "취소",

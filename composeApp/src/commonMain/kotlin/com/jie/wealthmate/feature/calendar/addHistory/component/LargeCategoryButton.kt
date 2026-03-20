@@ -1,65 +1,86 @@
 package com.jie.wealthmate.feature.calendar.addHistory.component
 
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.jie.wealthmate.component.WMText
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.theme.ColorGray
-import com.jie.wealthmate.theme.ColorPrimary
+
+private object LargeCategorySelectBoxDefaults {
+    val ContainerShape = RoundedCornerShape(8.dp)
+    val ButtonShape = RoundedCornerShape(6.dp)
+    val ContainerBackground = ColorGray.Gray_50
+    val Padding = 4.dp
+    val VerticalPadding = 10.dp
+}
 
 @Composable
 fun LargeCategorySelectBox(
     modifier: Modifier = Modifier,
     selectedLargeCategory: LargeCategoryEnum,
-    onLargeCategoryClick : (LargeCategoryEnum) -> Unit,
+    onLargeCategoryClick: (LargeCategoryEnum) -> Unit,
 ) {
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(8.dp))
-            .background(ColorGray.Gray_50),
+            .clip(LargeCategorySelectBoxDefaults.ContainerShape)
+            .background(LargeCategorySelectBoxDefaults.ContainerBackground)
+            .padding(LargeCategorySelectBoxDefaults.Padding),
+        horizontalArrangement = Arrangement.spacedBy(LargeCategorySelectBoxDefaults.Padding)
     ) {
-        LargeCategoryEnum.entries.forEach {
+        LargeCategoryEnum.entries.forEach { category ->
             LargeCategoryButton(
-                isSelected = selectedLargeCategory == it,
-                text = it.label,
-                onClick = { onLargeCategoryClick(it) }
+                modifier = Modifier.weight(1f),
+                isSelected = selectedLargeCategory == category,
+                category = category,
+                onClick = { onLargeCategoryClick(category) }
             )
         }
     }
 }
 
 @Composable
-private fun RowScope.LargeCategoryButton(
+private fun LargeCategoryButton(
+    modifier: Modifier = Modifier,
     isSelected: Boolean,
-    text: String,
-    onClick: () -> Unit = {},
+    category: LargeCategoryEnum,
+    onClick: () -> Unit,
 ) {
-    WMText(
-        text = text,
-        modifier = Modifier
-            .padding(4.dp)
-            .weight(1f)
-            .clip(RoundedCornerShape(8.dp))
-            .background(if (isSelected) ColorPrimary.Primary_500 else ColorGray.Gray_50)
-            .clickable { onClick() }
-            .padding(vertical = 8.dp),
-        textAlign = TextAlign.Center,
-        style = Typography().bodyMedium.copy(
-            fontWeight = FontWeight.SemiBold,
-            color = if (isSelected) ColorGray.White else ColorGray.Gray_700
-        )
+    val backgroundColor by animateColorAsState(
+        targetValue = if (isSelected) category.middleColor else LargeCategorySelectBoxDefaults.ContainerBackground,
+        label = "LargeCategoryButtonBg"
     )
+    val textColor by animateColorAsState(
+        targetValue = if (isSelected) ColorGray.White else ColorGray.Gray_700,
+        label = "LargeCategoryButtonText"
+    )
+
+    Box(
+        modifier = modifier
+            .clip(LargeCategorySelectBoxDefaults.ButtonShape)
+            .background(backgroundColor)
+            .clickable { onClick() }
+            .padding(vertical = LargeCategorySelectBoxDefaults.VerticalPadding),
+        contentAlignment = Alignment.Center
+    ) {
+        WMText(
+            text = category.label,
+            fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Medium,
+            color = textColor
+        )
+    }
 }

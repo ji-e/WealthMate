@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -26,9 +27,11 @@ import com.jie.wealthmate.component.bottomNav.BottomNavigation
 import com.jie.wealthmate.component.rememberSnackbarState
 import com.jie.wealthmate.feature.budget.BudgetScreen
 import com.jie.wealthmate.feature.calendar.CalendarScreen
+import com.jie.wealthmate.feature.calendar.addHistory.AddHistoryScreen
 import com.jie.wealthmate.feature.home.HomeScreen
 import com.jie.wealthmate.feature.menu.MenuScreen
 import com.jie.wealthmate.getPlatform
+import com.jie.wealthmate.utils.today
 import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinViewModel
 import kotlin.time.Clock
@@ -40,20 +43,26 @@ fun MainScreen(
     viewModel: MainViewModel = koinViewModel(),
 ) {
     val uiState by viewModel.container.uiState.collectAsState()
-    var isBottomBarVisible by remember { mutableStateOf(true) }
+    val isBottomBarVisible by remember {
+        derivedStateOf { uiState.selectedItem != BottomNavItem.Add }
+    }
     val snackbarState = rememberSnackbarState()
     val scope = rememberCoroutineScope()
     var lastBackPressedTime by remember { mutableStateOf(0L) }
     val platform = remember { getPlatform() }
 
     BackHandler(enabled = true) {
-        val currentTime = Clock.System.now().toEpochMilliseconds()
-        if (currentTime - lastBackPressedTime < 2000) {
-            platform.exitApp()
+        if (uiState.selectedItem == BottomNavItem.Add) {
+            viewModel.navigateBackToPreviousTab()
         } else {
-            lastBackPressedTime = currentTime
-            scope.launch {
-                snackbarState.showSnackbar("뒤로 가기 버튼을 한 번 더 누르면 종료됩니다.")
+            val currentTime = Clock.System.now().toEpochMilliseconds()
+            if (currentTime - lastBackPressedTime < 2000) {
+                platform.exitApp()
+            } else {
+                lastBackPressedTime = currentTime
+                scope.launch {
+                    snackbarState.showSnackbar("뒤로 가기 버튼을 한 번 더 누르면 종료됩니다.")
+                }
             }
         }
     }
@@ -69,7 +78,6 @@ fun MainScreen(
                     BottomNavItem.Home -> {
                         HomeScreen(
                             navController = navController,
-//                            onShowBottomBar = { isBottomBarVisible = it }
                         )
                     }
 
@@ -77,12 +85,13 @@ fun MainScreen(
                         CalendarScreen(
                             navController = navController,
                         )
-
                     }
 
                     BottomNavItem.Add -> {
-
-
+                        AddHistoryScreen(
+                            navController = navController,
+                            selectedDate = today
+                        )
                     }
 
                     BottomNavItem.Budget -> {
@@ -91,7 +100,6 @@ fun MainScreen(
 
                     BottomNavItem.Menu -> {
                         MenuScreen()
-
                     }
                 }
             }
@@ -110,6 +118,7 @@ fun MainScreen(
                     val item = when (route) {
                         BottomNavItem.Home.route -> BottomNavItem.Home
                         BottomNavItem.Calendar.route -> BottomNavItem.Calendar
+                        BottomNavItem.Add.route -> BottomNavItem.Add
                         BottomNavItem.Budget.route -> BottomNavItem.Budget
                         BottomNavItem.Menu.route -> BottomNavItem.Menu
                         else -> BottomNavItem.Home

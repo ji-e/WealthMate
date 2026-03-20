@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -24,6 +23,7 @@ import com.jie.wealthmate.component.textField.WMTextField
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.theme.ColorGray
 import com.jie.wealthmate.theme.ColorPrimary
+import com.jie.wealthmate.theme.ColorSetting
 import com.jie.wealthmate.theme.WMTheme
 import com.jie.wealthmate.utils.convertLocalDateToString
 import com.jie.wealthmate.utils.formatDateDotYYYYMDE
@@ -79,7 +79,7 @@ fun DateTextField(
                 Row {
                     WMText(
                         text = supportingText,
-                        style = Typography().bodyMedium.copy(color = ColorGray.Gray_500),
+                        color = ColorSetting.Info,
                         modifier = Modifier.weight(1f)
                     )
 

@@ -1,7 +1,6 @@
 package com.jie.wealthmate.base
 
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBarsPadding
@@ -18,6 +17,7 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import com.jie.wealthmate.component.LoadingOverlay
@@ -92,14 +92,16 @@ fun <S : UiState> BaseScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .navigationBarsPadding() // 시스템 내비게이션 바 영역 확보
-            .clickable(
-                interactionSource = remember { MutableInteractionSource() },
-                indication = null,
-                onClick = { focusManager.clearFocus() }
-            )
+            .pointerInput(Unit) {
+                // 배경 클릭 시 포커스 해제 (자식의 클릭 이벤트를 방해하지 않음)
+                detectTapGestures(onTap = {
+                    focusManager.clearFocus()
+                })
+            }
     ) {
         // 실제 화면 컨텐츠
+        // navigationBarsPadding은 각 화면에서 개별적으로 처리하도록 BaseScreen에서는 제거하거나 신중히 결정
+        // 여기서는 기본적으로 하단 바가 있는 앱 구조라면 content 내부에서 관리하는 것이 유연함
         content(uiState)
 
         // 스낵바 위치 및 패딩 조정
@@ -107,8 +109,9 @@ fun <S : UiState> BaseScreen(
             hostState = snackbarHostState,
             modifier = Modifier
                 .align(Alignment.BottomCenter)
+                .navigationBarsPadding() // 스낵바는 시스템 바 위에 떠야 함
                 .padding(horizontal = 24.dp)
-                .padding(bottom = 100.dp) // 하단 탭바 등과의 겹침 방지
+                .padding(bottom = 80.dp) // 하단 탭바 등과의 겹침 방지 조정
         )
 
         // 로딩 레이어 (최상단)
@@ -117,5 +120,3 @@ fun <S : UiState> BaseScreen(
         }
     }
 }
-
-

@@ -120,10 +120,7 @@ fun CalendarContent(
             items = monthItems,
             selectedItem = uiState.selectedMonth,
             itemLabel = { it.convertLocalDateToString(formatDateKorYM) },
-            onItemSelected = { month ->
-                onMonthChanged(month)
-                isShowSelectedCalendarModalBottomSheet = false
-            },
+            onItemSelected = onMonthChanged,
             onDismissRequest = { isShowSelectedCalendarModalBottomSheet = false }
         )
     }
