@@ -47,7 +47,7 @@ fun WMCheckBox(
             tint = when {
                 enabled.not() -> ColorSetting.DisabledBackground
                 checked -> ColorSetting.Primary
-                else -> ColorSetting.Empty
+                else -> ColorSetting.EmptyContent
             }
         )
 

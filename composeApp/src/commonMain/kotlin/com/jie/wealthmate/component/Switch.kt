@@ -45,7 +45,7 @@ fun WMSwitch(
         targetValue = when {
             enabled.not() -> ColorSetting.DisabledBackground
             checked -> ColorSetting.Primary
-            else -> ColorSetting.Empty
+            else -> ColorSetting.EmptyContent
         },
         animationSpec = tween(durationMillis = 300)
     )
@@ -63,7 +63,7 @@ fun WMSwitch(
             WMText(
                 text = it,
                 style = labelStyle,
-                color = if (enabled) ColorSetting.Default else ColorSetting.Empty
+                color = if (enabled) ColorSetting.Default else ColorSetting.EmptyContent
             )
         }
 

@@ -31,7 +31,7 @@ fun EmptyListView(
         WMText(
             text = contentText,
             style = MaterialTheme.typography.bodyLarge,
-            color = ColorSetting.Empty,
+            color = ColorSetting.EmptyContent,
             fontWeight = FontWeight.Medium
         )
     }
