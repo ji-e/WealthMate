@@ -24,7 +24,6 @@ import com.jie.wealthmate.component.SpacerSize
 import com.jie.wealthmate.component.WMSpacer
 import com.jie.wealthmate.component.WMText
 import com.jie.wealthmate.theme.ColorBlue
-import com.jie.wealthmate.theme.ColorGray
 import com.jie.wealthmate.theme.ColorRed
 import com.jie.wealthmate.theme.ColorSetting
 import com.jie.wealthmate.theme.WMTheme
@@ -87,13 +86,15 @@ private fun AnimatedBudgetBar(spent: Long, totalBudget: Long) {
         ) {
             WMText(
                 text = "${formatWithCommas(currentRemaining.toString())}원",
-                style = typography.titleLarge.copy(fontWeight = FontWeight.SemiBold),
+                style = typography.titleLarge,
+                fontWeight = FontWeight.SemiBold,
                 modifier = Modifier.weight(1f),
             )
 
             WMText(
                 text = percentageText,
-                style = typography.bodySmall.copy(color = ColorGray.Gray_500),
+                style = typography.bodySmall,
+                color = ColorSetting.Info,
                 modifier = Modifier.padding(bottom = 2.dp)
             )
         }
@@ -104,7 +105,7 @@ private fun AnimatedBudgetBar(spent: Long, totalBudget: Long) {
             spent = spent,
             total = totalBudget,
             firstBarColor = ColorBlue.Blue_200,
-            secondBarColor = ColorRed.Red_300,
+            secondBarColor = ColorRed.Red_200,
             changeColorRatio = 0.8f, // 80% 이상 사용 시 색상 변경
             isAnimated = true,
             onAnimatedSpentChange = { animatedSpentValue ->
