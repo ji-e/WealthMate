@@ -1,4 +1,4 @@
-package com.jie.wealthmate.feature.calendar.component.monthCalendar
+package com.jie.wealthmate.feature.calendar.monthCalendar
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background

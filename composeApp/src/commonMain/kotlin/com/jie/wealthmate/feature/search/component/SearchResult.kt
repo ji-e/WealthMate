@@ -24,7 +24,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.jie.wealthmate.component.EmptyListView
 import com.jie.wealthmate.component.WMText
-import com.jie.wealthmate.feature.calendar.component.listCalendar.HistoryItem
+import com.jie.wealthmate.feature.calendar.listCalendar.HistoryItem
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.feature.search.SearchSortOrder
 import com.jie.wealthmate.theme.ColorGray

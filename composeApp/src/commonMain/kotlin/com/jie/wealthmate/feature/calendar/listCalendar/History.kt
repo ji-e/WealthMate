@@ -1,4 +1,4 @@
-package com.jie.wealthmate.feature.calendar.component.listCalendar
+package com.jie.wealthmate.feature.calendar.listCalendar
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background

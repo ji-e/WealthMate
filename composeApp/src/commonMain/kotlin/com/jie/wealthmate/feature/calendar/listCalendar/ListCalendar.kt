@@ -1,4 +1,4 @@
-package com.jie.wealthmate.feature.calendar.component.listCalendar
+package com.jie.wealthmate.feature.calendar.listCalendar
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Spacer

@@ -1,4 +1,4 @@
-package com.jie.wealthmate.feature.calendar.component.monthCalendar
+package com.jie.wealthmate.feature.calendar.monthCalendar
 
 import androidx.compose.ui.graphics.Color
 import com.jie.wealthmate.theme.ColorBlue
@@ -45,7 +45,7 @@ enum class WeekEnum(val color: Color, val korDisplayName: String, val isoDayNumb
 
     companion object {
         fun creator(isoDayNumber: Int): WeekEnum =
-            WeekEnum.entries.find { it.isoDayNumber == isoDayNumber } ?: MON
+            entries.find { it.isoDayNumber == isoDayNumber } ?: MON
     }
 
 }
