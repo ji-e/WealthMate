@@ -40,13 +40,18 @@ fun WMText(
     textAlign: TextAlign? = null,
     textDecoration: TextDecoration? = null,
 ) {
+    val lineHeight =
+        if (style.lineHeight != TextUnit.Unspecified) style.lineHeight
+        else TextUnit.Unspecified
+
     Text(
         text = text,
         modifier = modifier,
         style = style.copy(
             color = color,
             fontWeight = fontWeight ?: style.fontWeight,
-            fontSize = fontSize ?: style.fontSize
+            fontSize = fontSize ?: style.fontSize,
+            lineHeight = lineHeight,
         ),
         maxLines = maxLines,
         overflow = overflow,
@@ -72,13 +77,18 @@ fun WMText(
     textDecoration: TextDecoration? = null,
     autoSize: TextAutoSize? = null,
 ) {
+    val lineHeight =
+        if (style.lineHeight != TextUnit.Unspecified) style.lineHeight
+        else TextUnit.Unspecified
+
     Text(
         text = text,
         modifier = modifier,
         style = style.copy(
             color = color,
             fontWeight = fontWeight ?: style.fontWeight,
-            fontSize = fontSize ?: style.fontSize
+            fontSize = fontSize ?: style.fontSize,
+            lineHeight = lineHeight,
         ),
         maxLines = maxLines,
         overflow = overflow,
