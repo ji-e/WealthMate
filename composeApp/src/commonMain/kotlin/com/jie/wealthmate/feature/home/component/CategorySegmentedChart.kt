@@ -4,7 +4,6 @@ import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -59,7 +58,6 @@ fun CategorySegmentedChart(
     categorySegmentChartItems: List<CategorySegmentedChartVo>,
     modifier: Modifier = Modifier,
     onCategoryChartClick: () -> Unit = {},
-    onCategoryItemClick: (String?) -> Unit = {},
 ) {
     val typography = MaterialTheme.typography
     var isStarted by remember { mutableStateOf(false) }
@@ -124,9 +122,6 @@ fun CategorySegmentedChart(
                             .weight(currentWeight)
                             .fillMaxHeight()
                             .background(color)
-                            .noRippleClickable {
-                                onCategoryItemClick(if (data.category.isUnset) null else data.category.id)
-                            }
                     )
                 }
 
@@ -142,13 +137,12 @@ fun CategorySegmentedChart(
             // 리스트 아이템 영역
             categorySegmentChartItems.forEachIndexed { index, item ->
                 val color = colors[index % colors.size]
-                CategorySegmentedItem(
-                    totalAmount = totalAmount,
-                    categorySegment = item,
+                SegmentedItem(
+                    icon = item.category.icon,
+                    label = item.category.middleLabel,
                     color = color,
-                    onClick = {
-                        onCategoryItemClick(if (item.category.isUnset) null else item.category.id)
-                    }
+                    totalAmount = totalAmount,
+                    amount = item.amount,
                 )
             }
         }
@@ -156,24 +150,23 @@ fun CategorySegmentedChart(
 }
 
 @Composable
-private fun CategorySegmentedItem(
-    totalAmount: Long,
-    categorySegment: CategorySegmentedChartVo,
+fun SegmentedItem(
+    icon: String?,
+    label: String,
     color: Color,
-    onClick: () -> Unit = {},
+    totalAmount: Long,
+    amount: Long,
 ) {
     val typography = MaterialTheme.typography
-    val category = categorySegment.category
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(onClick = onClick)
             .padding(vertical = 8.dp, horizontal = Padding.BackgroundHorizontal),
         verticalAlignment = Alignment.CenterVertically
     ) {
         EmojiIcon(
-            icon = category.icon,
+            icon = icon,
             color = color,
             size = EmojiIconSize.SMALL
         )
@@ -189,13 +182,13 @@ private fun CategorySegmentedItem(
                 modifier = Modifier.weight(1f),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                val rate = remember(totalAmount, categorySegment.amount) {
+                val rate = remember(totalAmount, amount) {
                     if (totalAmount <= 0L) 0
-                    else (categorySegment.amount.toDouble() / totalAmount.toDouble() * 100.0).roundToInt()
+                    else (amount.toDouble() / totalAmount.toDouble() * 100.0).roundToInt()
                 }
 
                 WMText(
-                    text = category.middleLabel,
+                    text = label,
                     modifier = Modifier.weight(1f, fill = false),
                     style = typography.bodyLarge,
                     fontWeight = FontWeight.Medium,
@@ -212,7 +205,7 @@ private fun CategorySegmentedItem(
             }
 
             WMText(
-                text = "${categorySegment.amount.formatWithCommas()}원",
+                text = "${amount.formatWithCommas()}원",
                 style = typography.titleMedium,
                 fontWeight = FontWeight.SemiBold,
                 maxLines = 1
