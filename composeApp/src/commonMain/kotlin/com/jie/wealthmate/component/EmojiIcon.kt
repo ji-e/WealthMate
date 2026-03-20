@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.jie.wealthmate.base.DEFAULT_CATEGORY_ICON
 import com.jie.wealthmate.theme.ColorRed
 import com.jie.wealthmate.theme.WMTheme
 import org.jetbrains.compose.resources.painterResource
@@ -47,7 +48,7 @@ fun EmojiIcon(
             contentAlignment = Alignment.Center
         ) {
             WMText(
-                text = icon ?: "❓",
+                text = icon ?: DEFAULT_CATEGORY_ICON,
                 fontSize = size.iconSize
             )
         }

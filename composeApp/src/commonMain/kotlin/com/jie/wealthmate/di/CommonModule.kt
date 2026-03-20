@@ -9,11 +9,12 @@ import com.jie.wealthmate.feature.budget.budgetYearDetail.BudgetYearDetailScreen
 import com.jie.wealthmate.feature.calendar.CalendarScreenModel
 import com.jie.wealthmate.feature.calendar.addHistory.AddHistoryScreenModel
 import com.jie.wealthmate.feature.calendar.historyDetail.HistoryDetailScreenModel
-import com.jie.wealthmate.feature.home.HomeScreenModel
+import com.jie.wealthmate.feature.home.HomeViewModel
 import com.jie.wealthmate.feature.home.StatusType
 import com.jie.wealthmate.feature.home.categoryExpenses.CategoryExpensesScreenModel
 import com.jie.wealthmate.feature.home.paymentMethodExpenses.PaymentMethodExpensesScreenModel
 import com.jie.wealthmate.feature.home.preparednessStatus.PreparednessStatusScreenModel
+import com.jie.wealthmate.feature.main.MainViewModel
 import com.jie.wealthmate.feature.menu.MenuScreenModel
 import com.jie.wealthmate.feature.menu.data.googleCloudShare.GoogleCloudShareScreenModel
 import com.jie.wealthmate.feature.menu.data.googleCloudSync.GoogleCloudSyncScreenModel
@@ -51,9 +52,14 @@ import com.jie.wealthmate.usecase.SaveHistoryUseCase
 import com.jie.wealthmate.usecase.UpdateInstallmentUseCase
 import com.jie.wealthmate.usecase.UpdateRepeatCycleUseCase
 import kotlinx.datetime.LocalDate
+import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 
 val commonModule = module {
+    viewModelOf(::MainViewModel)
+    viewModelOf(::HomeViewModel)
+
+
     single { DatabaseSyncManager(get(), get(), get()) }
 
     single { HttpClientFactory(get()).create() }
@@ -75,7 +81,6 @@ val commonModule = module {
 
 
     // 홈
-    factory { HomeScreenModel(get(), get(), get()) }
     factory { (initialStatusType: StatusType, initialLargeCategory: LargeCategoryEnum) ->
         PreparednessStatusScreenModel(get(), get(), get(), get(), initialStatusType, initialLargeCategory)
     }

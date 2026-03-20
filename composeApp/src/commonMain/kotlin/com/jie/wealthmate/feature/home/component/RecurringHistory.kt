@@ -25,7 +25,7 @@ import com.jie.wealthmate.component.HorizontalBar
 import com.jie.wealthmate.component.SpacerSize
 import com.jie.wealthmate.component.WMSpacer
 import com.jie.wealthmate.component.WMText
-import com.jie.wealthmate.feature.home.RecurringHistoryUiModel
+import com.jie.wealthmate.feature.home.component.vo.RecurringHistoryVo
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.theme.ColorGray
 import com.jie.wealthmate.theme.ColorRed
@@ -41,7 +41,7 @@ import wealthmate.composeapp.generated.resources.ic_keyboard_arrow_right
 
 @Composable
 fun RecurringHistory(
-    recurringHistories: List<RecurringHistoryUiModel>,
+    recurringHistories: List<RecurringHistoryVo>,
     totalAmount: Long,
     passedAmount: Long,
     modifier: Modifier = Modifier,
@@ -150,7 +150,7 @@ private fun RecurringStatusCard(
 
 @Composable
 private fun RecurringHistoryItem(
-    item: RecurringHistoryUiModel,
+    item: RecurringHistoryVo,
     onClick: () -> Unit,
 ) {
     val typography = MaterialTheme.typography
@@ -246,7 +246,7 @@ private fun RecurringHistoryPreview() {
         ) {
             RecurringHistory(
                 recurringHistories = listOf(
-                    RecurringHistoryUiModel(
+                    RecurringHistoryVo(
                         id = "1",
                         categoryIcon = "🍔",
                         largeCategory = LargeCategoryEnum.EXPENSES,
@@ -257,7 +257,7 @@ private fun RecurringHistoryPreview() {
                         isPassed = true,
                         isFixed = true
                     ),
-                    RecurringHistoryUiModel(
+                    RecurringHistoryVo(
                         id = "2",
                         categoryIcon = "🏠",
                         largeCategory = LargeCategoryEnum.EXPENSES,

@@ -1,8 +1,10 @@
 package com.jie.wealthmate.feature.home
 
 import com.jie.wealthmate.base.BaseUiState
-import com.jie.wealthmate.feature.home.component.CategorySegmentChartData
-import com.jie.wealthmate.feature.home.component.PaymentMethodSegmentChartData
+import com.jie.wealthmate.feature.home.component.vo.AmountVo
+import com.jie.wealthmate.feature.home.component.vo.CategorySegmentedChartVo
+import com.jie.wealthmate.feature.home.component.vo.PaymentMethodSegmentedChartVo
+import com.jie.wealthmate.feature.home.component.vo.RecurringHistoryVo
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.utils.default
 import com.jie.wealthmate.vo.CategoryTagVo
@@ -16,16 +18,15 @@ data class HomeUiState(
     val thisMonthBudgetAmount: Long = 0,
     val thisMonthExpensesAmount: Long = 0,
     val budgetAmount: Long = 0,
-    val currentAmount: Amount? = null,
-    val lastAmount: Amount? = null,
-    val categorySegment: List<CategorySegmentChartData> = emptyList(),
-    val paymentMethodSegment: List<PaymentMethodSegmentChartData> = emptyList(),
+    val currentAmount: AmountVo? = null,
+    val lastAmount: AmountVo? = null,
+    val categorySegment: List<CategorySegmentedChartVo> = emptyList(),
+    val paymentMethodSegment: List<PaymentMethodSegmentedChartVo> = emptyList(),
     val currentExpensesData: List<Float?> = emptyList(),
     val lastExpensesData: List<Float> = emptyList(),
-    val recurringHistories: List<RecurringHistoryUiModel> = emptyList(),
+    val recurringHistories: List<RecurringHistoryVo> = emptyList(),
 ) : BaseUiState {
-
-    val categorySegmentChartItems: List<CategorySegmentChartData>
+    val categorySegmentChartItems: List<CategorySegmentedChartVo>
         get() {
             val totalExpenses = currentAmount?.expensesAmount.default()
             if (totalExpenses <= 0L || categorySegment.isEmpty()) return emptyList()
@@ -39,7 +40,7 @@ data class HomeUiState(
 
             if (othersAmount <= 0L) return topItems
 
-            val othersItem = CategorySegmentChartData(
+            val othersItem = CategorySegmentedChartVo(
                 category = CategoryVo(
                     id = "others",
                     icon = "•••",
@@ -54,7 +55,7 @@ data class HomeUiState(
             return topItems + othersItem
         }
 
-    val paymentMethodSegmentChartItems: List<PaymentMethodSegmentChartData>
+    val paymentMethodSegmentChartItems: List<PaymentMethodSegmentedChartVo>
         get() {
             val totalExpenses = currentAmount?.expensesAmount.default()
             if (totalExpenses <= 0L || paymentMethodSegment.isEmpty()) return emptyList()
@@ -68,7 +69,7 @@ data class HomeUiState(
 
             if (othersAmount <= 0L) return topItems
 
-            val othersItem = PaymentMethodSegmentChartData(
+            val othersItem = PaymentMethodSegmentedChartVo(
                 paymentMethod = PaymentMethodVo(
                     id = "others",
                     label = "그 외 ${othersCount}개",
@@ -83,38 +84,20 @@ data class HomeUiState(
         }
 
     val passedRecurringAmount: Long
-        get() = recurringHistories.filter { it.isPassed || it.isToday }.sumOf { it.monthlyTotalAmount }
+        get() = recurringHistories
+            .filter { it.isPassed || it.isToday }
+            .sumOf { it.monthlyTotalAmount }
 
     val totalRecurringAmount: Long
         get() = recurringHistories.sumOf { it.monthlyTotalAmount }
 
-    val sortedRecurringHistories: List<RecurringHistoryUiModel>
+    val sortedRecurringHistories: List<RecurringHistoryVo>
         get() = recurringHistories.sortedWith(
-            compareBy<RecurringHistoryUiModel> { it.isPassed }
+            compareBy<RecurringHistoryVo> { it.isPassed }
                 .thenByDescending { it.isToday }
                 .thenBy { it.sortOrder }
         )
 }
-
-data class RecurringHistoryUiModel(
-    val id: String,
-    val categoryIcon: String,
-    val largeCategory: LargeCategoryEnum,
-    val content: String,
-    val singleAmount: Long,
-    val monthlyTotalAmount: Long,
-    val recurringDateText: String,
-    val isPassed: Boolean,
-    val isToday: Boolean = false,
-    val isFixed: Boolean = false,
-    val sortOrder: Int = 0,
-)
-
-data class Amount(
-    val expensesAmount: Long,
-    val incomeAmount: Long,
-    val savingAmount: Long,
-)
 
 enum class StatusType(val label: String, val lastLabel: String) {
     WEEK(

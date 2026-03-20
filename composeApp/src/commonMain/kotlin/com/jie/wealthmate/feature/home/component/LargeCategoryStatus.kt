@@ -21,8 +21,8 @@ import com.jie.wealthmate.component.EmojiIconSize
 import com.jie.wealthmate.component.SpacerSize
 import com.jie.wealthmate.component.WMSpacer
 import com.jie.wealthmate.component.WMText
-import com.jie.wealthmate.feature.home.Amount
 import com.jie.wealthmate.feature.home.StatusType
+import com.jie.wealthmate.feature.home.component.vo.AmountVo
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.theme.ColorSetting
 import com.jie.wealthmate.theme.Padding
@@ -38,8 +38,8 @@ import kotlin.math.roundToInt
 fun LargeCategoryStatus(
     modifier: Modifier = Modifier,
     statusType: StatusType,
-    currentAmount: Amount?,
-    lastAmount: Amount?,
+    currentAmount: AmountVo?,
+    lastAmount: AmountVo?,
     onCategoryClick: (LargeCategoryEnum) -> Unit = {},
 ) {
     val typography = MaterialTheme.typography

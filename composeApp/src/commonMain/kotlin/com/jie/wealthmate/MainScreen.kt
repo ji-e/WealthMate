@@ -48,155 +48,155 @@ import io.github.alexzhirkevich.compottie.rememberLottiePainter
 import kotlinx.coroutines.launch
 import wealthmate.composeapp.generated.resources.Res
 
-open class MainScreen : Screen {
-
-    @Composable
-    override fun Content() {
-        val uiState by MainUiManager.uiState.collectAsState()
-
-        var isShowLoading by remember { mutableStateOf(false) }
-        var isBottomNaviVisible by remember { mutableStateOf(true) }
-        val snackbarState = rememberSnackbarState()
-        val scope = rememberCoroutineScope()
-        val focusManager = LocalFocusManager.current
-        val navigator = LocalNavigator.currentOrThrow
-
-        // 각 탭의 화면 인스턴스를 유지하여 ScreenModel 상태가 보존되도록 함
-        val homeScreen = remember { HomeScreen() }
-        val calendarScreen = remember { CalendarScreen() }
-        val budgetScreen = remember { BudgetScreen() }
-        val menuScreen = remember { MenuScreen() }
-
-        LaunchedEffect(Unit) {
-            MainUiManager.sideEffect.collect { sideEffect ->
-                when (sideEffect) {
-                    is BaseUiSideEffect.ShowLoading -> {
-                        isShowLoading = sideEffect.isShowLoading
-                    }
-
-                    is BaseUiSideEffect.ShowSnackbar -> {
-                        scope.launch {
-                            snackbarState.showSnackbar(message = sideEffect.message)
-                        }
-                    }
-
-                    is BaseUiSideEffect.ShowSnackbarWithAction -> {
-                        scope.launch {
-                            snackbarState.showSnackbar(
-                                message = sideEffect.message,
-                                actionLabel = sideEffect.actionLabel,
-                                onAction = sideEffect.onAction
-                            )
-                        }
-                    }
-
-                    is BaseUiSideEffect.HideKeyboard -> {
-                        focusManager.clearFocus(true)
-                    }
-                }
-            }
-        }
-
-        Box {
-            Scaffold(
-                bottomBar = {
-                    AnimatedVisibility(
-                        visible = isBottomNaviVisible,
-                        enter = slideInVertically { height -> height },
-                        exit = slideOutVertically { height -> height }
-                    ) {
-                        BottomNavigation(
-                            selectedItem = uiState.selectedItem,
-                            onItemSelected = {
-                                if (it == BottomNavItem.Add.route) {
-                                    navigator.push(AddHistoryScreen(uiState.selectedDate))
-                                } else {
-                                    MainUiManager.updateSelectedItem(it)
-                                }
-                            }
-                        )
-                    }
-                },
-                contentWindowInsets = WindowInsets.systemBars,
-                containerColor = ColorGray.White,
-            ) { _ ->
-                Column(
-                    modifier = Modifier
-                        .navigationBarsPadding()
-                        .fillMaxSize(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    when (uiState.selectedItem) {
-                        BottomNavItem.Home.route -> {
-                            Navigator(homeScreen) { innerNavigator ->
-                                CurrentScreen()
-                                LaunchedEffect(innerNavigator.lastItem) {
-                                    isBottomNaviVisible = (innerNavigator.lastItem is HomeScreen)
-                                }
-                            }
-                        }
-
-                        BottomNavItem.Calendar.route -> {
-                            Navigator(calendarScreen) { innerNavigator ->
-                                CurrentScreen()
-                                LaunchedEffect(innerNavigator.lastItem) {
-                                    isBottomNaviVisible = (innerNavigator.lastItem is CalendarScreen)
-                                }
-                            }
-                        }
-
-                        BottomNavItem.Budget.route -> {
-                            Navigator(budgetScreen) { innerNavigator ->
-                                CurrentScreen()
-                                LaunchedEffect(innerNavigator.lastItem) {
-                                    isBottomNaviVisible = (innerNavigator.lastItem is BudgetScreen)
-                                }
-                            }
-                        }
-
-                        BottomNavItem.Menu.route -> {
-                            Navigator(menuScreen) { innerNavigator ->
-                                CurrentScreen()
-                                LaunchedEffect(innerNavigator.lastItem) {
-                                    isBottomNaviVisible = (innerNavigator.lastItem is MenuScreen)
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            Loading(isShowLoading)
-
-            CustomSnackbarHost(
-                snackbarState = snackbarState,
-                modifier = Modifier.padding(bottom = calculateAdjustedToastPadding(60))
-            )
-        }
-    }
-
-    @Composable
-    private fun Loading(isShowLoading: Boolean) {
-        if (isShowLoading) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .clickable(false) {},
-                contentAlignment = Alignment.Center
-            ) {
-                val composition by rememberLottieComposition {
-                    val animationBytes = Res.readBytes("files/loading_animation.json")
-                    LottieCompositionSpec.JsonString(animationBytes.decodeToString())
-                }
-
-                Image(
-                    contentDescription = "Lottie animation",
-                    painter = rememberLottiePainter(
-                        composition = composition,
-                        iterations = Compottie.IterateForever
-                    )
-                )
-            }
-        }
-    }
-}
+//open class MainScreen : Screen {
+//
+//    @Composable
+//    override fun Content() {
+//        val uiState by MainUiManager.uiState.collectAsState()
+//
+//        var isShowLoading by remember { mutableStateOf(false) }
+//        var isBottomNaviVisible by remember { mutableStateOf(true) }
+//        val snackbarState = rememberSnackbarState()
+//        val scope = rememberCoroutineScope()
+//        val focusManager = LocalFocusManager.current
+//        val navigator = LocalNavigator.currentOrThrow
+//
+//        // 각 탭의 화면 인스턴스를 유지하여 ScreenModel 상태가 보존되도록 함
+//        val homeScreen = remember { HomeScreen() }
+//        val calendarScreen = remember { CalendarScreen() }
+//        val budgetScreen = remember { BudgetScreen() }
+//        val menuScreen = remember { MenuScreen() }
+//
+//        LaunchedEffect(Unit) {
+//            MainUiManager.sideEffect.collect { sideEffect ->
+//                when (sideEffect) {
+//                    is BaseUiSideEffect.ShowLoading -> {
+//                        isShowLoading = sideEffect.isShowLoading
+//                    }
+//
+//                    is BaseUiSideEffect.ShowSnackbar -> {
+//                        scope.launch {
+//                            snackbarState.showSnackbar(message = sideEffect.message)
+//                        }
+//                    }
+//
+//                    is BaseUiSideEffect.ShowSnackbarWithAction -> {
+//                        scope.launch {
+//                            snackbarState.showSnackbar(
+//                                message = sideEffect.message,
+//                                actionLabel = sideEffect.actionLabel,
+//                                onAction = sideEffect.onAction
+//                            )
+//                        }
+//                    }
+//
+//                    is BaseUiSideEffect.HideKeyboard -> {
+//                        focusManager.clearFocus(true)
+//                    }
+//                }
+//            }
+//        }
+//
+//        Box {
+//            Scaffold(
+//                bottomBar = {
+//                    AnimatedVisibility(
+//                        visible = isBottomNaviVisible,
+//                        enter = slideInVertically { height -> height },
+//                        exit = slideOutVertically { height -> height }
+//                    ) {
+//                        BottomNavigation(
+//                            selectedItem = uiState.selectedItem,
+//                            onItemSelected = {
+//                                if (it == BottomNavItem.Add.route) {
+//                                    navigator.push(AddHistoryScreen(uiState.selectedDate))
+//                                } else {
+//                                    MainUiManager.updateSelectedItem(it)
+//                                }
+//                            }
+//                        )
+//                    }
+//                },
+//                contentWindowInsets = WindowInsets.systemBars,
+//                containerColor = ColorGray.White,
+//            ) { _ ->
+//                Column(
+//                    modifier = Modifier
+//                        .navigationBarsPadding()
+//                        .fillMaxSize(),
+//                    horizontalAlignment = Alignment.CenterHorizontally,
+//                ) {
+//                    when (uiState.selectedItem) {
+//                        BottomNavItem.Home.route -> {
+//                            Navigator(homeScreen) { innerNavigator ->
+//                                CurrentScreen()
+//                                LaunchedEffect(innerNavigator.lastItem) {
+//                                    isBottomNaviVisible = (innerNavigator.lastItem is HomeScreen)
+//                                }
+//                            }
+//                        }
+//
+//                        BottomNavItem.Calendar.route -> {
+//                            Navigator(calendarScreen) { innerNavigator ->
+//                                CurrentScreen()
+//                                LaunchedEffect(innerNavigator.lastItem) {
+//                                    isBottomNaviVisible = (innerNavigator.lastItem is CalendarScreen)
+//                                }
+//                            }
+//                        }
+//
+//                        BottomNavItem.Budget.route -> {
+//                            Navigator(budgetScreen) { innerNavigator ->
+//                                CurrentScreen()
+//                                LaunchedEffect(innerNavigator.lastItem) {
+//                                    isBottomNaviVisible = (innerNavigator.lastItem is BudgetScreen)
+//                                }
+//                            }
+//                        }
+//
+//                        BottomNavItem.Menu.route -> {
+//                            Navigator(menuScreen) { innerNavigator ->
+//                                CurrentScreen()
+//                                LaunchedEffect(innerNavigator.lastItem) {
+//                                    isBottomNaviVisible = (innerNavigator.lastItem is MenuScreen)
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//
+//            Loading(isShowLoading)
+//
+//            CustomSnackbarHost(
+//                snackbarState = snackbarState,
+//                modifier = Modifier.padding(bottom = calculateAdjustedToastPadding(60))
+//            )
+//        }
+//    }
+//
+//    @Composable
+//    private fun Loading(isShowLoading: Boolean) {
+//        if (isShowLoading) {
+//            Box(
+//                modifier = Modifier
+//                    .fillMaxSize()
+//                    .clickable(false) {},
+//                contentAlignment = Alignment.Center
+//            ) {
+//                val composition by rememberLottieComposition {
+//                    val animationBytes = Res.readBytes("files/loading_animation.json")
+//                    LottieCompositionSpec.JsonString(animationBytes.decodeToString())
+//                }
+//
+//                Image(
+//                    contentDescription = "Lottie animation",
+//                    painter = rememberLottiePainter(
+//                        composition = composition,
+//                        iterations = Compottie.IterateForever
+//                    )
+//                )
+//            }
+//        }
+//    }
+//}
