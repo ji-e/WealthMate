@@ -7,7 +7,10 @@ object Padding {
     val BackgroundBottom = 32.dp
     val ContainerHorizontal = 16.dp
     val ContainerVertical = 12.dp
-    val SpacerS = 12.dp
+    val SpacerXXS = 4.dp
+    val SpacerXS = 8.dp
+    val SpacerS = 16.dp
     val SpacerM = 24.dp
     val SpacerL = 32.dp
+    val SpacerXL = 48.dp
 }
