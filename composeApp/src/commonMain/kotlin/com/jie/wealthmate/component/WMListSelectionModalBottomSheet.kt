@@ -55,7 +55,7 @@ fun <T> WMListSelectionModalBottomSheet(
                 modifier = Modifier
                     .fillMaxWidth()
                     .heightIn(min = maxHeight * 0.2f, max = maxHeight * 0.6f),
-                contentPadding = PaddingValues(bottom = 16.dp)
+                contentPadding = PaddingValues(bottom = Padding.SpacerS)
             ) {
                 items(items) { item ->
                     val isSelected = item == tempSelectedItem

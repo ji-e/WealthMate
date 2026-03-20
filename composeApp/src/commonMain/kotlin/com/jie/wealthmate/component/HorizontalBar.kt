@@ -13,7 +13,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -91,14 +91,14 @@ fun HorizontalBar(
         modifier = modifier
             .fillMaxWidth()
             .height(8.dp)
-            .clip(RoundedCornerShape(8.dp))
+            .clip(CircleShape)
             .background(ColorGray.Gray_200)
     ) {
         Box(
             modifier = Modifier
                 .fillMaxWidth(barRatio)
                 .fillMaxHeight()
-                .clip(RoundedCornerShape(8.dp))
+                .clip(CircleShape)
                 .background(animatedColor)
         )
     }

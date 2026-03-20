@@ -31,11 +31,12 @@ fun WMTopBar(
     trailingItem: List<TopBarItem.TrailingItem>? = null,
     trailingCustomItem: TopBarItem.TrailingCustomItem? = null,
 ) {
+    val horizontalDp = 12.dp
     TopAppBar(
         modifier = Modifier
             .fillMaxWidth()
             .background(ColorGray.White)
-            .padding(horizontal = 12.dp),
+            .padding(horizontal = horizontalDp),
         title = {
             WMText(
                 text = title.title,
@@ -46,7 +47,7 @@ fun WMTopBar(
         },
         navigationIcon = {
             if (readingItem == null) {
-                Box(modifier = Modifier.width(12.dp))
+                Box(modifier = Modifier.width(horizontalDp))
             } else {
                 WMIconButton(
                     iconRes = readingItem.iconRes,

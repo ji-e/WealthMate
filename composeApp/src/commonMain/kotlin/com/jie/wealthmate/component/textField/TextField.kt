@@ -37,10 +37,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.jie.wealthmate.component.LabelText
+import com.jie.wealthmate.component.SpacerSize
 import com.jie.wealthmate.component.WMIconButton
+import com.jie.wealthmate.component.WMSpacer
 import com.jie.wealthmate.component.WMText
 import com.jie.wealthmate.theme.ColorPrimary
 import com.jie.wealthmate.theme.ColorSetting
+import com.jie.wealthmate.theme.Padding
 import com.jie.wealthmate.theme.WMTheme
 import com.jie.wealthmate.utils.default
 import wealthmate.composeapp.generated.resources.Res
@@ -179,8 +182,9 @@ fun WMTextField(
                 text = it,
                 textColor = if (enabled.not()) ColorSetting.DisabledContent else ColorSetting.Default,
                 isRequire = isRequire,
-                modifier = Modifier.padding(bottom = 6.dp)
             )
+
+            WMSpacer(size = SpacerSize.XX_SMALL)
         }
 
         Box(contentAlignment = Alignment.CenterStart) {
@@ -236,7 +240,7 @@ fun WMTextField(
                                         text = "${value.text.length}/$maxLength",
                                         style = MaterialTheme.typography.bodyMedium,
                                         color = ColorSetting.DisabledContent,
-                                        modifier = Modifier.padding(start = 4.dp)
+                                        modifier = Modifier.padding(start = Padding.SpacerXXS)
                                     )
                                 }
                             }
@@ -244,7 +248,7 @@ fun WMTextField(
                         trailingIcon = trailingIcon,
                         shape = TextFieldDefaults.shape,
                         colors = colors,
-                        contentPadding = PaddingValues(vertical = 10.dp),
+                        contentPadding = PaddingValues(vertical = Padding.ContainerVertical),
                         container = {
                             TextFieldDefaults.Container(
                                 enabled = enabled,
@@ -275,9 +279,9 @@ fun WMTextField(
         }
 
         if (isSupport) {
+            WMSpacer(size = SpacerSize.XX_SMALL)
             Row(
                 modifier = Modifier
-                    .padding(top = 4.dp)
                     .fillMaxWidth()
                     .heightIn(min = 16.dp),
                 verticalAlignment = Alignment.CenterVertically
@@ -288,7 +292,7 @@ fun WMTextField(
                     color = if (isError) ColorSetting.Error else ColorSetting.Info,
                     modifier = Modifier
                         .weight(1f)
-                        .padding(end = 4.dp)
+                        .padding(end = Padding.SpacerXXS)
                 )
                 supportingContent?.invoke()
             }
@@ -345,7 +349,7 @@ private fun WMTextFieldPreview() {
     WMTheme {
         Column(
             modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(20.dp)
+            verticalArrangement = Arrangement.spacedBy(32.dp)
         ) {
             WMTextField(
                 value = "입력된 텍스트",

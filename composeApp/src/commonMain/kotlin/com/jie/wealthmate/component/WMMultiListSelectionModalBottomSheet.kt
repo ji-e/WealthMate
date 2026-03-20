@@ -3,7 +3,6 @@ package com.jie.wealthmate.component
 
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -68,7 +67,7 @@ fun <T> WMMultiListSelectionModalBottomSheet(
                         WMHorizontalDivider(
                             modifier = Modifier.padding(
                                 horizontal = Padding.BackgroundHorizontal,
-                                vertical = 4.dp
+                                vertical = Padding.SpacerXXS
                             )
                         )
                     }
@@ -97,7 +96,7 @@ fun <T> WMMultiListSelectionModalBottomSheet(
             }
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        WMSpacer(size = SpacerSize.SMALL)
 
         WMButton(
             text = "확인",

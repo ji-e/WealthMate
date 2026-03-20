@@ -79,6 +79,8 @@ private fun Header(
     trailingItem: @Composable (() -> Unit)?,
     onDismissRequest: () -> Unit,
 ) {
+    val horizontalPadding = 12.dp
+
     Box(
         modifier = Modifier.fillMaxWidth(),
         contentAlignment = Alignment.Center
@@ -96,7 +98,7 @@ private fun Header(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 12.dp),
+                .padding(horizontal = horizontalPadding),
             contentAlignment = Alignment.CenterStart
         ) {
             readingItem?.invoke()
@@ -106,7 +108,7 @@ private fun Header(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 12.dp),
+                .padding(horizontal = horizontalPadding),
             contentAlignment = Alignment.CenterEnd
         ) {
             if (trailingItem != null) {

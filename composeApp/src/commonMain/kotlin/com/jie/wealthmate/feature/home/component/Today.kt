@@ -34,6 +34,7 @@ import com.jie.wealthmate.theme.ColorBlue
 import com.jie.wealthmate.theme.ColorGray
 import com.jie.wealthmate.theme.ColorRed
 import com.jie.wealthmate.theme.ColorSetting
+import com.jie.wealthmate.theme.Padding
 import com.jie.wealthmate.theme.WMTheme
 import com.jie.wealthmate.utils.formatWithCommas
 import com.jie.wealthmate.utils.lastDayOfMonth
@@ -102,7 +103,7 @@ fun Today(
                     text = "${displayAmount.formatWithCommas()}원",
                     style = typography.displaySmall,
                     fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.padding(vertical = 8.dp)
+                    modifier = Modifier.padding(Padding.SpacerXS)
                 )
 
                 WMText(

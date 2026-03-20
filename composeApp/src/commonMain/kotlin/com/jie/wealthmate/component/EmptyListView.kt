@@ -9,7 +9,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.jie.wealthmate.theme.ColorSetting
 import com.jie.wealthmate.theme.Padding
 import com.jie.wealthmate.theme.WMTheme
@@ -23,7 +22,10 @@ fun EmptyListView(
     contentText: String,
 ) {
     Box(
-        modifier = modifier.padding(vertical = 32.dp, horizontal = Padding.ContainerHorizontal),
+        modifier = modifier.padding(
+            vertical = Padding.SpacerL,
+            horizontal = Padding.ContainerHorizontal
+        ),
         contentAlignment = Alignment.Center
     ) {
         WMText(

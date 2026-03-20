@@ -20,6 +20,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.jie.wealthmate.component.HorizontalBar
+import com.jie.wealthmate.component.SpacerSize
+import com.jie.wealthmate.component.WMSpacer
 import com.jie.wealthmate.component.WMText
 import com.jie.wealthmate.theme.ColorBlue
 import com.jie.wealthmate.theme.ColorGray
@@ -46,8 +48,9 @@ fun RemainBudget(
             text = "이번 달 남은 금액",
             style = typography.titleSmall,
             color = ColorSetting.Info,
-            modifier = Modifier.padding(bottom = 8.dp)
         )
+
+        WMSpacer(size = SpacerSize.X_SMALL)
 
         AnimatedBudgetBar(spent = expensesAmount, totalBudget = budgetAmount)
     }
@@ -78,9 +81,7 @@ private fun AnimatedBudgetBar(spent: Long, totalBudget: Long) {
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 8.dp),
+            modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.Bottom,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
@@ -96,6 +97,8 @@ private fun AnimatedBudgetBar(spent: Long, totalBudget: Long) {
                 modifier = Modifier.padding(bottom = 2.dp)
             )
         }
+
+        WMSpacer(size = SpacerSize.X_SMALL)
 
         HorizontalBar(
             spent = spent,

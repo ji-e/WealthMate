@@ -33,7 +33,10 @@ fun WMCheckBox(
 ) {
     Row(
         modifier = modifier
-            .noRippleClickable(enabled = enabled) { onCheckedChange(!checked) },
+            .noRippleClickable(
+                enabled = enabled,
+                onClick = { onCheckedChange(checked.not()) }
+            ),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(4.dp)
     ) {
