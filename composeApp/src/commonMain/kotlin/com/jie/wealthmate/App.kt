@@ -2,7 +2,8 @@ package com.jie.wealthmate
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
-import cafe.adriel.voyager.navigator.Navigator
+import androidx.navigation.compose.rememberNavController
+import com.jie.wealthmate.feature.main.MainScreen
 import com.jie.wealthmate.feature.menu.data.googleCloudSync.GoogleCloudSyncScreenModel
 import com.jie.wealthmate.repository.AuthRepository
 import com.jie.wealthmate.theme.WMTheme
@@ -40,6 +41,7 @@ fun App() {
 //    }
 
     WMTheme() {
-        Navigator(MainScreen())
+        val navController = rememberNavController()
+        MainScreen(navController = navController)
     }
 }
