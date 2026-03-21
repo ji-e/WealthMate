@@ -2,7 +2,8 @@
 
 package com.jie.wealthmate.feature.budget.budgetSetting
 
-import com.jie.wealthmate.base.BaseScreenModel
+import androidx.lifecycle.viewModelScope
+import com.jie.wealthmate.base.BaseViewModel
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.repository.BudgetRepository
 import com.jie.wealthmate.repository.HistoryRepository
@@ -13,6 +14,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.Month
 import kotlinx.datetime.TimeZone
@@ -21,10 +23,10 @@ import kotlinx.datetime.number
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Clock
 
-class BudgetSettingScreenModel(
+class BudgetSettingViewModel(
     private val budgetRepository: BudgetRepository,
     private val historyRepository: HistoryRepository,
-) : BaseScreenModel<BudgetSettingUiState>() {
+) : BaseViewModel<BudgetSettingUiState>() {
 
     override val initialState: BudgetSettingUiState = BudgetSettingUiState()
 
@@ -56,7 +58,7 @@ class BudgetSettingScreenModel(
                     )
                 }
             }
-            .launchIn(ioScope)
+            .launchIn(viewModelScope)
     }
 
     private fun observeBudgets() {
@@ -133,7 +135,7 @@ class BudgetSettingScreenModel(
                     )
                 }
             }
-            .launchIn(ioScope)
+            .launchIn(viewModelScope)
     }
 
     private fun calculateYearlySummary(monthBudgets: List<MonthBudgetGroup>): YearlySummary {
@@ -174,9 +176,16 @@ class BudgetSettingScreenModel(
     }
 
     fun deleteBudget(yearMonth: String) {
-        launchSafe(
-            block = { budgetRepository.deleteBudgetsByMonth(yearMonth) },
-            onSuccess = { showSnackbar("삭제되었습니다.") }
-        )
+        viewModelScope.launch {
+            showLoading(true)
+            try {
+                budgetRepository.deleteBudgetsByMonth(yearMonth)
+                showSnackbar("삭제되었습니다.")
+            } catch (e: Exception) {
+                showSnackbar(e.message ?: "오류가 발생했습니다.")
+            } finally {
+                showLoading(false)
+            }
+        }
     }
 }

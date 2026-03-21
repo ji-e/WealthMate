@@ -1,7 +1,7 @@
 package com.jie.wealthmate.feature.budget.budgetDetail
 
-import cafe.adriel.voyager.core.model.screenModelScope
-import com.jie.wealthmate.base.BaseScreenModel
+import androidx.lifecycle.viewModelScope
+import com.jie.wealthmate.base.BaseViewModel
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.repository.BudgetRepository
 import com.jie.wealthmate.repository.CategoryRepository
@@ -21,12 +21,12 @@ import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.minus
 
-class BudgetDetailScreenModel(
+class BudgetDetailViewModel(
     private val budgetRepository: BudgetRepository,
     private val historyRepository: HistoryRepository,
     private val categoryRepository: CategoryRepository,
     private val initialMonth: LocalDate,
-) : BaseScreenModel<BudgetDetailUiState>() {
+) : BaseViewModel<BudgetDetailUiState>() {
     override val initialState: BudgetDetailUiState
         get() = BudgetDetailUiState(selectedMonth = initialMonth)
 
@@ -158,6 +158,6 @@ class BudgetDetailScreenModel(
                     sections = sections
                 )
             }
-        }.launchIn(screenModelScope)
+        }.launchIn(viewModelScope)
     }
 }

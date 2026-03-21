@@ -1,7 +1,8 @@
 package com.jie.wealthmate.feature.budget.addBudget
 
 import androidx.compose.ui.text.input.TextFieldValue
-import com.jie.wealthmate.base.BaseScreenModel
+import androidx.lifecycle.viewModelScope
+import com.jie.wealthmate.base.BaseViewModel
 import com.jie.wealthmate.database.eneity.BudgetEntity
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.repository.BudgetRepository
@@ -15,12 +16,13 @@ import com.jie.wealthmate.vo.CategoryVo.Companion.mapperToVo
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.collections.immutable.toImmutableMap
 import kotlinx.coroutines.flow.take
+import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
 
-class AddBudgetScreenModel(
+class AddBudgetViewModel(
     private val categoryRepository: CategoryRepository,
     private val budgetRepository: BudgetRepository,
-) : BaseScreenModel<AddBudgetUiState>() {
+) : BaseViewModel<AddBudgetUiState>() {
 
     override val initialState: AddBudgetUiState
         get() = AddBudgetUiState()
@@ -41,53 +43,48 @@ class AddBudgetScreenModel(
     }
 
     private fun loadBudgets(yearMonth: String, isCopyMode: Boolean = false) {
-        launchSafe(
-            block = {
-                budgetRepository.getBudgetsByMonth(yearMonth).take(1).collect { budgets ->
-                    reduceState { state ->
-                        var isCategoryTagInclude = false
-                        val incomeMap = state.incomeCategoryTextFieldMap.toMutableMap()
-                        val expenseMap = state.expensesCategoryTextFieldMap.toMutableMap()
-                        val savingMap = state.savingCategoryTextFieldMap.toMutableMap()
+        budgetRepository.getBudgetsByMonth(yearMonth).take(1).apiFlow { budgets ->
+            reduceState { state ->
+                var isCategoryTagInclude = false
+                val incomeMap = state.incomeCategoryTextFieldMap.toMutableMap()
+                val expenseMap = state.expensesCategoryTextFieldMap.toMutableMap()
+                val savingMap = state.savingCategoryTextFieldMap.toMutableMap()
 
-                        budgets.forEach { budget ->
-                            val category = (state.incomeCategoryItems + state.expensesCategoryItems + state.savingCategoryItems)
-                                .find { it.id == budget.categoryId } ?: return@forEach
+                budgets.forEach { budget ->
+                    val category = (state.incomeCategoryItems + state.expensesCategoryItems + state.savingCategoryItems)
+                        .find { it.id == budget.categoryId } ?: return@forEach
 
-                            val map = when (category.largeCategory) {
-                                LargeCategoryEnum.INCOME -> incomeMap
-                                LargeCategoryEnum.EXPENSES -> expenseMap
-                                LargeCategoryEnum.SAVING -> savingMap
+                    val map = when (category.largeCategory) {
+                        LargeCategoryEnum.INCOME -> incomeMap
+                        LargeCategoryEnum.EXPENSES -> expenseMap
+                        LargeCategoryEnum.SAVING -> savingMap
+                    }
+
+                    if (map != null) {
+                        if (budget.categoryTagId != null) {
+                            isCategoryTagInclude = true
+                            map[budget.categoryTagId!!] = TextFieldValue(budget.amount.toString())
+
+                            val sum = category.tags.sumOf { tag ->
+                                map[tag.id]?.text?.toLongOrNull() ?: 0L
                             }
-
-                            if (map != null) {
-                                if (budget.categoryTagId != null) {
-                                    isCategoryTagInclude = true
-                                    map[budget.categoryTagId!!] = TextFieldValue(budget.amount.toString())
-
-                                    val sum = category.tags.sumOf { tag ->
-                                        map[tag.id]?.text?.toLongOrNull() ?: 0L
-                                    }
-                                    map[category.id] = TextFieldValue(sum.toString())
-                                } else {
-                                    map[budget.categoryId] = TextFieldValue(budget.amount.toString())
-                                }
-                            }
+                            map[category.id] = TextFieldValue(sum.toString())
+                        } else {
+                            map[budget.categoryId] = TextFieldValue(budget.amount.toString())
                         }
-
-                        val newState = state.copy(
-                            isCategoryTagInclude = isCategoryTagInclude,
-                            incomeCategoryTextFieldMap = incomeMap.toImmutableMap(),
-                            expensesCategoryTextFieldMap = expenseMap.toImmutableMap(),
-                            savingCategoryTextFieldMap = savingMap.toImmutableMap(),
-                            isDataChanged = isCopyMode
-                        )
-                        newState.copy(remainBudget = calculateRemainBudget(newState))
                     }
                 }
-            },
-            showLoading = true
-        )
+
+                val newState = state.copy(
+                    isCategoryTagInclude = isCategoryTagInclude,
+                    incomeCategoryTextFieldMap = incomeMap.toImmutableMap(),
+                    expensesCategoryTextFieldMap = expenseMap.toImmutableMap(),
+                    savingCategoryTextFieldMap = savingMap.toImmutableMap(),
+                    isDataChanged = isCopyMode
+                )
+                newState.copy(remainBudget = calculateRemainBudget(newState))
+            }
+        }
     }
 
     fun updateSelectedMonth(month: LocalDate = today) {
@@ -355,14 +352,17 @@ class AddBudgetScreenModel(
             }
         }
 
-        launchSafe(
-            block = {
+        viewModelScope.launch {
+            showLoading(true)
+            try {
                 budgetRepository.saveBudgets(yearMonth, budgets)
-            },
-            onSuccess = {
                 showSnackbar("저장되었습니다.")
                 postSideEffect { AddBudgetUiSideEffect.OnSuccess }
+            } catch (e: Exception) {
+                showSnackbar(e.message ?: "오류가 발생했습니다.")
+            } finally {
+                showLoading(false)
             }
-        )
+        }
     }
 }

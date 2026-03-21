@@ -35,6 +35,10 @@ import com.jie.wealthmate.component.bottomNav.BottomNavItem
 import com.jie.wealthmate.component.bottomNav.BottomNavigation
 import com.jie.wealthmate.component.rememberSnackbarState
 import com.jie.wealthmate.feature.budget.BudgetScreen
+import com.jie.wealthmate.feature.budget.addBudget.AddBudgetScreen
+import com.jie.wealthmate.feature.budget.budgetDetail.BudgetDetailScreen
+import com.jie.wealthmate.feature.budget.budgetSetting.BudgetSettingScreen
+import com.jie.wealthmate.feature.budget.budgetYearDetail.BudgetYearDetailScreen
 import com.jie.wealthmate.feature.calendar.CalendarScreen
 import com.jie.wealthmate.feature.calendar.addHistory.AddHistoryScreen
 import com.jie.wealthmate.feature.calendar.historyDetail.HistoryDetailScreen
@@ -46,6 +50,8 @@ import com.jie.wealthmate.feature.home.preparednessStatus.PreparednessStatusScre
 import com.jie.wealthmate.feature.menu.MenuScreen
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.getPlatform
+import com.jie.wealthmate.utils.convertDateToLocalDate
+import com.jie.wealthmate.utils.today
 import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinViewModel
 import kotlin.time.Clock
@@ -124,7 +130,7 @@ fun MainScreen(
                         )
                     }
                     composable(BottomNavItem.Budget.route) {
-                        BudgetScreen()
+                        BudgetScreen(navController = innerNavController)
                     }
                     composable(BottomNavItem.Menu.route) {
                         MenuScreen()
@@ -281,6 +287,64 @@ fun MainScreen(
 //                            navController = innerNavController,
 //                            id = id
 //                        )
+                    }
+
+                    // Budget Routes
+                    composable("budgetSetting") {
+                        BudgetSettingScreen(navController = innerNavController)
+                    }
+                    composable(
+                        route = "budgetDetail/{selectedMonth}",
+                        arguments = listOf(
+                            navArgument("selectedMonth") { type = NavType.StringType }
+                        )
+                    ) { backStackEntry ->
+                        val selectedMonthStr = backStackEntry.arguments?.getString("selectedMonth")
+                        val selectedMonth = selectedMonthStr?.convertDateToLocalDate() ?: today
+                        BudgetDetailScreen(
+                            navController = innerNavController,
+                            selectedMonth = selectedMonth
+                        )
+                    }
+                    composable(
+                        route = "budgetYearDetail/{selectedYear}",
+                        arguments = listOf(
+                            navArgument("selectedYear") { type = NavType.StringType }
+                        )
+                    ) { backStackEntry ->
+                        val selectedYear = backStackEntry.arguments?.getString("selectedYear") ?: today.year.toString()
+                        BudgetYearDetailScreen(
+                            navController = innerNavController,
+                            selectedYear = selectedYear
+                        )
+                    }
+                    composable(
+                        route = "addBudget?selectedYearMonth={selectedYearMonth}&isEditMode={isEditMode}&isCopyMode={isCopyMode}",
+                        arguments = listOf(
+                            navArgument("selectedYearMonth") {
+                                type = NavType.StringType
+                                nullable = true
+                                defaultValue = null
+                            },
+                            navArgument("isEditMode") {
+                                type = NavType.BoolType
+                                defaultValue = false
+                            },
+                            navArgument("isCopyMode") {
+                                type = NavType.BoolType
+                                defaultValue = false
+                            }
+                        )
+                    ) { backStackEntry ->
+                        val selectedYearMonth = backStackEntry.arguments?.getString("selectedYearMonth")
+                        val isEditMode = backStackEntry.arguments?.getBoolean("isEditMode") ?: false
+                        val isCopyMode = backStackEntry.arguments?.getBoolean("isCopyMode") ?: false
+                        AddBudgetScreen(
+                            navController = innerNavController,
+                            selectedYearMonth = selectedYearMonth,
+                            isEditMode = isEditMode,
+                            isCopyMode = isCopyMode
+                        )
                     }
                 }
 

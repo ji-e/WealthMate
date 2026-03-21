@@ -1,7 +1,7 @@
 package com.jie.wealthmate.feature.budget
 
-import cafe.adriel.voyager.core.model.screenModelScope
-import com.jie.wealthmate.base.BaseScreenModel
+import androidx.lifecycle.viewModelScope
+import com.jie.wealthmate.base.BaseViewModel
 import com.jie.wealthmate.feature.budget.component.BudgetOverUsageVo
 import com.jie.wealthmate.feature.budget.component.BudgetSummaryVo
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
@@ -26,10 +26,10 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.datetime.LocalDate
 
-class BudgetScreenModel(
+class BudgetViewModel(
     private val budgetRepository: BudgetRepository,
     private val historyRepository: HistoryRepository,
-) : BaseScreenModel<BudgetUiState>() {
+) : BaseViewModel<BudgetUiState>() {
     override val initialState: BudgetUiState
         get() = BudgetUiState()
 
@@ -123,7 +123,7 @@ class BudgetScreenModel(
                         topExpenses = result.topExpenses
                     )
                 }
-            }.launchIn(screenModelScope)
+            }.launchIn(viewModelScope)
     }
 
     private data class BudgetResult(

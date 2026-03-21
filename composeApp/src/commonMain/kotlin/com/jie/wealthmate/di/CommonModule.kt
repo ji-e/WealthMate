@@ -1,11 +1,11 @@
 package com.jie.wealthmate.di
 
 import com.jie.wealthmate.database.DatabaseSyncManager
-import com.jie.wealthmate.feature.budget.BudgetScreenModel
-import com.jie.wealthmate.feature.budget.addBudget.AddBudgetScreenModel
-import com.jie.wealthmate.feature.budget.budgetDetail.BudgetDetailScreenModel
-import com.jie.wealthmate.feature.budget.budgetSetting.BudgetSettingScreenModel
-import com.jie.wealthmate.feature.budget.budgetYearDetail.BudgetYearDetailScreenModel
+import com.jie.wealthmate.feature.budget.BudgetViewModel
+import com.jie.wealthmate.feature.budget.addBudget.AddBudgetViewModel
+import com.jie.wealthmate.feature.budget.budgetDetail.BudgetDetailViewModel
+import com.jie.wealthmate.feature.budget.budgetSetting.BudgetSettingViewModel
+import com.jie.wealthmate.feature.budget.budgetYearDetail.BudgetYearDetailViewModel
 import com.jie.wealthmate.feature.calendar.CalendarViewModel
 import com.jie.wealthmate.feature.calendar.addHistory.AddHistoryViewModel
 import com.jie.wealthmate.feature.calendar.historyDetail.HistoryDetailViewModel
@@ -51,7 +51,6 @@ import com.jie.wealthmate.usecase.UpdateInstallmentUseCase
 import com.jie.wealthmate.usecase.UpdateRepeatCycleUseCase
 import kotlinx.datetime.LocalDate
 import org.koin.core.module.dsl.viewModelOf
-import org.koin.core.parameter.parametersOf
 import org.koin.dsl.module
 
 val commonModule = module {
@@ -63,7 +62,11 @@ val commonModule = module {
     viewModelOf(::CategoryExpensesViewModel)
     viewModelOf(::PaymentMethodExpensesViewModel)
     viewModelOf(::PreparednessStatusViewModel)
-
+    viewModelOf(::BudgetViewModel)
+    viewModelOf(::BudgetSettingViewModel)
+    viewModelOf(::AddBudgetViewModel)
+    viewModelOf(::BudgetDetailViewModel)
+    viewModelOf(::BudgetYearDetailViewModel)
 
 
     single { DatabaseSyncManager(get(), get(), get()) }
@@ -85,16 +88,7 @@ val commonModule = module {
     single { ModifyHistoryUseCase(get(), get()) }
 
 
-    // 예산
-    factory { BudgetScreenModel(get(), get()) }
-    factory { BudgetSettingScreenModel(get(), get()) }
-    factory { AddBudgetScreenModel(get(), get()) }
-    factory { (selectedMonth: LocalDate) ->
-        BudgetDetailScreenModel(get(), get(), get(), selectedMonth)
-    }
-    factory { (selectedYear: String) ->
-        BudgetYearDetailScreenModel(selectedYear, get(), get(), get())
-    }
+
 
 
     // 메뉴
