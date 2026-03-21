@@ -67,8 +67,9 @@ import com.jie.wealthmate.utils.today
 import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinViewModel
 import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
-@OptIn(InternalVoyagerApi::class)
+@OptIn(InternalVoyagerApi::class, ExperimentalTime::class)
 @Composable
 fun MainScreen(
     navController: NavController,
@@ -157,8 +158,8 @@ fun MainScreen(
                             navArgument("historyId") { type = NavType.StringType }
                         )
                     ) { backStackEntry ->
-                        val largeCategoryStr = backStackEntry.arguments?.getString("largeCategory")
-                        val historyId = backStackEntry.arguments?.getString("historyId") ?: ""
+                        val largeCategoryStr: String? = backStackEntry.savedStateHandle["largeCategory"]
+                        val historyId: String = backStackEntry.savedStateHandle["historyId"] ?: ""
                         val largeCategory = try {
                             LargeCategoryEnum.valueOf(largeCategoryStr ?: "EXPENSES")
                         } catch (e: Exception) {
@@ -185,10 +186,9 @@ fun MainScreen(
                             }
                         )
                     ) { backStackEntry ->
-                        val statusTypeStr = backStackEntry.arguments?.getString("statusType")
-                        val largeCategoryStr = backStackEntry.arguments?.getString("largeCategory")
-                        val scrollToPosition =
-                            backStackEntry.arguments?.getInt("scrollToPosition") ?: 0
+                        val statusTypeStr: String? = backStackEntry.savedStateHandle["statusType"]
+                        val largeCategoryStr: String? = backStackEntry.savedStateHandle["largeCategory"]
+                        val scrollToPosition: Int = backStackEntry.savedStateHandle["scrollToPosition"] ?: 0
 
                         val statusType = try {
                             StatusType.valueOf(statusTypeStr ?: "MONTH")
@@ -219,9 +219,9 @@ fun MainScreen(
                             }
                         )
                     ) { backStackEntry ->
-                        val statusTypeStr = backStackEntry.arguments?.getString("statusType")
-                        val largeCategoryStr = backStackEntry.arguments?.getString("largeCategory")
-                        val categoryId = backStackEntry.arguments?.getString("categoryId")
+                        val statusTypeStr: String? = backStackEntry.savedStateHandle["statusType"]
+                        val largeCategoryStr: String? = backStackEntry.savedStateHandle["largeCategory"]
+                        val categoryId: String? = backStackEntry.savedStateHandle["categoryId"]
 
                         val statusType = try {
                             StatusType.valueOf(statusTypeStr ?: "MONTH")
@@ -252,10 +252,9 @@ fun MainScreen(
                             }
                         )
                     ) { backStackEntry ->
-                        val statusTypeStr = backStackEntry.arguments?.getString("statusType")
-                        val largeCategoryStr = backStackEntry.arguments?.getString("largeCategory")
-                        val paymentMethodId =
-                            backStackEntry.arguments?.getString("paymentMethodId")
+                        val statusTypeStr: String? = backStackEntry.savedStateHandle["statusType"]
+                        val largeCategoryStr: String? = backStackEntry.savedStateHandle["largeCategory"]
+                        val paymentMethodId: String? = backStackEntry.savedStateHandle["paymentMethodId"]
 
                         val statusType = try {
                             StatusType.valueOf(statusTypeStr ?: "MONTH")
@@ -286,7 +285,7 @@ fun MainScreen(
                             navArgument("largeCategory") { type = NavType.StringType }
                         )
                     ) { backStackEntry ->
-                        val largeCategoryStr = backStackEntry.arguments?.getString("largeCategory")
+                        val largeCategoryStr: String? = backStackEntry.savedStateHandle["largeCategory"]
                         val largeCategory = try {
                             LargeCategoryEnum.valueOf(largeCategoryStr ?: "EXPENSES")
                         } catch (e: Exception) {
@@ -304,8 +303,8 @@ fun MainScreen(
                             navArgument("categoryId") { type = NavType.StringType }
                         )
                     ) { backStackEntry ->
-                        val largeCategoryStr = backStackEntry.arguments?.getString("largeCategory")
-                        val categoryId = backStackEntry.arguments?.getString("categoryId") ?: ""
+                        val largeCategoryStr: String? = backStackEntry.savedStateHandle["largeCategory"]
+                        val categoryId: String = backStackEntry.savedStateHandle["categoryId"] ?: ""
                         val largeCategory = try {
                             LargeCategoryEnum.valueOf(largeCategoryStr ?: "EXPENSES")
                         } catch (e: Exception) {
@@ -331,7 +330,7 @@ fun MainScreen(
                             navArgument("id") { type = NavType.StringType }
                         )
                     ) { backStackEntry ->
-                        val id = backStackEntry.arguments?.getString("id") ?: ""
+                        val id: String = backStackEntry.savedStateHandle["id"] ?: ""
                         ModifyPaymentMethodScreen(navController = innerNavController, paymentMethodId = id)
                     }
 
@@ -342,7 +341,7 @@ fun MainScreen(
                             navArgument("largeCategory") { type = NavType.StringType }
                         )
                     ) { backStackEntry ->
-                        val largeCategoryStr = backStackEntry.arguments?.getString("largeCategory")
+                        val largeCategoryStr: String? = backStackEntry.savedStateHandle["largeCategory"]
                         val largeCategory = try {
                             LargeCategoryEnum.valueOf(largeCategoryStr ?: "EXPENSES")
                         } catch (e: Exception) {
@@ -360,7 +359,7 @@ fun MainScreen(
                             navArgument("id") { type = NavType.StringType }
                         )
                     ) { backStackEntry ->
-                        val id = backStackEntry.arguments?.getString("id") ?: ""
+                        val id: String = backStackEntry.savedStateHandle["id"] ?: ""
                         RepeatHistoryDetailScreen(
                             navController = innerNavController,
                             repeatCycleId = id
@@ -372,7 +371,7 @@ fun MainScreen(
                             navArgument("largeCategory") { type = NavType.StringType }
                         )
                     ) { backStackEntry ->
-                        val largeCategoryStr = backStackEntry.arguments?.getString("largeCategory")
+                        val largeCategoryStr: String? = backStackEntry.savedStateHandle["largeCategory"]
                         val largeCategory = try {
                             LargeCategoryEnum.valueOf(largeCategoryStr ?: "EXPENSES")
                         } catch (e: Exception) {
@@ -402,7 +401,7 @@ fun MainScreen(
                             navArgument("selectedMonth") { type = NavType.StringType }
                         )
                     ) { backStackEntry ->
-                        val selectedMonthStr = backStackEntry.arguments?.getString("selectedMonth")
+                        val selectedMonthStr: String? = backStackEntry.savedStateHandle["selectedMonth"]
                         val selectedMonth = selectedMonthStr?.convertDateToLocalDate() ?: today
                         BudgetDetailScreen(
                             navController = innerNavController,
@@ -415,7 +414,7 @@ fun MainScreen(
                             navArgument("selectedYear") { type = NavType.StringType }
                         )
                     ) { backStackEntry ->
-                        val selectedYear = backStackEntry.arguments?.getString("selectedYear") ?: today.year.toString()
+                        val selectedYear: String = backStackEntry.savedStateHandle["selectedYear"] ?: today.year.toString()
                         BudgetYearDetailScreen(
                             navController = innerNavController,
                             selectedYear = selectedYear
@@ -439,9 +438,9 @@ fun MainScreen(
                             }
                         )
                     ) { backStackEntry ->
-                        val selectedYearMonth = backStackEntry.arguments?.getString("selectedYearMonth")
-                        val isEditMode = backStackEntry.arguments?.getBoolean("isEditMode") ?: false
-                        val isCopyMode = backStackEntry.arguments?.getBoolean("isCopyMode") ?: false
+                        val selectedYearMonth: String? = backStackEntry.savedStateHandle["selectedYearMonth"]
+                        val isEditMode: Boolean = backStackEntry.savedStateHandle["isEditMode"] ?: false
+                        val isCopyMode: Boolean = backStackEntry.savedStateHandle["isCopyMode"] ?: false
                         AddBudgetScreen(
                             navController = innerNavController,
                             selectedYearMonth = selectedYearMonth,
