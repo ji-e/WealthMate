@@ -35,11 +35,13 @@ val START_DATE = LocalDate(2025, 1, 1)
 @Composable
 fun CalendarScreen(
     navController: NavController,
+    onBack: () -> Unit,
     viewModel: CalendarViewModel = koinViewModel(),
 ) {
     // BaseScreen을 사용하여 공통 UI 상태 및 SideEffect 처리
     BaseScreen(
         viewModel = viewModel,
+        onBack = onBack
     ) { uiState ->
         CalendarContent(
             uiState = uiState,

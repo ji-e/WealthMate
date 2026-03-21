@@ -2,7 +2,6 @@
 
 package com.jie.wealthmate.feature.menu.management.categoryManagement
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -23,6 +22,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.jie.wealthmate.base.BackHandlerWrapper
 import com.jie.wealthmate.base.BaseScreen
 import com.jie.wealthmate.component.ButtonSize
 import com.jie.wealthmate.component.EmptyListView
@@ -61,7 +61,7 @@ fun CategoryManagementScreen(
     }
 
     val isAddItemEnabled by remember {
-        derivedStateOf { uiState.currentCategoryItems?.size.default() < 15 }
+        derivedStateOf { uiState.currentCategoryItems?.size.default() < 20 }
     }
 
     val onBack: () -> Unit = {
@@ -74,7 +74,7 @@ fun CategoryManagementScreen(
         }
     }
 
-    BackHandler(enabled = true, onBack = onBack)
+    BackHandlerWrapper(enabled = true, onBack = onBack)
 
     LaunchedEffect(pagerState.currentPage) {
         viewModel.changeTab(largeCategoryItems[pagerState.currentPage])

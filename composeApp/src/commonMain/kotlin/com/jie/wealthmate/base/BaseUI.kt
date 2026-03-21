@@ -1,6 +1,7 @@
+@file:OptIn(ExperimentalComposeUiApi::class)
+
 package com.jie.wealthmate.base
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,11 +18,13 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import com.jie.wealthmate.component.LoadingOverlay
+import io.github.aakira.napier.Napier
 import kotlinx.coroutines.launch
 
 /**
@@ -51,7 +54,8 @@ fun <S : UiState> BaseScreen(
     val currentOnSideEffect by rememberUpdatedState(onSideEffect)
 
     // 시스템 뒤로가기 버튼 처리
-    BackHandler(enabled = currentOnBack != null) {
+    BackHandlerWrapper(enabled = currentOnBack != null) {
+        Napier.e("backback")
         currentOnBack?.invoke()
     }
 

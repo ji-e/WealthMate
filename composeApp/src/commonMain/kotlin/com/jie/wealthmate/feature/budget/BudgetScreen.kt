@@ -10,7 +10,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -28,8 +27,8 @@ import com.jie.wealthmate.feature.budget.component.BudgetInfo
 import com.jie.wealthmate.feature.budget.component.BudgetOverPager
 import com.jie.wealthmate.feature.budget.component.BudgetSuccess
 import com.jie.wealthmate.feature.budget.component.BudgetSummary
-import com.jie.wealthmate.feature.calendar.component.SelectedCalendarModalBottomSheet
 import com.jie.wealthmate.feature.calendar.START_DATE
+import com.jie.wealthmate.feature.calendar.component.SelectedCalendarModalBottomSheet
 import com.jie.wealthmate.theme.ColorGray
 import com.jie.wealthmate.utils.convertLocalDateToString
 import com.jie.wealthmate.utils.formatDateHyphenYM
@@ -44,9 +43,13 @@ import wealthmate.composeapp.generated.resources.ic_setting
 @Composable
 fun BudgetScreen(
     navController: NavController,
+    onBack: () -> Unit,
     viewModel: BudgetViewModel = koinViewModel(),
 ) {
-    BaseScreen(viewModel = viewModel) { uiState ->
+    BaseScreen(
+        viewModel = viewModel,
+        onBack = onBack
+    ) { uiState ->
         BudgetContent(
             uiState = uiState,
             onSettingClick = { navController.navigate("budgetSetting") },
@@ -127,9 +130,11 @@ fun BudgetContent(
                     uiState.budgetOverItems.isNotEmpty() -> {
                         BudgetOverPager(items = uiState.budgetOverItems)
                     }
+
                     uiState.totalBudgetAmount > 0L && (uiState.totalBudgetAmount - uiState.usedAmount) > 0 -> {
                         BudgetSuccess()
                     }
+
                     else -> {
                         BudgetInfo(
                             isNotBudgetSetting = uiState.totalBudgetAmount == 0L,

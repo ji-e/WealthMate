@@ -8,9 +8,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.jie.wealthmate.base.BaseScreen
@@ -23,17 +22,21 @@ import com.jie.wealthmate.feature.menu.component.MenuItem
 import com.jie.wealthmate.feature.menu.component.MenuItemData
 import com.jie.wealthmate.feature.menu.component.MenuTitleItem
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
+import com.jie.wealthmate.theme.WMTheme
 import com.jie.wealthmate.utils.default
 import com.mmk.kmpauth.google.GoogleButtonUiContainer
+import io.github.aakira.napier.Napier
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun MenuScreen(
     navController: NavController,
+    onBack: () -> Unit,
     viewModel: MenuViewModel = koinViewModel(),
 ) {
     BaseScreen(
         viewModel = viewModel,
+        onBack = onBack,
         onSideEffect = { effect ->
             when (effect) {
                 is MenuUiSideEffect.OnCLickMenu -> {
@@ -89,11 +92,13 @@ fun MenuContent(
 
                     GoogleButtonUiContainer(
                         onGoogleSignInResult = { googleUser ->
-                            onUpdateUser(
-                                googleUser?.accessToken.default(),
-                                googleUser?.email.default(),
-                                googleUser?.idToken.default()
-                            )
+                            if (googleUser != null) {
+                                onUpdateUser(
+                                    googleUser.accessToken.default(),
+                                    googleUser.email.default(),
+                                    googleUser.idToken.default()
+                                )
+                            }
                         },
                         scopes = listOf(
                             "https://www.googleapis.com/auth/drive.appdata",
@@ -124,5 +129,21 @@ fun MenuContent(
                 Spacer(modifier = Modifier.height(28.dp))
             }
         }
+    }
+}
+
+@Preview
+@Composable
+fun MenuContentPreview() {
+    WMTheme {
+        MenuContent(
+            uiState = MenuUiState(
+                menuEnums = MenuItemData.menuItems,
+                userName = "example@gmail.com"
+            ),
+            onMenuClick = {},
+            onUpdateUser = { _, _, _ -> },
+            onLogout = {}
+        )
     }
 }

@@ -13,6 +13,15 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil
     ) -> Bool {
         FirebaseApp.configure()
+
+        // Info.plist에서 ID 값 읽어오기
+        let clientID = Bundle.main.object(forInfoDictionaryKey: "GIDClientID") as? String ?? ""
+        let serverClientID = Bundle.main.object(forInfoDictionaryKey: "GIDServerClientID") as? String ?? ""
+
+        GIDSignIn.sharedInstance.configuration = GIDConfiguration(
+            clientID: clientID,
+            serverClientID: serverClientID
+        )
         
         // Messaging delegate 설정
         Messaging.messaging().delegate = self
@@ -66,7 +75,9 @@ struct iOSApp: App {
         WindowGroup {
             ContentView()
                 .onOpenURL { url in
+                    print("✅ onOpenURL called: \(url)") // 이게 찍히는지 확인
                     if !GIDSignIn.sharedInstance.handle(url) {
+                        print("❌ GIDSignIn did not handle this URL")
                     }
                 }
         }
