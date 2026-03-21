@@ -12,7 +12,20 @@
           "package_name": "com.jie.wealthmate"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "808791516955-ickndfopa1tqdikia6rjbkv5o0nnv9v1.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.jie.wealthmate",
+            "certificate_hash": "950ef02d4ddb955468a09ebdc515a54bf930f265"
+          }
+        },
+        {
+          "client_id": "808791516955-mvuausum2tbonst3bf4kqna8t99tkkk6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyBU5zhJP5x_c9d1yxbYNnpz0TxwH-ZjlEs"
@@ -20,7 +33,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "808791516955-mvuausum2tbonst3bf4kqna8t99tkkk6.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "808791516955-aquafdtkchm74tfh6iro2uc6ovuhju77.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.jie.wealthmate.WealthMate"
+              }
+            }
+          ]
         }
       }
     }

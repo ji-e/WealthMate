@@ -1,4 +1,6 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import java.util.Properties
+import com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -8,6 +10,22 @@ plugins {
     alias(libs.plugins.composeHotReload)
     alias(libs.plugins.kotlinx.atomicfu)
     alias(libs.plugins.google.services)
+    alias(libs.plugins.buildkonfig)
+}
+
+val localProperties = Properties().apply {
+    val localPropertiesFile = rootProject.file("local.properties")
+    if (localPropertiesFile.exists()) {
+        localPropertiesFile.inputStream().use { load(it) }
+    }
+}
+val googleWebClientId = localProperties.getProperty("GOOGLE_WEB_CLIENT_ID") ?: ""
+
+buildkonfig {
+    packageName = "com.jie.wealthmate"
+    defaultConfigs {
+        buildConfigField(STRING, "GOOGLE_WEB_CLIENT_ID", googleWebClientId)
+    }
 }
 
 kotlin {
@@ -21,7 +39,6 @@ kotlin {
             baseName = "ComposeApp"
             isStatic = true
             linkerOpts.add("-lsqlite3")
-            // shared 모듈의 클래스들을 Swift에 노출
             export(projects.shared)
         }
     }
@@ -34,9 +51,6 @@ kotlin {
             implementation(libs.androidx.compose.ui.tooling.preview)
             implementation(libs.androidx.security.crypto)
         }
-        iosMain.dependencies {
-
-        }
         commonMain.dependencies {
             implementation(libs.compose.runtime)
             implementation(libs.compose.foundation)
@@ -46,36 +60,26 @@ kotlin {
             implementation(libs.compose.components.resources)
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
-            api(projects.shared) // implementation 대신 api 사용
+            api(projects.shared)
 
             implementation(libs.bundles.ktor.common)
             implementation(libs.kotlinx.serialization.json)
-
             implementation(libs.kotlinx.datetime)
             implementation(libs.kotlinx.atomicfu)
             implementation(libs.kotlinx.collections.immutable)
-
             implementation(libs.navigation.compose)
             implementation(libs.koin.compose.viewmodel)
             implementation(libs.voyager.navigator)
             implementation(libs.voyager.screenmodel)
             implementation(libs.voyager.transitions)
             implementation(libs.voyager.koin)
-
             implementation(libs.koin.core)
             implementation(libs.koin.compose)
-
             implementation(libs.compottie)
-
             implementation(libs.bundles.kmpAuth.common)
             implementation(libs.multiplatform.settings)
-
             implementation(libs.napier)
-
             implementation(libs.bundles.firebase.common)
-        }
-        commonTest.dependencies {
-            implementation(libs.kotlin.test)
         }
     }
 }
@@ -91,6 +95,7 @@ android {
         versionCode = 1
         versionName = "1.0"
     }
+    
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"

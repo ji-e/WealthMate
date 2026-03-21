@@ -53,6 +53,7 @@ napier = "2.7.1"
 firebase-kotlin = "2.4.0"
 
 google-services = "4.4.4"
+buildkonfig = "0.15.2"
 
 
 [libraries]
@@ -132,6 +133,7 @@ napier = { module = "io.github.aakira:napier", version.ref = "napier" }
 
 firebase-auth = { module = "dev.gitlive:firebase-auth", version.ref = "firebase-kotlin" }
 firebase-firestore = { module = "dev.gitlive:firebase-firestore", version.ref = "firebase-kotlin" }
+firebase-messaging = { module = "dev.gitlive:firebase-messaging", version.ref = "firebase-kotlin" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
@@ -147,6 +149,7 @@ kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", versi
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 androidx-room = { id = "androidx.room", version.ref = "room" }
 google-services = { id = "com.google.gms.google-services", version.ref = "google-services" }
+buildkonfig = { id = "com.codingfeline.buildkonfig", version.ref = "buildkonfig" }
 
 
 
@@ -162,7 +165,8 @@ ktor-common = [
 
 firebase-common = [
     "firebase-auth",
-    "firebase-firestore"
+    "firebase-firestore",
+    "firebase-messaging"
 ]
 
 kmpAuth-common = [

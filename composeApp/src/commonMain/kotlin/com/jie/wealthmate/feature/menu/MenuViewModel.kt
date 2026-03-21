@@ -1,10 +1,12 @@
 package com.jie.wealthmate.feature.menu
 
 import androidx.lifecycle.viewModelScope
+import com.jie.wealthmate.BuildKonfig
 import com.jie.wealthmate.base.BaseViewModel
 import com.jie.wealthmate.feature.menu.component.MenuEnum
 import com.jie.wealthmate.feature.menu.component.MenuItemData
 import com.jie.wealthmate.repository.AuthRepository
+import com.jie.wealthmate.repository.FirebaseRepository
 import com.jie.wealthmate.repository.GoogleRepository
 import com.jie.wealthmate.utils.default
 import com.mmk.kmpauth.google.GoogleAuthCredentials
@@ -14,6 +16,7 @@ import kotlinx.coroutines.launch
 class MenuViewModel(
     private val authRepository: AuthRepository,
     private val googleRepository: GoogleRepository,
+    private val firebaseRepository: FirebaseRepository,
 ) : BaseViewModel<MenuUiState>() {
 
     override val initialState: MenuUiState
@@ -39,12 +42,20 @@ class MenuViewModel(
         postSideEffect(MenuUiSideEffect.OnCLickMenu(menu))
     }
 
-    fun updateUser(accessToken: String?, email: String) {
-        authRepository.saveAuthData(accessToken.default(), null, email)
-        reduceState { state ->
-            state.copy(
-                userName = email
+    fun updateUser(accessToken: String?, email: String, idToken: String) {
+        viewModelScope.launch {
+            val fcmToken = firebaseRepository.getFcmToken()
+            firebaseRepository.saveUserConnection(
+                userId = email,
+                identificationKey = idToken,
+                fcmToken = fcmToken
             )
+            authRepository.saveAuthData(accessToken.default(), null, email)
+            reduceState { state ->
+                state.copy(
+                    userName = email
+                )
+            }
         }
     }
 
@@ -53,7 +64,7 @@ class MenuViewModel(
             showLoading(true)
             try {
                 GoogleAuthProvider.create(
-                    credentials = GoogleAuthCredentials(serverId = "808791516955-mvuausum2tbonst3bf4kqna8t99tkkk6.apps.googleusercontent.com")
+                    credentials = GoogleAuthCredentials(serverId = BuildKonfig.GOOGLE_WEB_CLIENT_ID)
                 ).signOut()
                 authRepository.clearAuthData()
                 showSnackbar("계정 연동이 해제 되었습니다.")

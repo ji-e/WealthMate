@@ -35,6 +35,8 @@ import com.jie.wealthmate.repository.BudgetRepository
 import com.jie.wealthmate.repository.BudgetRepositoryImpl
 import com.jie.wealthmate.repository.CategoryRepository
 import com.jie.wealthmate.repository.CategoryRepositoryImpl
+import com.jie.wealthmate.repository.FirebaseRepository
+import com.jie.wealthmate.repository.FirebaseRepositoryImpl
 import com.jie.wealthmate.repository.GoogleRepository
 import com.jie.wealthmate.repository.GoogleRepositoryImpl
 import com.jie.wealthmate.repository.HistoryRepository
@@ -83,16 +85,14 @@ val commonModule = module {
     viewModelOf(::SearchViewModel)
 
     singleOf(::DatabaseSyncManager)
-    singleOf(::HttpClientFactory)
+    single { HttpClientFactory(get()).create() }
     singleOf(::SaveHistoryUseCase)
     singleOf(::UpdateInstallmentUseCase)
     singleOf(::UpdateRepeatCycleUseCase)
     singleOf(::ModifyHistoryUseCase)
 
+    single<FirebaseRepository> { FirebaseRepositoryImpl() }
 
-//    single { DatabaseSyncManager(get(), get(), get()) }
-
-//    single { HttpClientFactory(get()).create() }
     single<AuthRepository> { AuthRepositoryImpl(get()) }
     single<GoogleRepository> { GoogleRepositoryImpl(get(), get()) }
     single<CategoryRepository> { CategoryRepositoryImpl(get()) }
@@ -101,11 +101,4 @@ val commonModule = module {
     single<InstallmentRepository> { InstallmentRepositoryImpl(get()) }
     single<RepeatCycleRepository> { RepeatCycleRepositoryImpl(get()) }
     single<BudgetRepository> { BudgetRepositoryImpl(get()) }
-
-
-//    single { SaveHistoryUseCase(get(), get(), get()) }
-//    single { UpdateInstallmentUseCase(get(), get()) }
-//    single { UpdateRepeatCycleUseCase(get(), get()) }
-//    single { ModifyHistoryUseCase(get(), get()) }
-
 }

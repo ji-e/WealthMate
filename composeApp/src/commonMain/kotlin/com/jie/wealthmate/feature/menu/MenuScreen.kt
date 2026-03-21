@@ -62,7 +62,7 @@ fun MenuScreen(
 fun MenuContent(
     uiState: MenuUiState,
     onMenuClick: (MenuEnum) -> Unit,
-    onUpdateUser: (String?, String) -> Unit,
+    onUpdateUser: (String?, String, String) -> Unit,
     onLogout: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -91,7 +91,8 @@ fun MenuContent(
                         onGoogleSignInResult = { googleUser ->
                             onUpdateUser(
                                 googleUser?.accessToken.default(),
-                                googleUser?.email.default()
+                                googleUser?.email.default(),
+                                googleUser?.idToken.default()
                             )
                         },
                         scopes = listOf(
