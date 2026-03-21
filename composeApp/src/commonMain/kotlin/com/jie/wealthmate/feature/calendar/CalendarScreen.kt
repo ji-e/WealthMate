@@ -48,11 +48,10 @@ fun CalendarScreen(
             onFilterOptionsChanged = viewModel::updateFilterOptions,
             onTodayClick = { viewModel.updateSelectedMonth() },
             onSearchClick = {
-                // navController.navigate(Screen.Search.route)
+                navController.navigate("search")
             },
             onHistoryClick = { history ->
                 navController.navigate("historyDetail/${history.largeCategory}/${history.id}")
-                // navController.navigate(Screen.HistoryDetail.createRoute(history.largeCategory, history.id))
             }
         )
     }

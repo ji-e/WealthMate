@@ -27,7 +27,7 @@ import com.jie.wealthmate.feature.menu.management.paymentMethodManagement.paymen
 import com.jie.wealthmate.feature.menu.management.repeatHistoryManagement.RepeatHistoryManagementViewModel
 import com.jie.wealthmate.feature.menu.management.repeatHistoryManagement.addRepeatHistory.AddRepeatHistoryViewModel
 import com.jie.wealthmate.feature.menu.management.repeatHistoryManagement.repeatHistoryDetail.RepeatHistoryDetailViewModel
-import com.jie.wealthmate.feature.search.SearchScreenModel
+import com.jie.wealthmate.feature.search.SearchViewModel
 import com.jie.wealthmate.network.HttpClientFactory
 import com.jie.wealthmate.repository.AuthRepository
 import com.jie.wealthmate.repository.AuthRepositoryImpl
@@ -49,6 +49,7 @@ import com.jie.wealthmate.usecase.ModifyHistoryUseCase
 import com.jie.wealthmate.usecase.SaveHistoryUseCase
 import com.jie.wealthmate.usecase.UpdateInstallmentUseCase
 import com.jie.wealthmate.usecase.UpdateRepeatCycleUseCase
+import org.koin.core.module.dsl.singleOf
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 
@@ -66,28 +67,6 @@ val commonModule = module {
     viewModelOf(::AddBudgetViewModel)
     viewModelOf(::BudgetDetailViewModel)
     viewModelOf(::BudgetYearDetailViewModel)
-
-
-    single { DatabaseSyncManager(get(), get(), get()) }
-
-    single { HttpClientFactory(get()).create() }
-    single<AuthRepository> { AuthRepositoryImpl(get()) }
-    single<GoogleRepository> { GoogleRepositoryImpl(get(), get()) }
-    single<CategoryRepository> { CategoryRepositoryImpl(get()) }
-    single<PaymentMethodRepository> { PaymentMethodRepositoryImpl(get()) }
-    single<HistoryRepository> { HistoryRepositoryImpl(get()) }
-    single<InstallmentRepository> { InstallmentRepositoryImpl(get()) }
-    single<RepeatCycleRepository> { RepeatCycleRepositoryImpl(get()) }
-    single<BudgetRepository> { BudgetRepositoryImpl(get()) }
-
-
-    single { SaveHistoryUseCase(get(), get(), get()) }
-    single { UpdateInstallmentUseCase(get(), get()) }
-    single { UpdateRepeatCycleUseCase(get(), get()) }
-    single { ModifyHistoryUseCase(get(), get()) }
-
-
-    // 메뉴
     viewModelOf(::MenuViewModel)
     viewModelOf(::AddCategoryViewModel)
     viewModelOf(::ModifyCategoryViewModel)
@@ -101,8 +80,32 @@ val commonModule = module {
     viewModelOf(::RepeatHistoryDetailViewModel)
     viewModelOf(::GoogleCloudSyncViewModel)
     viewModelOf(::GoogleCloudShareViewModel)
+    viewModelOf(::SearchViewModel)
 
-    // 검색
-    factory { SearchScreenModel(get(), get(), get()) }
+    singleOf(::DatabaseSyncManager)
+    singleOf(::HttpClientFactory)
+    singleOf(::SaveHistoryUseCase)
+    singleOf(::UpdateInstallmentUseCase)
+    singleOf(::UpdateRepeatCycleUseCase)
+    singleOf(::ModifyHistoryUseCase)
+
+
+//    single { DatabaseSyncManager(get(), get(), get()) }
+
+//    single { HttpClientFactory(get()).create() }
+    single<AuthRepository> { AuthRepositoryImpl(get()) }
+    single<GoogleRepository> { GoogleRepositoryImpl(get(), get()) }
+    single<CategoryRepository> { CategoryRepositoryImpl(get()) }
+    single<PaymentMethodRepository> { PaymentMethodRepositoryImpl(get()) }
+    single<HistoryRepository> { HistoryRepositoryImpl(get()) }
+    single<InstallmentRepository> { InstallmentRepositoryImpl(get()) }
+    single<RepeatCycleRepository> { RepeatCycleRepositoryImpl(get()) }
+    single<BudgetRepository> { BudgetRepositoryImpl(get()) }
+
+
+//    single { SaveHistoryUseCase(get(), get(), get()) }
+//    single { UpdateInstallmentUseCase(get(), get()) }
+//    single { UpdateRepeatCycleUseCase(get(), get()) }
+//    single { ModifyHistoryUseCase(get(), get()) }
 
 }

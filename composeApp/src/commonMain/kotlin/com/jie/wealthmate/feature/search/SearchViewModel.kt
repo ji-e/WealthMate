@@ -1,8 +1,8 @@
 package com.jie.wealthmate.feature.search
 
 import androidx.compose.ui.text.input.TextFieldValue
-import cafe.adriel.voyager.core.model.screenModelScope
-import com.jie.wealthmate.base.BaseScreenModel
+import androidx.lifecycle.viewModelScope
+import com.jie.wealthmate.base.BaseViewModel
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.repository.CategoryRepository
 import com.jie.wealthmate.repository.HistoryRepository
@@ -17,67 +17,78 @@ import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.persistentMapOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.collections.immutable.toImmutableMap
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
 
-class SearchScreenModel(
+class SearchViewModel(
     private val historyRepository: HistoryRepository,
     private val categoryRepository: CategoryRepository,
     private val paymentMethodRepository: PaymentMethodRepository,
-) : BaseScreenModel<SearchUiState>() {
+) : BaseViewModel<SearchUiState>() {
+
     override val initialState: SearchUiState = SearchUiState()
 
     private val PAGE_SIZE = 20
     private var searchJob: Job? = null
+    private var debounceJob: Job? = null
 
     init {
-        getAllCategories()
-        getAllPaymentMethods()
+        loadInitialData()
         search(isFirstPage = true)
     }
 
+    private fun loadInitialData() {
+        getAllCategories()
+        getAllPaymentMethods()
+    }
+
     private fun getAllCategories() {
-        categoryRepository.getAllCategories().apiFlow { response ->
-            reduceState { state ->
-                val categories = response.map { entity -> entity.mapperToVo() }
-                    .sortedWith(
-                        compareBy<CategoryVo> {
-                            when (it.largeCategory) {
-                                LargeCategoryEnum.INCOME -> 0
-                                LargeCategoryEnum.SAVING -> 1
-                                LargeCategoryEnum.EXPENSES -> 2
-                            }
-                        }.thenBy { it.sort }
-                    ).toImmutableList()
-                state.copy(
-                    categories = categories,
-                )
-            }
+        categoryRepository.getAllCategories().apiFlow(showLoadingIndicator = false) { response ->
+            val categories = response.map { it.mapperToVo() }
+                .sortedWith(
+                    compareBy<CategoryVo> {
+                        when (it.largeCategory) {
+                            LargeCategoryEnum.INCOME -> 0
+                            LargeCategoryEnum.SAVING -> 1
+                            LargeCategoryEnum.EXPENSES -> 2
+                        }
+                    }.thenBy { it.sort }
+                ).toImmutableList()
+            reduceState { it.copy(categories = categories) }
         }
     }
 
     private fun getAllPaymentMethods() {
-        paymentMethodRepository.getPaymentMethods().apiFlow { response ->
-            reduceState { state ->
-                val paymentMethods =
-                    (response.map { it.paymentMethod.mapperToVo() } + listOf(PaymentMethodVo.UNSET)).toImmutableList()
-                state.copy(
-                    paymentMethods = paymentMethods,
-                )
-            }
+        paymentMethodRepository.getPaymentMethods().apiFlow(showLoadingIndicator = false) { response ->
+            val paymentMethods =
+                (response.map { it.paymentMethod.mapperToVo() } + listOf(PaymentMethodVo.UNSET)).toImmutableList()
+            reduceState { it.copy(paymentMethods = paymentMethods) }
         }
     }
 
     fun updateQuery(query: TextFieldValue) {
         reduceState { it.copy(query = query) }
-        search(isFirstPage = true)
+        
+        debounceJob?.cancel()
+        debounceJob = viewModelScope.launch {
+            delay(500)
+            search(isFirstPage = true)
+        }
     }
 
     fun clearQuery() {
-        reduceState { it.copy(query = TextFieldValue(""), searchResults = persistentListOf(), summary = persistentMapOf()) }
+        debounceJob?.cancel()
+        reduceState {
+            it.copy(
+                query = TextFieldValue(""),
+                searchResults = persistentListOf(),
+                summary = persistentMapOf(),
+                offset = 0,
+                hasMore = true
+            )
+        }
         search(isFirstPage = true)
     }
 
@@ -86,26 +97,22 @@ class SearchScreenModel(
         if (currentState.isLoading || (!isFirstPage && !currentState.hasMore)) return
 
         searchJob?.cancel()
-        searchJob = screenModelScope.launch(Dispatchers.IO) {
-            reduceState { it.copy(isLoading = true) }
-
-            val offset = if (isFirstPage) 0 else currentState.offset
-
+        searchJob = ioScope.launch {
             try {
-                // Fetch summary only on the first page load or when filters change
-                if (isFirstPage) {
-                    val summaryMap = historyRepository.getSearchSummary(
+                reduceState { it.copy(isLoading = true) }
+                
+                val offset = if (isFirstPage) 0 else currentState.offset
+
+                val summary = if (isFirstPage) {
+                    historyRepository.getSearchSummary(
                         query = currentState.query.text,
                         startDate = currentState.startDate?.toEpochMilliseconds(),
                         endDate = currentState.endDate?.toEpochMilliseconds(),
                         largeCategories = currentState.selectedLargeCategories.map { it.name },
                         categoryIds = currentState.selectedCategories.map { it.id },
                         paymentMethodIds = currentState.selectedPaymentMethods.map { it.id }
-                    ).mapKeys { LargeCategoryEnum.creator(it.key) }
-                        .toImmutableMap()
-                    
-                    reduceState { it.copy(summary = summaryMap) }
-                }
+                    ).mapKeys { LargeCategoryEnum.creator(it.key) }.toImmutableMap()
+                } else null
 
                 val results = historyRepository.searchHistories(
                     query = currentState.query.text,
@@ -117,23 +124,22 @@ class SearchScreenModel(
                     paymentMethodIds = currentState.selectedPaymentMethods.map { it.id },
                     limit = PAGE_SIZE,
                     offset = offset
-                ).map { it.mapperToVo() }
+                )
 
                 reduceState { state ->
-                    val newResults = if (isFirstPage) {
-                        results.toImmutableList()
-                    } else {
-                        (state.searchResults + results).toImmutableList()
-                    }
+                    val mappedResults = results.map { it.mapperToVo() }
                     state.copy(
-                        searchResults = newResults,
+                        searchResults = if (isFirstPage) mappedResults.toImmutableList() else (state.searchResults + mappedResults).toImmutableList(),
+                        summary = summary ?: state.summary,
                         isLoading = false,
                         hasMore = results.size == PAGE_SIZE,
-                        offset = offset + results.size
+                        offset = (if (isFirstPage) 0 else state.offset) + results.size
                     )
                 }
             } catch (e: Exception) {
+                e.printStackTrace()
                 reduceState { it.copy(isLoading = false) }
+                showSnackbar(e.message ?: "검색 중 오류가 발생했습니다.")
             }
         }
     }
@@ -194,7 +200,9 @@ class SearchScreenModel(
                 endDate = null,
                 sortOrder = SearchSortOrder.LATEST,
                 query = TextFieldValue(""),
-                summary = persistentMapOf()
+                summary = persistentMapOf(),
+                offset = 0,
+                hasMore = true
             )
         }
         search(isFirstPage = true)

@@ -60,6 +60,7 @@ import com.jie.wealthmate.feature.menu.management.paymentMethodManagement.modify
 import com.jie.wealthmate.feature.menu.management.repeatHistoryManagement.RepeatHistoryManagementScreen
 import com.jie.wealthmate.feature.menu.management.repeatHistoryManagement.addRepeatHistory.AddRepeatHistoryScreen
 import com.jie.wealthmate.feature.menu.management.repeatHistoryManagement.repeatHistoryDetail.RepeatHistoryDetailScreen
+import com.jie.wealthmate.feature.search.SearchScreen
 import com.jie.wealthmate.getPlatform
 import com.jie.wealthmate.utils.convertDateToLocalDate
 import com.jie.wealthmate.utils.today
@@ -145,6 +146,9 @@ fun MainScreen(
                     }
                     composable(BottomNavItem.Menu.route) {
                         MenuScreen(navController = innerNavController)
+                    }
+                    composable("search") {
+                        SearchScreen(navController = innerNavController)
                     }
                     composable(
                         route = "historyDetail/{largeCategory}/{historyId}",
