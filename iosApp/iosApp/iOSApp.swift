@@ -2,9 +2,32 @@ import SwiftUI
 import ComposeApp
 import GoogleSignIn
 import Firebase
+import FirebaseMessaging
+import UserNotifications
 
 // 1. 반드시 클래스 선언이 struct iOSApp 밖에 있어야 합니다.
-class AppDelegate: NSObject, UIApplicationDelegate {
+class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDelegate, MessagingDelegate {
+
+    func application(
+        _ application: UIApplication,
+        didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil
+    ) -> Bool {
+        FirebaseApp.configure()
+        
+        // Messaging delegate 설정
+        Messaging.messaging().delegate = self
+        
+        // 알림 센터 delegate 설정
+        UNUserNotificationCenter.current().delegate = self
+        
+        // 원격 알림 등록
+        let authOptions: UNAuthorizationOptions = [.alert, .badge, .sound]
+        UNUserNotificationCenter.current().requestAuthorization(options: authOptions) { _, _ in }
+        
+        application.registerForRemoteNotifications()
+        
+        return true
+    }
 
     func application(
         _ app: UIApplication,
@@ -13,7 +36,19 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         // 구글 로그인 인증 결과 핸들링
         return GIDSignIn.sharedInstance.handle(url)
     }
+    
+    // APNS 토큰을 Firebase에 전달
+    func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+        Messaging.messaging().apnsToken = deviceToken
+    }
+    
+    // FCM 등록 토큰 수신
+    func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String?) {
+        print("Firebase registration token: \(String(describing: fcmToken))")
+        // 필요한 경우 여기서 서버로 토큰을 전송하거나 앱 내에서 활용할 수 있습니다.
+    }
 }
+
 @main
 struct iOSApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
@@ -21,7 +56,7 @@ struct iOSApp: App {
     init() {
         MainViewControllerKt.debugBuild()
         KoinInitializerKt.doInitKoin()
-        FirebaseApp.configure()
+        // FirebaseApp.configure() // AppDelegate의 didFinishLaunchingWithOptions에서 호출하도록 변경함
 
         // 조용한 로그인(Silent Sign-In) 프로바이더 등록
         setupSilentSignInProvider()

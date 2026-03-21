@@ -1,7 +1,8 @@
-@file:OptIn(InternalVoyagerApi::class)
+@file:OptIn(ExperimentalComposeUiApi::class)
 
 package com.jie.wealthmate.feature.menu.management.categoryManagement
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -18,14 +19,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import cafe.adriel.voyager.core.annotation.InternalVoyagerApi
-import cafe.adriel.voyager.navigator.internal.BackHandler
 import com.jie.wealthmate.base.BaseScreen
-import com.jie.wealthmate.component.EmptyListView
 import com.jie.wealthmate.component.ButtonSize
+import com.jie.wealthmate.component.EmptyListView
 import com.jie.wealthmate.component.WMFloatingButton
 import com.jie.wealthmate.component.reorderable.rememberReorderableLazyListState
 import com.jie.wealthmate.component.topbar.TopBarItem
@@ -81,9 +81,11 @@ fun CategoryManagementScreen(
     }
 
     BaseScreen(viewModel = viewModel) {
-        Column(modifier = Modifier
-            .navigationBarsPadding()
-            .fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .navigationBarsPadding()
+                .fillMaxSize()
+        ) {
             if (isDragging) {
                 WMTopBar(
                     title = TopBarItem.Title("${MenuEnum.CATEGORY.label} 순서 변경"),
@@ -99,7 +101,8 @@ fun CategoryManagementScreen(
                             tint = if (isAddItemEnabled) ColorGray.Gray_700 else ColorGray.Gray_100,
                             action = {
                                 if (isAddItemEnabled) {
-                                    val currentLargeCategory = largeCategoryItems[pagerState.currentPage].name
+                                    val currentLargeCategory =
+                                        largeCategoryItems[pagerState.currentPage].name
                                     navController.navigate("addCategory/$currentLargeCategory")
                                 }
                             }
@@ -151,7 +154,8 @@ fun CategoryManagementScreen(
                 WMFloatingButton(
                     text = "저장",
                     buttonSize = ButtonSize.LARGE,
-                    modifier = Modifier.padding(horizontal = 28.dp, vertical = 20.dp).fillMaxWidth(),
+                    modifier = Modifier.padding(horizontal = 28.dp, vertical = 20.dp)
+                        .fillMaxWidth(),
                     onClick = {
                         viewModel.saveCategorySort()
                         isDragging = false

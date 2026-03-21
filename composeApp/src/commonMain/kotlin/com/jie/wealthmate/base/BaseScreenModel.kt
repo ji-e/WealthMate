@@ -1,6 +1,7 @@
 package com.jie.wealthmate.base
 
-import cafe.adriel.voyager.core.model.ScreenModel
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.jie.wealthmate.MainUiManager
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.CancellationException
@@ -19,11 +20,11 @@ import kotlinx.coroutines.launch
 
 /**
  * MVI 패턴을 적용한 화면의 기본 클래스입니다.
- * Voyager의 ScreenModel을 상속받아 화면 전환을 관리하고, ContainerHost를 구현하여 UI 상태와 이벤트를 처리합니다.
+ * Jetpack Lifecycle의 ViewModel을 상속받아 화면 전환을 관리하고, ContainerHost를 구현하여 UI 상태와 이벤트를 처리합니다.
  *
  * @param S 이 화면에서 사용할 UI 상태(UiState)의 타입
  */
-abstract class BaseScreenModel<S : UiState> : ScreenModel, ContainerHost<S> {
+abstract class BaseScreenModel<S : UiState> : ViewModel(), ContainerHost<S> {
 
     /**
      * KMP 환경에 맞는 CoroutineScope를 생성합니다.
@@ -31,7 +32,7 @@ abstract class BaseScreenModel<S : UiState> : ScreenModel, ContainerHost<S> {
      * - SupervisorJob: 자식 코루틴 중 하나에서 예외가 발생해도 다른 코루틴이나 부모 스코프에 영향을 주지 않아,
      *   UI의 안정성을 높입니다.
      */
-    protected val screenScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
+    protected val screenScope: CoroutineScope = viewModelScope
     protected val ioScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
 
@@ -80,14 +81,14 @@ abstract class BaseScreenModel<S : UiState> : ScreenModel, ContainerHost<S> {
         BaseUiSideEffect.Idle
     }
 
-    override fun onDispose() {
+    override fun onCleared() {
+        super.onCleared()
         // RealContainer 리소스 정리
         try {
             when (container) {
                 is RealContainer -> (container as RealContainer<S>).close()
                 else -> println("Container doesn't support close operation: ${container::class.simpleName}")
             }
-            screenScope.cancel()
             ioScope.cancel()
         } catch (e: Exception) {
             println("Error closing container: $e")

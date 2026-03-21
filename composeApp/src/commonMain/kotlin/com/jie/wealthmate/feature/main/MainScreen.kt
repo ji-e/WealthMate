@@ -1,5 +1,6 @@
 package com.jie.wealthmate.feature.main
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
@@ -27,8 +28,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import cafe.adriel.voyager.core.annotation.InternalVoyagerApi
-import cafe.adriel.voyager.navigator.internal.BackHandler
 import com.jie.wealthmate.MainUiManager
 import com.jie.wealthmate.component.CustomSnackbarHost
 import com.jie.wealthmate.component.bottomNav.BottomNavItem
@@ -69,7 +68,7 @@ import org.koin.compose.viewmodel.koinViewModel
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
-@OptIn(InternalVoyagerApi::class, ExperimentalTime::class)
+@OptIn(ExperimentalTime::class)
 @Composable
 fun MainScreen(
     navController: NavController,
