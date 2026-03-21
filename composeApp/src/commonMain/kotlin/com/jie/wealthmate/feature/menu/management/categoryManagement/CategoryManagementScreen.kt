@@ -5,6 +5,7 @@ package com.jie.wealthmate.feature.menu.management.categoryManagement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -19,9 +20,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import cafe.adriel.voyager.core.annotation.InternalVoyagerApi
-import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.currentOrThrow
 import cafe.adriel.voyager.navigator.internal.BackHandler
 import com.jie.wealthmate.base.BaseScreen
 import com.jie.wealthmate.component.EmptyListView
@@ -31,87 +31,77 @@ import com.jie.wealthmate.component.reorderable.rememberReorderableLazyListState
 import com.jie.wealthmate.component.topbar.TopBarItem
 import com.jie.wealthmate.component.topbar.WMTopBar
 import com.jie.wealthmate.feature.menu.component.MenuEnum
-import com.jie.wealthmate.feature.menu.management.categoryManagement.addCategory.AddCategoryScreen
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.Category
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.CategoryTab
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
-import com.jie.wealthmate.feature.menu.management.categoryManagement.modifyCategory.ModifyCategoryScreen
 import com.jie.wealthmate.theme.ColorGray
 import com.jie.wealthmate.utils.default
 import kotlinx.coroutines.launch
-import org.koin.compose.koinInject
+import org.koin.compose.viewmodel.koinViewModel
 import wealthmate.composeapp.generated.resources.Res
 import wealthmate.composeapp.generated.resources.ic_add
 
-class CategoryManagementScreen : BaseScreen() {
-    private val largeCategoryItems = LargeCategoryEnum.entries
+@Composable
+fun CategoryManagementScreen(
+    navController: NavController,
+    viewModel: CategoryManagementViewModel = koinViewModel(),
+) {
+    val largeCategoryItems = LargeCategoryEnum.entries
+    val uiState by viewModel.container.uiState.collectAsState()
+    val coroutineScope = rememberCoroutineScope()
+    var isDragging by remember { mutableStateOf(false) }
+    val pagerState = rememberPagerState(pageCount = { largeCategoryItems.size })
 
-    @Composable
-    override fun Content() {
-        super.Content()
-
-        val navigator = LocalNavigator.currentOrThrow
-        val screenModel: CategoryManagementScreenModel = koinInject()
-        val uiState by screenModel.container.uiState.collectAsState()
-        val coroutineScope = rememberCoroutineScope()
-        var isDragging by remember { mutableStateOf(false) }
-        val pagerState = rememberPagerState(pageCount = { largeCategoryItems.size })
-
-        // 각 탭별로 독립적인 스크롤/Reorder 상태를 유지하기 위한 맵
-        val listStates = largeCategoryItems.associateWith {
-            rememberReorderableLazyListState(
-                onMove = { from, to ->
-                    screenModel.handleReorderCategoryItems(
-                        from.index,
-                        to.index
-                    )
-                }
-            )
-        }
-
-        val isAddItemEnabled by remember {
-            derivedStateOf { uiState.currentCategoryItems?.size.default() < 15 }
-        }
-
-        val onBack: () -> Unit = remember(isDragging) {
-            {
-                if (isDragging) {
-                    showSaveBackDialog(isDragging) {
-                        isDragging = false
-                        screenModel.getCategories(largeCategoryItems[pagerState.currentPage])
-                    }
-                } else {
-                    navigator.pop()
-                }
+    val listStates = largeCategoryItems.associateWith {
+        rememberReorderableLazyListState(
+            onMove = { from, to ->
+                viewModel.handleReorderCategoryItems(from.index, to.index)
             }
-        }
-
-        BackHandler(
-            enabled = true,
-            onBack = onBack
         )
+    }
 
-        LaunchedEffect(pagerState.currentPage) {
-            screenModel.changeTab(largeCategoryItems[pagerState.currentPage])
+    val isAddItemEnabled by remember {
+        derivedStateOf { uiState.currentCategoryItems?.size.default() < 15 }
+    }
+
+    val onBack: () -> Unit = {
+        if (isDragging) {
+            // TODO: Use viewModel to show confirmation or handle local state
+            isDragging = false
+            viewModel.getCategories(largeCategoryItems[pagerState.currentPage])
+        } else {
+            navController.popBackStack()
         }
+    }
 
-        Column {
+    BackHandler(enabled = true, onBack = onBack)
+
+    LaunchedEffect(pagerState.currentPage) {
+        viewModel.changeTab(largeCategoryItems[pagerState.currentPage])
+    }
+
+    BaseScreen(viewModel = viewModel) {
+        Column(modifier = Modifier
+            .navigationBarsPadding()
+            .fillMaxSize()) {
             if (isDragging) {
                 WMTopBar(
                     title = TopBarItem.Title("${MenuEnum.CATEGORY.label} 순서 변경"),
-                    readingItem = TopBarItem.ReadingItem().copy(action = { onBack() })
+                    readingItem = TopBarItem.ReadingItem(action = onBack)
                 )
             } else {
                 WMTopBar(
                     title = TopBarItem.Title(MenuEnum.CATEGORY.title),
-                    readingItem = TopBarItem.ReadingItem().copy(action = { navigator.pop() }),
+                    readingItem = TopBarItem.ReadingItem(action = { navController.popBackStack() }),
                     trailingItem = listOf(
                         TopBarItem.TrailingItem(
                             iconRes = Res.drawable.ic_add,
                             tint = if (isAddItemEnabled) ColorGray.Gray_700 else ColorGray.Gray_100,
                             action = {
-                                if (isAddItemEnabled.not()) return@TrailingItem
-                                navigator.push(AddCategoryScreen(largeCategory = largeCategoryItems[pagerState.currentPage]))
+                                if (isAddItemEnabled) {
+                                    val currentLargeCategory = largeCategoryItems[pagerState.currentPage].name
+                                    navController.navigate("addCategory/$currentLargeCategory")
+                                }
                             }
                         )
                     )
@@ -122,12 +112,13 @@ class CategoryManagementScreen : BaseScreen() {
                 pagerState = pagerState,
                 onTapClick = {
                     if (isDragging) {
-                        screenModel.showSnackbar("순서 변경을 저장해 주세요.")
+                        viewModel.showSnackbar("순서 변경을 저장해 주세요.")
                     } else {
                         coroutineScope.launch { pagerState.animateScrollToPage(it) }
                     }
                 }
             )
+
             HorizontalPager(
                 modifier = Modifier.weight(1f),
                 state = pagerState,
@@ -140,9 +131,7 @@ class CategoryManagementScreen : BaseScreen() {
 
                 if (items.isEmpty()) {
                     EmptyListView(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(20.dp),
+                        modifier = Modifier.fillMaxSize().padding(20.dp),
                         contentText = "카테고리를 추가해주세요.",
                     )
                 } else {
@@ -151,13 +140,8 @@ class CategoryManagementScreen : BaseScreen() {
                         categoryItems = items,
                         isDragging = isDragging,
                         onIsDraggingChange = { isDragging = it },
-                        onItemClick = {
-                            navigator.push(
-                                ModifyCategoryScreen(
-                                    largeCategory = it.largeCategory,
-                                    categoryId = it.id
-                                )
-                            )
+                        onItemClick = { category ->
+                            navController.navigate("modifyCategory/${category.largeCategory.name}/${category.id}")
                         }
                     )
                 }
@@ -167,10 +151,9 @@ class CategoryManagementScreen : BaseScreen() {
                 WMFloatingButton(
                     text = "저장",
                     buttonSize = ButtonSize.LARGE,
-                    modifier = Modifier.padding(horizontal = 28.dp, vertical = 20.dp)
-                        .fillMaxWidth(),
+                    modifier = Modifier.padding(horizontal = 28.dp, vertical = 20.dp).fillMaxWidth(),
                     onClick = {
-                        screenModel.saveCategorySort()
+                        viewModel.saveCategorySort()
                         isDragging = false
                     }
                 )

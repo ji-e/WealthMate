@@ -1,7 +1,8 @@
 package com.jie.wealthmate.feature.menu.management.repeatHistoryManagement.addRepeatHistory
 
 import androidx.compose.ui.text.input.TextFieldValue
-import com.jie.wealthmate.base.BaseScreenModel
+import androidx.lifecycle.viewModelScope
+import com.jie.wealthmate.base.BaseViewModel
 import com.jie.wealthmate.database.eneity.RepeatCycleEntity
 import com.jie.wealthmate.feature.calendar.addHistory.component.RepeatCycleEnum
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
@@ -16,19 +17,25 @@ import com.jie.wealthmate.vo.CategoryTagVo
 import com.jie.wealthmate.vo.CategoryVo
 import com.jie.wealthmate.vo.CategoryVo.Companion.mapperToVo
 import com.jie.wealthmate.vo.PaymentMethodVo
+import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
 
-class AddRepeatHistoryScreenModel(
+class AddRepeatHistoryViewModel(
     private val repeatCycleRepository: RepeatCycleRepository,
     private val categoryRepository: CategoryRepository,
     private val paymentMethodRepository: PaymentMethodRepository,
-) : BaseScreenModel<AddRepeatHistoryUiState>() {
+    private val largeCategory: LargeCategoryEnum,
+) : BaseViewModel<AddRepeatHistoryUiState>() {
 
     override val initialState: AddRepeatHistoryUiState
-        get() = AddRepeatHistoryUiState()
+        get() = AddRepeatHistoryUiState(
+            selectedLargeCategory = largeCategory,
+            startDate = today,
+            endDate = today,
+        )
 
     init {
-        getCategories(LargeCategoryEnum.EXPENSES)
+        getCategories(largeCategory)
         getPaymentMethods()
     }
 
@@ -41,7 +48,6 @@ class AddRepeatHistoryScreenModel(
         }
         getCategories(largeCategory)
     }
-
 
     fun updateDate(type: String, date: LocalDate?) {
         reduceState { state ->
@@ -130,7 +136,7 @@ class AddRepeatHistoryScreenModel(
 
     private fun getCategories(largeCategoryEnum: LargeCategoryEnum) {
         categoryRepository.getCategoriesByLargeCategory(largeCategoryEnum.name)
-            .apiFlow { response ->
+            .apiFlow(showLoadingIndicator = false) { response ->
                 reduceState { state ->
                     state.copy(
                         categoryItems = response.map { it.mapperToVo() }
@@ -141,8 +147,7 @@ class AddRepeatHistoryScreenModel(
 
     private fun getPaymentMethods() {
         paymentMethodRepository.getPaymentMethods()
-            .apiFlow { response ->
-                println("response: $response")
+            .apiFlow(showLoadingIndicator = false) { response ->
                 reduceState { state ->
                     state.copy(
                         paymentMethodItems = response.map {
@@ -161,8 +166,9 @@ class AddRepeatHistoryScreenModel(
 
     fun saveRepeatCycle() {
         val uiState = container.uiState.value
-        launchSafe(
-            block = {
+        viewModelScope.launch {
+            showLoading(true)
+            try {
                 repeatCycleRepository.insertRepeatCycle(
                     RepeatCycleEntity(
                         largeCategory = uiState.selectedLargeCategory.name,
@@ -179,14 +185,17 @@ class AddRepeatHistoryScreenModel(
                         paymentMethodId = uiState.paymentMethod?.id,
                     )
                 )
+                showSnackbar("반복 정보가 저장되었습니다.")
+                postSideEffect(AddRepeatHistoryUiSideEffect.OnSuccessSave)
+            } catch (e: Exception) {
+                showSnackbar(e.message ?: "오류가 발생했습니다.")
+            } finally {
+                showLoading(false)
             }
-        ) {
-            showSnackbar("반복 정보가 저장되었습니다.")
-            postSideEffect { AddRepeatHistoryUiSideEffect.OnSuccessSave }
         }
     }
 
-    companion object {
+    companion object Companion {
         const val START_DATE = "시작일"
         const val END_DATE = "종료일"
     }

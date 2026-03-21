@@ -27,14 +27,18 @@ class AddHistoryViewModel(
     private val paymentMethodRepository: PaymentMethodRepository,
     private val historyRepository: HistoryRepository,
     private val saveHistoryUseCase: SaveHistoryUseCase,
+    private val initialSelectedDate: LocalDate
 ) : BaseViewModel<AddHistoryUiState>() {
 
-    override val initialState: AddHistoryUiState = AddHistoryUiState()
+    override val initialState: AddHistoryUiState = AddHistoryUiState(
+        date = initialSelectedDate
+    )
 
     // 대분류 상태를 관리하는 Flow (카테고리 목록 로딩 트리거)
     private val largeCategoryFlow = MutableStateFlow(initialState.selectedLargeCategory)
 
     init {
+        largeCategoryFlow.value = initialState.selectedLargeCategory
         observeCategories()
         observePaymentMethods()
     }
@@ -75,17 +79,6 @@ class AddHistoryViewModel(
                     )
                 }
             }
-    }
-
-    fun updateInit(selectedDate: LocalDate) {
-        largeCategoryFlow.value = initialState.selectedLargeCategory
-        reduceState { state ->
-            initialState.copy(
-                date = selectedDate,
-                categoryItems = state.categoryItems,
-                paymentMethodItems = state.paymentMethodItems
-            )
-        }
     }
 
     fun updateLargeCategory(largeCategory: LargeCategoryEnum) {

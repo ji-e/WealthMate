@@ -1,16 +1,18 @@
 package com.jie.wealthmate.feature.menu.management.paymentMethodManagement.modifyPaymentMethod
 
 import androidx.compose.ui.text.input.TextFieldValue
-import com.jie.wealthmate.base.BaseScreenModel
+import androidx.lifecycle.viewModelScope
+import com.jie.wealthmate.base.BaseViewModel
 import com.jie.wealthmate.database.eneity.PaymentMethodEntity
 import com.jie.wealthmate.database.eneity.PaymentMethodWithGroupEntity
 import com.jie.wealthmate.feature.menu.management.paymentMethodManagement.addPaymentMethod.component.PaymentMethodGroupItemData
 import com.jie.wealthmate.repository.PaymentMethodRepository
 import com.jie.wealthmate.utils.default
+import kotlinx.coroutines.launch
 
-class ModifyPaymentMethodScreenModel(
+class ModifyPaymentMethodViewModel(
     private val paymentMethodRepository: PaymentMethodRepository,
-) : BaseScreenModel<ModifyPaymentMethodUiState>() {
+) : BaseViewModel<ModifyPaymentMethodUiState>() {
     private var paymentMethodItems: List<PaymentMethodWithGroupEntity> = emptyList()
     private var paymentMethodId: String = ""
 
@@ -26,21 +28,26 @@ class ModifyPaymentMethodScreenModel(
     }
 
     private fun getPaymentMethod() {
-        launchSafe(
-            block = {
-                paymentMethodRepository.getPaymentMethodById(paymentMethodId)
-            }
-        ) { response ->
-            response ?: return@launchSafe
-            reduceState { state ->
-                state.copy(
-                    label = TextFieldValue(response.paymentMethod.label),
-                    group = PaymentMethodGroupItemData(
-                        id = response.group?.id.default(),
-                        label = response.group?.label.default(),
-                    ),
-                    sort = response.paymentMethod.sort
-                )
+        viewModelScope.launch {
+            showLoading(true)
+            try {
+                val response = paymentMethodRepository.getPaymentMethodById(paymentMethodId)
+                if (response != null) {
+                    reduceState { state ->
+                        state.copy(
+                            label = TextFieldValue(response.paymentMethod.label),
+                            group = PaymentMethodGroupItemData(
+                                id = response.group?.id.default(),
+                                label = response.group?.label.default(),
+                            ),
+                            sort = response.paymentMethod.sort
+                        )
+                    }
+                }
+            } catch (e: Exception) {
+                showSnackbar(e.message ?: "결제 수단을 불러오지 못했습니다.")
+            } finally {
+                showLoading(false)
             }
         }
     }
@@ -73,8 +80,9 @@ class ModifyPaymentMethodScreenModel(
             return
         }
 
-        launchSafe(
-            block = {
+        viewModelScope.launch {
+            showLoading(true)
+            try {
                 paymentMethodRepository.updatePaymentMethod(
                     PaymentMethodEntity(
                         id = paymentMethodId,
@@ -84,27 +92,34 @@ class ModifyPaymentMethodScreenModel(
                         sort = uiState.sort
                     )
                 )
-            },
-        ) {
-            showSnackbar("결제수단이 수정되었습니다.")
-            postSideEffect { ModifyPaymentMethodUiSideEffect.OnSuccess }
+                showSnackbar("결제수단이 수정되었습니다.")
+                postSideEffect(ModifyPaymentMethodUiSideEffect.OnSuccess)
+            } catch (e: Exception) {
+                showSnackbar(e.message ?: "오류가 발생했습니다.")
+            } finally {
+                showLoading(false)
+            }
         }
     }
 
     fun removePaymentMethod() {
-        launchSafe(
-            block = {
+        viewModelScope.launch {
+            showLoading(true)
+            try {
                 paymentMethodRepository.deletePaymentMethod(paymentMethodId)
-            },
-        ) {
-            showSnackbar("결제수단이 삭제되었습니다.")
-            postSideEffect { ModifyPaymentMethodUiSideEffect.OnSuccess }
+                showSnackbar("결제수단이 삭제되었습니다.")
+                postSideEffect(ModifyPaymentMethodUiSideEffect.OnSuccess)
+            } catch (e: Exception) {
+                showSnackbar(e.message ?: "오류가 발생했습니다.")
+            } finally {
+                showLoading(false)
+            }
         }
     }
 
     private fun getPaymentMethods() {
         paymentMethodRepository.getPaymentMethods()
-            .apiFlow { response ->
+            .apiFlow(showLoadingIndicator = false) { response ->
                 paymentMethodItems = response
             }
     }

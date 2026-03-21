@@ -1,138 +1,153 @@
-@file:OptIn(InternalVoyagerApi::class)
-
 package com.jie.wealthmate.feature.menu.management.paymentMethodManagement.addPaymentMethod
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
-import cafe.adriel.voyager.core.annotation.InternalVoyagerApi
-import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.currentOrThrow
-import cafe.adriel.voyager.navigator.internal.BackHandler
+import androidx.navigation.NavController
 import com.jie.wealthmate.base.BaseScreen
-import com.jie.wealthmate.base.collectSideEffect
 import com.jie.wealthmate.component.ButtonSize
 import com.jie.wealthmate.component.WMButton
+import com.jie.wealthmate.component.WMSaveBackDialog
 import com.jie.wealthmate.component.textField.WMTextField
 import com.jie.wealthmate.component.topbar.TopBarItem
 import com.jie.wealthmate.component.topbar.WMTopBar
 import com.jie.wealthmate.feature.menu.component.MenuEnum
+import com.jie.wealthmate.feature.menu.management.paymentMethodManagement.addPaymentMethod.component.PaymentMethodGroupItemData
 import com.jie.wealthmate.feature.menu.management.paymentMethodManagement.paymentMethodGroup.PaymentMethodGroupModalBottomSheet
 import com.jie.wealthmate.utils.default
 import com.jie.wealthmate.vo.PaymentMethodVo
-import org.koin.compose.koinInject
+import org.koin.compose.viewmodel.koinViewModel
+import org.koin.core.parameter.parametersOf
 
-class AddPaymentMethodScreen(
-    val paymentMethodItems: List<PaymentMethodVo> = emptyList(),
-) : BaseScreen() {
+@Composable
+fun AddPaymentMethodScreen(
+    navController: NavController,
+    paymentMethodItems: List<PaymentMethodVo> = emptyList(),
+    viewModel: AddPaymentMethodViewModel = koinViewModel { parametersOf(paymentMethodItems) },
+) {
+    val uiState by viewModel.container.uiState.collectAsState()
+    var isShowSaveBackDialog by remember { mutableStateOf(false) }
 
-    @Composable
-    override fun Content() {
-        super.Content()
-
-        val navigator = LocalNavigator.currentOrThrow
-        val screenModel: AddPaymentMethodScreenModel = koinInject()
-        val uiState by screenModel.container.uiState.collectAsState()
-
-        var isShowPaymentMethodModalBottomSheet by remember { mutableStateOf(false) }
-
-        val onBack: () -> Unit = remember(uiState.isDataChanged) {
-            {
-                showSaveBackDialog(
-                    isShow = uiState.isDataChanged,
-                    callback = { navigator.pop() }
-                )
+    BaseScreen(
+        viewModel = viewModel,
+        onSideEffect = { sideEffect ->
+            when (sideEffect) {
+                is AddPaymentMethodUiSideEffect.OnSuccessSave -> navController.popBackStack()
             }
         }
-
-        BackHandler(
-            enabled = true,
-            onBack = onBack
+    ) {
+        AddPaymentMethodContent(
+            uiState = uiState,
+            onBack = {
+                if (uiState.isDataChanged) {
+                    isShowSaveBackDialog = true
+                } else {
+                    navController.popBackStack()
+                }
+            },
+            onUpdatePaymentMethodLabel = viewModel::updatePaymentMethodLabel,
+            onUpdatePaymentMethodGroup = viewModel::updatePaymentMethodGroup,
+            onSavePaymentMethod = viewModel::savePaymentMethod
         )
 
-        LaunchedEffect(Unit) {
-            screenModel.updateInit(
-                paymentMethodItems = paymentMethodItems
+        if (isShowSaveBackDialog) {
+            WMSaveBackDialog(
+                onConfirm = {
+                    isShowSaveBackDialog = false
+                    navController.popBackStack()
+                },
+                onDismiss = { isShowSaveBackDialog = false }
             )
         }
 
-        screenModel.collectSideEffect { sideEffect ->
-            when (sideEffect) {
-                is AddPaymentMethodUiSideEffect.OnSuccessSave -> navigator.pop()
-            }
-        }
+    }
+}
+
+@Composable
+fun AddPaymentMethodContent(
+    uiState: AddPaymentMethodUiState,
+    onBack: () -> Unit,
+    onUpdatePaymentMethodLabel: (TextFieldValue) -> Unit,
+    onUpdatePaymentMethodGroup: (PaymentMethodGroupItemData?) -> Unit,
+    onSavePaymentMethod: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    var isShowPaymentMethodModalBottomSheet by remember { mutableStateOf(false) }
+
+    Column(
+        modifier = modifier
+            .navigationBarsPadding()
+            .fillMaxSize()
+    ) {
+        WMTopBar(
+            title = TopBarItem.Title("${MenuEnum.PAYMENT_METHOD.label} 추가"),
+            readingItem = TopBarItem.ReadingItem(action = onBack),
+        )
 
         Column(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .weight(1f)
+                .padding(horizontal = 28.dp)
         ) {
-            WMTopBar(
-                title = TopBarItem.Title("${MenuEnum.PAYMENT_METHOD.label} 추가"),
-                readingItem = TopBarItem.ReadingItem().copy(action = { onBack() }),
+            WMTextField(
+                value = uiState.label,
+                onValueChange = onUpdatePaymentMethodLabel,
+                modifier = Modifier.padding(top = 4.dp),
+                label = "결제수단 이름",
+                placeholder = "삼성카드",
+                isRequire = true,
+                maxLength = 15,
+                isCount = true,
             )
 
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(horizontal = 28.dp)
-            ) {
-                WMTextField(
-                    value = uiState.label,
-                    onValueChange = screenModel::updatePaymentMethodLabel,
-                    modifier = Modifier.padding(top = 4.dp),
-                    label = "결제수단 이름",
-                    placeholder = "삼성카드",
-                    isRequire = true,
-                    maxLength = 15,
-                    isCount = true,
-                )
-
-                WMTextField(
-                    value = uiState.group?.label.default(),
-                    onValueChange = { },
-                    modifier = Modifier.padding(top = 4.dp),
-                    label = "결제수단 그룹",
-                    placeholder = "신용카드",
-                    readOnly = true,
-                    onReadOnlyClick = { isShowPaymentMethodModalBottomSheet = true }
-                )
-            }
-            // 저장 버튼
-            WMButton(
-                text = "저장",
-                buttonSize = ButtonSize.LARGE,
-                modifier = Modifier
-                    .padding(horizontal = 28.dp)
-                    .padding(bottom = 20.dp)
-                    .fillMaxWidth(),
-                enabled = uiState.label.text.isNotBlank(),
-                onClick = screenModel::savePaymentMethod
+            WMTextField(
+                value = uiState.group?.label.default(),
+                onValueChange = { },
+                modifier = Modifier.padding(top = 4.dp),
+                label = "결제수단 그룹",
+                placeholder = "신용카드",
+                readOnly = true,
+                onReadOnlyClick = { isShowPaymentMethodModalBottomSheet = true }
             )
         }
 
-        // 결제수단 그룹  ModalBottomSheet
-        if (isShowPaymentMethodModalBottomSheet) {
-            PaymentMethodGroupModalBottomSheet(
-                selectedPaymentMethodGroup = uiState.group,
-                onSelectClick = screenModel::updatePaymentMethodGroup,
-                onRemoveClick = { onConfirmClick ->
-                    showRemoveDialog() {
-                        onConfirmClick()
-                    }
-                },
-                onGroupLabelChange = screenModel::updatePaymentMethodGroup,
-                onSuccessRemove = { screenModel.updatePaymentMethodGroup(null) },
-                onDismissRequest = { isShowPaymentMethodModalBottomSheet = false }
-            )
-        }
+        WMButton(
+            text = "저장",
+            buttonSize = ButtonSize.LARGE,
+            modifier = Modifier
+                .padding(horizontal = 28.dp)
+                .padding(bottom = 20.dp)
+                .fillMaxWidth(),
+            enabled = uiState.label.text.isNotBlank(),
+            onClick = onSavePaymentMethod
+        )
+    }
+
+    if (isShowPaymentMethodModalBottomSheet) {
+        PaymentMethodGroupModalBottomSheet(
+            selectedPaymentMethodGroup = uiState.group,
+            onSelectClick = {
+                onUpdatePaymentMethodGroup(it)
+                isShowPaymentMethodModalBottomSheet = false
+            },
+            onRemoveClick = { onConfirmClick ->
+                // TODO: show remove dialog
+                onConfirmClick()
+            },
+            onGroupLabelChange = onUpdatePaymentMethodGroup,
+            onSuccessRemove = { onUpdatePaymentMethodGroup(null) },
+            onDismissRequest = { isShowPaymentMethodModalBottomSheet = false }
+        )
     }
 }

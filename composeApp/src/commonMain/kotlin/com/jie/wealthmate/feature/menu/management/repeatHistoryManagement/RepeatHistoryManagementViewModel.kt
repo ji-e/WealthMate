@@ -1,13 +1,15 @@
 package com.jie.wealthmate.feature.menu.management.repeatHistoryManagement
 
-import com.jie.wealthmate.base.BaseScreenModel
+import androidx.lifecycle.viewModelScope
+import com.jie.wealthmate.base.BaseViewModel
 import com.jie.wealthmate.database.eneity.RepeatCycleEntity
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.repository.RepeatCycleRepository
+import kotlinx.coroutines.launch
 
-class RepeatHistoryManagementScreenModel(
+class RepeatHistoryManagementViewModel(
     private val repeatCycleRepository: RepeatCycleRepository,
-) : BaseScreenModel<RepeatHistoryManagementUiState>() {
+) : BaseViewModel<RepeatHistoryManagementUiState>() {
 
     override val initialState: RepeatHistoryManagementUiState
         get() = RepeatHistoryManagementUiState()
@@ -34,16 +36,20 @@ class RepeatHistoryManagementScreenModel(
     }
 
     fun modifyRepeatCycle(repeatCycle: RepeatCycleEntity, isActive: Boolean) {
-        launchSafe(
-            block = {
+        viewModelScope.launch {
+            showLoading(true)
+            try {
                 repeatCycleRepository.updateRepeatCycle(
                     repeatCycle.copy(
                         isActive = isActive
                     )
                 )
+                showSnackbar("반복 정보가 수정되었습니다.")
+            } catch (e: Exception) {
+                showSnackbar(e.message ?: "오류가 발생했습니다.")
+            } finally {
+                showLoading(false)
             }
-        ) {
-            showSnackbar("반복 정보가 수정되었습니다.")
         }
     }
 }

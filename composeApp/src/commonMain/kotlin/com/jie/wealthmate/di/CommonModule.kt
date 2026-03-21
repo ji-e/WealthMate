@@ -14,19 +14,19 @@ import com.jie.wealthmate.feature.home.categoryExpenses.CategoryExpensesViewMode
 import com.jie.wealthmate.feature.home.paymentMethodExpenses.PaymentMethodExpensesViewModel
 import com.jie.wealthmate.feature.home.preparednessStatus.PreparednessStatusViewModel
 import com.jie.wealthmate.feature.main.MainViewModel
-import com.jie.wealthmate.feature.menu.MenuScreenModel
-import com.jie.wealthmate.feature.menu.data.googleCloudShare.GoogleCloudShareScreenModel
-import com.jie.wealthmate.feature.menu.data.googleCloudSync.GoogleCloudSyncScreenModel
-import com.jie.wealthmate.feature.menu.management.categoryManagement.CategoryManagementScreenModel
-import com.jie.wealthmate.feature.menu.management.categoryManagement.addCategory.AddCategoryScreenModel
-import com.jie.wealthmate.feature.menu.management.categoryManagement.modifyCategory.ModifyCategoryScreenModel
-import com.jie.wealthmate.feature.menu.management.paymentMethodManagement.PaymentMethodManagementScreenModel
-import com.jie.wealthmate.feature.menu.management.paymentMethodManagement.addPaymentMethod.AddPaymentMethodScreenModel
-import com.jie.wealthmate.feature.menu.management.paymentMethodManagement.modifyPaymentMethod.ModifyPaymentMethodScreenModel
-import com.jie.wealthmate.feature.menu.management.paymentMethodManagement.paymentMethodGroup.PaymentMethodGroupScreenModel
-import com.jie.wealthmate.feature.menu.management.repeatHistoryManagement.RepeatHistoryManagementScreenModel
-import com.jie.wealthmate.feature.menu.management.repeatHistoryManagement.addRepeatHistory.AddRepeatHistoryScreenModel
-import com.jie.wealthmate.feature.menu.management.repeatHistoryManagement.repeatHistoryDetail.RepeatHistoryDetailScreenModel
+import com.jie.wealthmate.feature.menu.MenuViewModel
+import com.jie.wealthmate.feature.menu.data.googleCloudShare.GoogleCloudShareViewModel
+import com.jie.wealthmate.feature.menu.data.googleCloudSync.GoogleCloudSyncViewModel
+import com.jie.wealthmate.feature.menu.management.categoryManagement.CategoryManagementViewModel
+import com.jie.wealthmate.feature.menu.management.categoryManagement.addCategory.AddCategoryViewModel
+import com.jie.wealthmate.feature.menu.management.categoryManagement.modifyCategory.ModifyCategoryViewModel
+import com.jie.wealthmate.feature.menu.management.paymentMethodManagement.PaymentMethodManagementViewModel
+import com.jie.wealthmate.feature.menu.management.paymentMethodManagement.addPaymentMethod.AddPaymentMethodViewModel
+import com.jie.wealthmate.feature.menu.management.paymentMethodManagement.modifyPaymentMethod.ModifyPaymentMethodViewModel
+import com.jie.wealthmate.feature.menu.management.paymentMethodManagement.paymentMethodGroup.PaymentMethodGroupViewModel
+import com.jie.wealthmate.feature.menu.management.repeatHistoryManagement.RepeatHistoryManagementViewModel
+import com.jie.wealthmate.feature.menu.management.repeatHistoryManagement.addRepeatHistory.AddRepeatHistoryViewModel
+import com.jie.wealthmate.feature.menu.management.repeatHistoryManagement.repeatHistoryDetail.RepeatHistoryDetailViewModel
 import com.jie.wealthmate.feature.search.SearchScreenModel
 import com.jie.wealthmate.network.HttpClientFactory
 import com.jie.wealthmate.repository.AuthRepository
@@ -49,7 +49,6 @@ import com.jie.wealthmate.usecase.ModifyHistoryUseCase
 import com.jie.wealthmate.usecase.SaveHistoryUseCase
 import com.jie.wealthmate.usecase.UpdateInstallmentUseCase
 import com.jie.wealthmate.usecase.UpdateRepeatCycleUseCase
-import kotlinx.datetime.LocalDate
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 
@@ -88,24 +87,20 @@ val commonModule = module {
     single { ModifyHistoryUseCase(get(), get()) }
 
 
-
-
-
     // 메뉴
-    factory { MenuScreenModel(get(), get()) }
-    factory { AddCategoryScreenModel(get()) }
-    factory { ModifyCategoryScreenModel(get()) }
-    factory { CategoryManagementScreenModel(get()) }
-    factory { PaymentMethodManagementScreenModel(get()) }
-    factory { PaymentMethodGroupScreenModel(get()) }
-    factory { AddPaymentMethodScreenModel(get()) }
-    factory { ModifyPaymentMethodScreenModel(get()) }
-    factory { RepeatHistoryManagementScreenModel(get()) }
-    factory { AddRepeatHistoryScreenModel(get(), get(), get()) }
-    factory { RepeatHistoryDetailScreenModel(get(), get(), get()) }
-
-    factory { GoogleCloudSyncScreenModel(get(), get(), get()) }
-    factory { GoogleCloudShareScreenModel(get(), get(), get()) }
+    viewModelOf(::MenuViewModel)
+    viewModelOf(::AddCategoryViewModel)
+    viewModelOf(::ModifyCategoryViewModel)
+    viewModelOf(::CategoryManagementViewModel)
+    viewModelOf(::PaymentMethodManagementViewModel)
+    viewModelOf(::PaymentMethodGroupViewModel)
+    viewModelOf(::AddPaymentMethodViewModel)
+    viewModelOf(::ModifyPaymentMethodViewModel)
+    viewModelOf(::RepeatHistoryManagementViewModel)
+    viewModelOf(::AddRepeatHistoryViewModel)
+    viewModelOf(::RepeatHistoryDetailViewModel)
+    viewModelOf(::GoogleCloudSyncViewModel)
+    viewModelOf(::GoogleCloudShareViewModel)
 
     // 검색
     factory { SearchScreenModel(get(), get(), get()) }

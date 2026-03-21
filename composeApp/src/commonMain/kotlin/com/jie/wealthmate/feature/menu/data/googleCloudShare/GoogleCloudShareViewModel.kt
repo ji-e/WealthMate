@@ -1,19 +1,21 @@
 package com.jie.wealthmate.feature.menu.data.googleCloudShare
 
 import androidx.compose.ui.text.input.TextFieldValue
-import com.jie.wealthmate.base.BaseScreenModel
+import androidx.lifecycle.viewModelScope
+import com.jie.wealthmate.base.BaseViewModel
 import com.jie.wealthmate.database.DatabaseSyncManager
 import com.jie.wealthmate.repository.AuthRepository
 import com.jie.wealthmate.repository.GoogleRepository
 import com.jie.wealthmate.utils.default
 import com.jie.wealthmate.vo.GoogleDrivePermissionVo.Companion.mapperToVo
 import io.github.aakira.napier.Napier
+import kotlinx.coroutines.launch
 
-class GoogleCloudShareScreenModel(
+class GoogleCloudShareViewModel(
     private val googleRepository: GoogleRepository,
     private val authRepository: AuthRepository,
     private val syncManager: DatabaseSyncManager,
-) : BaseScreenModel<GoogleCloudShareUiState>() {
+) : BaseViewModel<GoogleCloudShareUiState>() {
 
     override val initialState: GoogleCloudShareUiState
         get() = GoogleCloudShareUiState(
@@ -40,47 +42,45 @@ class GoogleCloudShareScreenModel(
     }
 
     private fun getSharedFolderId() {
-        launchSafe(
-            block = {
-                googleRepository.findFolderByName("Wealth_Mate_Shared")
-            }
-        ) { response ->
+        viewModelScope.launch {
+            try {
+                val response = googleRepository.findFolderByName("Wealth_Mate_Shared")
+                val sharedFolderId =
+                    authRepository.getSharedFolderId().default().ifEmpty { response.default() }
 
-            val sharedFolderId =
-                authRepository.getSharedFolderId().default().ifEmpty { response.default() }
+                fetchFilePermissions(sharedFolderId)
 
-            fetchFilePermissions(sharedFolderId)
-
-            reduceState { state ->
-                state.copy(
-                    sharedFolderId = sharedFolderId
-                )
+                reduceState { state ->
+                    state.copy(sharedFolderId = sharedFolderId)
+                }
+            } catch (e: Exception) {
+                // Handle error
             }
         }
     }
 
     private fun fetchFilePermissions(sharedFolderId: String) {
-        launchSafe(
-            block = {
-                googleRepository.getFilePermissions(sharedFolderId)
-            }
-        ) { response ->
-            val googleDrivePermissionVo = response.mapperToVo()
+        viewModelScope.launch {
+            try {
+                val response = googleRepository.getFilePermissions(sharedFolderId)
+                val googleDrivePermissionVo = response.mapperToVo()
 
-            reduceState { state ->
-                state.copy(
-                    googleDrivePermissionVo = googleDrivePermissionVo,
-                    isOwnerMode = googleDrivePermissionVo.permissions
-                        .find { it.emailAddress.equals(state.userName, ignoreCase = true) }
-                        ?.role == "owner"
-                )
+                reduceState { state ->
+                    state.copy(
+                        googleDrivePermissionVo = googleDrivePermissionVo,
+                        isOwnerMode = googleDrivePermissionVo.permissions
+                            .find { it.emailAddress.equals(state.userName, ignoreCase = true) }
+                            ?.role == "owner"
+                    )
+                }
+            } catch (e: Exception) {
+                // Handle error
             }
         }
     }
 
     fun updateUser(accessToken: String?, email: String) {
         authRepository.saveAuthData(accessToken.default(), null, email)
-
         reduceState { state ->
             state.copy(
                 isLoggedIn = accessToken != null,
@@ -89,10 +89,10 @@ class GoogleCloudShareScreenModel(
         }
     }
 
-
     fun createShareFolder() {
-        launchSafe(
-            block = {
+        viewModelScope.launch {
+            showLoading(true)
+            try {
                 val sharedFolderId = googleRepository.getOrCreateSharedFolder("Wealth_Mate_Shared")
                     ?: throw Exception("잠시 후 다시 시도해 주세요.")
 
@@ -103,69 +103,76 @@ class GoogleCloudShareScreenModel(
                         isOwnerMode = true
                     )
                 }
+                uploadMyDataToSharedFolder()
+            } catch (e: Exception) {
+                showSnackbar(e.message ?: "오류가 발생했습니다.")
+            } finally {
+                showLoading(false)
             }
-        ) {
-            uploadMyDataToSharedFolder()
         }
     }
 
     fun uploadMyDataToSharedFolder() {
-        launchSafe(
-            block = {
+        viewModelScope.launch {
+            try {
                 syncManager.syncFullToSharedFolder()
+                Napier.d("내 데이터를 공유 폴더에 성공적으로 업로드했습니다.")
+            } catch (e: Exception) {
+                Napier.e("내 데이터 업로드 실패: ${e.message}")
             }
-        ) {
-            Napier.d("내 데이터를 공유 폴더에 성공적으로 업로드했습니다.")
         }
     }
 
     fun inviteMember() {
         val uiState = container.uiState.value
-        launchSafe(
-            block = {
-                val isPermissionGranted =
-                    googleRepository.grantPermission(
-                        fileId = uiState.sharedFolderId,
-                        email = container.uiState.value.inviteEmail.text
-                    )
+        viewModelScope.launch {
+            showLoading(true)
+            try {
+                val isPermissionGranted = googleRepository.grantPermission(
+                    fileId = uiState.sharedFolderId,
+                    email = uiState.inviteEmail.text
+                )
                 if (!isPermissionGranted) {
                     throw Exception("잠시 후 다시 시도해 주세요.")
                 }
-            }
-        ) {
-            fetchFilePermissions(uiState.sharedFolderId)
-            reduceState { state ->
-                state.copy(
-                    inviteEmail = TextFieldValue("")
-                )
+                fetchFilePermissions(uiState.sharedFolderId)
+                reduceState { state ->
+                    state.copy(inviteEmail = TextFieldValue(""))
+                }
+            } catch (e: Exception) {
+                showSnackbar(e.message ?: "오류가 발생했습니다.")
+            } finally {
+                showLoading(false)
             }
         }
     }
 
     fun connectToSharedFolder() {
         val folderId = container.uiState.value.inviteCode.text
-
-        launchSafe(
-            block = {
+        viewModelScope.launch {
+            showLoading(true)
+            try {
                 googleRepository.connectToSharedFolder(folderId)
+                reduceState { state ->
+                    state.copy(sharedFolderId = folderId)
+                }
+                syncFromSharedFolder()
+            } catch (e: Exception) {
+                showSnackbar(e.message ?: "오류가 발생했습니다.")
+            } finally {
+                showLoading(false)
             }
-        ) {
-            reduceState { state ->
-                state.copy(
-                    sharedFolderId = folderId
-                )
-            }
-            syncFromSharedFolder()
         }
     }
 
     fun syncFromSharedFolder() {
-        launchSafe(
-            block = {
+        viewModelScope.launch {
+            try {
                 syncManager.syncFromSharedFolder()
+                Napier.d("상대방 데이터를 공유 폴더에서 성공적으로 다운로드했습니다.")
+            } catch (e: Exception) {
+                Napier.e("데이터 다운로드 실패: ${e.message}")
             }
-        ) {
-            Napier.d("상대방 데이터를 공유 폴더에서 성공적으로 다운로드했습니다.")
         }
     }
 

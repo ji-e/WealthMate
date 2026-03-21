@@ -1,17 +1,19 @@
 package com.jie.wealthmate.feature.menu.management.categoryManagement.addCategory
 
 import androidx.compose.ui.text.input.TextFieldValue
-import com.jie.wealthmate.base.BaseScreenModel
+import androidx.lifecycle.viewModelScope
+import com.jie.wealthmate.base.BaseViewModel
 import com.jie.wealthmate.component.CategoryIconEnum
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.repository.CategoryRepository
 import com.jie.wealthmate.vo.CategoryTagVo
 import com.jie.wealthmate.vo.CategoryVo
 import com.jie.wealthmate.vo.CategoryVo.Companion.mapperToVo
+import kotlinx.coroutines.launch
 
-class AddCategoryScreenModel(
+class AddCategoryViewModel(
     private val categoryRepository: CategoryRepository,
-) : BaseScreenModel<AddCategoryUiState>() {
+) : BaseViewModel<AddCategoryUiState>() {
 
     private var categoryItems: List<CategoryVo> = emptyList()
 
@@ -119,8 +121,9 @@ class AddCategoryScreenModel(
             return
         }
 
-        launchSafe(
-            block = {
+        viewModelScope.launch {
+            showLoading(true)
+            try {
                 categoryRepository.insertCategory(
                     icon = uiState.categoryIcon.text,
                     largeCategory = uiState.largeCategory.name,
@@ -129,16 +132,19 @@ class AddCategoryScreenModel(
                     isFixed = uiState.isFixed,
                     tagLabels = uiState.tagLabelItems.map { it.label }
                 )
-            },
-        ) {
-            showSnackbar("카테고리가 저장되었습니다.")
-            postSideEffect { AddCategoryUiSideEffect.OnSuccessSave }
+                showSnackbar("카테고리가 저장되었습니다.")
+                postSideEffect(AddCategoryUiSideEffect.OnSuccessSave)
+            } catch (e: Exception) {
+                showSnackbar(e.message ?: "오류가 발생했습니다.")
+            } finally {
+                showLoading(false)
+            }
         }
     }
 
     fun getCategories(largeCategoryEnum: LargeCategoryEnum) {
         categoryRepository.getCategoriesByLargeCategory(largeCategoryEnum.name)
-            .apiFlow { response ->
+            .apiFlow(showLoadingIndicator = false) { response ->
                 categoryItems = response.map { it.mapperToVo() }
             }
     }

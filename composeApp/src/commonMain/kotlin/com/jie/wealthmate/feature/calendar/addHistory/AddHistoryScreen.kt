@@ -12,7 +12,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -54,30 +53,21 @@ import com.jie.wealthmate.vo.CategoryVo
 import com.jie.wealthmate.vo.PaymentMethodVo
 import kotlinx.datetime.LocalDate
 import org.koin.compose.viewmodel.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 @Composable
 fun AddHistoryScreen(
     navController: NavController,
-    selectedDate: LocalDate,
+    initialSelectedDate: LocalDate,
     onBack: () -> Unit,
-    viewModel: AddHistoryViewModel = koinViewModel(),
+    viewModel: AddHistoryViewModel = koinViewModel() {
+        parametersOf(initialSelectedDate)
+    },
 ) {
     var isShowSaveBackDialog by remember { mutableStateOf(false) }
     var isShowConfirmDialog by remember { mutableStateOf(false) }
     var confirmContent by remember { mutableStateOf("") }
     var confirmCallback by remember { mutableStateOf<() -> Unit>({}) }
-
-    LaunchedEffect(Unit) {
-        viewModel.updateInit(selectedDate)
-    }
-
-//    BackHandler(enabled = true){
-//        if (viewModel.container.uiState.value.isDataChanged) {
-//            isShowSaveBackDialog = true
-//        } else {
-//            navController.popBackStack()
-//        }
-//    }
 
     BaseScreen(
         viewModel = viewModel,

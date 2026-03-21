@@ -4,5 +4,5 @@ import com.jie.wealthmate.base.BaseUiState
 import com.jie.wealthmate.vo.PaymentMethodVo
 
 data class PaymentMethodManagementUiState(
-    val paymentMethodItems: List<PaymentMethodVo>? = null,
+    val paymentMethodItems: List<PaymentMethodVo> = emptyList(),
 ) : BaseUiState

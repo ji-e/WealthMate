@@ -1,7 +1,8 @@
 package com.jie.wealthmate.feature.menu.management.repeatHistoryManagement.repeatHistoryDetail
 
 import androidx.compose.ui.text.input.TextFieldValue
-import com.jie.wealthmate.base.BaseScreenModel
+import androidx.lifecycle.viewModelScope
+import com.jie.wealthmate.base.BaseViewModel
 import com.jie.wealthmate.database.eneity.RepeatCycleEntity
 import com.jie.wealthmate.feature.calendar.addHistory.component.RepeatCycleEnum
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
@@ -14,18 +15,17 @@ import com.jie.wealthmate.utils.toEpochMilliseconds
 import com.jie.wealthmate.utils.toLocalDate
 import com.jie.wealthmate.utils.today
 import com.jie.wealthmate.vo.CategoryTagVo
-import com.jie.wealthmate.vo.CategoryTagVo.Companion.mapperToVo
 import com.jie.wealthmate.vo.CategoryVo
 import com.jie.wealthmate.vo.CategoryVo.Companion.mapperToVo
 import com.jie.wealthmate.vo.PaymentMethodVo
-import com.jie.wealthmate.vo.PaymentMethodVo.Companion.mapperToVo
+import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
 
-class RepeatHistoryDetailScreenModel(
+class RepeatHistoryDetailViewModel(
     private val repeatCycleRepository: RepeatCycleRepository,
     private val categoryRepository: CategoryRepository,
     private val paymentMethodRepository: PaymentMethodRepository,
-) : BaseScreenModel<RepeatHistoryDetailUiState>() {
+) : BaseViewModel<RepeatHistoryDetailUiState>() {
 
     var repeatCycleId: String? = null
 
@@ -51,7 +51,6 @@ class RepeatHistoryDetailScreenModel(
         }
         getCategories(largeCategory)
     }
-
 
     fun updateDate(type: String, date: LocalDate?) {
         reduceState { state ->
@@ -141,36 +140,49 @@ class RepeatHistoryDetailScreenModel(
     }
 
     private fun getRepeatCycle() {
-        launchSafe(
-            block = {
-                repeatCycleRepository.getRepeatCycleById(repeatCycleId.default())
-            }
-        ) { response ->
-            val repeatCycle = response?.repeatCycle ?: return@launchSafe
-            val repeatCycleEnum = RepeatCycleEnum.create(repeatCycle.repeatCycle)
+        viewModelScope.launch {
+            showLoading(true)
+            try {
+                val response = repeatCycleRepository.getRepeatCycleById(repeatCycleId.default())
+                if (response != null) {
+                    val repeatCycle = response.repeatCycle
+                    val repeatCycleEnum = RepeatCycleEnum.create(repeatCycle.repeatCycle)
 
-            reduceState { state ->
-                state.copy(
-                    selectedLargeCategory = LargeCategoryEnum.creator(repeatCycle.largeCategory),
-                    startDate = repeatCycle.startDate.toLocalDate(),
-                    endDate = repeatCycle.endDate?.toLocalDate(),
-                    repeatCycle = repeatCycleEnum,
-                    repeatCycleDate = if (repeatCycleEnum == RepeatCycleEnum.WEEKLY) repeatCycle.dayOfWeek else if (repeatCycleEnum == RepeatCycleEnum.MONTHLY) repeatCycle.dayOfMonth else null,
-                    repeatCycleDateFull = repeatCycle.date.toLocalDate(),
-                    content = TextFieldValue(repeatCycle.content.default()),
-                    amount = TextFieldValue(repeatCycle.amount.default().toString()),
-                    category = response.category?.mapperToVo(),
-                    categoryTag = response.categoryTag?.mapperToVo(),
-                    paymentMethod = response.paymentMethod?.mapperToVo(),
-                )
+                    reduceState { state ->
+                        state.copy(
+                            selectedLargeCategory = LargeCategoryEnum.creator(repeatCycle.largeCategory),
+                            startDate = repeatCycle.startDate.toLocalDate(),
+                            endDate = repeatCycle.endDate?.toLocalDate(),
+                            repeatCycle = repeatCycleEnum,
+                            repeatCycleDate = if (repeatCycleEnum == RepeatCycleEnum.WEEKLY) repeatCycle.dayOfWeek else if (repeatCycleEnum == RepeatCycleEnum.MONTHLY) repeatCycle.dayOfMonth else null,
+                            repeatCycleDateFull = repeatCycle.date.toLocalDate(),
+                            content = TextFieldValue(repeatCycle.content.default()),
+                            amount = TextFieldValue(repeatCycle.amount.default().toString()),
+                            category = response.category?.mapperToVo(),
+                            categoryTag = response.categoryTag?.let { CategoryTagVo(id = it.id, label = it.tagLabel) },
+                            paymentMethod = response.paymentMethod?.let {
+                                PaymentMethodVo(
+                                    id = it.id,
+                                    label = it.label,
+                                    groupId = it.groupId,
+                                    groupLabel = it.groupLabel,
+                                    sort = it.sort
+                                )
+                            },
+                        )
+                    }
+                }
+            } catch (e: Exception) {
+                showSnackbar(e.message ?: "반복 내역을 불러오는데 실패했습니다.")
+            } finally {
+                showLoading(false)
             }
-
         }
     }
 
     private fun getCategories(largeCategoryEnum: LargeCategoryEnum) {
         categoryRepository.getCategoriesByLargeCategory(largeCategoryEnum.name)
-            .apiFlow { response ->
+            .apiFlow(showLoadingIndicator = false) { response ->
                 reduceState { state ->
                     state.copy(
                         categoryItems = response.map { it.mapperToVo() }
@@ -181,8 +193,7 @@ class RepeatHistoryDetailScreenModel(
 
     private fun getPaymentMethods() {
         paymentMethodRepository.getPaymentMethods()
-            .apiFlow { response ->
-                println("response: $response")
+            .apiFlow(showLoadingIndicator = false) { response ->
                 reduceState { state ->
                     state.copy(
                         paymentMethodItems = response.map {
@@ -201,10 +212,11 @@ class RepeatHistoryDetailScreenModel(
 
     fun modifyRepeatCycle() {
         val repeatCycleId = repeatCycleId ?: return
-
         val uiState = container.uiState.value
-        launchSafe(
-            block = {
+
+        viewModelScope.launch {
+            showLoading(true)
+            try {
                 repeatCycleRepository.updateRepeatCycle(
                     RepeatCycleEntity(
                         id = repeatCycleId,
@@ -222,30 +234,35 @@ class RepeatHistoryDetailScreenModel(
                         paymentMethodId = uiState.paymentMethod?.id,
                     )
                 )
-            }
-        ) {
-            showSnackbar("반복 정보가 수정 되었습니다.")
-            reduceState { state ->
-                state.copy(
-                    isDataChanged = false
-                )
+                showSnackbar("반복 정보가 수정 되었습니다.")
+                reduceState { state ->
+                    state.copy(isDataChanged = false)
+                }
+            } catch (e: Exception) {
+                showSnackbar(e.message ?: "오류가 발생했습니다.")
+            } finally {
+                showLoading(false)
             }
         }
     }
 
     fun removeRepeatCycle() {
         val repeatCycleId = repeatCycleId ?: return
-        launchSafe(
-            block = {
+        viewModelScope.launch {
+            showLoading(true)
+            try {
                 repeatCycleRepository.deleteRepeatCycle(repeatCycleId)
+                showSnackbar("반복 정보가 삭제 되었습니다.")
+                postSideEffect(RepeatHistoryDetailUiSideEffect.OnSuccess)
+            } catch (e: Exception) {
+                showSnackbar(e.message ?: "오류가 발생했습니다.")
+            } finally {
+                showLoading(false)
             }
-        ) {
-            showSnackbar("반복 정보가 삭제 되었습니다.")
-            postSideEffect { RepeatHistoryDetailUiSideEffect.OnSuccess }
         }
     }
 
-    companion object {
+    companion object Companion {
         const val START_DATE = "시작일"
         const val END_DATE = "종료일"
     }

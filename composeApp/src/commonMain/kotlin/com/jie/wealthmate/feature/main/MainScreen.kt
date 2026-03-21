@@ -48,7 +48,18 @@ import com.jie.wealthmate.feature.home.categoryExpenses.CategoryExpensesScreen
 import com.jie.wealthmate.feature.home.paymentMethodExpenses.PaymentMethodExpensesScreen
 import com.jie.wealthmate.feature.home.preparednessStatus.PreparednessStatusScreen
 import com.jie.wealthmate.feature.menu.MenuScreen
+import com.jie.wealthmate.feature.menu.data.googleCloudShare.GoogleCloudShareScreen
+import com.jie.wealthmate.feature.menu.data.googleCloudSync.GoogleCloudSyncScreen
+import com.jie.wealthmate.feature.menu.management.categoryManagement.CategoryManagementScreen
+import com.jie.wealthmate.feature.menu.management.categoryManagement.addCategory.AddCategoryScreen
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
+import com.jie.wealthmate.feature.menu.management.categoryManagement.modifyCategory.ModifyCategoryScreen
+import com.jie.wealthmate.feature.menu.management.paymentMethodManagement.PaymentMethodManagementScreen
+import com.jie.wealthmate.feature.menu.management.paymentMethodManagement.addPaymentMethod.AddPaymentMethodScreen
+import com.jie.wealthmate.feature.menu.management.paymentMethodManagement.modifyPaymentMethod.ModifyPaymentMethodScreen
+import com.jie.wealthmate.feature.menu.management.repeatHistoryManagement.RepeatHistoryManagementScreen
+import com.jie.wealthmate.feature.menu.management.repeatHistoryManagement.addRepeatHistory.AddRepeatHistoryScreen
+import com.jie.wealthmate.feature.menu.management.repeatHistoryManagement.repeatHistoryDetail.RepeatHistoryDetailScreen
 import com.jie.wealthmate.getPlatform
 import com.jie.wealthmate.utils.convertDateToLocalDate
 import com.jie.wealthmate.utils.today
@@ -125,7 +136,7 @@ fun MainScreen(
                     composable(BottomNavItem.Add.route) {
                         AddHistoryScreen(
                             navController = innerNavController,
-                            selectedDate = mainUiState.selectedDate,
+                            initialSelectedDate = mainUiState.selectedDate,
                             onBack = { viewModel.navigateBackToPreviousTab() }
                         )
                     }
@@ -133,7 +144,7 @@ fun MainScreen(
                         BudgetScreen(navController = innerNavController)
                     }
                     composable(BottomNavItem.Menu.route) {
-                        MenuScreen()
+                        MenuScreen(navController = innerNavController)
                     }
                     composable(
                         route = "historyDetail/{largeCategory}/{historyId}",
@@ -154,7 +165,9 @@ fun MainScreen(
                             largeCategory = largeCategory,
                             historyId = historyId,
                             onBack = { innerNavController.popBackStack() },
-                            onNavigateToRepeatDetail = { /* TODO */ }
+                            onNavigateToRepeatDetail = { id ->
+                                innerNavController.navigate("repeatHistoryDetail/$id")
+                            }
                         )
                     }
                     composable(
@@ -258,6 +271,67 @@ fun MainScreen(
                             paymentMethodId = paymentMethodId
                         )
                     }
+
+                    // Category Management Routes
+                    composable("categoryManagement") {
+                        CategoryManagementScreen(navController = innerNavController)
+                    }
+                    composable(
+                        route = "addCategory/{largeCategory}",
+                        arguments = listOf(
+                            navArgument("largeCategory") { type = NavType.StringType }
+                        )
+                    ) { backStackEntry ->
+                        val largeCategoryStr = backStackEntry.arguments?.getString("largeCategory")
+                        val largeCategory = try {
+                            LargeCategoryEnum.valueOf(largeCategoryStr ?: "EXPENSES")
+                        } catch (e: Exception) {
+                            LargeCategoryEnum.EXPENSES
+                        }
+                        AddCategoryScreen(
+                            navController = innerNavController,
+                            largeCategory = largeCategory
+                        )
+                    }
+                    composable(
+                        route = "modifyCategory/{largeCategory}/{categoryId}",
+                        arguments = listOf(
+                            navArgument("largeCategory") { type = NavType.StringType },
+                            navArgument("categoryId") { type = NavType.StringType }
+                        )
+                    ) { backStackEntry ->
+                        val largeCategoryStr = backStackEntry.arguments?.getString("largeCategory")
+                        val categoryId = backStackEntry.arguments?.getString("categoryId") ?: ""
+                        val largeCategory = try {
+                            LargeCategoryEnum.valueOf(largeCategoryStr ?: "EXPENSES")
+                        } catch (e: Exception) {
+                            LargeCategoryEnum.EXPENSES
+                        }
+                        ModifyCategoryScreen(
+                            navController = innerNavController,
+                            largeCategory = largeCategory,
+                            categoryId = categoryId
+                        )
+                    }
+
+                    // Payment Method Management Routes
+                    composable("paymentMethodManagement") {
+                        PaymentMethodManagementScreen(navController = innerNavController)
+                    }
+                    composable("addPaymentMethod") {
+                        AddPaymentMethodScreen(navController = innerNavController)
+                    }
+                    composable(
+                        route = "modifyPaymentMethod/{id}",
+                        arguments = listOf(
+                            navArgument("id") { type = NavType.StringType }
+                        )
+                    ) { backStackEntry ->
+                        val id = backStackEntry.arguments?.getString("id") ?: ""
+                        ModifyPaymentMethodScreen(navController = innerNavController, paymentMethodId = id)
+                    }
+
+                    // Repeat History Management Routes
                     composable(
                         route = "repeatHistoryManagement/{largeCategory}",
                         arguments = listOf(
@@ -271,10 +345,10 @@ fun MainScreen(
                             LargeCategoryEnum.EXPENSES
                         }
 
-//                        RepeatHistoryManagementScreen(
-//                            navController = innerNavController,
-//                            initialLargeCategory = largeCategory
-//                        )
+                        RepeatHistoryManagementScreen(
+                            navController = innerNavController,
+                            initialLargeCategory = largeCategory
+                        )
                     }
                     composable(
                         route = "repeatHistoryDetail/{id}",
@@ -283,10 +357,35 @@ fun MainScreen(
                         )
                     ) { backStackEntry ->
                         val id = backStackEntry.arguments?.getString("id") ?: ""
-//                        RepeatHistoryDetailScreen(
-//                            navController = innerNavController,
-//                            id = id
-//                        )
+                        RepeatHistoryDetailScreen(
+                            navController = innerNavController,
+                            repeatCycleId = id
+                        )
+                    }
+                    composable(
+                        route = "addRepeatHistory/{largeCategory}",
+                        arguments = listOf(
+                            navArgument("largeCategory") { type = NavType.StringType }
+                        )
+                    ) { backStackEntry ->
+                        val largeCategoryStr = backStackEntry.arguments?.getString("largeCategory")
+                        val largeCategory = try {
+                            LargeCategoryEnum.valueOf(largeCategoryStr ?: "EXPENSES")
+                        } catch (e: Exception) {
+                            LargeCategoryEnum.EXPENSES
+                        }
+                        AddRepeatHistoryScreen(
+                            navController = innerNavController,
+                            largeCategory = largeCategory
+                        )
+                    }
+
+                    // Data Sync Routes
+                    composable("googleCloudSync") {
+                        GoogleCloudSyncScreen(navController = innerNavController)
+                    }
+                    composable("googleCloudShare") {
+                        GoogleCloudShareScreen(navController = innerNavController)
                     }
 
                     // Budget Routes

@@ -1,14 +1,16 @@
 package com.jie.wealthmate.feature.menu.management.paymentMethodManagement.addPaymentMethod
 
 import androidx.compose.ui.text.input.TextFieldValue
-import com.jie.wealthmate.base.BaseScreenModel
+import androidx.lifecycle.viewModelScope
+import com.jie.wealthmate.base.BaseViewModel
 import com.jie.wealthmate.feature.menu.management.paymentMethodManagement.addPaymentMethod.component.PaymentMethodGroupItemData
 import com.jie.wealthmate.repository.PaymentMethodRepository
 import com.jie.wealthmate.vo.PaymentMethodVo
+import kotlinx.coroutines.launch
 
-class AddPaymentMethodScreenModel(
+class AddPaymentMethodViewModel(
     private val paymentMethodRepository: PaymentMethodRepository,
-) : BaseScreenModel<AddPaymentMethodUiState>() {
+) : BaseViewModel<AddPaymentMethodUiState>() {
     private var paymentMethodItems: List<PaymentMethodVo> = emptyList()
 
     override val initialState: AddPaymentMethodUiState
@@ -46,22 +48,26 @@ class AddPaymentMethodScreenModel(
             return
         }
 
-        launchSafe(
-            block = {
+        viewModelScope.launch {
+            showLoading(true)
+            try {
                 paymentMethodRepository.insertPaymentMethod(
                     paymentMethodLabel = uiState.label.text,
                     paymentMethodGroupId = uiState.group?.id,
                     paymentMethodGroupLabel = uiState.group?.label,
                     sort = paymentMethodItems.size.toLong()
                 )
-            },
-        ) {
-            showSnackbar("결제수단이 저장되었습니다.")
-            postSideEffect { AddPaymentMethodUiSideEffect.OnSuccessSave }
+                showSnackbar("결제수단이 저장되었습니다.")
+                postSideEffect(AddPaymentMethodUiSideEffect.OnSuccessSave)
+            } catch (e: Exception) {
+                showSnackbar(e.message ?: "오류가 발생했습니다.")
+            } finally {
+                showLoading(false)
+            }
         }
     }
 
-    companion object {
+    companion object Companion {
         const val GROUP_ID_NONE = "none"
     }
 }

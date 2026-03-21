@@ -1,14 +1,16 @@
 package com.jie.wealthmate.feature.menu.management.categoryManagement
 
-import com.jie.wealthmate.base.BaseScreenModel
+import androidx.lifecycle.viewModelScope
+import com.jie.wealthmate.base.BaseViewModel
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.repository.CategoryRepository
 import com.jie.wealthmate.utils.default
 import com.jie.wealthmate.vo.CategoryVo.Companion.mapperToVo
+import kotlinx.coroutines.launch
 
-class CategoryManagementScreenModel(
+class CategoryManagementViewModel(
     private val categoryRepository: CategoryRepository,
-) : BaseScreenModel<CategoryManagementUiState>() {
+) : BaseViewModel<CategoryManagementUiState>() {
 
     override val initialState: CategoryManagementUiState
         get() = CategoryManagementUiState()
@@ -37,16 +39,19 @@ class CategoryManagementScreenModel(
     }
 
     fun saveCategorySort() {
-        launchSafe(
-            block = {
+        viewModelScope.launch {
+            showLoading(true)
+            try {
                 val categoryItems = container.uiState.value.currentCategoryItems
                 categoryRepository.updateCategoriesSort(
                     categoryItems?.mapIndexed { index, item -> item.id to index.toLong() }.default()
                 )
-            },
-            errorMsg = "카테고리 저장에 실패했습니다.",
-        ) {
-            showSnackbar("저장되었습니다.")
+                showSnackbar("저장되었습니다.")
+            } catch (e: Exception) {
+                showSnackbar(e.message ?: "카테고리 저장에 실패했습니다.")
+            } finally {
+                showLoading(false)
+            }
         }
     }
 

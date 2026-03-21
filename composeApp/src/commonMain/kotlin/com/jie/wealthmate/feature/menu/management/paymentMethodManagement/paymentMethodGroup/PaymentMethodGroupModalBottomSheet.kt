@@ -18,8 +18,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
-import cafe.adriel.voyager.core.annotation.InternalVoyagerApi
-import cafe.adriel.voyager.navigator.internal.BackHandler
 import com.jie.wealthmate.component.ButtonSize
 import com.jie.wealthmate.component.ButtonStyle
 import com.jie.wealthmate.component.WMButton
@@ -27,16 +25,15 @@ import com.jie.wealthmate.component.WMIconButton
 import com.jie.wealthmate.component.WMModalBottomSheet
 import com.jie.wealthmate.component.WMShadowDivider
 import com.jie.wealthmate.component.textField.WMTextField
-import com.jie.wealthmate.feature.menu.management.paymentMethodManagement.addPaymentMethod.AddPaymentMethodScreenModel
+import com.jie.wealthmate.feature.menu.management.paymentMethodManagement.addPaymentMethod.AddPaymentMethodViewModel
 import com.jie.wealthmate.feature.menu.management.paymentMethodManagement.addPaymentMethod.component.PaymentMethodGroupItemData
 import com.jie.wealthmate.feature.menu.management.paymentMethodManagement.addPaymentMethod.component.PaymentMethodGroupList
 import com.jie.wealthmate.utils.default
-import org.koin.compose.koinInject
+import org.koin.compose.viewmodel.koinViewModel
 import wealthmate.composeapp.generated.resources.Res
 import wealthmate.composeapp.generated.resources.ic_add
 import wealthmate.composeapp.generated.resources.ic_delete_outline
 
-@InternalVoyagerApi
 @Composable
 fun PaymentMethodGroupModalBottomSheet(
     selectedPaymentMethodGroup: PaymentMethodGroupItemData? = null,
@@ -46,8 +43,8 @@ fun PaymentMethodGroupModalBottomSheet(
     onSuccessRemove: () -> Unit = {},
     onDismissRequest: () -> Unit,
 ) {
-    val screenModel: PaymentMethodGroupScreenModel = koinInject()
-    val paymentMethodGroupItems = screenModel.paymentMethodGroupItems
+    val viewModel: PaymentMethodGroupViewModel = koinViewModel()
+    val paymentMethodGroupItems = viewModel.paymentMethodGroupItems
     var tempSelectedPaymentMethodGroup by remember { mutableStateOf(selectedPaymentMethodGroup) }
     var addGroupLabel by remember { mutableStateOf(TextFieldValue("")) }
 
@@ -98,11 +95,6 @@ fun PaymentMethodGroupModalBottomSheet(
         },
         onDismissRequest = onDismissRequest,
     ) {
-        BackHandler(enabled = isAdd || isModify) {
-            isAdd = false
-            isModify = false
-        }
-
         Column(
             modifier = Modifier.padding(bottom = 20.dp)
         ) {
@@ -116,8 +108,8 @@ fun PaymentMethodGroupModalBottomSheet(
                 tempSelectedPaymentMethodGroup = tempSelectedPaymentMethodGroup,
                 onGroupClick = {
                     when {
-                        isModify -> screenModel.showSnackbar("결제수단 그룹 수정을 완료해 주세요.")
-                        isAdd -> screenModel.showSnackbar("결제수단 그룹 추가를 완료해 주세요.")
+                        isModify -> viewModel.showSnackbar("결제수단 그룹 수정을 완료해 주세요.")
+                        isAdd -> viewModel.showSnackbar("결제수단 그룹 추가를 완료해 주세요.")
                         else -> tempSelectedPaymentMethodGroup = it
                     }
                 }
@@ -149,7 +141,7 @@ fun PaymentMethodGroupModalBottomSheet(
                         iconRes = Res.drawable.ic_delete_outline,
                         onClick = {
                             onRemoveClick {
-                                screenModel.removePaymentMethodGroup(tempSelectedPaymentMethodGroup)
+                                viewModel.removePaymentMethodGroup(tempSelectedPaymentMethodGroup)
                                 isRemoved = true
                             }
                         }
@@ -187,7 +179,7 @@ fun PaymentMethodGroupModalBottomSheet(
                             onSecondaryClick = { isModify = false },
                             primaryText = "수정 완료",
                             onPrimaryClick = {
-                                screenModel.updatePaymentMethodGroup(
+                                viewModel.updatePaymentMethodGroup(
                                     tempSelectedPaymentMethodGroup
                                 )
                                 if (tempSelectedPaymentMethodGroup?.id == selectedPaymentMethodGroup?.id) {
@@ -203,13 +195,13 @@ fun PaymentMethodGroupModalBottomSheet(
                             secondaryText = "취소",
                             onSecondaryClick = { isAdd = false },
                             primaryText = "추가",
-                            onPrimaryClick = { screenModel.addPaymentMethodGroup(addGroupLabel) }
+                            onPrimaryClick = { viewModel.addPaymentMethodGroup(addGroupLabel) }
                         )
                     }
 
                     else -> {
                         val isSecondaryVisible =
-                            tempSelectedPaymentMethodGroup?.id != AddPaymentMethodScreenModel.GROUP_ID_NONE &&
+                            tempSelectedPaymentMethodGroup?.id != AddPaymentMethodViewModel.GROUP_ID_NONE &&
                                     tempSelectedPaymentMethodGroup?.id.isNullOrEmpty().not()
 
                         ActionButtons(
