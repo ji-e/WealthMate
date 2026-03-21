@@ -32,7 +32,9 @@ import com.jie.wealthmate.feature.search.SearchViewModel
 import com.jie.wealthmate.network.HttpClientFactory
 import com.jie.wealthmate.repository.AuthRepository
 import com.jie.wealthmate.repository.AuthRepositoryImpl
+import com.jie.wealthmate.repository.BudgetFirestoreRepositoryImpl
 import com.jie.wealthmate.repository.BudgetRepository
+import com.jie.wealthmate.repository.BudgetRepositoryDelegate
 import com.jie.wealthmate.repository.BudgetRepositoryImpl
 import com.jie.wealthmate.repository.CategoryFirestoreRepositoryImpl
 import com.jie.wealthmate.repository.CategoryRepository
@@ -42,13 +44,21 @@ import com.jie.wealthmate.repository.FirebaseRepository
 import com.jie.wealthmate.repository.FirebaseRepositoryImpl
 import com.jie.wealthmate.repository.GoogleRepository
 import com.jie.wealthmate.repository.GoogleRepositoryImpl
+import com.jie.wealthmate.repository.HistoryFirestoreRepositoryImpl
 import com.jie.wealthmate.repository.HistoryRepository
+import com.jie.wealthmate.repository.HistoryRepositoryDelegate
 import com.jie.wealthmate.repository.HistoryRepositoryImpl
+import com.jie.wealthmate.repository.InstallmentFirestoreRepositoryImpl
 import com.jie.wealthmate.repository.InstallmentRepository
+import com.jie.wealthmate.repository.InstallmentRepositoryDelegate
 import com.jie.wealthmate.repository.InstallmentRepositoryImpl
+import com.jie.wealthmate.repository.PaymentMethodFirestoreRepositoryImpl
 import com.jie.wealthmate.repository.PaymentMethodRepository
+import com.jie.wealthmate.repository.PaymentMethodRepositoryDelegate
 import com.jie.wealthmate.repository.PaymentMethodRepositoryImpl
+import com.jie.wealthmate.repository.RepeatCycleFirestoreRepositoryImpl
 import com.jie.wealthmate.repository.RepeatCycleRepository
+import com.jie.wealthmate.repository.RepeatCycleRepositoryDelegate
 import com.jie.wealthmate.repository.RepeatCycleRepositoryImpl
 import com.jie.wealthmate.usecase.ModifyHistoryUseCase
 import com.jie.wealthmate.usecase.SaveHistoryUseCase
@@ -97,9 +107,9 @@ val commonModule = module {
     single<FirebaseRepository> { FirebaseRepositoryImpl() }
     singleOf(::AccountProvider)
 
+    // Category Repository
     singleOf(::CategoryRepositoryImpl)
     singleOf(::CategoryFirestoreRepositoryImpl)
-
     single<CategoryRepository> {
         CategoryRepositoryDelegate(
             accountProvider = get(),
@@ -109,11 +119,61 @@ val commonModule = module {
         )
     }
 
+    // PaymentMethod Repository
+    singleOf(::PaymentMethodRepositoryImpl)
+    singleOf(::PaymentMethodFirestoreRepositoryImpl)
+    single<PaymentMethodRepository> {
+        PaymentMethodRepositoryDelegate(
+            accountProvider = get(),
+            localRepository = get<PaymentMethodRepositoryImpl>(),
+            firestoreRepository = get<PaymentMethodFirestoreRepositoryImpl>()
+        )
+    }
+
+    // History Repository
+    singleOf(::HistoryRepositoryImpl)
+    singleOf(::HistoryFirestoreRepositoryImpl)
+    single<HistoryRepository> {
+        HistoryRepositoryDelegate(
+            accountProvider = get(),
+            localRepository = get<HistoryRepositoryImpl>(),
+            firestoreRepository = get<HistoryFirestoreRepositoryImpl>()
+        )
+    }
+
+    // Installment Repository
+    singleOf(::InstallmentRepositoryImpl)
+    singleOf(::InstallmentFirestoreRepositoryImpl)
+    single<InstallmentRepository> {
+        InstallmentRepositoryDelegate(
+            accountProvider = get(),
+            localRepository = get<InstallmentRepositoryImpl>(),
+            firestoreRepository = get<InstallmentFirestoreRepositoryImpl>()
+        )
+    }
+
+    // RepeatCycle Repository
+    singleOf(::RepeatCycleRepositoryImpl)
+    singleOf(::RepeatCycleFirestoreRepositoryImpl)
+    single<RepeatCycleRepository> {
+        RepeatCycleRepositoryDelegate(
+            accountProvider = get(),
+            localRepository = get<RepeatCycleRepositoryImpl>(),
+            firestoreRepository = get<RepeatCycleFirestoreRepositoryImpl>()
+        )
+    }
+
+    // Budget Repository
+    singleOf(::BudgetRepositoryImpl)
+    singleOf(::BudgetFirestoreRepositoryImpl)
+    single<BudgetRepository> {
+        BudgetRepositoryDelegate(
+            accountProvider = get(),
+            localRepository = get<BudgetRepositoryImpl>(),
+            firestoreRepository = get<BudgetFirestoreRepositoryImpl>()
+        )
+    }
+
     single<AuthRepository> { AuthRepositoryImpl(get(), get()) }
     single<GoogleRepository> { GoogleRepositoryImpl(get(), get()) }
-    single<PaymentMethodRepository> { PaymentMethodRepositoryImpl(get()) }
-    single<HistoryRepository> { HistoryRepositoryImpl(get()) }
-    single<InstallmentRepository> { InstallmentRepositoryImpl(get()) }
-    single<RepeatCycleRepository> { RepeatCycleRepositoryImpl(get()) }
-    single<BudgetRepository> { BudgetRepositoryImpl(get()) }
 }
