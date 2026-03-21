@@ -1,5 +1,6 @@
 package com.jie.wealthmate.di
 
+import com.jie.wealthmate.account.AccountProvider
 import com.jie.wealthmate.database.DatabaseSyncManager
 import com.jie.wealthmate.feature.budget.BudgetViewModel
 import com.jie.wealthmate.feature.budget.addBudget.AddBudgetViewModel
@@ -33,7 +34,9 @@ import com.jie.wealthmate.repository.AuthRepository
 import com.jie.wealthmate.repository.AuthRepositoryImpl
 import com.jie.wealthmate.repository.BudgetRepository
 import com.jie.wealthmate.repository.BudgetRepositoryImpl
+import com.jie.wealthmate.repository.CategoryFirestoreRepositoryImpl
 import com.jie.wealthmate.repository.CategoryRepository
+import com.jie.wealthmate.repository.CategoryRepositoryDelegate
 import com.jie.wealthmate.repository.CategoryRepositoryImpl
 import com.jie.wealthmate.repository.FirebaseRepository
 import com.jie.wealthmate.repository.FirebaseRepositoryImpl
@@ -92,10 +95,22 @@ val commonModule = module {
     singleOf(::ModifyHistoryUseCase)
 
     single<FirebaseRepository> { FirebaseRepositoryImpl() }
+    singleOf(::AccountProvider)
 
-    single<AuthRepository> { AuthRepositoryImpl(get()) }
+    singleOf(::CategoryRepositoryImpl)
+    singleOf(::CategoryFirestoreRepositoryImpl)
+
+    single<CategoryRepository> {
+        CategoryRepositoryDelegate(
+            accountProvider = get(),
+            authRepository = get(),
+            localRepository = get<CategoryRepositoryImpl>(),
+            firestoreRepository = get<CategoryFirestoreRepositoryImpl>()
+        )
+    }
+
+    single<AuthRepository> { AuthRepositoryImpl(get(), get()) }
     single<GoogleRepository> { GoogleRepositoryImpl(get(), get()) }
-    single<CategoryRepository> { CategoryRepositoryImpl(get()) }
     single<PaymentMethodRepository> { PaymentMethodRepositoryImpl(get()) }
     single<HistoryRepository> { HistoryRepositoryImpl(get()) }
     single<InstallmentRepository> { InstallmentRepositoryImpl(get()) }
