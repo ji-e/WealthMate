@@ -1,7 +1,6 @@
 package com.jie.wealthmate.feature.home.preparednessStatus.component
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,9 +9,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -31,6 +28,8 @@ import com.jie.wealthmate.theme.ColorBlue
 import com.jie.wealthmate.theme.ColorGray
 import com.jie.wealthmate.theme.ColorGroup
 import com.jie.wealthmate.theme.ColorRed
+import com.jie.wealthmate.theme.noRippleClickable
+import com.jie.wealthmate.utils.default
 import com.jie.wealthmate.utils.formatWithCommas
 import com.jie.wealthmate.vo.PaymentMethodDiffInfoVo
 import kotlin.math.max
@@ -76,10 +75,9 @@ fun StatusPaymentMethodSection(
         ) {
             WMText(
                 text = "결제수단별 비교",
-                style = typography.titleSmall.copy(
-                    color = ColorGray.Gray_500,
-                    fontWeight = FontWeight.SemiBold
-                ),
+                style = typography.titleSmall,
+                color = ColorGray.Gray_500,
+                fontWeight = FontWeight.SemiBold,
             )
 
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -96,7 +94,7 @@ fun StatusPaymentMethodSection(
                     info = info,
                     maxAmount = maxAmount,
                     groupBackgroundColor = groupColorMap[info.groupLabel] ?: ColorGray.Gray_200,
-                    onClick = { onPaymentMethodClick(info.id) }
+                    onClick = { onPaymentMethodClick(info.id.default()) }
                 )
             }
         }
@@ -121,7 +119,7 @@ private fun StatusPaymentMethodItem(
     }
 
     Column(
-        modifier = Modifier.clickable { onClick() }
+        modifier = Modifier.noRippleClickable { onClick() }
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -131,28 +129,27 @@ private fun StatusPaymentMethodItem(
                 modifier = Modifier.weight(1f),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                if (info.groupLabel.isNullOrBlank().not()) {
-                    WMText(
-                        text = info.groupLabel!!,
-                        style = typography.labelSmall.copy(fontWeight = FontWeight.SemiBold),
-                        modifier = Modifier
-                            .padding(end = 8.dp)
-                            .clip(CircleShape)
-                            .background(groupBackgroundColor)
-                            .padding(horizontal = 6.dp, vertical = 2.dp)
-                    )
-                }
 
                 Column(modifier = Modifier.weight(1f)) {
-                    WMText(
-                        text = info.label,
-                        style = typography.titleMedium.copy(fontWeight = FontWeight.Medium),
-                        maxLines = 1,
-                    )
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        WMText(
+                            text = info.label,
+                            style = typography.titleMedium,
+                            fontWeight = FontWeight.Medium,
+                            maxLines = 1,
+                        )
+                        if (info.groupLabel.isNullOrBlank().not()) {
+                            WMText(
+                                text = " | ${info.groupLabel}",
+                                style = typography.titleMedium,
+                            )
+                        }
+                    }
 
                     WMText(
                         text = if (percentage >= 0) "+$percentage%" else "$percentage%",
-                        style = typography.labelSmall.copy(color = ColorGray.Gray_500),
+                        style = typography.labelSmall,
+                        color = ColorGray.Gray_500,
                         maxLines = 1,
                     )
                 }
@@ -163,7 +160,8 @@ private fun StatusPaymentMethodItem(
             ) {
                 WMText(
                     text = "${info.currentAmount.formatWithCommas()}원",
-                    style = typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold),
+                    style = typography.bodyLarge,
+                    fontWeight = FontWeight.SemiBold,
                     maxLines = 1
                 )
                 val diffColor = when {
@@ -174,7 +172,8 @@ private fun StatusPaymentMethodItem(
                 val sign = if (info.diffAmount > 0) "+" else ""
                 WMText(
                     text = "$sign${info.diffAmount.formatWithCommas()}원",
-                    style = typography.labelSmall.copy(color = diffColor),
+                    style = typography.labelSmall,
+                    color = diffColor,
                     maxLines = 1
                 )
             }

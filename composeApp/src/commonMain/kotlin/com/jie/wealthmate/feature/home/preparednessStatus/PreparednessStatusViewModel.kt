@@ -1,10 +1,12 @@
 package com.jie.wealthmate.feature.home.preparednessStatus
 
-import com.jie.wealthmate.base.BaseScreenModel
+import com.jie.wealthmate.base.BaseViewModel
+import com.jie.wealthmate.base.DAY_END_MILLIS_OFFSET
 import com.jie.wealthmate.database.eneity.CategoryEntity
 import com.jie.wealthmate.database.eneity.HistoryWithDetails
 import com.jie.wealthmate.database.eneity.PaymentMethodEntity
 import com.jie.wealthmate.feature.home.StatusType
+import com.jie.wealthmate.feature.home.component.vo.PeriodsVo
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.repository.BudgetRepository
 import com.jie.wealthmate.repository.CategoryRepository
@@ -24,21 +26,20 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.onStart
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.isoDayNumber
 import kotlinx.datetime.minus
 import kotlinx.datetime.plus
 
-class PreparednessStatusScreenModel(
+class PreparednessStatusViewModel(
     private val historyRepository: HistoryRepository,
     private val categoryRepository: CategoryRepository,
     private val budgetRepository: BudgetRepository,
     private val paymentMethodRepository: PaymentMethodRepository,
     initialStatusType: StatusType,
     initialLargeCategory: LargeCategoryEnum
-) : BaseScreenModel<PreparednessStatusUiState>() {
+) : BaseViewModel<PreparednessStatusUiState>() {
 
     override val initialState: PreparednessStatusUiState = PreparednessStatusUiState(
         statusType = initialStatusType,
@@ -51,22 +52,28 @@ class PreparednessStatusScreenModel(
         observeData()
     }
 
+    /**
+     * 기간 타입을 업데이트합니다.
+     */
     fun updateStatusType(statusType: StatusType) {
+        if (filterFlow.value.first == statusType) return
         filterFlow.value = statusType to filterFlow.value.second
     }
 
+    /**
+     * 대분류 카테고리를 업데이트합니다.
+     */
     fun updateLargeCategory(largeCategory: LargeCategoryEnum) {
+        if (filterFlow.value.second == largeCategory) return
         filterFlow.value = filterFlow.value.first to largeCategory
     }
 
+    /**
+     * 필터 상태에 따른 데이터를 관찰하고 UI 상태를 업데이트합니다.
+     */
     @OptIn(ExperimentalCoroutinesApi::class)
     private fun observeData() {
         filterFlow.flatMapLatest { (statusType, largeCategory) ->
-            combine(
-                historyRepository.getHistoriesByMonth(0, 0), // Dummy to trigger onStart
-                categoryRepository.getCategoriesByLargeCategory(largeCategory.name)
-            ) { _, _ -> }.onStart { showLoading(true) } // Show loading when filters change
-
             val periods = getPeriods(statusType)
             combine(
                 historyRepository.getHistoriesByMonth(periods.currentStart, periods.currentEnd),
@@ -81,7 +88,6 @@ class PreparednessStatusScreenModel(
                 val currentAmount = filteredCurrent.sumOf { it.history.amount }
                 val lastAmount = filteredLast.sumOf { it.history.amount }
 
-                // categoryId가 null이거나 빈 값인 경우를 통일하여 그룹화
                 val currentGrouped = filteredCurrent.groupBy { if (it.history.categoryId.isNullOrBlank()) null else it.history.categoryId }
                 val lastGrouped = filteredLast.groupBy { if (it.history.categoryId.isNullOrBlank()) null else it.history.categoryId }
 
@@ -90,14 +96,10 @@ class PreparednessStatusScreenModel(
                     budgets.filter { it.categoryId in savingCategoryIds }.sumOf { it.amount }
                 } else 0L
 
-                // 모든 카테고리 타입(INCOME, EXPENSES, SAVING)에 대해 고정/변동 분리 적용
-                val (variableComparisons, fixedComparisons) = run {
-                    val (fixed, variable) = allCategories.partition { it.isFixed }
-                    calculateCategoryComparisons(currentGrouped, lastGrouped, variable, currentAmount, true, largeCategory) to
-                            calculateCategoryComparisons(currentGrouped, lastGrouped, fixed, currentAmount, false, largeCategory)
-                }
+                val (fixed, variable) = allCategories.partition { it.isFixed }
+                val variableComparisons = calculateCategoryComparisons(currentGrouped, lastGrouped, variable, currentAmount, true, largeCategory)
+                val fixedComparisons = calculateCategoryComparisons(currentGrouped, lastGrouped, fixed, currentAmount, false, largeCategory)
 
-                // 결제수단별 비교 계산
                 val currentPaymentGrouped = filteredCurrent.groupBy { if (it.history.paymentMethodId.isNullOrBlank()) null else it.history.paymentMethodId }
                 val lastPaymentGrouped = filteredLast.groupBy { if (it.history.paymentMethodId.isNullOrBlank()) null else it.history.paymentMethodId }
                 val paymentMethodComparisons = calculatePaymentMethodComparisons(
@@ -211,7 +213,7 @@ class PreparednessStatusScreenModel(
             .sortedByDescending { it.currentAmount }
     }
 
-    private fun getPeriods(statusType: StatusType): Periods {
+    private fun getPeriods(statusType: StatusType): PeriodsVo {
         val (currentRange, lastRange) = when (statusType) {
             StatusType.WEEK -> {
                 val start = today.minus(today.dayOfWeek.isoDayNumber - 1, DateTimeUnit.DAY)
@@ -225,19 +227,11 @@ class PreparednessStatusScreenModel(
                 (LocalDate(today.year, 1, 1) to LocalDate(today.year, 12, 31)) to (LocalDate(today.year - 1, 1, 1) to LocalDate(today.year - 1, 12, 31))
             }
         }
-        val endOffset = 86_399_999L
-        return Periods(
+        return PeriodsVo(
             currentStart = currentRange.first.toEpochMilliseconds(),
-            currentEnd = currentRange.second.toEpochMilliseconds() + endOffset,
+            currentEnd = currentRange.second.toEpochMilliseconds() + DAY_END_MILLIS_OFFSET,
             lastStart = lastRange.first.toEpochMilliseconds(),
-            lastEnd = lastRange.second.toEpochMilliseconds() + endOffset
+            lastEnd = lastRange.second.toEpochMilliseconds() + DAY_END_MILLIS_OFFSET
         )
     }
-
-    data class Periods(
-        val currentStart: Long,
-        val currentEnd: Long,
-        val lastStart: Long,
-        val lastEnd: Long,
-    )
 }

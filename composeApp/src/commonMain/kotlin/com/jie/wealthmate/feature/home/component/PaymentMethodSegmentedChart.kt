@@ -38,6 +38,7 @@ import com.jie.wealthmate.theme.Padding
 import com.jie.wealthmate.theme.Shapes
 import com.jie.wealthmate.theme.WMTheme
 import com.jie.wealthmate.theme.noRippleClickable
+import com.jie.wealthmate.utils.default
 import com.jie.wealthmate.vo.PaymentMethodVo
 import org.jetbrains.compose.resources.painterResource
 import wealthmate.composeapp.generated.resources.Res
@@ -162,7 +163,7 @@ fun PaymentMethodSegmentedChart(
                     totalAmount = totalAmountForCalc,
                     amount = item.amount,
                     onItemClick = {
-                        onPaymentMethodItemClick(item.paymentMethod?.id)
+                        onPaymentMethodItemClick(item.paymentMethod?.id.default())
                     }
                 )
             }

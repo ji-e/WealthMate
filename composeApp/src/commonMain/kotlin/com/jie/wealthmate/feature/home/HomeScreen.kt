@@ -37,6 +37,7 @@ import com.jie.wealthmate.feature.home.component.RecurringHistory
 import com.jie.wealthmate.feature.home.component.RemainBudget
 import com.jie.wealthmate.feature.home.component.Today
 import com.jie.wealthmate.feature.home.component.vo.AmountVo
+import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.theme.Padding
 import com.jie.wealthmate.theme.WMTheme
 import com.jie.wealthmate.theme.noRippleClickable
@@ -56,7 +57,28 @@ fun HomeScreen(
     ) { uiState ->
         HomeContent(
             uiState = uiState,
-            onUpdateStatusType = viewModel::updateStatusType
+            onUpdateStatusType = viewModel::updateStatusType,
+            onLargeCategoryClick = { largeCategory ->
+                navController.navigate("preparednessStatus/${uiState.statusType.name}/${largeCategory.name}")
+            },
+            onCategoryChartClick = {
+                navController.navigate("preparednessStatus/${uiState.statusType.name}/${LargeCategoryEnum.EXPENSES.name}?scrollToPosition=2")
+            },
+            onCategoryItemClick = { categoryId ->
+                navController.navigate("categoryExpenses/${uiState.statusType.name}/${LargeCategoryEnum.EXPENSES.name}/$categoryId")
+            },
+            onPaymentMethodChartClick = {
+                navController.navigate("preparednessStatus/${uiState.statusType.name}/${LargeCategoryEnum.EXPENSES.name}?scrollToPosition=5")
+            },
+            onPaymentMethodItemClick = { paymentMethodId ->
+                navController.navigate("paymentMethodExpenses/${uiState.statusType.name}/${LargeCategoryEnum.EXPENSES.name}/$paymentMethodId")
+            },
+            onRecurringHeaderClick = {
+                navController.navigate("repeatHistoryManagement/${LargeCategoryEnum.EXPENSES.name}")
+            },
+            onRecurringItemClick = { id ->
+                navController.navigate("repeatHistoryDetail/$id")
+            }
         )
     }
 }
@@ -65,6 +87,13 @@ fun HomeScreen(
 fun HomeContent(
     uiState: HomeUiState,
     onUpdateStatusType: (StatusType) -> Unit,
+    onLargeCategoryClick: (LargeCategoryEnum) -> Unit,
+    onCategoryChartClick: () -> Unit,
+    onCategoryItemClick: (String?) -> Unit,
+    onPaymentMethodChartClick: () -> Unit,
+    onPaymentMethodItemClick: (String?) -> Unit,
+    onRecurringHeaderClick: () -> Unit,
+    onRecurringItemClick: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var isShowStatusTypeModalBottomSheet by remember { mutableStateOf(false) }
@@ -124,14 +153,7 @@ fun HomeContent(
             statusType = uiState.statusType,
             currentAmount = uiState.currentAmount,
             lastAmount = uiState.lastAmount,
-            onCategoryClick = { largeCategory ->
-//                    navigator.push(
-//                        PreparednessStatusScreen(
-//                            initialStatusType = uiState.statusType,
-//                            initialLargeCategory = largeCategory
-//                        )
-//                    )
-            }
+            onCategoryClick = onLargeCategoryClick
         )
 
         WMSpacer(size = SpacerSize.LARGE)
@@ -147,26 +169,8 @@ fun HomeContent(
             statusType = uiState.statusType,
             expensesAmount = uiState.currentAmount?.expensesAmount.default(),
             categorySegmentChartItems = uiState.categorySegmentChartItems,
-            onCategoryChartClick = {
-                // 카테고리 차트 전체 클릭 시 지출 현황 화면으로 이동 (비교 섹션으로 스크롤)
-//                    navigator.push(
-//                        PreparednessStatusScreen(
-//                            initialStatusType = uiState.statusType,
-//                            initialLargeCategory = LargeCategoryEnum.EXPENSES,
-//                            scrollToPosition = 2
-//                        )
-//                    )
-            },
-            onCategoryItemClick = { categoryId ->
-                // 개별 카테고리 클릭 시 상세 지출 내역 화면으로 이동
-//                    navigator.push(
-//                        CategoryExpensesScreen(
-//                            initialStatusType = uiState.statusType,
-//                            initialLargeCategory = LargeCategoryEnum.EXPENSES,
-//                            categoryId = categoryId
-//                        )
-//                    )
-            }
+            onCategoryChartClick = onCategoryChartClick,
+            onCategoryItemClick = onCategoryItemClick
         )
 
         WMSpacer(size = SpacerSize.LARGE)
@@ -174,26 +178,8 @@ fun HomeContent(
             statusType = uiState.statusType,
             expensesAmount = uiState.currentAmount?.expensesAmount.default(),
             paymentMethodSegmentChartItems = uiState.paymentMethodSegmentChartItems,
-            onPaymentMethodChartClick = {
-                // 카테고리 차트 전체 클릭 시 지출 현황 화면으로 이동
-//                    navigator.push(
-//                        PreparednessStatusScreen(
-//                            initialStatusType = uiState.statusType,
-//                            initialLargeCategory = LargeCategoryEnum.EXPENSES,
-//                            scrollToPosition = 5
-//                        )
-//                    )
-            },
-            onPaymentMethodItemClick = { paymentMethodId ->
-                // 개별 결제수단 클릭 시 상세 지출 내역 화면으로 이동
-//                    navigator.push(
-//                        PaymentMethodExpensesScreen(
-//                            initialStatusType = uiState.statusType,
-//                            initialLargeCategory = LargeCategoryEnum.EXPENSES,
-//                            paymentMethodId = paymentMethodId
-//                        )
-//                    )
-            }
+            onPaymentMethodChartClick = onPaymentMethodChartClick,
+            onPaymentMethodItemClick = onPaymentMethodItemClick
         )
 
         WMHorizontalDivider(
@@ -205,12 +191,8 @@ fun HomeContent(
             recurringHistories = uiState.sortedRecurringHistories,
             totalAmount = uiState.totalRecurringAmount,
             passedAmount = uiState.passedRecurringAmount,
-            onHeaderClick = {
-//                    navigator.push(RepeatHistoryManagementScreen(initialLargeCategory = LargeCategoryEnum.EXPENSES))
-            },
-            onItemClick = { id ->
-//                    navigator.push(RepeatHistoryDetailScreen(id))
-            }
+            onHeaderClick = onRecurringHeaderClick,
+            onItemClick = onRecurringItemClick
         )
 
         Spacer(modifier = Modifier.height(Padding.SpacerL))
@@ -252,7 +234,14 @@ private fun HomeContentPreview() {
                 ),
                 statusType = StatusType.MONTH
             ),
-            onUpdateStatusType = {}
+            onUpdateStatusType = {},
+            onLargeCategoryClick = {},
+            onCategoryChartClick = {},
+            onCategoryItemClick = {},
+            onPaymentMethodChartClick = {},
+            onPaymentMethodItemClick = {},
+            onRecurringHeaderClick = {},
+            onRecurringItemClick = {}
         )
     }
 }

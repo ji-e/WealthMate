@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -59,7 +58,7 @@ fun CategoryExpensesHeader(
 
                 WMText(
                     text = category.icon.ifEmpty { "❓" },
-                    style = Typography().displayMedium
+                    style = MaterialTheme.typography.displayMedium
                 )
             }
 
@@ -78,15 +77,16 @@ fun CategoryExpensesHeader(
         Spacer(modifier = Modifier.height(12.dp))
         WMText(
             text = category.middleLabel.ifEmpty { "카테고리 없음" },
-            style = typography.titleMedium.copy(
-                color = ColorGray.Gray_500,
-                fontWeight = FontWeight.SemiBold
-            )
+            style = typography.titleMedium,
+            color = ColorGray.Gray_500,
+            fontWeight = FontWeight.SemiBold
+
         )
         Spacer(modifier = Modifier.height(8.dp))
         WMText(
             text = "${totalAmount.formatWithCommas()}원",
-            style = typography.headlineMedium.copy(fontWeight = FontWeight.SemiBold)
+            style = typography.headlineMedium,
+            fontWeight = FontWeight.SemiBold
         )
 
         val diffColor = when {
@@ -98,7 +98,8 @@ fun CategoryExpensesHeader(
 
         WMText(
             text = "${statusType.lastLabel} 대비 $sign${diffAmount.formatWithCommas()}원",
-            style = typography.bodySmall.copy(color = diffColor)
+            style = typography.bodySmall,
+            color = diffColor
         )
     }
 }

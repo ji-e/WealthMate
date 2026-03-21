@@ -71,10 +71,9 @@ fun CategoryExpensesItem(
                 }
             WMText(
                 text = content.default().ifEmpty { "내용 미입력" },
-                style = MaterialTheme.typography.bodyLarge.copy(
-                    fontWeight = FontWeight.Medium,
-                    color = if (content.isNullOrBlank()) ColorGray.Gray_300 else ColorGray.Gray_700
-                ),
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.Medium,
+                color = if (content.isNullOrBlank()) ColorGray.Gray_300 else ColorGray.Gray_700,
                 maxLines = 1
             )
             if (infoText.isNotBlank()) {
@@ -87,10 +86,9 @@ fun CategoryExpensesItem(
         Spacer(modifier = Modifier.size(4.dp))
         WMText(
             text = "${history.history.amount.formatWithCommas()}원",
-            style = MaterialTheme.typography.titleMedium.copy(
-                fontSize = 18.sp,
-                fontWeight = FontWeight.SemiBold
-            ),
+            style = MaterialTheme.typography.titleMedium,
+            fontSize = 18.sp,
+            fontWeight = FontWeight.SemiBold,
             maxLines = 1
         )
     }

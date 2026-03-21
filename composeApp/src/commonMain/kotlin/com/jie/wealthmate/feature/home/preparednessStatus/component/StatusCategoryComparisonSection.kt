@@ -74,10 +74,9 @@ fun StatusCategoryComparisonSection(
         ) {
             WMText(
                 text = title,
-                style = typography.titleSmall.copy(
-                    color = ColorGray.Gray_500,
-                    fontWeight = FontWeight.SemiBold
-                ),
+                style = typography.titleSmall,
+                color = ColorGray.Gray_500,
+                fontWeight = FontWeight.SemiBold,
             )
 
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -136,10 +135,9 @@ fun StatusFixedCategoryComparisonSection(
         ) {
             WMText(
                 text = title,
-                style = typography.titleSmall.copy(
-                    color = ColorGray.Gray_500,
-                    fontWeight = FontWeight.SemiBold
-                ),
+                style = typography.titleSmall,
+                color = ColorGray.Gray_500,
+                fontWeight = FontWeight.SemiBold,
             )
 
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -204,7 +202,8 @@ private fun StatusCategoryComparisonItem(
                         WMText(
                             text = info.categoryName,
                             modifier = Modifier.weight(1f, fill = false),
-                            style = typography.titleMedium.copy(fontWeight = FontWeight.Medium),
+                            style = typography.titleMedium,
+                            fontWeight = FontWeight.Medium,
                             maxLines = 1,
                         )
                         Icon(
@@ -219,7 +218,8 @@ private fun StatusCategoryComparisonItem(
 
                     WMText(
                         text = if (percentage >= 0) "+$percentage%" else "$percentage%",
-                        style = typography.labelSmall.copy(color = ColorGray.Gray_500),
+                        style = typography.labelSmall,
+                        color = ColorGray.Gray_500,
                         maxLines = 1,
                     )
                 }
@@ -230,7 +230,8 @@ private fun StatusCategoryComparisonItem(
             ) {
                 WMText(
                     text = "${info.currentAmount.formatWithCommas()}원",
-                    style = typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold),
+                    style = typography.bodyLarge,
+                    fontWeight = FontWeight.SemiBold,
                     maxLines = 1
                 )
                 val diffColor = when {
@@ -241,7 +242,8 @@ private fun StatusCategoryComparisonItem(
                 val sign = if (info.diffAmount > 0) "+" else ""
                 WMText(
                     text = "$sign${info.diffAmount.formatWithCommas()}원",
-                    style = typography.labelSmall.copy(color = diffColor),
+                    style = typography.labelSmall,
+                    color = diffColor,
                     maxLines = 1
                 )
             }
@@ -280,7 +282,10 @@ fun StatusCategoryIcon(icon: String, backgroundColor: Color, isFixed: Boolean = 
                 .align(Alignment.CenterEnd),
             contentAlignment = Alignment.Center
         ) {
-            WMText(text = icon, style = MaterialTheme.typography.titleLarge)
+            WMText(
+                text = icon,
+                style = MaterialTheme.typography.titleLarge
+            )
         }
 
         if (isFixed) {

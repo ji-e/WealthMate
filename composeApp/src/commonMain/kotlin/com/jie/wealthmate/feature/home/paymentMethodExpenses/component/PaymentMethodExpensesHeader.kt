@@ -55,15 +55,16 @@ fun PaymentMethodExpensesHeader(
         Spacer(modifier = Modifier.height(12.dp))
         WMText(
             text = paymentMethod.label.ifEmpty { "결제수단 없음" },
-            style = typography.titleMedium.copy(
-                color = ColorGray.Gray_500,
-                fontWeight = FontWeight.SemiBold
-            )
+            style = typography.titleMedium,
+            color = ColorGray.Gray_500,
+            fontWeight = FontWeight.SemiBold
+
         )
         Spacer(modifier = Modifier.height(8.dp))
         WMText(
             text = "${totalAmount.formatWithCommas()}원",
-            style = typography.headlineMedium.copy(fontWeight = FontWeight.SemiBold)
+            style = typography.headlineMedium,
+            fontWeight = FontWeight.SemiBold
         )
 
         val diffColor = when {
@@ -75,7 +76,8 @@ fun PaymentMethodExpensesHeader(
 
         WMText(
             text = "${statusType.lastLabel} 대비 $sign${diffAmount.formatWithCommas()}원",
-            style = typography.bodySmall.copy(color = diffColor)
+            style = typography.bodySmall,
+            color = diffColor
         )
     }
 }

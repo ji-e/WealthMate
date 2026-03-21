@@ -71,16 +71,16 @@ fun SummarySection(
         Row(verticalAlignment = Alignment.CenterVertically) {
             WMText(
                 text = "${statusType.label} 총 ${largeCategory.label}",
-                style = typography.titleSmall.copy(
-                    color = ColorGray.Gray_500,
-                    fontWeight = FontWeight.SemiBold
-                ),
+                style = typography.titleSmall,
+                color = ColorGray.Gray_500,
+                fontWeight = FontWeight.SemiBold,
             )
 
             comparisonText?.let {
                 WMText(
                     text = it,
-                    style = typography.bodySmall.copy(color = textColor),
+                    style = typography.bodySmall,
+                    color = textColor,
                     modifier = Modifier.padding(start = 4.dp)
                 )
             }
@@ -88,7 +88,8 @@ fun SummarySection(
 
         WMText(
             text = "${formatWithCommas(currentAmount.toString())}원",
-            style = typography.displaySmall.copy(fontWeight = FontWeight.SemiBold),
+            style = typography.displaySmall,
+            fontWeight = FontWeight.SemiBold,
             modifier = Modifier.padding(vertical = 8.dp)
         )
 
@@ -98,18 +99,18 @@ fun SummarySection(
         ) {
             WMText(
                 text = "${statusType.lastLabel} 대비 ",
-                style = typography.bodyMedium.copy(color = ColorGray.Gray_500)
+                style = typography.bodyMedium,
+                color = ColorGray.Gray_500
             )
             WMText(
                 text = "${formatWithCommas(diffAmount.absoluteValue.toString())}원 ",
-                style = typography.bodyMedium.copy(
-                    color = textColor,
-                    fontWeight = FontWeight.Bold
-                )
+                color = textColor,
+                fontWeight = FontWeight.Bold
+
             )
             WMText(
                 text = diffActionText,
-                style = typography.bodyMedium.copy(color = ColorGray.Gray_500)
+                color = ColorGray.Gray_500
             )
         }
     }

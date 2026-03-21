@@ -10,17 +10,15 @@ import com.jie.wealthmate.feature.calendar.CalendarViewModel
 import com.jie.wealthmate.feature.calendar.addHistory.AddHistoryViewModel
 import com.jie.wealthmate.feature.calendar.historyDetail.HistoryDetailViewModel
 import com.jie.wealthmate.feature.home.HomeViewModel
-import com.jie.wealthmate.feature.home.StatusType
-import com.jie.wealthmate.feature.home.categoryExpenses.CategoryExpensesScreenModel
-import com.jie.wealthmate.feature.home.paymentMethodExpenses.PaymentMethodExpensesScreenModel
-import com.jie.wealthmate.feature.home.preparednessStatus.PreparednessStatusScreenModel
+import com.jie.wealthmate.feature.home.categoryExpenses.CategoryExpensesViewModel
+import com.jie.wealthmate.feature.home.paymentMethodExpenses.PaymentMethodExpensesViewModel
+import com.jie.wealthmate.feature.home.preparednessStatus.PreparednessStatusViewModel
 import com.jie.wealthmate.feature.main.MainViewModel
 import com.jie.wealthmate.feature.menu.MenuScreenModel
 import com.jie.wealthmate.feature.menu.data.googleCloudShare.GoogleCloudShareScreenModel
 import com.jie.wealthmate.feature.menu.data.googleCloudSync.GoogleCloudSyncScreenModel
 import com.jie.wealthmate.feature.menu.management.categoryManagement.CategoryManagementScreenModel
 import com.jie.wealthmate.feature.menu.management.categoryManagement.addCategory.AddCategoryScreenModel
-import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.feature.menu.management.categoryManagement.modifyCategory.ModifyCategoryScreenModel
 import com.jie.wealthmate.feature.menu.management.paymentMethodManagement.PaymentMethodManagementScreenModel
 import com.jie.wealthmate.feature.menu.management.paymentMethodManagement.addPaymentMethod.AddPaymentMethodScreenModel
@@ -53,6 +51,7 @@ import com.jie.wealthmate.usecase.UpdateInstallmentUseCase
 import com.jie.wealthmate.usecase.UpdateRepeatCycleUseCase
 import kotlinx.datetime.LocalDate
 import org.koin.core.module.dsl.viewModelOf
+import org.koin.core.parameter.parametersOf
 import org.koin.dsl.module
 
 val commonModule = module {
@@ -61,13 +60,15 @@ val commonModule = module {
     viewModelOf(::CalendarViewModel)
     viewModelOf(::AddHistoryViewModel)
     viewModelOf(::HistoryDetailViewModel)
+    viewModelOf(::CategoryExpensesViewModel)
+    viewModelOf(::PaymentMethodExpensesViewModel)
+    viewModelOf(::PreparednessStatusViewModel)
 
 
 
     single { DatabaseSyncManager(get(), get(), get()) }
 
     single { HttpClientFactory(get()).create() }
-
     single<AuthRepository> { AuthRepositoryImpl(get()) }
     single<GoogleRepository> { GoogleRepositoryImpl(get(), get()) }
     single<CategoryRepository> { CategoryRepositoryImpl(get()) }
@@ -82,18 +83,6 @@ val commonModule = module {
     single { UpdateInstallmentUseCase(get(), get()) }
     single { UpdateRepeatCycleUseCase(get(), get()) }
     single { ModifyHistoryUseCase(get(), get()) }
-
-
-    // 홈
-    factory { (initialStatusType: StatusType, initialLargeCategory: LargeCategoryEnum) ->
-        PreparednessStatusScreenModel(get(), get(), get(), get(), initialStatusType, initialLargeCategory)
-    }
-    factory { (initialStatusType: StatusType, initialLargeCategory: LargeCategoryEnum, categoryId: String?) ->
-        CategoryExpensesScreenModel(get(), get(), initialStatusType, initialLargeCategory, categoryId)
-    }
-    factory { (initialStatusType: StatusType, initialLargeCategory: LargeCategoryEnum, paymentMethodId: String?) ->
-        PaymentMethodExpensesScreenModel(get(), get(), initialStatusType, initialLargeCategory, paymentMethodId)
-    }
 
 
     // 예산

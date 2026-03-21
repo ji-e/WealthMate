@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -15,7 +16,6 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -23,16 +23,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import cafe.adriel.voyager.core.screen.Screen
-import cafe.adriel.voyager.koin.koinScreenModel
-import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.currentOrThrow
+import androidx.navigation.NavController
+import com.jie.wealthmate.base.BaseScreen
 import com.jie.wealthmate.component.EmptyListView
 import com.jie.wealthmate.component.WMListSelectionModalBottomSheet
 import com.jie.wealthmate.component.topbar.TopBarItem
 import com.jie.wealthmate.component.topbar.WMTopBar
-import com.jie.wealthmate.feature.calendar.historyDetail.HistoryDetailScreen
+import com.jie.wealthmate.database.eneity.HistoryEntity
+import com.jie.wealthmate.database.eneity.HistoryWithDetails
 import com.jie.wealthmate.feature.home.StatusType
 import com.jie.wealthmate.feature.home.categoryExpenses.component.CategoryExpensesHeader
 import com.jie.wealthmate.feature.home.categoryExpenses.component.CategoryExpensesItem
@@ -40,137 +40,219 @@ import com.jie.wealthmate.feature.home.preparednessStatus.component.Preparedness
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.feature.search.component.DateHeader
 import com.jie.wealthmate.theme.ColorGray
+import com.jie.wealthmate.theme.WMTheme
 import com.jie.wealthmate.utils.formatDateKorMDE
+import com.jie.wealthmate.utils.toEpochMilliseconds
+import com.jie.wealthmate.utils.today
+import com.jie.wealthmate.vo.CategoryVo
+import kotlinx.collections.immutable.persistentListOf
+import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 
-class CategoryExpensesScreen(
-    private val initialStatusType: StatusType,
-    private val initialLargeCategory: LargeCategoryEnum,
-    private val categoryId: String?,
-) : Screen {
-    @OptIn(ExperimentalFoundationApi::class)
-    @Composable
-    override fun Content() {
-        val navigator = LocalNavigator.currentOrThrow
-        val screenModel: CategoryExpensesScreenModel = koinScreenModel {
-            parametersOf(initialStatusType, initialLargeCategory, categoryId)
-        }
-        val uiState by screenModel.container.uiState.collectAsState()
-
-        var isShowStatusTypeModal by remember { mutableStateOf(false) }
-
-        val listState = rememberLazyListState()
-        val shouldLoadNextPage by remember {
-            derivedStateOf {
-                val lastVisibleItem = listState.layoutInfo.visibleItemsInfo.lastOrNull()
-                lastVisibleItem != null && lastVisibleItem.index >= listState.layoutInfo.totalItemsCount - 5
+@Composable
+fun CategoryExpensesScreen(
+    navController: NavController,
+    initialStatusType: StatusType,
+    initialLargeCategory: LargeCategoryEnum,
+    categoryId: String?,
+    viewModel: CategoryExpensesViewModel = koinViewModel {
+        parametersOf(initialStatusType, initialLargeCategory, categoryId)
+    }
+) {
+    BaseScreen(
+        viewModel = viewModel,
+        onBack = { navController.popBackStack() }
+    ) { uiState ->
+        CategoryExpensesContent(
+            uiState = uiState,
+            onBackClick = { navController.popBackStack() },
+            onUpdateStatusType = viewModel::updateStatusType,
+            onLoadNextPage = viewModel::loadNextPage,
+            onClickHistory = { historyId ->
+                navController.navigate("historyDetail/${uiState.largeCategory.name}/$historyId")
             }
+        )
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun CategoryExpensesContent(
+    uiState: CategoryExpensesUiState,
+    onBackClick: () -> Unit,
+    onUpdateStatusType: (StatusType) -> Unit,
+    onLoadNextPage: () -> Unit,
+    onClickHistory: (String) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    var isShowStatusTypeModal by remember { mutableStateOf(false) }
+    val listState = rememberLazyListState()
+
+    // 페이징 트리거: 리스트 끝 부분 도달 시 다음 페이지 로드
+    val shouldLoadNextPage by remember {
+        derivedStateOf {
+            val lastVisibleItem = listState.layoutInfo.visibleItemsInfo.lastOrNull()
+            lastVisibleItem != null && lastVisibleItem.index >= listState.layoutInfo.totalItemsCount - 5
         }
+    }
 
-        LaunchedEffect(shouldLoadNextPage) {
-            if (shouldLoadNextPage) {
-                screenModel.loadNextPage()
-            }
+    LaunchedEffect(shouldLoadNextPage) {
+        if (shouldLoadNextPage) {
+            onLoadNextPage()
         }
+    }
 
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(ColorGray.White)
-        ) {
-            WMTopBar(
-                title = TopBarItem.Title("${uiState.largeCategory.label} 상세"),
-                readingItem = TopBarItem.ReadingItem(
-                    action = { navigator.pop() }
-                ),
-                trailingCustomItem = TopBarItem.TrailingCustomItem {
-                    PreparednessStatusFilter(
-                        statusTypeLabel = uiState.statusType.label,
-                        largeCategoryLabel = null,
-                        onStatusTypeClick = { isShowStatusTypeModal = true },
-                        onLargeCategoryClick = null
-                    )
-                }
-            )
-
-            LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                state = listState
-            ) {
-                item {
-                    CategoryExpensesHeader(
-                        statusType = uiState.statusType,
-                        category = uiState.category,
-                        totalAmount = uiState.totalAmount,
-                        diffAmount = uiState.diffAmount,
-                    )
-                }
-
-                if (uiState.histories.isEmpty() && !uiState.isPagingLoading) {
-                    item {
-                        EmptyListView(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(300.dp),
-                            contentText = "내역이 없습니다."
-                        )
-                    }
-                } else {
-                    uiState.groupedHistories.forEach { (date, histories) ->
-                        stickyHeader(key = "header_$date") {
-                            DateHeader(
-                                date = date,
-                                format = formatDateKorMDE
-                            )
-                        }
-
-                        items(histories, key = { it.history.id }) { history ->
-                            CategoryExpensesItem(
-                                history = history,
-                                onClickHistory = { historyId ->
-//                                    navigator.push(
-//                                        HistoryDetailScreen(
-//                                            largeCategory = uiState.largeCategory,
-//                                            historyId = historyId
-//                                        )
-//                                    )
-                                }
-                            )
-                        }
-
-                        item {
-                            Spacer(modifier = Modifier.height(4.dp))
-                        }
-                    }
-
-                    if (uiState.isPagingLoading) {
-                        item {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(16.dp),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                CircularProgressIndicator()
-                            }
-                        }
-                    }
-
-                    item {
-                        Spacer(modifier = Modifier.height(40.dp))
-                    }
-                }
-            }
-            if (isShowStatusTypeModal) {
-                WMListSelectionModalBottomSheet(
-                    title = "기간 선택",
-                    items = StatusType.entries,
-                    selectedItem = uiState.statusType,
-                    itemLabel = { it.label },
-                    onItemSelected = { screenModel.updateStatusType(it) },
-                    onDismissRequest = { isShowStatusTypeModal = false }
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .navigationBarsPadding()
+            .background(ColorGray.White)
+    ) {
+        WMTopBar(
+            title = TopBarItem.Title("${uiState.largeCategory.label} 상세"),
+            readingItem = TopBarItem.ReadingItem(
+                action = onBackClick
+            ),
+            trailingCustomItem = TopBarItem.TrailingCustomItem {
+                PreparednessStatusFilter(
+                    statusTypeLabel = uiState.statusType.label,
+                    largeCategoryLabel = null,
+                    onStatusTypeClick = { isShowStatusTypeModal = true },
+                    onLargeCategoryClick = null
                 )
             }
+        )
+
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            state = listState
+        ) {
+            item {
+                CategoryExpensesHeader(
+                    statusType = uiState.statusType,
+                    category = uiState.category,
+                    totalAmount = uiState.totalAmount,
+                    diffAmount = uiState.diffAmount,
+                )
+            }
+
+            if (uiState.histories.isEmpty() && !uiState.isPagingLoading) {
+                item {
+                    EmptyListView(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(300.dp),
+                        contentText = "내역이 없습니다."
+                    )
+                }
+            } else {
+                uiState.groupedHistories.forEach { (date, histories) ->
+                    stickyHeader(key = "header_$date") {
+                        DateHeader(
+                            date = date,
+                            format = formatDateKorMDE
+                        )
+                    }
+
+                    items(histories, key = { it.history.id }) { history ->
+                        CategoryExpensesItem(
+                            history = history,
+                            onClickHistory = onClickHistory
+                        )
+                    }
+
+                    item {
+                        Spacer(modifier = Modifier.height(4.dp))
+                    }
+                }
+
+                if (uiState.isPagingLoading) {
+                    item {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator()
+                        }
+                    }
+                }
+
+                item {
+                    Spacer(modifier = Modifier.height(40.dp))
+                }
+            }
         }
+
+        if (isShowStatusTypeModal) {
+            WMListSelectionModalBottomSheet(
+                title = "기간 선택",
+                items = StatusType.entries,
+                selectedItem = uiState.statusType,
+                itemLabel = { it.label },
+                onItemSelected = {
+                    onUpdateStatusType(it)
+                    isShowStatusTypeModal = false
+                },
+                onDismissRequest = { isShowStatusTypeModal = false }
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun CategoryExpensesContentPreview() {
+    WMTheme {
+        CategoryExpensesContent(
+            uiState = CategoryExpensesUiState(
+                statusType = StatusType.MONTH,
+                largeCategory = LargeCategoryEnum.EXPENSES,
+                category = CategoryVo(
+                    id = "1",
+                    middleLabel = "식비",
+                    icon = "🍔",
+                    largeCategory = LargeCategoryEnum.EXPENSES,
+                    sort = 0L,
+                    isFixed = false,
+                    tags = persistentListOf()
+                ),
+                totalAmount = 450000,
+                lastTotalAmount = 400000,
+                histories = listOf(
+                    HistoryWithDetails(
+                        history = HistoryEntity(
+                            id = "1",
+                            largeCategory = LargeCategoryEnum.EXPENSES.name,
+                            date = today.toEpochMilliseconds(),
+                            amount = 12000,
+                            content = "점심 식사"
+                        ),
+                        category = null,
+                        paymentMethod = null,
+                        repeatCycle = null,
+                        installment = null
+                    ),
+                    HistoryWithDetails(
+                        history = HistoryEntity(
+                            id = "2",
+                            largeCategory = LargeCategoryEnum.EXPENSES.name,
+                            date = today.toEpochMilliseconds(),
+                            amount = 5500,
+                            content = "스타벅스"
+                        ),
+                        category = null,
+                        paymentMethod = null,
+                        repeatCycle = null,
+                        installment = null
+                    )
+                )
+            ),
+            onBackClick = {},
+            onUpdateStatusType = {},
+            onLoadNextPage = {},
+            onClickHistory = {}
+        )
     }
 }

@@ -50,7 +50,8 @@ private fun FilterItem(text: String, onClick: () -> Unit) {
     ) {
         WMText(
             text = text,
-            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.SemiBold,
         )
         Icon(
             painter = painterResource(Res.drawable.ic_arrow_drop_down),

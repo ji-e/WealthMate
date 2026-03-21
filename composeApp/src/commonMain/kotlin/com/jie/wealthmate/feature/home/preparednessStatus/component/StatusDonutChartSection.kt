@@ -77,10 +77,9 @@ fun StatusDonutChartSection(
     ) {
         WMText(
             text = title,
-            style = typography.titleSmall.copy(
-                color = ColorGray.Gray_500,
-                fontWeight = FontWeight.SemiBold
-            ),
+            style = typography.titleSmall,
+            color = ColorGray.Gray_500,
+            fontWeight = FontWeight.SemiBold,
             modifier = Modifier.padding(bottom = 16.dp)
         )
 
@@ -123,10 +122,10 @@ fun StatusDonutChartSection(
 
                 WMText(
                     text = totalLabel,
-                    style = typography.bodyLarge.copy(
-                        color = ColorGray.Gray_500,
-                        fontWeight = FontWeight.SemiBold
-                    )
+                    style = typography.bodyLarge,
+                    color = ColorGray.Gray_500,
+                    fontWeight = FontWeight.SemiBold
+
                 )
             }
 
@@ -185,7 +184,7 @@ private fun StatusLegendItem(
         ) {
             WMText(
                 text = category.categoryName,
-                style = typography.bodyMedium.copy(fontWeight = FontWeight.Medium),
+                fontWeight = FontWeight.Medium,
                 modifier = Modifier.weight(1f),
                 maxLines = 1,
             )
@@ -193,7 +192,8 @@ private fun StatusLegendItem(
             val rate = remember(category.ratio) { (category.ratio * 100).roundToInt() }
             WMText(
                 text = "${rate}%",
-                style = typography.bodySmall.copy(color = ColorGray.Gray_500),
+                style = typography.bodySmall,
+                color = ColorGray.Gray_500,
                 modifier = Modifier.padding(start = 6.dp)
             )
         }

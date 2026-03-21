@@ -39,6 +39,10 @@ import com.jie.wealthmate.feature.calendar.CalendarScreen
 import com.jie.wealthmate.feature.calendar.addHistory.AddHistoryScreen
 import com.jie.wealthmate.feature.calendar.historyDetail.HistoryDetailScreen
 import com.jie.wealthmate.feature.home.HomeScreen
+import com.jie.wealthmate.feature.home.StatusType
+import com.jie.wealthmate.feature.home.categoryExpenses.CategoryExpensesScreen
+import com.jie.wealthmate.feature.home.paymentMethodExpenses.PaymentMethodExpensesScreen
+import com.jie.wealthmate.feature.home.preparednessStatus.PreparednessStatusScreen
 import com.jie.wealthmate.feature.menu.MenuScreen
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.getPlatform
@@ -64,7 +68,9 @@ fun MainScreen(
                 BottomNavItem.Home.route,
                 BottomNavItem.Calendar.route,
                 BottomNavItem.Budget.route,
-                BottomNavItem.Menu.route -> true
+                BottomNavItem.Menu.route,
+                    -> true
+
                 else -> false
             }
         }
@@ -144,6 +150,137 @@ fun MainScreen(
                             onBack = { innerNavController.popBackStack() },
                             onNavigateToRepeatDetail = { /* TODO */ }
                         )
+                    }
+                    composable(
+                        route = "preparednessStatus/{statusType}/{largeCategory}?scrollToPosition={scrollToPosition}",
+                        arguments = listOf(
+                            navArgument("statusType") { type = NavType.StringType },
+                            navArgument("largeCategory") { type = NavType.StringType },
+                            navArgument("scrollToPosition") {
+                                type = NavType.IntType
+                                defaultValue = 0
+                            }
+                        )
+                    ) { backStackEntry ->
+                        val statusTypeStr = backStackEntry.arguments?.getString("statusType")
+                        val largeCategoryStr = backStackEntry.arguments?.getString("largeCategory")
+                        val scrollToPosition =
+                            backStackEntry.arguments?.getInt("scrollToPosition") ?: 0
+
+                        val statusType = try {
+                            StatusType.valueOf(statusTypeStr ?: "MONTH")
+                        } catch (e: Exception) {
+                            StatusType.MONTH
+                        }
+                        val largeCategory = try {
+                            LargeCategoryEnum.valueOf(largeCategoryStr ?: "EXPENSES")
+                        } catch (e: Exception) {
+                            LargeCategoryEnum.EXPENSES
+                        }
+
+                        PreparednessStatusScreen(
+                            navController = innerNavController,
+                            initialStatusType = statusType,
+                            initialLargeCategory = largeCategory,
+                            scrollToPosition = scrollToPosition
+                        )
+                    }
+                    composable(
+                        route = "categoryExpenses/{statusType}/{largeCategory}/{categoryId}",
+                        arguments = listOf(
+                            navArgument("statusType") { type = NavType.StringType },
+                            navArgument("largeCategory") { type = NavType.StringType },
+                            navArgument("categoryId") {
+                                type = NavType.StringType
+                                nullable = true
+                            }
+                        )
+                    ) { backStackEntry ->
+                        val statusTypeStr = backStackEntry.arguments?.getString("statusType")
+                        val largeCategoryStr = backStackEntry.arguments?.getString("largeCategory")
+                        val categoryId = backStackEntry.arguments?.getString("categoryId")
+
+                        val statusType = try {
+                            StatusType.valueOf(statusTypeStr ?: "MONTH")
+                        } catch (e: Exception) {
+                            StatusType.MONTH
+                        }
+                        val largeCategory = try {
+                            LargeCategoryEnum.valueOf(largeCategoryStr ?: "EXPENSES")
+                        } catch (e: Exception) {
+                            LargeCategoryEnum.EXPENSES
+                        }
+
+                        CategoryExpensesScreen(
+                            navController = innerNavController,
+                            initialStatusType = statusType,
+                            initialLargeCategory = largeCategory,
+                            categoryId = categoryId
+                        )
+                    }
+                    composable(
+                        route = "paymentMethodExpenses/{statusType}/{largeCategory}/{paymentMethodId}",
+                        arguments = listOf(
+                            navArgument("statusType") { type = NavType.StringType },
+                            navArgument("largeCategory") { type = NavType.StringType },
+                            navArgument("paymentMethodId") {
+                                type = NavType.StringType
+                                nullable = true
+                            }
+                        )
+                    ) { backStackEntry ->
+                        val statusTypeStr = backStackEntry.arguments?.getString("statusType")
+                        val largeCategoryStr = backStackEntry.arguments?.getString("largeCategory")
+                        val paymentMethodId =
+                            backStackEntry.arguments?.getString("paymentMethodId")
+
+                        val statusType = try {
+                            StatusType.valueOf(statusTypeStr ?: "MONTH")
+                        } catch (e: Exception) {
+                            StatusType.MONTH
+                        }
+                        val largeCategory = try {
+                            LargeCategoryEnum.valueOf(largeCategoryStr ?: "EXPENSES")
+                        } catch (e: Exception) {
+                            LargeCategoryEnum.EXPENSES
+                        }
+
+                        PaymentMethodExpensesScreen(
+                            navController = innerNavController,
+                            initialStatusType = statusType,
+                            initialLargeCategory = largeCategory,
+                            paymentMethodId = paymentMethodId
+                        )
+                    }
+                    composable(
+                        route = "repeatHistoryManagement/{largeCategory}",
+                        arguments = listOf(
+                            navArgument("largeCategory") { type = NavType.StringType }
+                        )
+                    ) { backStackEntry ->
+                        val largeCategoryStr = backStackEntry.arguments?.getString("largeCategory")
+                        val largeCategory = try {
+                            LargeCategoryEnum.valueOf(largeCategoryStr ?: "EXPENSES")
+                        } catch (e: Exception) {
+                            LargeCategoryEnum.EXPENSES
+                        }
+
+//                        RepeatHistoryManagementScreen(
+//                            navController = innerNavController,
+//                            initialLargeCategory = largeCategory
+//                        )
+                    }
+                    composable(
+                        route = "repeatHistoryDetail/{id}",
+                        arguments = listOf(
+                            navArgument("id") { type = NavType.StringType }
+                        )
+                    ) { backStackEntry ->
+                        val id = backStackEntry.arguments?.getString("id") ?: ""
+//                        RepeatHistoryDetailScreen(
+//                            navController = innerNavController,
+//                            id = id
+//                        )
                     }
                 }
 

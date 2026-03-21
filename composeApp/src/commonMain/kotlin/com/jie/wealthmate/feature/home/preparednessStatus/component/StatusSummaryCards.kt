@@ -95,10 +95,9 @@ private fun RowScope.StatusSummaryCard(
     ) {
         WMText(
             text = label,
-            style = typography.titleSmall.copy(
-                color = ColorGray.Gray_500,
-                fontWeight = FontWeight.SemiBold
-            ),
+            style = typography.titleSmall,
+            color = ColorGray.Gray_500,
+            fontWeight = FontWeight.SemiBold,
             modifier = Modifier.padding(bottom = 12.dp)
         )
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -107,12 +106,14 @@ private fun RowScope.StatusSummaryCard(
             Column(verticalArrangement = Arrangement.SpaceBetween) {
                 WMText(
                     text = info.categoryName,
-                    style = typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold)
+                    style = typography.bodyLarge,
+                    fontWeight = FontWeight.SemiBold
                 )
                 val sign = if (info.diffAmount > 0) "+" else ""
                 WMText(
                     text = "$sign${info.diffAmount.formatWithCommas()}원",
-                    style = typography.labelMedium.copy(color = diffColor)
+                    style = typography.labelMedium,
+                    color = diffColor
                 )
             }
         }
