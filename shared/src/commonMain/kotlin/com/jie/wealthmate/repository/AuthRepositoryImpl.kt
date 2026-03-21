@@ -3,6 +3,7 @@
 package com.jie.wealthmate.repository
 
 import com.benasher44.uuid.uuid4
+import com.jie.wealthmate.account.AccountProvider
 import com.jie.wealthmate.entity.GoogleAuthEntity
 import com.russhwolf.settings.Settings
 import io.github.aakira.napier.Napier
@@ -15,6 +16,7 @@ expect suspend fun platformSilentSignIn(): GoogleAuthEntity?
 
 class AuthRepositoryImpl(
     private val settings: Settings,
+    private val accountProvider: AccountProvider,
 ) : AuthRepository {
 
     companion object {
@@ -31,6 +33,7 @@ class AuthRepositoryImpl(
         settings.putString(KEY_ACCESS_TOKEN, accessToken)
         refreshToken?.let { settings.putString(KEY_REFRESH_TOKEN, it) }
         email?.let { settings.putString(KEY_USER_NAME, it) }
+        accountProvider.updateAccount(email)
     }
 
     override fun getAccessToken(): String? = settings.getStringOrNull(KEY_ACCESS_TOKEN)

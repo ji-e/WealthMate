@@ -1,11 +1,20 @@
 package com.jie.wealthmate.feature.main
 
+import com.jie.wealthmate.account.AccountProvider
 import com.jie.wealthmate.base.BaseViewModel
 import com.jie.wealthmate.component.bottomNav.BottomNavItem
+import com.jie.wealthmate.repository.AuthRepository
 
-class MainViewModel : BaseViewModel<MainUiState>() {
+class MainViewModel(
+    private val authRepository: AuthRepository,
+    private val accountProvider: AccountProvider,
+) : BaseViewModel<MainUiState>() {
 
     override val initialState: MainUiState = MainUiState()
+
+    init {
+        accountProvider.updateAccount(authRepository.getUserName())
+    }
 
     fun onTabSelected(item: BottomNavItem) {
         reduceState { state ->
