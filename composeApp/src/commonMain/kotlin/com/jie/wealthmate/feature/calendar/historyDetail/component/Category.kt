@@ -13,12 +13,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Typography
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.jie.wealthmate.component.LabelText
 import com.jie.wealthmate.component.WMText
@@ -59,7 +58,8 @@ fun Category(
                 ) {
                     WMText(
                         text = "카테고리 없음",
-                        style = Typography().titleSmall.copy(color = ColorGray.Gray_300),
+                        style = MaterialTheme.typography.titleSmall,
+                        color = ColorGray.Gray_300,
                     )
                 }
                 return@Row
@@ -75,7 +75,7 @@ fun Category(
                 ) {
                     WMText(
                         text = category.icon,
-                        style = Typography().titleLarge
+                        style = MaterialTheme.typography.titleLarge
                     )
                 }
                 if (category.isFixed) {
@@ -92,14 +92,14 @@ fun Category(
 
             WMText(
                 text = category.middleLabel,
-                style = Typography().titleMedium,
+                style = MaterialTheme.typography.titleMedium,
                 maxLines = 1
             )
 
             categoryTag?.let {
                 WMText(
                     text = " > ${it.label}",
-                    style = Typography().titleMedium,
+                    style = MaterialTheme.typography.titleMedium,
                     maxLines = 1
                 )
             }

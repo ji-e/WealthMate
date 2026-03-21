@@ -1,7 +1,9 @@
 package com.jie.wealthmate.feature.calendar.historyDetail
 
 import androidx.compose.ui.text.input.TextFieldValue
-import com.jie.wealthmate.base.BaseScreenModel
+import com.jie.wealthmate.base.BaseViewModel
+import com.jie.wealthmate.database.eneity.HistoryEntity
+import com.jie.wealthmate.database.eneity.HistoryWithDetails
 import com.jie.wealthmate.feature.calendar.addHistory.component.RepeatCycleEnum
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.repository.CategoryRepository
@@ -18,20 +20,19 @@ import com.jie.wealthmate.vo.CategoryVo.Companion.mapperToVo
 import com.jie.wealthmate.vo.HistoryVo.Companion.mapperToVo
 import com.jie.wealthmate.vo.PaymentMethodVo
 import com.jie.wealthmate.vo.PaymentMethodVo.Companion.mapperToVo
+import kotlinx.coroutines.flow.flow
 import kotlinx.datetime.LocalDate
 
-class HistoryDetailScreenModel(
+class HistoryDetailViewModel(
     private val categoryRepository: CategoryRepository,
     private val paymentMethodRepository: PaymentMethodRepository,
     private val historyRepository: HistoryRepository,
     private val updateInstallmentUseCase: UpdateInstallmentUseCase,
     private val updateRepeatCycleUseCase: UpdateRepeatCycleUseCase,
     private val modifyHistoryUseCase: ModifyHistoryUseCase,
-) : BaseScreenModel<HistoryDetailUiState>() {
+) : BaseViewModel<HistoryDetailUiState>() {
 
-    override val initialState: HistoryDetailUiState
-        get() = HistoryDetailUiState()
-
+    override val initialState: HistoryDetailUiState = HistoryDetailUiState()
 
     fun updateInit(historyId: String) {
         getHistory(historyId)
@@ -62,7 +63,6 @@ class HistoryDetailScreenModel(
     fun updateRepeatCycle(repeatCycle: RepeatCycleEnum?) {
         repeatCycle ?: return
         val uiState = container.uiState.value
-
 
         uiState.history?.repeatCycle?.let { repeatCycleVo ->
             updateRepeatCycle(
@@ -131,39 +131,37 @@ class HistoryDetailScreenModel(
     }
 
     fun getHistory(historyId: String) {
-        launchSafe(
-            block = {
-                historyRepository.getHistoryById(historyId)
+        flow<HistoryWithDetails?> {
+            emit(historyRepository.getHistoryById(historyId))
+        }.apiFlow { response ->
+            response?.let { details ->
+                val history = details.mapperToVo()
+                reduceState { state ->
+                    state.copy(
+                        history = history.copy(
+                            repeatCycle = if (history.repeatCycle?.isDeleted.default()) null else history.repeatCycle
+                        ),
+                        date = history.date,
+                        amount = TextFieldValue(history.amount.toString()),
+                        category = history.category,
+                        categoryTag = history.categoryTag,
+                        paymentMethod = history.paymentMethod,
+                        content = TextFieldValue(history.content.default()),
+                        largeCategory = history.largeCategory
+                    )
+                }
+                getInstallmentHistory(history.installment?.id)
+                getCategories(history.largeCategory)
             }
-        ) { response ->
-            val history = response.mapperToVo()
-            reduceState { state ->
-                state.copy(
-                    history = history.copy(
-                        repeatCycle = if (history.repeatCycle?.isDeleted.default()) null else history.repeatCycle
-                    ),
-                    date = history.date,
-                    amount = TextFieldValue(history.amount.toString()),
-                    category = history.category,
-                    categoryTag = history.categoryTag,
-                    paymentMethod = history.paymentMethod,
-                    content = TextFieldValue(history.content.default()),
-                )
-            }
-            getInstallmentHistory(history.installment?.id)
-            getCategories(history.largeCategory)
-            println(response)
         }
     }
 
     fun getInstallmentHistory(installmentId: String?) {
         installmentId ?: return
 
-        launchSafe(
-            block = {
-                historyRepository.getHistoriesByInstallmentId(installmentId)
-            }
-        ) { response ->
+        flow<List<HistoryEntity>> {
+            emit(historyRepository.getHistoriesByInstallmentId(installmentId))
+        }.apiFlow { response ->
             reduceState { state ->
                 state.copy(
                     installmentHistoryItems = response
@@ -177,7 +175,7 @@ class HistoryDetailScreenModel(
             .apiFlow { response ->
                 reduceState { state ->
                     state.copy(
-                        categoryItems = response.map {it.mapperToVo()}
+                        categoryItems = response.map { it.mapperToVo() }
                     )
                 }
             }
@@ -186,10 +184,9 @@ class HistoryDetailScreenModel(
     private fun getPaymentMethods() {
         paymentMethodRepository.getPaymentMethods()
             .apiFlow { response ->
-                println("response: $response")
                 reduceState { state ->
                     state.copy(
-                        paymentMethodItems = response.map {it.paymentMethod.mapperToVo()}
+                        paymentMethodItems = response.map { it.paymentMethod.mapperToVo() }
                     )
                 }
             }
@@ -199,15 +196,14 @@ class HistoryDetailScreenModel(
         val uiState = container.uiState.value
         val historyVo = uiState.history ?: return
 
-        launchSafe(
-            block = {
-                updateInstallmentUseCase(
-                    historyId = historyVo.id,
-                    totalAmount = totalAmount,
-                    totalCount = totalCount
-                )
-            }
-        ) {
+        flow<Unit> {
+            updateInstallmentUseCase(
+                historyId = historyVo.id,
+                totalAmount = totalAmount,
+                totalCount = totalCount
+            )
+            emit(Unit)
+        }.apiFlow {
             getHistory(historyVo.id)
             showSnackbar("할부 정보가 수정되었습니다.")
         }
@@ -221,16 +217,15 @@ class HistoryDetailScreenModel(
         val uiState = container.uiState.value
         val historyVo = uiState.history ?: return
 
-        launchSafe(
-            block = {
-                updateRepeatCycleUseCase(
-                    historyId = historyVo.id,
-                    newIsActive = isActive,
-                    newRepeatCycle = repeatCycle.name,
-                    newEndDate = endDate
-                )
-            }
-        ) {
+        flow<Unit> {
+            updateRepeatCycleUseCase(
+                historyId = historyVo.id,
+                newIsActive = isActive,
+                newRepeatCycle = repeatCycle.name,
+                newEndDate = endDate
+            )
+            emit(Unit)
+        }.apiFlow {
             getHistory(historyVo.id)
             showSnackbar("반복 정보가 수정되었습니다.")
         }
@@ -241,20 +236,19 @@ class HistoryDetailScreenModel(
         val historyVo = uiState.history ?: return
         val newAmount = uiState.amount.text.formatRemoveCommas().toLongOrNull().default()
 
-        launchSafe(
-            block = {
-                modifyHistoryUseCase(
-                    historyId = historyVo.id,
-                    newAmount = newAmount,
-                    newDate = uiState.date,
-                    newCategoryId = uiState.category?.id,
-                    newCategoryTagId = uiState.categoryTag?.id,
-                    newPaymentMethodId = uiState.paymentMethod?.id,
-                    newContent = uiState.content.text,
-                    isVisibility = uiState.isVisibility
-                )
-            }
-        ) {
+        flow<Unit> {
+            modifyHistoryUseCase(
+                historyId = historyVo.id,
+                newAmount = newAmount,
+                newDate = uiState.date,
+                newCategoryId = uiState.category?.id,
+                newCategoryTagId = uiState.categoryTag?.id,
+                newPaymentMethodId = uiState.paymentMethod?.id,
+                newContent = uiState.content.text,
+                isVisibility = uiState.isVisibility
+            )
+            emit(Unit)
+        }.apiFlow {
             getHistory(historyVo.id)
             showSnackbar("저장되었습니다.")
             reduceState { state ->
@@ -267,19 +261,17 @@ class HistoryDetailScreenModel(
         val uiState = container.uiState.value
         val historyVo = uiState.history ?: return
 
-        launchSafe(
-            block = {
-                val installmentId = historyVo.installment?.id
-                if (isInstallmentAllRemove && installmentId != null) {
-                    historyRepository.deleteHistoriesByInstallmentId(installmentId)
-                } else {
-                    historyRepository.deleteHistory(historyVo.id)
-                }
+        flow<Unit> {
+            val installmentId = historyVo.installment?.id
+            if (isInstallmentAllRemove && installmentId != null) {
+                historyRepository.deleteHistoriesByInstallmentId(installmentId)
+            } else {
+                historyRepository.deleteHistory(historyVo.id)
             }
-        ) {
+            emit(Unit)
+        }.apiFlow {
             showSnackbar("${uiState.largeCategory.label} 내역이 삭제되었습니다.")
             postSideEffect { HistoryDetailUiSideEffect.OnSuccess }
         }
     }
-
 }

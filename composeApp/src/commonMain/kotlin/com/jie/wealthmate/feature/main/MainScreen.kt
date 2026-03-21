@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -19,6 +20,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import cafe.adriel.voyager.core.annotation.InternalVoyagerApi
 import cafe.adriel.voyager.navigator.internal.BackHandler
 import com.jie.wealthmate.MainUiManager
@@ -29,8 +37,10 @@ import com.jie.wealthmate.component.rememberSnackbarState
 import com.jie.wealthmate.feature.budget.BudgetScreen
 import com.jie.wealthmate.feature.calendar.CalendarScreen
 import com.jie.wealthmate.feature.calendar.addHistory.AddHistoryScreen
+import com.jie.wealthmate.feature.calendar.historyDetail.HistoryDetailScreen
 import com.jie.wealthmate.feature.home.HomeScreen
 import com.jie.wealthmate.feature.menu.MenuScreen
+import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.getPlatform
 import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinViewModel
@@ -44,8 +54,20 @@ fun MainScreen(
 ) {
     val uiState by viewModel.container.uiState.collectAsState()
     val mainUiState by MainUiManager.uiState.collectAsState()
-    val isBottomBarVisible by remember {
-        derivedStateOf { uiState.selectedItem != BottomNavItem.Add }
+    val innerNavController = rememberNavController()
+    val navBackStackEntry by innerNavController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
+
+    val isBottomBarVisible by remember(currentRoute) {
+        derivedStateOf {
+            when (currentRoute) {
+                BottomNavItem.Home.route,
+                BottomNavItem.Calendar.route,
+                BottomNavItem.Budget.route,
+                BottomNavItem.Menu.route -> true
+                else -> false
+            }
+        }
     }
     val snackbarState = rememberSnackbarState()
     val scope = rememberCoroutineScope()
@@ -55,6 +77,8 @@ fun MainScreen(
     BackHandler(enabled = true) {
         if (uiState.selectedItem == BottomNavItem.Add) {
             viewModel.navigateBackToPreviousTab()
+        } else if (innerNavController.previousBackStackEntry != null) {
+            innerNavController.popBackStack()
         } else {
             val currentTime = Clock.System.now().toEpochMilliseconds()
             if (currentTime - lastBackPressedTime < 2000) {
@@ -75,33 +99,65 @@ fun MainScreen(
             Box(
                 modifier = Modifier.fillMaxSize()
             ) {
-                when (uiState.selectedItem) {
-                    BottomNavItem.Home -> {
-                        HomeScreen(
-                            navController = navController,
-                        )
+                NavHost(
+                    navController = innerNavController,
+                    startDestination = BottomNavItem.Home.route,
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    composable(BottomNavItem.Home.route) {
+                        HomeScreen(navController = innerNavController)
                     }
-
-                    BottomNavItem.Calendar -> {
-                        CalendarScreen(
-                            navController = navController,
-                        )
+                    composable(BottomNavItem.Calendar.route) {
+                        CalendarScreen(navController = innerNavController)
                     }
-
-                    BottomNavItem.Add -> {
+                    composable(BottomNavItem.Add.route) {
                         AddHistoryScreen(
-                            navController = navController,
+                            navController = innerNavController,
                             selectedDate = mainUiState.selectedDate,
                             onBack = { viewModel.navigateBackToPreviousTab() }
                         )
                     }
-
-                    BottomNavItem.Budget -> {
+                    composable(BottomNavItem.Budget.route) {
                         BudgetScreen()
                     }
-
-                    BottomNavItem.Menu -> {
+                    composable(BottomNavItem.Menu.route) {
                         MenuScreen()
+                    }
+                    composable(
+                        route = "historyDetail/{largeCategory}/{historyId}",
+                        arguments = listOf(
+                            navArgument("largeCategory") { type = NavType.StringType },
+                            navArgument("historyId") { type = NavType.StringType }
+                        )
+                    ) { backStackEntry ->
+                        val largeCategoryStr = backStackEntry.arguments?.getString("largeCategory")
+                        val historyId = backStackEntry.arguments?.getString("historyId") ?: ""
+                        val largeCategory = try {
+                            LargeCategoryEnum.valueOf(largeCategoryStr ?: "EXPENSES")
+                        } catch (e: Exception) {
+                            LargeCategoryEnum.EXPENSES
+                        }
+
+                        HistoryDetailScreen(
+                            largeCategory = largeCategory,
+                            historyId = historyId,
+                            onBack = { innerNavController.popBackStack() },
+                            onNavigateToRepeatDetail = { /* TODO */ }
+                        )
+                    }
+                }
+
+                // Sync tab selection with NavHost
+                LaunchedEffect(uiState.selectedItem) {
+                    val currentRoute = innerNavController.currentDestination?.route
+                    if (currentRoute != uiState.selectedItem.route) {
+                        innerNavController.navigate(uiState.selectedItem.route) {
+                            popUpTo(innerNavController.graph.findStartDestination().id) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
                     }
                 }
             }

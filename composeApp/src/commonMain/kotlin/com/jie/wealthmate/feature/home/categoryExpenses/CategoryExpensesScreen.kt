@@ -128,12 +128,12 @@ class CategoryExpensesScreen(
                             CategoryExpensesItem(
                                 history = history,
                                 onClickHistory = { historyId ->
-                                    navigator.push(
-                                        HistoryDetailScreen(
-                                            largeCategory = uiState.largeCategory,
-                                            historyId = historyId
-                                        )
-                                    )
+//                                    navigator.push(
+//                                        HistoryDetailScreen(
+//                                            largeCategory = uiState.largeCategory,
+//                                            historyId = historyId
+//                                        )
+//                                    )
                                 }
                             )
                         }

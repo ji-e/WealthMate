@@ -10,7 +10,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Typography
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,6 +23,7 @@ import com.jie.wealthmate.component.WMText
 import com.jie.wealthmate.database.eneity.HistoryEntity
 import com.jie.wealthmate.theme.ColorGray
 import com.jie.wealthmate.theme.ColorPrimary
+import com.jie.wealthmate.theme.ColorSetting
 import com.jie.wealthmate.utils.convertLocalDateToString
 import com.jie.wealthmate.utils.formatDateDotYYMD
 import com.jie.wealthmate.utils.formatWithCommas
@@ -32,7 +33,6 @@ import org.jetbrains.compose.resources.painterResource
 import wealthmate.composeapp.generated.resources.Res
 import wealthmate.composeapp.generated.resources.ic_error_outline
 import wealthmate.composeapp.generated.resources.ic_keyboard_arrow_right
-
 
 @Composable
 fun Installment(
@@ -56,7 +56,8 @@ fun Installment(
         ) {
             WMText(
                 text = "총 ${formatWithCommas(installment.amount.toString())}원 / ${installment.count}개월",
-                style = Typography().titleMedium.copy(fontWeight = FontWeight.SemiBold),
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
                 modifier = Modifier.weight(1f, false)
             )
 
@@ -77,18 +78,20 @@ fun Installment(
                 painter = painterResource(Res.drawable.ic_error_outline),
                 contentDescription = null,
                 modifier = Modifier.size(14.dp),
-                tint = ColorGray.Gray_500
+                tint = ColorSetting.Info
             )
 
             WMText(
                 text = "수정시 바로 적용됩니다.",
-                style = Typography().bodySmall.copy(color = ColorGray.Gray_500)
+                style = MaterialTheme.typography.bodySmall,
+                color = ColorSetting.Info
             )
         }
 
         WMText(
             text = "할부 내역",
-            style = Typography().bodyMedium.copy(fontWeight = FontWeight.SemiBold),
+            style = MaterialTheme.typography.bodyMedium,
+            fontWeight = FontWeight.SemiBold,
         )
 
         Row(
@@ -99,37 +102,32 @@ fun Installment(
         ) {
             WMText(
                 text = "회차",
-                style = Typography().bodyMedium.copy(
-                    fontWeight = FontWeight.SemiBold,
-                    color = ColorGray.Gray_500
-                ),
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.SemiBold,
+                color = ColorSetting.Info,
                 modifier = Modifier.width(44.dp)
             )
             WMText(
                 text = "날짜",
-                style = Typography().bodyMedium.copy(
-                    fontWeight = FontWeight.SemiBold,
-                    color = ColorGray.Gray_500
-                ),
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.SemiBold,
+                color = ColorSetting.Info,
                 modifier = Modifier.width(56.dp),
                 maxLines = 1
-
             )
             WMText(
                 text = "금액",
-                style = Typography().bodyMedium.copy(
-                    fontWeight = FontWeight.SemiBold,
-                    color = ColorGray.Gray_500
-                ),
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.SemiBold,
+                color = ColorSetting.Info,
                 modifier = Modifier.weight(2f),
                 maxLines = 1
             )
             WMText(
                 text = "잔액",
-                style = Typography().bodyMedium.copy(
-                    fontWeight = FontWeight.SemiBold,
-                    color = ColorGray.Gray_500
-                ),
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.SemiBold,
+                color = ColorSetting.Info,
                 modifier = Modifier.weight(3f),
                 maxLines = 1
             )
@@ -157,26 +155,29 @@ fun Installment(
 
                 WMText(
                     text = "${installmentHistory.installment?.installmentTime}회차",
-                    style = Typography().bodyMedium.copy(fontWeight = fontWeight),
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = fontWeight,
                     modifier = Modifier.width(44.dp)
                 )
                 WMText(
                     text = installmentHistory.date.toLocalDate()
                         .convertLocalDateToString(formatDateDotYYMD),
-                    style = Typography().bodyMedium.copy(fontWeight = fontWeight),
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = fontWeight,
                     modifier = Modifier.width(56.dp),
                     maxLines = 1
-
                 )
                 WMText(
                     text = "${formatWithCommas(installmentHistory.amount.toString())}원",
-                    style = Typography().bodyMedium.copy(fontWeight = fontWeight),
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = fontWeight,
                     modifier = Modifier.weight(2f),
                     maxLines = 1
                 )
                 WMText(
                     text = "${formatWithCommas(installmentHistory.installment?.installmentRemainAmount.toString())}원",
-                    style = Typography().bodyMedium.copy(fontWeight = fontWeight),
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = fontWeight,
                     modifier = Modifier.weight(3f),
                     maxLines = 1
                 )

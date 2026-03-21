@@ -72,7 +72,7 @@ fun HomeContent(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(top = 44.dp, bottom = calculateAdjustedToastPadding(80))
+            .padding(top = 44.dp, bottom = calculateAdjustedToastPadding(124))
             .verticalScroll(rememberScrollState()),
     ) {
 

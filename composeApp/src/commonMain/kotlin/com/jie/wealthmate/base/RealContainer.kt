@@ -34,6 +34,9 @@ class RealContainer<S>(
     private val duplicateThresholdMs: Long = 500L,
 ) : Container<S> {
 
+    // 컨테이너 생성 시점을 기준으로 시간 측정
+    private val startTime = TimeSource.Monotonic.markNow()
+
     // 컨테이너 내부 비동기 작업을 위한 독립적 스코프
     private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
 
@@ -119,7 +122,7 @@ class RealContainer<S>(
 
     private fun getCurrentTimeMillis(): Long {
         // Monotonic TimeSource를 사용하여 시스템 시간 변경에 무관하게 정확한 시간 차이 측정
-        return TimeSource.Monotonic.markNow().elapsedNow().inWholeMilliseconds
+        return startTime.elapsedNow().inWholeMilliseconds
     }
 
     override fun event(intent: ContainerContext<S>.() -> Unit) {

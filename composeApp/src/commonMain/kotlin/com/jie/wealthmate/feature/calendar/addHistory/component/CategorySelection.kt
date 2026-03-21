@@ -197,7 +197,7 @@ fun CategorySelectionRow(
                         selectedLargeCategory == selectedCategory.largeCategory &&
                         selectedCategory.tags.isNotEmpty()
 
-                if (showTags) {
+//                if (showTags) {
                     Spacer(
                         modifier = Modifier
                             .height(1.dp)
@@ -205,14 +205,15 @@ fun CategorySelectionRow(
                             .background(CategorySelectionDefaults.DividerColor)
                     )
 
-                    LazyRow(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(48.dp),
-                        contentPadding = PaddingValues(horizontal = 16.dp),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
+                LazyRow(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(48.dp),
+                    contentPadding = PaddingValues(horizontal = 16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    if (showTags) {
                         items(selectedCategory.tags, key = { it.id.default() }) { tag ->
                             CategoryTagItem(
                                 tag = tag,

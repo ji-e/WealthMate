@@ -51,6 +51,7 @@ fun CalendarScreen(
                 // navController.navigate(Screen.Search.route)
             },
             onHistoryClick = { history ->
+                navController.navigate("historyDetail/${history.largeCategory}/${history.id}")
                 // navController.navigate(Screen.HistoryDetail.createRoute(history.largeCategory, history.id))
             }
         )
@@ -84,7 +85,7 @@ fun CalendarContent(
     Box(
         modifier = modifier
             .fillMaxSize()
-            .padding(top = 44.dp, bottom = calculateAdjustedToastPadding(80))
+            .padding(top = 44.dp, bottom = calculateAdjustedToastPadding(124))
     ) {
         Column(
             modifier = Modifier.fillMaxSize(),

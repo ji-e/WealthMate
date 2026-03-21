@@ -86,12 +86,12 @@ class SearchScreen : BaseScreen() {
                 hasMore = uiState.hasMore,
                 onLoadMore = screenModel::loadMore,
                 onHistoryClick = { history ->
-                    navigator.push(
-                        HistoryDetailScreen(
-                            largeCategory = history.largeCategory,
-                            historyId = history.id
-                        )
-                    )
+//                    navigator.push(
+//                        HistoryDetailScreen(
+//                            largeCategory = history.largeCategory,
+//                            historyId = history.id
+//                        )
+//                    )
                 }
             )
         }

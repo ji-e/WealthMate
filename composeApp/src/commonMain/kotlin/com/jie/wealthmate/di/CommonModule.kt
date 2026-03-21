@@ -8,7 +8,7 @@ import com.jie.wealthmate.feature.budget.budgetSetting.BudgetSettingScreenModel
 import com.jie.wealthmate.feature.budget.budgetYearDetail.BudgetYearDetailScreenModel
 import com.jie.wealthmate.feature.calendar.CalendarViewModel
 import com.jie.wealthmate.feature.calendar.addHistory.AddHistoryViewModel
-import com.jie.wealthmate.feature.calendar.historyDetail.HistoryDetailScreenModel
+import com.jie.wealthmate.feature.calendar.historyDetail.HistoryDetailViewModel
 import com.jie.wealthmate.feature.home.HomeViewModel
 import com.jie.wealthmate.feature.home.StatusType
 import com.jie.wealthmate.feature.home.categoryExpenses.CategoryExpensesScreenModel
@@ -60,6 +60,8 @@ val commonModule = module {
     viewModelOf(::HomeViewModel)
     viewModelOf(::CalendarViewModel)
     viewModelOf(::AddHistoryViewModel)
+    viewModelOf(::HistoryDetailViewModel)
+
 
 
     single { DatabaseSyncManager(get(), get(), get()) }
@@ -92,11 +94,6 @@ val commonModule = module {
     factory { (initialStatusType: StatusType, initialLargeCategory: LargeCategoryEnum, paymentMethodId: String?) ->
         PaymentMethodExpensesScreenModel(get(), get(), initialStatusType, initialLargeCategory, paymentMethodId)
     }
-
-    // 캘린더
-
-//    factory { AddHistoryViewModel(get(), get(), get(), get()) }
-    factory { HistoryDetailScreenModel(get(), get(), get(), get(), get(), get()) }
 
 
     // 예산

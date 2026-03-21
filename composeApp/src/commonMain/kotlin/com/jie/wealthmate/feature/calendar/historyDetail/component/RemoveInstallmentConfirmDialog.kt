@@ -13,7 +13,7 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Typography
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -64,12 +64,12 @@ fun RemoveInstallmentConfirmDialog(
                     WMText(
                         text = "정말 삭제하시겠습니까?\n삭제된 정보는 복구할 수 없습니다.",
                         textAlign = TextAlign.Center,
-                        style = androidx.compose.material3.Typography().titleMedium,
+                        style = androidx.compose.material3.MaterialTheme.typography.titleMedium,
                     )
 
                     WMCheckBox(
                         label = "관련 모든 할부 내역 삭제",
-                        labelStyle = Typography().titleSmall,
+                        labelStyle = MaterialTheme.typography.titleSmall,
                         checked = isChecked,
                         onCheckedChange = { isChecked = it },
                     )
@@ -86,7 +86,8 @@ fun RemoveInstallmentConfirmDialog(
                 ) {
                     WMText(
                         text = "취소",
-                        style = androidx.compose.material3.Typography().titleMedium.copy(fontWeight = FontWeight.Medium),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Medium,
                     )
                 }
 
@@ -103,10 +104,9 @@ fun RemoveInstallmentConfirmDialog(
                 ) {
                     WMText(
                         text = "삭제",
-                        style = Typography().titleMedium.copy(
-                            color = ColorGray.White,
-                            fontWeight = FontWeight.Medium
-                        ),
+                        style = MaterialTheme.typography.titleMedium,
+                        color = ColorGray.White,
+                        fontWeight = FontWeight.Medium,
                     )
                 }
             }

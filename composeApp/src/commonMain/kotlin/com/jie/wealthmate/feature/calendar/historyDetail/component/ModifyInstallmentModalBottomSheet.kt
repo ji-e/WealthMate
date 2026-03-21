@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -62,7 +63,7 @@ fun ModifyInstallmentModalBottomSheet(
                 suffix = {
                     WMText(
                         text = "원",
-                        style = androidx.compose.material3.Typography().bodyLarge.copy(fontWeight = FontWeight.SemiBold)
+                        style = androidx.compose.material3.MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold)
                     )
                 },
                 placeholder = "총 결제 금액을 입력해 주세요.",
@@ -82,7 +83,8 @@ fun ModifyInstallmentModalBottomSheet(
                 suffix = {
                     WMText(
                         text = "개월",
-                        style = Typography().bodyLarge.copy(fontWeight = FontWeight.SemiBold)
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.SemiBold
                     )
                 },
                 keyboardOptions = KeyboardOptions(

@@ -12,7 +12,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Typography
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -26,6 +26,7 @@ import com.jie.wealthmate.component.WMText
 import com.jie.wealthmate.feature.calendar.addHistory.component.RepeatCycleEnum
 import com.jie.wealthmate.feature.calendar.addHistory.component.formattedShortDescription
 import com.jie.wealthmate.theme.ColorGray
+import com.jie.wealthmate.theme.ColorSetting
 import com.jie.wealthmate.utils.convertLocalDateToString
 import com.jie.wealthmate.utils.formatDateDotYYMDE
 import com.jie.wealthmate.vo.RepeatCycleVo
@@ -76,10 +77,9 @@ fun RepeatCycle(
         ) {
             WMText(
                 text = repeatDescription,
-                style = Typography().titleMedium.copy(
-                    color = contentColor,
-                    fontWeight = FontWeight.SemiBold
-                ),
+                style = MaterialTheme.typography.titleMedium,
+                color = contentColor,
+                fontWeight = FontWeight.SemiBold,
             )
 
             WMIconButton(
@@ -107,16 +107,15 @@ fun RepeatCycle(
         ) {
             WMText(
                 text = "시작일",
-                style = Typography().bodyMedium.copy(
-                    fontWeight = FontWeight.SemiBold,
-                    color = ColorGray.Gray_500
-                ),
+
+                fontWeight = FontWeight.SemiBold,
+                color = ColorGray.Gray_500,
                 modifier = Modifier.width(50.dp)
             )
 
             WMText(
                 text = repeatCycle.startDate.convertLocalDateToString(formatDateDotYYMDE),
-                style = Typography().bodyMedium.copy(color = contentColor)
+                color = contentColor
             )
         }
 
@@ -129,16 +128,14 @@ fun RepeatCycle(
             ) {
                 WMText(
                     text = "종료일",
-                    style = Typography().bodyMedium.copy(
-                        fontWeight = FontWeight.SemiBold,
-                        color = ColorGray.Gray_500
-                    ),
+                    fontWeight = FontWeight.SemiBold,
+                    color = ColorGray.Gray_500,
                     modifier = Modifier.width(50.dp)
                 )
 
                 WMText(
                     text = repeatCycle.endDate.convertLocalDateToString(formatDateDotYYMDE, "없음"),
-                    style = Typography().bodyMedium.copy(color = contentColor)
+                    color = contentColor
                 )
             }
         }
@@ -153,12 +150,13 @@ fun RepeatCycle(
                     painter = painterResource(Res.drawable.ic_error_outline),
                     contentDescription = null,
                     modifier = Modifier.size(14.dp),
-                    tint = ColorGray.Gray_500
+                    tint = ColorSetting.Info
                 )
 
                 WMText(
                     text = "내역 작성 이후 반복 설정이 변경되었습니다.",
-                    style = Typography().bodySmall.copy(color = ColorGray.Gray_500)
+                    style = MaterialTheme.typography.bodySmall,
+                    color = ColorSetting.Info
                 )
             }
         }
