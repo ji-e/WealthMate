@@ -4,7 +4,6 @@ package com.jie.wealthmate.feature.menu.management.categoryManagement
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
@@ -48,20 +47,22 @@ fun CategoryManagementScreen(
 ) {
     val largeCategoryItems = LargeCategoryEnum.entries
     val uiState by viewModel.container.uiState.collectAsState()
+    val categoryMap = viewModel.categoryMap
     val coroutineScope = rememberCoroutineScope()
     var isDragging by remember { mutableStateOf(false) }
     val pagerState = rememberPagerState(pageCount = { largeCategoryItems.size })
 
     val listStates = largeCategoryItems.associateWith {
         rememberReorderableLazyListState(
-            onMove = { from, to ->
-                viewModel.handleReorderCategoryItems(from.index, to.index)
-            }
+            onMove = viewModel::handleReorderCategoryItems,
+            canDragOver = { draggedOver, _ ->
+                viewModel.onDragOver(draggedOver)
+            },
         )
     }
 
     val isAddItemEnabled by remember {
-        derivedStateOf { uiState.currentCategoryItems?.size.default() < 20 }
+        derivedStateOf { viewModel.currentCategoryItems?.size.default() < 20 }
     }
 
     val onBack: () -> Unit = {
@@ -129,7 +130,7 @@ fun CategoryManagementScreen(
                 beyondViewportPageCount = 1
             ) { pageIndex ->
                 val categoryType = largeCategoryItems[pageIndex]
-                val items = uiState.categoryMap[categoryType] ?: return@HorizontalPager
+                val items = categoryMap[categoryType] ?: return@HorizontalPager
                 val currentListState = listStates[categoryType]!!
 
                 if (items.isEmpty()) {
@@ -154,8 +155,6 @@ fun CategoryManagementScreen(
                 WMFloatingButton(
                     text = "저장",
                     buttonSize = ButtonSize.LARGE,
-                    modifier = Modifier.padding(horizontal = 28.dp, vertical = 20.dp)
-                        .fillMaxWidth(),
                     onClick = {
                         viewModel.saveCategorySort()
                         isDragging = false

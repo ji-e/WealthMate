@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -14,6 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
@@ -38,6 +40,7 @@ import com.jie.wealthmate.component.reorderable.reorderable
 import com.jie.wealthmate.theme.ColorGray
 import com.jie.wealthmate.theme.ColorPrimary
 import com.jie.wealthmate.theme.ColorRed
+import com.jie.wealthmate.theme.Padding
 import com.jie.wealthmate.vo.CategoryVo
 import org.jetbrains.compose.resources.painterResource
 import wealthmate.composeapp.generated.resources.Res
@@ -60,16 +63,16 @@ fun ColumnScope.Category(
         modifier = modifier
             .fillMaxSize()
             .reorderable(listState),
-        contentPadding = PaddingValues(vertical = 20.dp)
+        contentPadding = PaddingValues(top  = 12.dp, bottom = Padding.BackgroundBottom)
     ) {
-        items(
-            count = categoryItems.size,
-            key = { index -> categoryItems[index].id }
-        ) { index ->
-            val category = categoryItems[index]
+        item {
+            Spacer(modifier = Modifier.height(8.dp))
+
+        }
+        itemsIndexed(categoryItems, { _, item -> item.id }) { _, item ->
             ReorderableItem(
-                state = listState,
-                key = category.id,
+                reorderableState = listState,
+                key = item.id,
             ) { dragging ->
                 if (isDragging.not() && dragging) {
                     onIsDraggingChange(true)
@@ -80,7 +83,7 @@ fun ColumnScope.Category(
                 }
 
                 CategoryItem(
-                    data = category,
+                    data = item,
                     modifier = Modifier.then(
                         if (dragging) {
                             Modifier
@@ -96,7 +99,7 @@ fun ColumnScope.Category(
                                 )
                                 .clip(RoundedCornerShape(4.dp))
                         } else {
-                            Modifier.clickable(enabled = !isDragging) { onItemClick(category) }
+                            Modifier.clickable(enabled = !isDragging) { onItemClick(item) }
                         }
                     ),
                     onDragHandle = Modifier.detectReorderAfterLongPress(listState),

@@ -7,6 +7,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.runtime.withFrameMillis
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.util.fastForEach
+import com.jie.wealthmate.utils.default
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
@@ -47,14 +48,37 @@ abstract class ReorderableState<T>(
     protected abstract val viewportEndOffset: Int
     internal val interactions = Channel<StartDrag>()
     internal val scrollChannel = Channel<Float>()
-    val draggingItemLeft: Float
+
+    private val unconstrainedDraggingItemLeft: Float
         get() = draggingLayoutInfo?.let { item ->
             (selected?.left ?: 0) + draggingDelta.x - item.left
-        } ?: 0f
-    val draggingItemTop: Float
+        }.default()
+
+    private val unconstrainedDraggingItemTop: Float
         get() = draggingLayoutInfo?.let { item ->
             (selected?.top ?: 0) + draggingDelta.y - item.top
-        } ?: 0f
+        }.default()
+
+    val draggingItemLeft: Float
+        get() = draggingLayoutInfo?.let { item ->
+            val offset = (selected?.left ?: 0) + draggingDelta.x - item.left
+            if (!isVerticalScroll) {
+                val min = (viewportStartOffset - item.left).toFloat()
+                val max = (viewportEndOffset - item.left - item.width).toFloat()
+                if (min <= max) offset.coerceIn(min, max) else offset
+            } else offset
+        }.default()
+
+    val draggingItemTop: Float
+        get() = draggingLayoutInfo?.let { item ->
+            val offset = (selected?.top ?: 0) + draggingDelta.y - item.top
+            if (isVerticalScroll) {
+                val min = (viewportStartOffset - item.top).toFloat()
+                val max = (viewportEndOffset - item.top - item.height).toFloat()
+                if (min <= max) offset.coerceIn(min, max) else offset
+            } else offset
+        }.default()
+
     abstract val isVerticalScroll: Boolean
     private val draggingLayoutInfo: T?
         get() = visibleItemsInfo.firstOrNull { it.itemIndex == draggingItemIndex }
@@ -117,11 +141,18 @@ abstract class ReorderableState<T>(
         val selected = selected ?: return
         draggingDelta = Offset(draggingDelta.x + offsetX, draggingDelta.y + offsetY)
         val draggingItem = draggingLayoutInfo ?: return
+
+        // 아이템이 시각적으로 머물러 있는 '제약된 위치(constrained)'를 기준으로 순서 변경 로직 수행
         val startOffset = draggingItem.top + draggingItemTop
         val startOffsetX = draggingItem.left + draggingItemLeft
+
+        // findTargets는 선택된 아이템의 초기 위치로부터의 상대적인 이동량(delta)을 필요로 함
+        val constrainedDeltaX = (startOffsetX - selected.left).toInt()
+        val constrainedDeltaY = (startOffset - selected.top).toInt()
+
         chooseDropItem(
             draggingItem,
-            findTargets(draggingDelta.x.toInt(), draggingDelta.y.toInt(), selected),
+            findTargets(constrainedDeltaX, constrainedDeltaY, selected),
             startOffsetX.toInt(),
             startOffset.toInt()
         )?.also { targetItem ->
@@ -142,6 +173,7 @@ abstract class ReorderableState<T>(
             draggingItemIndex = targetItem.itemIndex
         }
 
+        // 자동 스크롤은 사용자의 실제 드래그 의도(unconstrained)를 반영하여 트리거함
         with(calcAutoScrollOffset(0, maxScrollPerFrame)) {
             if (this != 0f) autoscroll(this)
         }
@@ -285,11 +317,11 @@ abstract class ReorderableState<T>(
         val endOffset: Float
         val delta: Float
         if (isVerticalScroll) {
-            startOffset = draggingItem.top + draggingItemTop
+            startOffset = draggingItem.top + unconstrainedDraggingItemTop
             endOffset = startOffset + draggingItem.height
             delta = draggingDelta.y
         } else {
-            startOffset = draggingItem.left + draggingItemLeft
+            startOffset = draggingItem.left + unconstrainedDraggingItemLeft
             endOffset = startOffset + draggingItem.width
             delta = draggingDelta.x
         }
