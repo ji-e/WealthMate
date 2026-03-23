@@ -1,4 +1,4 @@
-package com.jie.wealthmate.feature.menu.management.categoryManagement.addCategory.component
+package com.jie.wealthmate.feature.menu.management.categoryManagement.editCategory.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -12,7 +12,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Typography
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -27,8 +27,8 @@ import androidx.compose.ui.unit.dp
 import com.jie.wealthmate.component.WMText
 import com.jie.wealthmate.component.textField.WMTextField
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
-import com.jie.wealthmate.theme.ColorGray
-import com.jie.wealthmate.theme.ColorPrimary
+import com.jie.wealthmate.theme.ColorSetting
+import com.jie.wealthmate.theme.Padding
 import com.jie.wealthmate.theme.WMTheme
 import com.jie.wealthmate.vo.CategoryTagVo
 import org.jetbrains.compose.resources.DrawableResource
@@ -48,6 +48,8 @@ fun CategoryTag(
     onChipAdd: (TextFieldValue?) -> Unit = {},
     onChipClick: (CategoryTagVo) -> Unit = {},
 ) {
+    val focusRequester = remember { FocusRequester() }
+
     Column(
         modifier = modifier,
     ) {
@@ -55,9 +57,9 @@ fun CategoryTag(
             value = tagLabel,
             onValueChange = onValueChange,
             modifier = Modifier
-                .focusRequester(remember { FocusRequester() })
+                .focusRequester(focusRequester)
                 .onFocusChanged { focusState ->
-                    if (focusState.isFocused.not()) {
+                    if (!focusState.isFocused) {
                         onChipAdd(null)
                     }
                 },
@@ -72,7 +74,8 @@ fun CategoryTag(
             ),
             supportingContent = {
                 CategoryTagItem(
-                    modifier = Modifier.padding(top = 8.dp),
+                    modifier = Modifier.padding(top = Padding.SpacerXS),
+                    largeCategory = largeCategory,
                     trailingIcon = trailingIcon,
                     chipItems = tagLabelItems,
                     onChipClick = onChipClick
@@ -85,35 +88,35 @@ fun CategoryTag(
 @Composable
 fun CategoryTagItem(
     modifier: Modifier = Modifier,
+    largeCategory: LargeCategoryEnum,
     trailingIcon: DrawableResource,
     chipItems: List<CategoryTagVo>,
     onChipClick: (CategoryTagVo) -> Unit,
 ) {
     FlowRow(
         modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(4.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        horizontalArrangement = Arrangement.spacedBy(Padding.SpacerXXS),
+        verticalArrangement = Arrangement.spacedBy(Padding.SpacerXS)
     ) {
         chipItems.forEach { item ->
             Row(
                 modifier = Modifier
                     .clip(CircleShape)
-                    .background(color = ColorPrimary.Primary_300)
+                    .background(color = largeCategory.backgroundColor)
                     .clickable { onChipClick(item) }
-                    .padding(horizontal = 8.dp, vertical = 4.dp),
+                    .padding(horizontal = Padding.SpacerXS, vertical = Padding.SpacerXXS),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(4.dp)
+                horizontalArrangement = Arrangement.spacedBy(Padding.SpacerXXS)
             ) {
                 WMText(
                     text = item.label,
-                    style = Typography().labelMedium
+                    style = MaterialTheme.typography.labelMedium
                 )
 
-                // 삭제 아이콘
                 Icon(
                     painter = painterResource(trailingIcon),
-                    contentDescription = item.label,
-                    tint = ColorGray.Gray_500,
+                    contentDescription = "삭제",
+                    tint = ColorSetting.Info,
                     modifier = Modifier.size(16.dp)
                 )
             }
@@ -122,13 +125,38 @@ fun CategoryTagItem(
 }
 
 @Composable
-@Preview(showBackground = true)
-private fun CategoryTagPreView() {
+@Preview
+private fun CategoryTagPreview() {
     WMTheme {
-        CategoryTag(
-            tagLabel = TextFieldValue(""),
-            onValueChange = {},
-            largeCategory = LargeCategoryEnum.INCOME,
-        )
+        Column(
+            modifier = Modifier
+                .background(MaterialTheme.colorScheme.background)
+                .padding(Padding.SpacerM),
+            verticalArrangement = Arrangement.spacedBy(Padding.SpacerL)
+        ) {
+            // 수입 태그 예시
+            CategoryTag(
+                tagLabel = TextFieldValue(""),
+                onValueChange = {},
+                largeCategory = LargeCategoryEnum.INCOME,
+                tagLabelItems = listOf(
+                    CategoryTagVo(label = "상여금"),
+                    CategoryTagVo(label = "성과급"),
+                    CategoryTagVo(label = "용돈")
+                )
+            )
+
+            // 지출 태그 예시
+            CategoryTag(
+                tagLabel = TextFieldValue("점심식사"),
+                onValueChange = {},
+                largeCategory = LargeCategoryEnum.EXPENSES,
+                tagLabelItems = listOf(
+                    CategoryTagVo(label = "외식"),
+                    CategoryTagVo(label = "커피"),
+                    CategoryTagVo(label = "배달음식")
+                )
+            )
+        }
     }
 }

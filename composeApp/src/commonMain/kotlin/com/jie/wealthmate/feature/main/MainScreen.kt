@@ -53,8 +53,8 @@ import com.jie.wealthmate.feature.menu.MenuScreen
 import com.jie.wealthmate.feature.menu.data.googleCloudShare.GoogleCloudShareScreen
 import com.jie.wealthmate.feature.menu.data.googleCloudSync.GoogleCloudSyncScreen
 import com.jie.wealthmate.feature.menu.management.categoryManagement.CategoryManagementScreen
-import com.jie.wealthmate.feature.menu.management.categoryManagement.addCategory.AddCategoryScreen
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
+import com.jie.wealthmate.feature.menu.management.categoryManagement.editCategory.EditCategoryScreen
 import com.jie.wealthmate.feature.menu.management.categoryManagement.modifyCategory.ModifyCategoryScreen
 import com.jie.wealthmate.feature.menu.management.paymentMethodManagement.PaymentMethodManagementScreen
 import com.jie.wealthmate.feature.menu.management.paymentMethodManagement.addPaymentMethod.AddPaymentMethodScreen
@@ -306,21 +306,25 @@ fun MainScreen(
                         CategoryManagementScreen(navController = innerNavController)
                     }
                     composable(
-                        route = "addCategory/{largeCategory}",
+                        route = "editCategory/{largeCategory}/{categoryId}",
                         arguments = listOf(
-                            navArgument("largeCategory") { type = NavType.StringType }
+                            navArgument("largeCategory") { type = NavType.StringType },
+                            navArgument("categoryId") {
+                                type = NavType.StringType
+                                nullable = true
+                            }
                         )
+
                     ) { backStackEntry ->
                         val largeCategoryStr: String? =
                             backStackEntry.savedStateHandle["largeCategory"]
-                        val largeCategory = try {
-                            LargeCategoryEnum.valueOf(largeCategoryStr ?: "EXPENSES")
-                        } catch (e: Exception) {
-                            LargeCategoryEnum.EXPENSES
-                        }
-                        AddCategoryScreen(
+                        val largeCategory = LargeCategoryEnum.creator(largeCategoryStr)
+                        val categoryId: String? = backStackEntry.savedStateHandle["categoryId"]
+
+                        EditCategoryScreen(
                             navController = innerNavController,
-                            largeCategory = largeCategory
+                            largeCategory = largeCategory,
+                            categoryId = categoryId
                         )
                     }
                     composable(
