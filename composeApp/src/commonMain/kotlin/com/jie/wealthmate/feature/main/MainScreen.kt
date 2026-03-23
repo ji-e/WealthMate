@@ -57,7 +57,6 @@ import com.jie.wealthmate.feature.menu.management.categoryManagement.editCategor
 import com.jie.wealthmate.feature.menu.management.categoryManagement.main.CategoryManagementScreen
 import com.jie.wealthmate.feature.menu.management.paymentMethodManagement.PaymentMethodManagementScreen
 import com.jie.wealthmate.feature.menu.management.paymentMethodManagement.editPaymentMethod.EditPaymentMethodScreen
-import com.jie.wealthmate.feature.menu.management.paymentMethodManagement.modifyPaymentMethod.ModifyPaymentMethodScreen
 import com.jie.wealthmate.feature.menu.management.repeatHistoryManagement.RepeatHistoryManagementScreen
 import com.jie.wealthmate.feature.menu.management.repeatHistoryManagement.addRepeatHistory.AddRepeatHistoryScreen
 import com.jie.wealthmate.feature.menu.management.repeatHistoryManagement.repeatHistoryDetail.RepeatHistoryDetailScreen
@@ -348,19 +347,6 @@ fun MainScreen(
                             paymentMethodId = paymentMethodId
                         )
                     }
-                    composable(
-                        route = "modifyPaymentMethod/{id}",
-                        arguments = listOf(
-                            navArgument("id") { type = NavType.StringType }
-                        )
-                    ) { backStackEntry ->
-                        val id: String = backStackEntry.savedStateHandle["id"] ?: ""
-                        ModifyPaymentMethodScreen(
-                            navController = innerNavController,
-                            paymentMethodId = id
-                        )
-                    }
-
                     // Repeat History Management Routes
                     composable(
                         route = "repeatHistoryManagement/{largeCategory}",

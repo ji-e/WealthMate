@@ -18,11 +18,10 @@ import com.jie.wealthmate.feature.main.MainViewModel
 import com.jie.wealthmate.feature.menu.MenuViewModel
 import com.jie.wealthmate.feature.menu.data.googleCloudShare.GoogleCloudShareViewModel
 import com.jie.wealthmate.feature.menu.data.googleCloudSync.GoogleCloudSyncViewModel
-import com.jie.wealthmate.feature.menu.management.categoryManagement.main.CategoryManagementViewModel
 import com.jie.wealthmate.feature.menu.management.categoryManagement.editCategory.EditCategoryViewModel
+import com.jie.wealthmate.feature.menu.management.categoryManagement.main.CategoryManagementViewModel
 import com.jie.wealthmate.feature.menu.management.paymentMethodManagement.PaymentMethodManagementViewModel
 import com.jie.wealthmate.feature.menu.management.paymentMethodManagement.editPaymentMethod.EditPaymentMethodViewModel
-import com.jie.wealthmate.feature.menu.management.paymentMethodManagement.modifyPaymentMethod.ModifyPaymentMethodViewModel
 import com.jie.wealthmate.feature.menu.management.paymentMethodManagement.paymentMethodGroup.PaymentMethodGroupViewModel
 import com.jie.wealthmate.feature.menu.management.repeatHistoryManagement.RepeatHistoryManagementViewModel
 import com.jie.wealthmate.feature.menu.management.repeatHistoryManagement.addRepeatHistory.AddRepeatHistoryViewModel
@@ -87,7 +86,6 @@ val commonModule = module {
     viewModelOf(::PaymentMethodManagementViewModel)
     viewModelOf(::PaymentMethodGroupViewModel)
     viewModelOf(::EditPaymentMethodViewModel)
-    viewModelOf(::ModifyPaymentMethodViewModel)
     viewModelOf(::RepeatHistoryManagementViewModel)
     viewModelOf(::AddRepeatHistoryViewModel)
     viewModelOf(::RepeatHistoryDetailViewModel)
