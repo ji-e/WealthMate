@@ -80,4 +80,21 @@ class BudgetRepositoryImpl(private val databaseProvider: DatabaseProvider) : Bud
             dao.softDeleteByMonth(yearMonth, Clock.System.now().toEpochMilliseconds())
         }
     }
+
+    // ✅ 복원용 추가 구현 - Dispatchers.Default와 정확한 DAO 메서드 사용
+    override suspend fun getAllBudgetsList(): List<BudgetEntity> = withContext(Dispatchers.Default) {
+        dao.getAllList()
+    }
+
+    override suspend fun insertBudgets(budgets: List<BudgetEntity>) = withContext(Dispatchers.Default) {
+        dao.insertAll(budgets)
+    }
+
+    override suspend fun deleteAllBudgets() = withContext(Dispatchers.Default) {
+        dao.deleteAll()
+    }
+
+    override suspend fun syncRemoteToLocal() {
+        // Delegate에서 처리
+    }
 }

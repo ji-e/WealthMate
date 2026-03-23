@@ -153,4 +153,33 @@ class PaymentMethodRepositoryImpl(
     ) {
         paymentMethodGroupDao.getAll()
     }.flowOn(Dispatchers.Default)
+
+    // ✅ 복원용 추가 구현 - Dispatchers.Default 사용
+    override suspend fun getAllPaymentMethodsList(): List<PaymentMethodEntity> = withContext(Dispatchers.Default) {
+        paymentMethodDao.getAllList()
+    }
+
+    override suspend fun getAllPaymentMethodGroupsList(): List<PaymentMethodGroupEntity> = withContext(Dispatchers.Default) {
+        paymentMethodGroupDao.getAllList()
+    }
+
+    override suspend fun insertPaymentMethods(methods: List<PaymentMethodEntity>) = withContext(Dispatchers.Default) {
+        paymentMethodDao.upsertAll(methods)
+    }
+
+    override suspend fun insertPaymentMethodGroups(groups: List<PaymentMethodGroupEntity>) = withContext(Dispatchers.Default) {
+        paymentMethodGroupDao.upsertAll(groups)
+    }
+
+    override suspend fun deleteAllPaymentMethods() = withContext(Dispatchers.Default) {
+        paymentMethodDao.deleteAll()
+    }
+
+    override suspend fun deleteAllPaymentMethodGroups() = withContext(Dispatchers.Default) {
+        paymentMethodGroupDao.deleteAll()
+    }
+
+    override suspend fun syncRemoteToLocal() {
+        // Delegate에서 처리
+    }
 }

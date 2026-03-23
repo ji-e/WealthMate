@@ -13,4 +13,10 @@ interface InstallmentRepository {
     suspend fun deleteInstallment(installment: String)
 
     fun getInstallments(): Flow<List<InstallmentEntity>>
+
+    // ✅ 복원용 추가
+    suspend fun getAllInstallmentsList(): List<InstallmentEntity>
+    suspend fun insertInstallments(installments: List<InstallmentEntity>)
+    suspend fun deleteAllInstallments()
+    suspend fun syncRemoteToLocal()
 }

@@ -1,7 +1,13 @@
 package com.jie.wealthmate.database
 
 import com.jie.wealthmate.repository.AuthRepository
+import com.jie.wealthmate.repository.BudgetRepository
+import com.jie.wealthmate.repository.CategoryRepository
 import com.jie.wealthmate.repository.GoogleRepository
+import com.jie.wealthmate.repository.HistoryRepository
+import com.jie.wealthmate.repository.InstallmentRepository
+import com.jie.wealthmate.repository.PaymentMethodRepository
+import com.jie.wealthmate.repository.RepeatCycleRepository
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
@@ -16,6 +22,12 @@ class DatabaseSyncManager(
     private val databaseProvider: DatabaseProvider,
     private val googleRepository: GoogleRepository,
     private val authRepository: AuthRepository,
+    private val categoryRepository: CategoryRepository,
+    private val historyRepository: HistoryRepository,
+    private val paymentMethodRepository: PaymentMethodRepository,
+    private val repeatCycleRepository: RepeatCycleRepository,
+    private val installmentRepository: InstallmentRepository,
+    private val budgetRepository: BudgetRepository,
 ) {
     private val json = Json {
         ignoreUnknownKeys = true
@@ -23,6 +35,27 @@ class DatabaseSyncManager(
     }
 
     private val syncFileName = "wealthmate_sync_data.json"
+
+    /**
+     * ✅ Firestore(Remote)의 모든 데이터를 로컬 DB로 복원합니다.
+     * isComposite(uohihi@gmail.com) 상태에서만 동작합니다.
+     */
+    suspend fun restoreFromFirestore(): Result<Unit> = withContext(Dispatchers.IO) {
+        return@withContext try {
+            Napier.d("Firestore -> 로컬 DB 전체 복원 시작")
+            categoryRepository.syncRemoteToLocal()
+            paymentMethodRepository.syncRemoteToLocal()
+            repeatCycleRepository.syncRemoteToLocal()
+            installmentRepository.syncRemoteToLocal()
+            budgetRepository.syncRemoteToLocal()
+            historyRepository.syncRemoteToLocal()
+            Napier.d("Firestore -> 로컬 DB 전체 복원 완료")
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Napier.e("Firestore 복원 실패", e)
+            Result.failure(e)
+        }
+    }
 
     // --- 개인 클라우드 백업 (Personal Cloud) ---
 

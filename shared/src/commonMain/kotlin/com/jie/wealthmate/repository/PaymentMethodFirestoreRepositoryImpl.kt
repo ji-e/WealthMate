@@ -62,12 +62,15 @@ class PaymentMethodFirestoreRepositoryImpl(
 
     override suspend fun updatePaymentMethodSort(updates: List<Pair<String, Long>>) = withContext(Dispatchers.Default) {
         firestore.runTransaction {
-            updates.forEach { (id, newSort) ->
+            val snapshotsWithNewSort = updates.map { (id, newSort) ->
                 val docRef = getPaymentMethodCollection().document(id)
-                val snapshot = get(docRef)
+                Triple(docRef, get(docRef), newSort)
+            }
+            val now = Clock.System.now().toEpochMilliseconds()
+            snapshotsWithNewSort.forEach { (docRef, snapshot, newSort) ->
                 if (snapshot.exists) {
                     val current = snapshot.data<PaymentMethodEntity>()
-                    set(docRef, current.copy(sort = newSort, updatedAt = Clock.System.now().toEpochMilliseconds()))
+                    set(docRef, current.copy(sort = newSort, updatedAt = now), encodeDefaults = true)
                 }
             }
         }
@@ -140,4 +143,33 @@ class PaymentMethodFirestoreRepositoryImpl(
             .snapshots
             .map { snapshot -> snapshot.documents.map { it.data<PaymentMethodGroupEntity>() } }
             .flowOn(Dispatchers.Default)
+
+    // ✅ 복원용 추가 구현
+    override suspend fun getAllPaymentMethodsList(): List<PaymentMethodEntity> = withContext(Dispatchers.Default) {
+        getPaymentMethodCollection().where { "isDeleted" equalTo false }.get().documents.map { it.data() }
+    }
+
+    override suspend fun getAllPaymentMethodGroupsList(): List<PaymentMethodGroupEntity> = withContext(Dispatchers.Default) {
+        getGroupCollection().where { "isDeleted" equalTo false }.get().documents.map { it.data() }
+    }
+
+    override suspend fun insertPaymentMethods(methods: List<PaymentMethodEntity>) {
+        methods.forEach { getPaymentMethodCollection().document(it.id).set(it, encodeDefaults = true) }
+    }
+
+    override suspend fun insertPaymentMethodGroups(groups: List<PaymentMethodGroupEntity>) {
+        groups.forEach { getGroupCollection().document(it.id).set(it, encodeDefaults = true) }
+    }
+
+    override suspend fun deleteAllPaymentMethods() {
+        getPaymentMethodCollection().get().documents.forEach { it.reference.delete() }
+    }
+
+    override suspend fun deleteAllPaymentMethodGroups() {
+        getGroupCollection().get().documents.forEach { it.reference.delete() }
+    }
+
+    override suspend fun syncRemoteToLocal() {
+        // Delegate에서 처리
+    }
 }

@@ -67,13 +67,12 @@ class HistoryFirestoreRepositoryImpl(
         if (!snapshot.exists) return@withContext null
         val history = snapshot.data<HistoryEntity>()
         
-        // 단일 조회 시에도 Details 조합이 필요할 경우 (간소화된 구현)
         HistoryWithDetails(
             history = history,
             category = history.categoryId?.let { categoryRepository.getCategoryById(it) },
             paymentMethod = history.paymentMethodId?.let { paymentMethodRepository.getPaymentMethodById(it)?.paymentMethod },
             repeatCycle = history.repeatCycleId?.let { repeatCycleRepository.getRepeatCycleById(it)?.repeatCycle },
-            installment = null // 필요 시 추가 구현
+            installment = null
         )
     }
 
@@ -82,7 +81,7 @@ class HistoryFirestoreRepositoryImpl(
         val now = Clock.System.now().toEpochMilliseconds()
         val historyWithId = history.copy(
             id = id,
-            createdAt = now,
+            createdAt = if (history.createdAt == 0L) now else history.createdAt,
             updatedAt = now
         )
         getHistoryCollection().document(id).set(historyWithId, encodeDefaults = true)
@@ -93,7 +92,7 @@ class HistoryFirestoreRepositoryImpl(
         firestore.runTransaction {
             histories.forEach { history ->
                 val id = history.id.ifBlank { generateId() }
-                set(getHistoryCollection().document(id), history.copy(id = id, createdAt = now, updatedAt = now), encodeDefaults = true)
+                set(getHistoryCollection().document(id), history.copy(id = id, createdAt = if (history.createdAt == 0L) now else history.createdAt, updatedAt = now), encodeDefaults = true)
             }
         }
     }
@@ -184,8 +183,6 @@ class HistoryFirestoreRepositoryImpl(
         limit: Int,
         offset: Int
     ): List<HistoryWithDetails> = withContext(Dispatchers.Default) {
-        // Firestore의 쿼리 제한으로 인해 클라이언트 측 필터링이 필요할 수 있음
-        // 여기서는 기본 필터만 적용 후 결과 반환
         var firestoreQuery = getHistoryCollection().where { "isDeleted" equalTo false }
         
         startDate?.let { firestoreQuery = firestoreQuery.where { "date" greaterThanOrEqualTo it } }
@@ -194,7 +191,6 @@ class HistoryFirestoreRepositoryImpl(
         val snapshots = firestoreQuery.get()
         val allHistories = snapshots.documents.map { it.data<HistoryEntity>() }
         
-        // 메모리 내 필터링 및 정렬
         val filtered = allHistories.filter { history ->
             val matchesQuery = query.isBlank() || history.content?.contains(query, ignoreCase = true) == true
             val matchesLargeCategory = largeCategories.isEmpty() || largeCategories.contains(history.largeCategory)
@@ -203,9 +199,8 @@ class HistoryFirestoreRepositoryImpl(
             matchesQuery && matchesLargeCategory && matchesCategory && matchesPayment
         }
         
-        // 정렬 및 페이징 (생략 또는 간략화)
         filtered.drop(offset).take(limit).map { history ->
-            HistoryWithDetails(history, null, null, null, null) // Search 상세는 필요 시 추가 조회
+            HistoryWithDetails(history, null, null, null, null)
         }
     }
 
@@ -220,5 +215,19 @@ class HistoryFirestoreRepositoryImpl(
         val histories = searchHistories(query, "LATEST", startDate, endDate, largeCategories, categoryIds, paymentMethodIds, Int.MAX_VALUE, 0)
         histories.groupBy { it.history.largeCategory }
             .mapValues { it.value.sumOf { item -> item.history.amount } }
+    }
+
+    // ✅ 복원용 추가 구현
+    override suspend fun getAllHistoriesList(): List<HistoryEntity> = withContext(Dispatchers.Default) {
+        getHistoryCollection().where { "isDeleted" equalTo false }.get().documents.map { it.data() }
+    }
+
+    override suspend fun deleteAllHistories() {
+        val snapshot = getHistoryCollection().get()
+        snapshot.documents.forEach { it.reference.delete() }
+    }
+
+    override suspend fun syncRemoteToLocal() {
+        // Delegate에서 처리
     }
 }

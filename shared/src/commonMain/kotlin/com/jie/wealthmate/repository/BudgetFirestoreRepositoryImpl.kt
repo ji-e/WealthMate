@@ -17,7 +17,6 @@ class BudgetFirestoreRepositoryImpl(
     private val authRepository: AuthRepository,
     private val categoryRepository: CategoryRepository
 ) : BudgetRepository {
-    private val repoName = "BudgetFirestoreRepository"
     private val firestore = Firebase.firestore
 
     private fun getUserId(): String = authRepository.getUserName() ?: "anonymous"
@@ -28,13 +27,12 @@ class BudgetFirestoreRepositoryImpl(
 
     override suspend fun saveBudgets(yearMonth: String, budgets: List<BudgetEntity>) = withContext(Dispatchers.Default) {
         val now = Clock.System.now().toEpochMilliseconds()
-        
-        // 해당 월의 기존 예산 삭제 (Soft Delete)
         val existing = getBudgetCollection().where { "yearMonth" equalTo yearMonth }.get()
         
         firestore.runTransaction {
             existing.documents.forEach { doc ->
                 val current = doc.data<BudgetEntity>()
+                // 최신 SDK 방식 권장 (deprecated 경고 방지 위해 builder 스타일 사용 가능하나 여기서는 기존 set 유지하되 필수 인자 확인)
                 set(doc.reference, current.copy(isDeleted = true, updatedAt = now), encodeDefaults = true)
             }
             budgets.forEach { budget ->
@@ -105,5 +103,22 @@ class BudgetFirestoreRepositoryImpl(
                 set(doc.reference, current.copy(isDeleted = true, updatedAt = now), encodeDefaults = true)
             }
         }
+    }
+
+    // ✅ 인터페이스 미구현 오류 해결 (복원용 메서드 추가)
+    override suspend fun getAllBudgetsList(): List<BudgetEntity> = withContext(Dispatchers.Default) {
+        getBudgetCollection().where { "isDeleted" equalTo false }.get().documents.map { it.data() }
+    }
+
+    override suspend fun insertBudgets(budgets: List<BudgetEntity>) {
+        budgets.forEach { getBudgetCollection().document(it.id).set(it, encodeDefaults = true) }
+    }
+
+    override suspend fun deleteAllBudgets() {
+        getBudgetCollection().get().documents.forEach { it.reference.delete() }
+    }
+
+    override suspend fun syncRemoteToLocal() {
+        // Delegate에서 비즈니스 로직 처리
     }
 }

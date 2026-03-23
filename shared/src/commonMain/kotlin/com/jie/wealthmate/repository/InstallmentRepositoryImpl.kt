@@ -65,4 +65,20 @@ class InstallmentRepositoryImpl(private val databaseProvider: DatabaseProvider) 
         dao.getInstallments()
     }.flowOn(Dispatchers.Default)
 
+    // ✅ 복원용 추가 구현
+    override suspend fun getAllInstallmentsList(): List<InstallmentEntity> = withContext(Dispatchers.Default) {
+        dao.getAllList()
+    }
+
+    override suspend fun insertInstallments(installments: List<InstallmentEntity>) = withContext(Dispatchers.Default) {
+        dao.upsertAll(installments)
+    }
+
+    override suspend fun deleteAllInstallments() = withContext(Dispatchers.Default) {
+        dao.deleteAll()
+    }
+
+    override suspend fun syncRemoteToLocal() {
+        // Delegate에서 처리
+    }
 }

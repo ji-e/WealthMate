@@ -41,7 +41,6 @@ interface PaymentMethodDao {
     @Query("UPDATE payment_method SET groupId = NULL, groupLabel = NULL, updatedAt = :updatedAt WHERE groupId = :groupId")
     suspend fun clearGroupId(groupId: String, updatedAt: Long = Clock.System.now().toEpochMilliseconds())
 
-    // 단건 조회
     @Query("SELECT * FROM payment_method WHERE id = :id AND isDeleted = 0 LIMIT 1")
     suspend fun getById(id: String): PaymentMethodEntity?
 
@@ -55,25 +54,20 @@ interface PaymentMethodDao {
 
     @Query("SELECT * FROM payment_method WHERE isDeleted = 0 ORDER BY sort ASC")
     fun getAllPaymentMethods(): Flow<List<PaymentMethodEntity>>
+    
+    // ✅ 복원용 추가
+    @Query("SELECT * FROM payment_method WHERE isDeleted = 0 ORDER BY sort ASC")
+    suspend fun getAllList(): List<PaymentMethodEntity>
 
     @Query("SELECT * FROM payment_method WHERE groupId = :groupId AND isDeleted = 0")
     fun getMethodsByGroupId(groupId: String): Flow<List<PaymentMethodEntity>>
 
-    /**
-     * 특정 시점 이후에 변경된 모든 결제 수단 조회 (삭제된 항목 포함)
-     */
     @Query("SELECT * FROM payment_method WHERE updatedAt > :lastSync")
     suspend fun getChangesSince(lastSync: Long): List<PaymentMethodEntity>
 
-    /**
-     * 클라우드 데이터를 로컬에 병합 (ID가 같으면 덮어쓰기)
-     */
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun upsertAll(paymentMethods: List<PaymentMethodEntity>)
 
-    /**
-     * 모든 결제 수단 삭제 (백업 복원 시 사용)
-     */
     @Query("DELETE FROM payment_method")
     suspend fun deleteAll()
 }

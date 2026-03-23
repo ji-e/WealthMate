@@ -20,4 +20,10 @@ interface RepeatCycleRepository {
     fun getRepeatCycleWithDetails(): Flow<List<RepeatCycleWithDetails>>
 
     suspend fun getRepeatCycleById(repeatCycleId: String): RepeatCycleWithDetails?
+
+    // ✅ 복원용 추가
+    suspend fun getAllRepeatCyclesList(): List<RepeatCycleEntity>
+    suspend fun insertRepeatCycles(repeatCycles: List<RepeatCycleEntity>)
+    suspend fun deleteAllRepeatCycles()
+    suspend fun syncRemoteToLocal()
 }

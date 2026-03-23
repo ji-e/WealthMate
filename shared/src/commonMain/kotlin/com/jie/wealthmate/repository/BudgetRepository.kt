@@ -12,4 +12,10 @@ interface BudgetRepository {
     fun getBudgetsByYearWithDetails(year: String): Flow<List<BudgetWithDetails>>
     fun getAllYearMonths(): Flow<List<String>>
     suspend fun deleteBudgetsByMonth(yearMonth: String)
+
+    // ✅ 복원용 추가
+    suspend fun getAllBudgetsList(): List<BudgetEntity>
+    suspend fun insertBudgets(budgets: List<BudgetEntity>)
+    suspend fun deleteAllBudgets()
+    suspend fun syncRemoteToLocal()
 }

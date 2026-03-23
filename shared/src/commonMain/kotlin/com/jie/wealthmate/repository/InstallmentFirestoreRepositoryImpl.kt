@@ -14,7 +14,6 @@ import kotlin.time.Clock
 class InstallmentFirestoreRepositoryImpl(
     private val authRepository: AuthRepository
 ) : InstallmentRepository {
-    private val repoName = "InstallmentFirestoreRepository"
     private val firestore = Firebase.firestore
 
     private fun getUserId(): String = authRepository.getUserName() ?: "anonymous"
@@ -48,4 +47,21 @@ class InstallmentFirestoreRepositoryImpl(
             .snapshots
             .map { snapshot -> snapshot.documents.map { it.data<InstallmentEntity>() } }
             .flowOn(Dispatchers.Default)
+
+    // ✅ 복원용 추가 구현
+    override suspend fun getAllInstallmentsList(): List<InstallmentEntity> = withContext(Dispatchers.Default) {
+        getInstallmentCollection().where { "isDeleted" equalTo false }.get().documents.map { it.data() }
+    }
+
+    override suspend fun insertInstallments(installments: List<InstallmentEntity>) {
+        installments.forEach { getInstallmentCollection().document(it.id).set(it, encodeDefaults = true) }
+    }
+
+    override suspend fun deleteAllInstallments() {
+        getInstallmentCollection().get().documents.forEach { it.reference.delete() }
+    }
+
+    override suspend fun syncRemoteToLocal() {
+        // Delegate에서 처리
+    }
 }

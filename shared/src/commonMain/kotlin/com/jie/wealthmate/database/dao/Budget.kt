@@ -21,6 +21,10 @@ interface BudgetDao {
     @Query("SELECT * FROM budgets WHERE yearMonth = :yearMonth AND isDeleted = 0")
     fun getBudgetsByMonth(yearMonth: String): Flow<List<BudgetEntity>>
 
+    // ✅ 복원용 전체 리스트 조회 추가
+    @Query("SELECT * FROM budgets WHERE isDeleted = 0")
+    suspend fun getAllList(): List<BudgetEntity>
+
     @Transaction
     @Query("SELECT * FROM budgets WHERE yearMonth = :yearMonth AND isDeleted = 0")
     fun getBudgetsByMonthWithDetails(yearMonth: String): Flow<List<BudgetWithDetails>>

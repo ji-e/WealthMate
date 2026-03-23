@@ -23,6 +23,10 @@ interface PaymentMethodGroupDao {
 
     @Query("SELECT * FROM payment_method_groups WHERE isDeleted = 0 ORDER BY label ASC")
     fun getAll(): Flow<List<PaymentMethodGroupEntity>>
+    
+    // ✅ 복원용 전체 리스트 조회 추가
+    @Query("SELECT * FROM payment_method_groups WHERE isDeleted = 0 ORDER BY label ASC")
+    suspend fun getAllList(): List<PaymentMethodGroupEntity>
 
     /**
      * 특정 시점 이후에 변경된 모든 결제 수단 그룹 조회 (삭제된 항목 포함)

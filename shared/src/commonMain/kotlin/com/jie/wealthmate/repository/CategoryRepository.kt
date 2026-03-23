@@ -25,7 +25,14 @@ interface CategoryRepository {
     fun getCategoryByIdFlow(categoryId: String): Flow<CategoryEntity?>
 
     fun getAllCategories(): Flow<List<CategoryEntity>>
+    
+    // ✅ 복원을 위해 추가
+    suspend fun getAllCategoriesList(): List<CategoryEntity>
+    suspend fun insertCategories(categories: List<CategoryEntity>)
+    suspend fun deleteAllCategories()
 
     fun getCategoriesByLargeCategory(largeCategory: String): Flow<List<CategoryEntity>>
 
+    // ✅ 공통 복원 로직
+    suspend fun syncRemoteToLocal()
 }

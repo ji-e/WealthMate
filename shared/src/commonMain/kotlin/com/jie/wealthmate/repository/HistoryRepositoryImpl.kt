@@ -9,6 +9,7 @@ import com.jie.wealthmate.database.eneity.HistoryEntity
 import com.jie.wealthmate.database.eneity.HistoryWithDetails
 import com.jie.wealthmate.utils.default
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
@@ -55,8 +56,8 @@ class HistoryRepositoryImpl(private val databaseProvider: DatabaseProvider) : Hi
             params = mapOf("history" to history)
         ) {
             val historyWithId = history.copy(
-                id = generateId(),
-                createdAt = Clock.System.now().toEpochMilliseconds(),
+                id = if (history.id.isEmpty()) generateId() else history.id,
+                createdAt = if (history.createdAt == 0L) Clock.System.now().toEpochMilliseconds() else history.createdAt,
                 updatedAt = Clock.System.now().toEpochMilliseconds(),
             )
             dao.insertHistory(historyWithId)
@@ -72,8 +73,8 @@ class HistoryRepositoryImpl(private val databaseProvider: DatabaseProvider) : Hi
             val timestamp = Clock.System.now().toEpochMilliseconds()
             val historiesWithIds = histories.map {
                 it.copy(
-                    id = generateId(),
-                    createdAt = timestamp,
+                    id = if (it.id.isEmpty()) generateId() else it.id,
+                    createdAt = if (it.createdAt == 0L) timestamp else it.createdAt,
                     updatedAt = timestamp,
                 )
             }
@@ -243,19 +244,23 @@ class HistoryRepositoryImpl(private val databaseProvider: DatabaseProvider) : Hi
                 }
             }
             
-            // Note: Since searchHistories returns List<HistoryWithDetails>, we can't directly use it for SUM.
-            // But we need to use RawQuery for dynamic WHERE clause.
-            // I'll reuse the logic but return a Map. I need a way to execute this.
-            // For now, I'll fetch IDs or just the fields I need if possible, but the DAO is limited.
-            // Actually, I should probably add a specific RawQuery method for summary if needed, 
-            // but let's see if I can get away with fetching enough info.
-            // Actually, fetching all items just for summary is bad if there are many.
-            // I will add a method to Dao that returns summary info.
-            
             val result = dao.searchHistories(rawQuery)
             result.groupBy { it.history.largeCategory }
                 .mapValues { entry -> entry.value.sumOf { it.history.amount } }
         }
+    }
+
+    // ✅ 복원용 구현
+    override suspend fun getAllHistoriesList(): List<HistoryEntity> = withContext(Dispatchers.IO) {
+        dao.getAllHistoriesList()
+    }
+
+    override suspend fun deleteAllHistories() = withContext(Dispatchers.IO) {
+        dao.deleteAll()
+    }
+
+    override suspend fun syncRemoteToLocal() {
+        // Delegate에서 처리
     }
 
     private fun buildSearchQuery(

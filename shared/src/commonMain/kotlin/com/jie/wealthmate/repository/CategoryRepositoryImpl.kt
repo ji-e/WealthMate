@@ -7,6 +7,7 @@ import com.jie.wealthmate.database.DatabaseProvider
 import com.jie.wealthmate.database.eneity.CategoryEntity
 import com.jie.wealthmate.database.eneity.CategoryTagEntity
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
@@ -116,7 +117,7 @@ class CategoryRepositoryImpl(private val databaseProvider: DatabaseProvider) : C
             params = mapOf()
         ) {
             dao.getAll()
-        }.flowOn(Dispatchers.Default) // DB 조회 및 로그 처리를 백그라운드 스레드에서 실행
+        }.flowOn(Dispatchers.Default)
 
 
     override fun getCategoriesByLargeCategory(largeCategory: String): Flow<List<CategoryEntity>> =
@@ -126,5 +127,22 @@ class CategoryRepositoryImpl(private val databaseProvider: DatabaseProvider) : C
             params = mapOf("largeCategory" to largeCategory)
         ) {
             dao.getByLargeCategory(largeCategory)
-        }.flowOn(Dispatchers.Default) // DB 조회 및 로그 처리를 백그라운드 스레드에서 실행
+        }.flowOn(Dispatchers.Default)
+
+    // ✅ 복원용 추가 구현
+    override suspend fun getAllCategoriesList(): List<CategoryEntity> = withContext(Dispatchers.IO) {
+        dao.getAllList()
+    }
+
+    override suspend fun insertCategories(categories: List<CategoryEntity>) = withContext(Dispatchers.IO) {
+        dao.upsertAll(categories)
+    }
+
+    override suspend fun deleteAllCategories() = withContext(Dispatchers.IO) {
+        dao.deleteAll()
+    }
+
+    override suspend fun syncRemoteToLocal() {
+        // Delegate에서 처리하므로 Impl에서는 비워둠 (또는 예외 처리)
+    }
 }

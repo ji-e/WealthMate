@@ -17,17 +17,40 @@ class RepeatCycleRepositoryDelegate(
         accountProvider = accountProvider,
     )
 
-    override suspend fun insertRepeatCycle(repeatCycle: RepeatCycleEntity) = d.current.insertRepeatCycle(repeatCycle)
+    override suspend fun insertRepeatCycle(repeatCycle: RepeatCycleEntity) =
+        d.dualCall { it.insertRepeatCycle(repeatCycle) }
 
-    override suspend fun updateRepeatCycle(repeatCycle: RepeatCycleEntity) = d.current.updateRepeatCycle(repeatCycle)
+    override suspend fun updateRepeatCycle(repeatCycle: RepeatCycleEntity) =
+        d.dualCall { it.updateRepeatCycle(repeatCycle) }
 
-    override suspend fun deactivateRepeatCycle(repeatCycleId: String) = d.current.deactivateRepeatCycle(repeatCycleId)
+    override suspend fun deactivateRepeatCycle(repeatCycleId: String) =
+        d.dualCall { it.deactivateRepeatCycle(repeatCycleId) }
 
-    override suspend fun deleteRepeatCycle(repeatCycleId: String) = d.current.deleteRepeatCycle(repeatCycleId)
+    override suspend fun deleteRepeatCycle(repeatCycleId: String) =
+        d.dualCall { it.deleteRepeatCycle(repeatCycleId) }
 
-    override fun getRepeatCycles(): Flow<List<RepeatCycleEntity>> = d.flatFlow { it.getRepeatCycles() }
+    override fun getRepeatCycles(): Flow<List<RepeatCycleEntity>> =
+        d.flatFlow { it.getRepeatCycles() }
 
-    override fun getRepeatCycleWithDetails(): Flow<List<RepeatCycleWithDetails>> = d.flatFlow { it.getRepeatCycleWithDetails() }
+    override fun getRepeatCycleWithDetails(): Flow<List<RepeatCycleWithDetails>> =
+        d.flatFlow { it.getRepeatCycleWithDetails() }
 
-    override suspend fun getRepeatCycleById(repeatCycleId: String): RepeatCycleWithDetails? = d.current.getRepeatCycleById(repeatCycleId)
+    override suspend fun getRepeatCycleById(repeatCycleId: String): RepeatCycleWithDetails? =
+        d.call { it.getRepeatCycleById(repeatCycleId) }
+
+    // ✅ 복원용 메서드들 구현
+    override suspend fun getAllRepeatCyclesList(): List<RepeatCycleEntity> = d.call { it.getAllRepeatCyclesList() }
+    override suspend fun insertRepeatCycles(repeatCycles: List<RepeatCycleEntity>) = d.dualCall { it.insertRepeatCycles(repeatCycles) }
+    override suspend fun deleteAllRepeatCycles() = d.dualCall { it.deleteAllRepeatCycles() }
+
+    // ✅ 핵심 복원 로직: Firestore -> Local
+    override suspend fun syncRemoteToLocal() {
+        d.restore { special, normal ->
+            val remoteData = special.getAllRepeatCyclesList()
+            if (remoteData.isNotEmpty()) {
+                normal.deleteAllRepeatCycles()
+                normal.insertRepeatCycles(remoteData)
+            }
+        }
+    }
 }

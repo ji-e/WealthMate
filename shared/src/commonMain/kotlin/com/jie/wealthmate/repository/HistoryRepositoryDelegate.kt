@@ -19,27 +19,39 @@ class HistoryRepositoryDelegate(
 
     override fun getAllHistories(): Flow<List<HistoryEntity>> = d.flatFlow { it.getAllHistories() }
 
-    override fun getHistoriesWithDetails(): Flow<List<HistoryWithDetails>> = d.flatFlow { it.getHistoriesWithDetails() }
+    override fun getHistoriesWithDetails(): Flow<List<HistoryWithDetails>> =
+        d.flatFlow { it.getHistoriesWithDetails() }
 
-    override suspend fun getHistoryById(id: String): HistoryWithDetails? = d.current.getHistoryById(id)
+    override suspend fun getHistoryById(id: String): HistoryWithDetails? =
+        d.call { it.getHistoryById(id) }
 
-    override suspend fun insertHistory(history: HistoryEntity) = d.current.insertHistory(history)
+    override suspend fun insertHistory(history: HistoryEntity) =
+        d.dualCall { it.insertHistory(history) }
 
-    override suspend fun insertHistories(histories: List<HistoryEntity>) = d.current.insertHistories(histories)
+    override suspend fun insertHistories(histories: List<HistoryEntity>) =
+        d.dualCall { it.insertHistories(histories) }
 
-    override suspend fun updateHistory(history: HistoryEntity) = d.current.updateHistory(history)
+    override suspend fun updateHistory(history: HistoryEntity) =
+        d.dualCall { it.updateHistory(history) }
 
-    override suspend fun updateHistories(histories: List<HistoryEntity>) = d.current.updateHistories(histories)
+    override suspend fun updateHistories(histories: List<HistoryEntity>) =
+        d.dualCall { it.updateHistories(histories) }
 
-    override suspend fun deleteHistory(id: String) = d.current.deleteHistory(id)
+    override suspend fun deleteHistory(id: String) = d.dualCall { it.deleteHistory(id) }
 
-    override suspend fun deleteHistoriesByInstallmentId(installmentId: String) = d.current.deleteHistoriesByInstallmentId(installmentId)
+    override suspend fun deleteHistoriesByInstallmentId(installmentId: String) =
+        d.dualCall { it.deleteHistoriesByInstallmentId(installmentId) }
 
-    override fun getHistoriesByMonth(startDate: Long, endDate: Long): Flow<List<HistoryWithDetails>> = d.flatFlow { it.getHistoriesByMonth(startDate, endDate) }
+    override fun getHistoriesByMonth(
+        startDate: Long,
+        endDate: Long,
+    ): Flow<List<HistoryWithDetails>> = d.flatFlow { it.getHistoriesByMonth(startDate, endDate) }
 
-    override fun getSumByMonth(startDate: Long, endDate: Long, categoryType: String): Flow<Long> = d.flatFlow { it.getSumByMonth(startDate, endDate, categoryType) }
+    override fun getSumByMonth(startDate: Long, endDate: Long, categoryType: String): Flow<Long> =
+        d.flatFlow { it.getSumByMonth(startDate, endDate, categoryType) }
 
-    override suspend fun getHistoriesByInstallmentId(installmentId: String): List<HistoryEntity> = d.current.getHistoriesByInstallmentId(installmentId)
+    override suspend fun getHistoriesByInstallmentId(installmentId: String): List<HistoryEntity> =
+        d.call { it.getHistoriesByInstallmentId(installmentId) }
 
     override suspend fun searchHistories(
         query: String,
@@ -50,8 +62,20 @@ class HistoryRepositoryDelegate(
         categoryIds: List<String>,
         paymentMethodIds: List<String>,
         limit: Int,
-        offset: Int
-    ): List<HistoryWithDetails> = d.current.searchHistories(query, sortOrder, startDate, endDate, largeCategories, categoryIds, paymentMethodIds, limit, offset)
+        offset: Int,
+    ): List<HistoryWithDetails> = d.call {
+        it.searchHistories(
+            query,
+            sortOrder,
+            startDate,
+            endDate,
+            largeCategories,
+            categoryIds,
+            paymentMethodIds,
+            limit,
+            offset
+        )
+    }
 
     override suspend fun getSearchSummary(
         query: String,
@@ -59,6 +83,30 @@ class HistoryRepositoryDelegate(
         endDate: Long?,
         largeCategories: List<String>,
         categoryIds: List<String>,
-        paymentMethodIds: List<String>
-    ): Map<String, Long> = d.current.getSearchSummary(query, startDate, endDate, largeCategories, categoryIds, paymentMethodIds)
+        paymentMethodIds: List<String>,
+    ): Map<String, Long> = d.call {
+        it.getSearchSummary(
+            query,
+            startDate,
+            endDate,
+            largeCategories,
+            categoryIds,
+            paymentMethodIds
+        )
+    }
+
+    // ✅ 복원용 메서드들
+    override suspend fun getAllHistoriesList(): List<HistoryEntity> = d.call { it.getAllHistoriesList() }
+    override suspend fun deleteAllHistories() = d.dualCall { it.deleteAllHistories() }
+
+    // ✅ 핵심 복원 로직: Firestore -> Local
+    override suspend fun syncRemoteToLocal() {
+        d.restore { special, normal ->
+            val remoteData = special.getAllHistoriesList()
+            if (remoteData.isNotEmpty()) {
+                normal.deleteAllHistories()
+                normal.insertHistories(remoteData)
+            }
+        }
+    }
 }

@@ -50,4 +50,9 @@ interface HistoryRepository {
         categoryIds: List<String>,
         paymentMethodIds: List<String>
     ): Map<String, Long>
+
+    // ✅ 복원용 추가
+    suspend fun getAllHistoriesList(): List<HistoryEntity>
+    suspend fun deleteAllHistories()
+    suspend fun syncRemoteToLocal()
 }

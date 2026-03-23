@@ -19,19 +19,19 @@ class CategoryRepositoryDelegate(
     override suspend fun insertCategory(
         icon: String, largeCategory: String, middleLabel: String,
         sort: Long, isFixed: Boolean, tagLabels: List<String>,
-    ) = d.current.insertCategory(icon, largeCategory, middleLabel, sort, isFixed, tagLabels)
+    ) = d.dualCall { it.insertCategory(icon, largeCategory, middleLabel, sort, isFixed, tagLabels) }
 
     override suspend fun updateCategory(category: CategoryEntity) =
-        d.current.updateCategory(category)
+        d.dualCall { it.updateCategory(category) }
 
     override suspend fun updateCategoriesSort(updates: List<Pair<String, Long>>) =
-        d.current.updateCategoriesSort(updates)
+        d.dualCall { it.updateCategoriesSort(updates) }
 
     override suspend fun deleteCategory(categoryId: String) =
-        d.current.deleteCategory(categoryId)
+        d.dualCall { it.deleteCategory(categoryId) }
 
     override suspend fun getCategoryById(categoryId: String) =
-        d.current.getCategoryById(categoryId)
+        d.call { it.getCategoryById(categoryId) }
 
     override fun getCategoryByIdFlow(categoryId: String) =
         d.flatFlow { it.getCategoryByIdFlow(categoryId) }
@@ -42,4 +42,19 @@ class CategoryRepositoryDelegate(
     override fun getCategoriesByLargeCategory(largeCategory: String) =
         d.flatFlow { it.getCategoriesByLargeCategory(largeCategory) }
 
+    // ✅ 복원용 메서드들
+    override suspend fun getAllCategoriesList(): List<CategoryEntity> = d.call { it.getAllCategoriesList() }
+    override suspend fun insertCategories(categories: List<CategoryEntity>) = d.dualCall { it.insertCategories(categories) }
+    override suspend fun deleteAllCategories() = d.dualCall { it.deleteAllCategories() }
+
+    // ✅ 핵심 복원 로직: Firestore -> Local
+    override suspend fun syncRemoteToLocal() {
+        d.restore { special, normal ->
+            val remoteData = special.getAllCategoriesList()
+            if (remoteData.isNotEmpty()) {
+                normal.deleteAllCategories()
+                normal.insertCategories(remoteData)
+            }
+        }
+    }
 }

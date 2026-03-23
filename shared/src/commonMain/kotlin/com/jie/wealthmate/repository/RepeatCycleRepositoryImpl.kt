@@ -94,4 +94,21 @@ class RepeatCycleRepositoryImpl(private val databaseProvider: DatabaseProvider) 
             dao.getRepeatCycleById(repeatCycleId)
         }
     }
+
+    // ✅ 복원용 추가 구현 (Dispatchers.Default 사용)
+    override suspend fun getAllRepeatCyclesList(): List<RepeatCycleEntity> = withContext(Dispatchers.Default) {
+        dao.getAllList()
+    }
+
+    override suspend fun insertRepeatCycles(repeatCycles: List<RepeatCycleEntity>) = withContext(Dispatchers.Default) {
+        dao.upsertAll(repeatCycles)
+    }
+
+    override suspend fun deleteAllRepeatCycles() = withContext(Dispatchers.Default) {
+        dao.deleteAll()
+    }
+
+    override suspend fun syncRemoteToLocal() {
+        // Delegate에서 처리
+    }
 }

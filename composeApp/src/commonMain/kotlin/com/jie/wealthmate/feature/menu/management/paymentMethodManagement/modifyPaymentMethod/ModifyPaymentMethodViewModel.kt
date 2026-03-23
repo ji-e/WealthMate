@@ -12,17 +12,14 @@ import kotlinx.coroutines.launch
 
 class ModifyPaymentMethodViewModel(
     private val paymentMethodRepository: PaymentMethodRepository,
+    private val paymentMethodId: String,
 ) : BaseViewModel<ModifyPaymentMethodUiState>() {
     private var paymentMethodItems: List<PaymentMethodWithGroupEntity> = emptyList()
-    private var paymentMethodId: String = ""
 
     override val initialState: ModifyPaymentMethodUiState
         get() = ModifyPaymentMethodUiState()
 
-    fun updateInit(
-        paymentMethodId: String,
-    ) {
-        this.paymentMethodId = paymentMethodId
+    init {
         getPaymentMethods()
         getPaymentMethod()
     }

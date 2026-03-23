@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import androidx.room.Update
 import com.jie.wealthmate.database.eneity.RepeatCycleEntity
 import com.jie.wealthmate.database.eneity.RepeatCycleWithDetails
@@ -12,14 +13,6 @@ import kotlin.time.Clock
 
 @Dao
 interface RepeatCycleDao {
-    @Query("SELECT * FROM repeat_cycle WHERE isDeleted = 0")
-    fun getRepeatCycles(): Flow<List<RepeatCycleEntity>>
-
-    @Query("SELECT * FROM repeat_cycle WHERE isDeleted = 0")
-    fun getRepeatCyclesWithDetail(): Flow<List<RepeatCycleWithDetails>>
-
-    @Query("SELECT * FROM repeat_cycle WHERE id = :id AND isDeleted = 0")
-    suspend fun getRepeatCycleById(id: String): RepeatCycleWithDetails?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(repeatCycle: RepeatCycleEntity)
@@ -27,15 +20,29 @@ interface RepeatCycleDao {
     @Update
     suspend fun update(repeatCycle: RepeatCycleEntity)
 
-    // 반복 중단 시
     @Query("UPDATE repeat_cycle SET isActive = 0, updatedAt = :updatedAt WHERE id = :id")
     suspend fun deactivate(id: String, updatedAt: Long = Clock.System.now().toEpochMilliseconds())
 
     @Query("UPDATE repeat_cycle SET isDeleted = 1, updatedAt = :updatedAt WHERE id = :id")
     suspend fun delete(id: String, updatedAt: Long = Clock.System.now().toEpochMilliseconds())
 
+    @Query("SELECT * FROM repeat_cycle WHERE isDeleted = 0")
+    fun getRepeatCycles(): Flow<List<RepeatCycleEntity>>
+    
+    // ✅ 복원용 전체 리스트 조회 추가
+    @Query("SELECT * FROM repeat_cycle WHERE isDeleted = 0")
+    suspend fun getAllList(): List<RepeatCycleEntity>
+
+    @Transaction
+    @Query("SELECT * FROM repeat_cycle WHERE isDeleted = 0")
+    fun getRepeatCyclesWithDetail(): Flow<List<RepeatCycleWithDetails>>
+
+    @Transaction
+    @Query("SELECT * FROM repeat_cycle WHERE id = :repeatCycleId AND isDeleted = 0")
+    suspend fun getRepeatCycleById(repeatCycleId: String): RepeatCycleWithDetails?
+
     /**
-     * 특정 시점 이후에 변경된 모든 반복 주기 조회 (삭제된 항목 포함)
+     * 특정 시점 이후에 변경된 모든 반복 내역 조회 (삭제된 항목 포함)
      */
     @Query("SELECT * FROM repeat_cycle WHERE updatedAt > :lastSync")
     suspend fun getChangesSince(lastSync: Long): List<RepeatCycleEntity>

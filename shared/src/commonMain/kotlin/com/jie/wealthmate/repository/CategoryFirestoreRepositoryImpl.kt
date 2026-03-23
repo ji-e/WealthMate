@@ -48,115 +48,80 @@ class CategoryFirestoreRepositoryImpl(
         isFixed: Boolean,
         tagLabels: List<String>,
     ) = withContext(Dispatchers.Default) {
-        Napier.d("[$repoName] insertCategory called")
-        loggedCall(
-            repositoryName = repoName,
-            methodName = "insertCategory",
-            params = mapOf(
-                "icon" to icon,
-                "largeCategory" to largeCategory,
-                "middleLabel" to middleLabel,
-                "sort" to sort,
-                "isFixed" to isFixed,
-                "tagLabels" to tagLabels
-            )
-        ) {
-            val id = generateId()
-            val now = Clock.System.now().toEpochMilliseconds()
-            val tags = tagLabels.map { label ->
-                CategoryTagEntity(
-                    id = generateId(),
-                    tagLabel = label,
-                    updatedAt = now,
-                    isDeleted = false
-                )
-            }
-            val category = CategoryEntity(
-                id = id,
-                icon = icon,
-                largeCategory = largeCategory,
-                middleLabel = middleLabel,
-                sort = sort,
-                isFixed = isFixed,
-                tags = tags,
+        val id = generateId()
+        val now = Clock.System.now().toEpochMilliseconds()
+        val tags = tagLabels.map { label ->
+            CategoryTagEntity(
+                id = generateId(),
+                tagLabel = label,
                 updatedAt = now,
                 isDeleted = false
             )
-            getCategoryCollection().document(id).set(category, encodeDefaults = true)
         }
+        val category = CategoryEntity(
+            id = id,
+            icon = icon,
+            largeCategory = largeCategory,
+            middleLabel = middleLabel,
+            sort = sort,
+            isFixed = isFixed,
+            tags = tags,
+            updatedAt = now,
+            isDeleted = false
+        )
+        getCategoryCollection().document(id).set(category, encodeDefaults = true)
     }
 
     override suspend fun updateCategory(category: CategoryEntity) =
         withContext(Dispatchers.Default) {
-            Napier.d("[$repoName] updateCategory called")
-            loggedCall(
-                repositoryName = repoName,
-                methodName = "updateCategory",
-                params = mapOf("category" to category)
-            ) {
-                val updatedCategory =
-                    category.copy(updatedAt = Clock.System.now().toEpochMilliseconds())
-                getCategoryCollection().document(category.id)
-                    .set(updatedCategory, encodeDefaults = true)
-            }
+            val updatedCategory =
+                category.copy(updatedAt = Clock.System.now().toEpochMilliseconds())
+            getCategoryCollection().document(category.id)
+                .set(updatedCategory, encodeDefaults = true)
         }
 
     override suspend fun updateCategoriesSort(updates: List<Pair<String, Long>>) =
         withContext(Dispatchers.Default) {
-            loggedCall(
-                repositoryName = repoName,
-                methodName = "updateCategoriesSort",
-                params = mapOf("updates" to updates)
-            ) {
-                firestore.runTransaction {
-                    updates.forEach { (id, newSort) ->
-                        val docRef = getCategoryCollection().document(id)
-                        val snapshot = get(docRef)
-                        if (snapshot.exists) {
-                            val current = snapshot.data<CategoryEntity>()
-                            set(
-                                docRef,
-                                current.copy(
-                                    sort = newSort,
-                                    updatedAt = Clock.System.now().toEpochMilliseconds()
-                                )
-                            )
-                        }
+            firestore.runTransaction {
+                val snapshotsWithNewSort = updates.map { (id, newSort) ->
+                    val docRef = getCategoryCollection().document(id)
+                    Triple(docRef, get(docRef), newSort)
+                }
+                val now = Clock.System.now().toEpochMilliseconds()
+                snapshotsWithNewSort.forEach { (docRef, snapshot, newSort) ->
+                    if (snapshot.exists) {
+                        val current = snapshot.data<CategoryEntity>()
+                        set(
+                            docRef,
+                            current.copy(
+                                sort = newSort,
+                                updatedAt = now
+                            ),
+                            encodeDefaults = true
+                        )
                     }
                 }
             }
         }
 
     override suspend fun deleteCategory(categoryId: String) = withContext(Dispatchers.Default) {
-        loggedCall(
-            repositoryName = repoName,
-            methodName = "deleteCategory",
-            params = mapOf("categoryId" to categoryId)
-        ) {
-            val docRef = getCategoryCollection().document(categoryId)
-            val snapshot = docRef.get()
-            if (snapshot.exists) {
-                val current = snapshot.data<CategoryEntity>()
-                docRef.set(
-                    current.copy(
-                        isDeleted = true,
-                        updatedAt = Clock.System.now().toEpochMilliseconds()
-                    ), encodeDefaults = true
-                )
-            }
+        val docRef = getCategoryCollection().document(categoryId)
+        val snapshot = docRef.get()
+        if (snapshot.exists) {
+            val current = snapshot.data<CategoryEntity>()
+            docRef.set(
+                current.copy(
+                    isDeleted = true,
+                    updatedAt = Clock.System.now().toEpochMilliseconds()
+                ), encodeDefaults = true
+            )
         }
     }
 
     override suspend fun getCategoryById(categoryId: String): CategoryEntity? =
         withContext(Dispatchers.Default) {
-            loggedCall(
-                repositoryName = repoName,
-                methodName = "getCategoryById",
-                params = mapOf("categoryId" to categoryId)
-            ) {
-                val snapshot = getCategoryCollection().document(categoryId).get()
-                if (snapshot.exists) snapshot.data<CategoryEntity>() else null
-            }
+            val snapshot = getCategoryCollection().document(categoryId).get()
+            if (snapshot.exists) snapshot.data<CategoryEntity>() else null
         }
 
     override fun getCategoryByIdFlow(categoryId: String): Flow<CategoryEntity?> = flow {
@@ -167,30 +132,42 @@ class CategoryFirestoreRepositoryImpl(
     }.flowOn(Dispatchers.Default)
 
     override fun getAllCategories(): Flow<List<CategoryEntity>> =
-        loggedFlow<List<CategoryEntity>>(
-            repositoryName = repoName,
-            methodName = "getAllCategories",
-            params = emptyMap()
-        ) {
-            getCategoryCollection()
-                .where { "isDeleted" equalTo false }
-                .orderBy("sort", Direction.ASCENDING)
-                .snapshots
-                .map { snapshot -> snapshot.documents.map { it.data<CategoryEntity>() } }
-        }.onStart { Napier.d("[$repoName] getAllCategories flow started") }
-        .flowOn(Dispatchers.Default)
+        getCategoryCollection()
+            .where { "isDeleted" equalTo false }
+            .orderBy("sort", Direction.ASCENDING)
+            .snapshots
+            .map { snapshot -> snapshot.documents.map { it.data<CategoryEntity>() } }
+            .flowOn(Dispatchers.Default)
 
     override fun getCategoriesByLargeCategory(largeCategory: String): Flow<List<CategoryEntity>> =
-        loggedFlow<List<CategoryEntity>>(
-            repositoryName = repoName,
-            methodName = "getCategoriesByLargeCategory",
-            params = mapOf("largeCategory" to largeCategory)
-        ) {
-            getCategoryCollection()
-                .where { "largeCategory" equalTo largeCategory }
-                .where { "isDeleted" equalTo false }
-                .orderBy("sort", Direction.ASCENDING)
-                .snapshots
-                .map { snapshot -> snapshot.documents.map { it.data<CategoryEntity>() } }
-        }.flowOn(Dispatchers.Default)
+        getCategoryCollection()
+            .where { "largeCategory" equalTo largeCategory }
+            .where { "isDeleted" equalTo false }
+            .orderBy("sort", Direction.ASCENDING)
+            .snapshots
+            .map { snapshot -> snapshot.documents.map { it.data<CategoryEntity>() } }
+            .flowOn(Dispatchers.Default)
+
+    // ✅ 복원용 추가 구현
+    override suspend fun getAllCategoriesList(): List<CategoryEntity> = withContext(Dispatchers.Default) {
+        val snapshot = getCategoryCollection().where { "isDeleted" equalTo false }.get()
+        snapshot.documents.map { it.data() }
+    }
+
+    override suspend fun insertCategories(categories: List<CategoryEntity>) {
+        // Firestore 대량 insert는 보통 writeBatch 사용 (여기서는 단순 구현)
+        categories.forEach { category ->
+            getCategoryCollection().document(category.id).set(category, encodeDefaults = true)
+        }
+    }
+
+    override suspend fun deleteAllCategories() {
+        // Firestore는 collection 전체 삭제 API가 없으므로 document 하나씩 삭제해야 함
+        val snapshot = getCategoryCollection().get()
+        snapshot.documents.forEach { doc -> doc.reference.delete() }
+    }
+
+    override suspend fun syncRemoteToLocal() {
+        // Delegate에서 처리
+    }
 }

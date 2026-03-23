@@ -25,6 +25,10 @@ interface InstallmentDao {
     @Query("SELECT * FROM installments WHERE isDeleted = 0")
     fun getInstallments(): Flow<List<InstallmentEntity>>
 
+    // ✅ 복원용 전체 리스트 조회 추가
+    @Query("SELECT * FROM installments WHERE isDeleted = 0")
+    suspend fun getAllList(): List<InstallmentEntity>
+
     /**
      * 특정 시점 이후에 변경된 모든 할부 내역 조회 (삭제된 항목 포함)
      */

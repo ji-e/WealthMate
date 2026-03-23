@@ -4,6 +4,7 @@ import com.jie.wealthmate.database.eneity.RepeatCycleEntity
 import com.jie.wealthmate.database.eneity.RepeatCycleWithDetails
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.firestore.firestore
+import dev.gitlive.firebase.firestore.where
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -101,10 +102,25 @@ class RepeatCycleFirestoreRepositoryImpl(
                 repeatCycle = repeat,
                 category = repeat.categoryId?.let { categoryRepository.getCategoryById(it) },
                 paymentMethod = repeat.paymentMethodId?.let {
-                    paymentMethodRepository.getPaymentMethodById(
-                        it
-                    )?.paymentMethod
+                    paymentMethodRepository.getPaymentMethodById(it)?.paymentMethod
                 }
             )
         }
+
+    // ✅ 복원용 메서드들 구현
+    override suspend fun getAllRepeatCyclesList(): List<RepeatCycleEntity> = withContext(Dispatchers.Default) {
+        getRepeatCycleCollection().where { "isDeleted" equalTo false }.get().documents.map { it.data() }
+    }
+
+    override suspend fun insertRepeatCycles(repeatCycles: List<RepeatCycleEntity>) {
+        repeatCycles.forEach { getRepeatCycleCollection().document(it.id).set(it, encodeDefaults = true) }
+    }
+
+    override suspend fun deleteAllRepeatCycles() {
+        getRepeatCycleCollection().get().documents.forEach { it.reference.delete() }
+    }
+
+    override suspend fun syncRemoteToLocal() {
+        // Delegate에서 비즈니스 로직 처리
+    }
 }
