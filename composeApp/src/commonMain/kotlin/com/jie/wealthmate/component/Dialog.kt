@@ -111,6 +111,22 @@ fun WMSaveBackDialog(
 }
 
 /**
+ * 삭제 확인 다이얼로그
+ */
+@Composable
+fun WMRemoveDialog(
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    WMDialog(
+        contentText = "정말로 삭제하시겠습니까?\n삭제된 데이터는 복구할 수 없습니다.",
+        confirmCallback = onConfirm,
+        onDismissRequest = onDismiss
+    )
+}
+
+
+/**
  * 다이얼로그 내부에서 사용되는 버튼 컴포넌트
  */
 @Composable
