@@ -41,6 +41,9 @@ interface PaymentMethodDao {
     @Query("UPDATE payment_method SET groupId = NULL, groupLabel = NULL, updatedAt = :updatedAt WHERE groupId = :groupId")
     suspend fun clearGroupId(groupId: String, updatedAt: Long = Clock.System.now().toEpochMilliseconds())
 
+    @Query("UPDATE payment_method SET groupLabel = :groupLabel, updatedAt = :updatedAt WHERE groupId = :groupId")
+    suspend fun updateGroupLabel(groupId: String, groupLabel: String, updatedAt: Long = Clock.System.now().toEpochMilliseconds())
+
     @Query("SELECT * FROM payment_method WHERE id = :id AND isDeleted = 0 LIMIT 1")
     suspend fun getById(id: String): PaymentMethodEntity?
 

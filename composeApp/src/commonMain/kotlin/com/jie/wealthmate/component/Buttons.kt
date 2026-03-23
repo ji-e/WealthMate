@@ -229,16 +229,14 @@ fun WMFloatingButton(
     onClick: () -> Unit,
 ) {
     Column(
-        modifier = Modifier
-            .padding(horizontal = Padding.BackgroundHorizontal)
-            .fillMaxWidth()
+        modifier = Modifier.fillMaxWidth()
     ) {
         WMShadowDivider()
 
         WMSpacer()
 
         WMButton(
-            modifier = modifier,
+            modifier = modifier.padding(horizontal = Padding.BackgroundHorizontal),
             text = text,
             buttonStyle = buttonStyle,
             buttonSize = buttonSize,
@@ -246,7 +244,7 @@ fun WMFloatingButton(
             isRounded = isRounded,
             onClick = onClick
         )
-        WMSpacer()
+        WMSpacer(size = SpacerSize.LARGE)
     }
 }
 

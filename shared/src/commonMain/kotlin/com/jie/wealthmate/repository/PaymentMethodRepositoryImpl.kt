@@ -132,6 +132,7 @@ class PaymentMethodRepositoryImpl(
                     updatedAt = Clock.System.now().toEpochMilliseconds()
                 )
             )
+            paymentMethodDao.updateGroupLabel(paymentMethodGroupId, paymentMethodGroupLabel)
         }
     }
 

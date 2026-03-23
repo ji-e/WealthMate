@@ -1,6 +1,7 @@
 package com.jie.wealthmate.feature.menu.management.paymentMethodManagement.paymentMethodGroup
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
@@ -24,10 +25,13 @@ import com.jie.wealthmate.component.WMButton
 import com.jie.wealthmate.component.WMIconButton
 import com.jie.wealthmate.component.WMModalBottomSheet
 import com.jie.wealthmate.component.WMShadowDivider
+import com.jie.wealthmate.component.WMSpacer
 import com.jie.wealthmate.component.textField.WMTextField
-import com.jie.wealthmate.feature.menu.management.paymentMethodManagement.addPaymentMethod.AddPaymentMethodViewModel
-import com.jie.wealthmate.feature.menu.management.paymentMethodManagement.addPaymentMethod.component.PaymentMethodGroupItemData
-import com.jie.wealthmate.feature.menu.management.paymentMethodManagement.addPaymentMethod.component.PaymentMethodGroupList
+import com.jie.wealthmate.feature.menu.management.paymentMethodManagement.editPaymentMethod.EditPaymentMethodViewModel
+import com.jie.wealthmate.feature.menu.management.paymentMethodManagement.editPaymentMethod.component.PaymentMethodGroupItem
+import com.jie.wealthmate.feature.menu.management.paymentMethodManagement.editPaymentMethod.component.PaymentMethodGroupItemData
+import com.jie.wealthmate.feature.menu.management.paymentMethodManagement.editPaymentMethod.component.PaymentMethodGroupList
+import com.jie.wealthmate.theme.Padding
 import com.jie.wealthmate.utils.default
 import org.koin.compose.viewmodel.koinViewModel
 import wealthmate.composeapp.generated.resources.Res
@@ -86,7 +90,7 @@ fun PaymentMethodGroupModalBottomSheet(
     WMModalBottomSheet(
         title = "결제수단 그룹",
         readingItem = {
-            if (isModify.not() && paymentMethodGroupItems.size < 10) {
+            if (isModify.not() && isAdd.not() && paymentMethodGroupItems.size < 10) {
                 WMIconButton(
                     iconRes = Res.drawable.ic_add,
                     onClick = { isAdd = true },
@@ -96,32 +100,50 @@ fun PaymentMethodGroupModalBottomSheet(
         onDismissRequest = onDismissRequest,
     ) {
         Column(
-            modifier = Modifier.padding(bottom = 20.dp)
+            modifier = Modifier.padding(bottom = Padding.BackgroundBottom)
         ) {
-            PaymentMethodGroupList(
-                modifier = Modifier
-                    .padding(horizontal = 28.dp)
-                    .padding(bottom = 20.dp)
-                    .height(200.dp),
-                listState = listState,
-                paymentMethodGroupItems = paymentMethodGroupItems,
-                tempSelectedPaymentMethodGroup = tempSelectedPaymentMethodGroup,
-                onGroupClick = {
-                    when {
-                        isModify -> viewModel.showSnackbar("결제수단 그룹 수정을 완료해 주세요.")
-                        isAdd -> viewModel.showSnackbar("결제수단 그룹 추가를 완료해 주세요.")
-                        else -> tempSelectedPaymentMethodGroup = it
+            if (isModify) {
+                tempSelectedPaymentMethodGroup?.let {
+                    Box(modifier = Modifier.padding(horizontal = Padding.BackgroundHorizontal)) {
+                        PaymentMethodGroupItem(
+                            groupLabel = it.label,
+                            isSelected = true,
+                            onClick = {}
+                        )
                     }
                 }
-            )
+            } else if (isAdd) {
+
+            } else {
+                PaymentMethodGroupList(
+                    modifier = Modifier
+                        .padding(horizontal = Padding.BackgroundHorizontal)
+                        .padding(bottom = Padding.BackgroundBottom)
+                        .height(200.dp),
+                    listState = listState,
+                    paymentMethodGroupItems = paymentMethodGroupItems,
+                    tempSelectedPaymentMethodGroup = tempSelectedPaymentMethodGroup,
+                    onGroupClick = {
+                        when {
+                            isModify -> viewModel.showSnackbar("결제수단 그룹 수정을 완료해 주세요.")
+                            isAdd -> viewModel.showSnackbar("결제수단 그룹 추가를 완료해 주세요.")
+                            else -> tempSelectedPaymentMethodGroup = it
+                        }
+                    }
+                )
+            }
 
             if (isModify) {
+                WMSpacer()
                 WMShadowDivider()
 
                 Row(
                     modifier = Modifier
-                        .padding(start = 28.dp, end = 12.dp)
-                        .padding(top = 32.dp),
+                        .padding(
+                            top = Padding.SpacerM,
+                            start = Padding.BackgroundHorizontal,
+                            end = 12.dp
+                        ),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     WMTextField(
@@ -150,12 +172,12 @@ fun PaymentMethodGroupModalBottomSheet(
             }
 
             if (isAdd) {
-                WMShadowDivider()
+//                WMShadowDivider()
 
                 WMTextField(
                     modifier = Modifier
-                        .padding(horizontal = 28.dp)
-                        .padding(top = 32.dp),
+                        .padding(horizontal = Padding.BackgroundHorizontal),
+//                        .padding(top = 32.dp),
                     value = addGroupLabel,
                     onValueChange = { addGroupLabel = it },
                     maxLength = 15,
@@ -167,10 +189,10 @@ fun PaymentMethodGroupModalBottomSheet(
             // 버튼 영역 통합 및 최적화
             Row(
                 modifier = Modifier
-                    .padding(horizontal = 28.dp)
-                    .padding(top = 4.dp)
+                    .padding(horizontal = Padding.BackgroundHorizontal)
+                    .padding(top = Padding.SpacerXXS)
                     .fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.spacedBy(Padding.SpacerXS)
             ) {
                 when {
                     isModify -> {
@@ -201,7 +223,7 @@ fun PaymentMethodGroupModalBottomSheet(
 
                     else -> {
                         val isSecondaryVisible =
-                            tempSelectedPaymentMethodGroup?.id != AddPaymentMethodViewModel.GROUP_ID_NONE &&
+                            tempSelectedPaymentMethodGroup?.id != EditPaymentMethodViewModel.GROUP_ID_NONE &&
                                     tempSelectedPaymentMethodGroup?.id.isNullOrEmpty().not()
 
                         ActionButtons(

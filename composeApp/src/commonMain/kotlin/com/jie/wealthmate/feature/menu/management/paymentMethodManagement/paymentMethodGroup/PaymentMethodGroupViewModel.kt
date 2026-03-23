@@ -7,8 +7,8 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.viewModelScope
 import com.jie.wealthmate.base.BaseUiState
 import com.jie.wealthmate.base.BaseViewModel
-import com.jie.wealthmate.feature.menu.management.paymentMethodManagement.addPaymentMethod.AddPaymentMethodUiState
-import com.jie.wealthmate.feature.menu.management.paymentMethodManagement.addPaymentMethod.component.PaymentMethodGroupItemData
+import com.jie.wealthmate.feature.menu.management.paymentMethodManagement.editPaymentMethod.EditPaymentMethodUiState
+import com.jie.wealthmate.feature.menu.management.paymentMethodManagement.editPaymentMethod.component.PaymentMethodGroupItemData
 import com.jie.wealthmate.repository.PaymentMethodRepository
 import com.jie.wealthmate.utils.default
 import kotlinx.coroutines.delay
@@ -21,7 +21,7 @@ class PaymentMethodGroupViewModel(
         private set
 
     override val initialState: BaseUiState
-        get() = AddPaymentMethodUiState()
+        get() = EditPaymentMethodUiState()
 
     init {
         getPaymentMethodGroups()

@@ -19,7 +19,6 @@ import kotlin.time.Clock
 class PaymentMethodFirestoreRepositoryImpl(
     private val authRepository: AuthRepository
 ) : PaymentMethodRepository {
-    private val repoName = "PaymentMethodFirestoreRepository"
     private val firestore = Firebase.firestore
 
     private fun generateId(): String = uuid4().toString()
@@ -119,21 +118,46 @@ class PaymentMethodFirestoreRepositoryImpl(
         getGroupCollection().document(id).set(entity, encodeDefaults = true)
     }
 
-    override suspend fun updatePaymentMethodGroup(paymentMethodGroupId: String, paymentMethodGroupLabel: String) = withContext(Dispatchers.Default) {
+    override suspend fun updatePaymentMethodGroup(paymentMethodGroupId: String, paymentMethodGroupLabel: String): Unit = withContext(Dispatchers.Default) {
         val now = Clock.System.now().toEpochMilliseconds()
-        getGroupCollection().document(paymentMethodGroupId).set(
-            PaymentMethodGroupEntity(id = paymentMethodGroupId, label = paymentMethodGroupLabel, updatedAt = now),
-            encodeDefaults = true
-        )
+        // Firestore transactions cannot execute queries. Fetch documents outside first.
+        val methodsSnapshot = getPaymentMethodMethodQueryByGroupId(paymentMethodGroupId).get()
+        
+        firestore.runTransaction {
+            // 1. Update group info
+            val groupRef = getGroupCollection().document(paymentMethodGroupId)
+            set(groupRef, PaymentMethodGroupEntity(id = paymentMethodGroupId, label = paymentMethodGroupLabel, updatedAt = now), encodeDefaults = true)
+            
+            // 2. Update all payment methods using this group
+            methodsSnapshot.documents.forEach { doc ->
+                val method = doc.data<PaymentMethodEntity>()
+                set(doc.reference, method.copy(groupLabel = paymentMethodGroupLabel, updatedAt = now), encodeDefaults = true)
+            }
+        }
     }
+    
+    private fun getPaymentMethodMethodQueryByGroupId(groupId: String) = 
+        getPaymentMethodCollection().where { "groupId" equalTo groupId }
 
-    override suspend fun deletePaymentMethodGroup(paymentMethodGroupId: String) = withContext(Dispatchers.Default) {
+    override suspend fun deletePaymentMethodGroup(paymentMethodGroupId: String): Unit = withContext(Dispatchers.Default) {
         val now = Clock.System.now().toEpochMilliseconds()
-        val docRef = getGroupCollection().document(paymentMethodGroupId)
-        val snapshot = docRef.get()
-        if (snapshot.exists) {
-            val current = snapshot.data<PaymentMethodGroupEntity>()
-            docRef.set(current.copy(isDeleted = true, updatedAt = now), encodeDefaults = true)
+        // Firestore transactions cannot execute queries. Fetch documents outside first.
+        val methodsSnapshot = getPaymentMethodMethodQueryByGroupId(paymentMethodGroupId).get()
+        
+        firestore.runTransaction {
+            // 1. Soft delete group
+            val groupRef = getGroupCollection().document(paymentMethodGroupId)
+            val groupSnapshot = get(groupRef)
+            if (groupSnapshot.exists) {
+                val current = groupSnapshot.data<PaymentMethodGroupEntity>()
+                set(groupRef, current.copy(isDeleted = true, updatedAt = now), encodeDefaults = true)
+            }
+            
+            // 2. Clear groupId and groupLabel from associated payment methods
+            methodsSnapshot.documents.forEach { doc ->
+                val method = doc.data<PaymentMethodEntity>()
+                set(doc.reference, method.copy(groupId = null, groupLabel = null, updatedAt = now), encodeDefaults = true)
+            }
         }
     }
 

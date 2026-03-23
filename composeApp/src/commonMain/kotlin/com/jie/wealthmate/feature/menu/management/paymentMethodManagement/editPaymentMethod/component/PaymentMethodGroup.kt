@@ -1,4 +1,4 @@
-package com.jie.wealthmate.feature.menu.management.paymentMethodManagement.addPaymentMethod.component
+package com.jie.wealthmate.feature.menu.management.paymentMethodManagement.editPaymentMethod.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.sp
 import com.jie.wealthmate.component.WMText
 import com.jie.wealthmate.theme.ColorGray
 import com.jie.wealthmate.theme.ColorPrimary
+import com.jie.wealthmate.theme.ColorSetting
 
 @Composable
 fun PaymentMethodGroupList(
@@ -64,11 +65,10 @@ fun PaymentMethodGroupItem(
     ) {
         WMText(
             text = groupLabel,
-            style = Typography().bodyLarge.copy(
-                fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
-                color = if (isSelected) ColorPrimary.Primary_700 else ColorGray.Gray_700,
-                fontSize = if (isSelected) 18.sp else 16.sp
-            ),
+            style = Typography().bodyLarge,
+            fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
+            color = if (isSelected) ColorPrimary.Primary_700 else ColorSetting.Info,
+            fontSize = if (isSelected) 18.sp else 16.sp,
         )
     }
 }

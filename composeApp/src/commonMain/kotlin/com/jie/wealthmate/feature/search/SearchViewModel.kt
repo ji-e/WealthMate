@@ -63,7 +63,7 @@ class SearchViewModel(
     private fun getAllPaymentMethods() {
         paymentMethodRepository.getPaymentMethods().apiFlow(showLoadingIndicator = false) { response ->
             val paymentMethods =
-                (response.map { it.paymentMethod.mapperToVo() } + listOf(PaymentMethodVo.UNSET)).toImmutableList()
+                (response.map { it.mapperToVo() } + listOf(PaymentMethodVo.UNSET)).toImmutableList()
             reduceState { it.copy(paymentMethods = paymentMethods) }
         }
     }

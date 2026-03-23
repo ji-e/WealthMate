@@ -97,8 +97,11 @@ fun ColumnScope.PaymentMethod(
                 LaunchedEffect(dragging) {
                     if (dragging) {
                         onIsDraggingChange(true)
-                        hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
                     }
+                }
+
+                if (dragging) {
+                    hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
                 }
 
                 // Modifier 메모이제이션

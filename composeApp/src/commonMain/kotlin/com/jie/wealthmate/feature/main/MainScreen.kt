@@ -52,11 +52,11 @@ import com.jie.wealthmate.feature.home.preparednessStatus.PreparednessStatusScre
 import com.jie.wealthmate.feature.menu.MenuScreen
 import com.jie.wealthmate.feature.menu.data.googleCloudShare.GoogleCloudShareScreen
 import com.jie.wealthmate.feature.menu.data.googleCloudSync.GoogleCloudSyncScreen
-import com.jie.wealthmate.feature.menu.management.categoryManagement.main.CategoryManagementScreen
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.feature.menu.management.categoryManagement.editCategory.EditCategoryScreen
+import com.jie.wealthmate.feature.menu.management.categoryManagement.main.CategoryManagementScreen
 import com.jie.wealthmate.feature.menu.management.paymentMethodManagement.PaymentMethodManagementScreen
-import com.jie.wealthmate.feature.menu.management.paymentMethodManagement.addPaymentMethod.AddPaymentMethodScreen
+import com.jie.wealthmate.feature.menu.management.paymentMethodManagement.editPaymentMethod.EditPaymentMethodScreen
 import com.jie.wealthmate.feature.menu.management.paymentMethodManagement.modifyPaymentMethod.ModifyPaymentMethodScreen
 import com.jie.wealthmate.feature.menu.management.repeatHistoryManagement.RepeatHistoryManagementScreen
 import com.jie.wealthmate.feature.menu.management.repeatHistoryManagement.addRepeatHistory.AddRepeatHistoryScreen
@@ -331,8 +331,22 @@ fun MainScreen(
                     composable("paymentMethodManagement") {
                         PaymentMethodManagementScreen(navController = innerNavController)
                     }
-                    composable("addPaymentMethod") {
-                        AddPaymentMethodScreen(navController = innerNavController)
+                    composable(
+                        route = "editPaymentMethod/{paymentMethodId}",
+                        arguments = listOf(
+                            navArgument("paymentMethodId") {
+                                type = NavType.StringType
+                                nullable = true
+                            }
+                        )
+                    ) { backStackEntry ->
+                        val paymentMethodId: String? =
+                            backStackEntry.savedStateHandle["paymentMethodId"]
+
+                        EditPaymentMethodScreen(
+                            navController = innerNavController,
+                            paymentMethodId = paymentMethodId
+                        )
                     }
                     composable(
                         route = "modifyPaymentMethod/{id}",
@@ -511,7 +525,9 @@ fun MainScreen(
 
         CustomSnackbarHost(
             snackbarState = snackbarState,
-            modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 80.dp)
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(bottom = 80.dp)
         )
     }
 }

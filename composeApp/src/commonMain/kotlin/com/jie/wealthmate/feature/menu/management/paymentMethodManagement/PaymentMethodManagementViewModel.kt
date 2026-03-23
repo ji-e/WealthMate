@@ -10,6 +10,7 @@ import com.jie.wealthmate.repository.PaymentMethodRepository
 import com.jie.wealthmate.utils.default
 import com.jie.wealthmate.vo.PaymentMethodVo
 import com.jie.wealthmate.vo.PaymentMethodVo.Companion.mapperToVo
+import io.github.aakira.napier.Napier
 import kotlinx.coroutines.launch
 
 class PaymentMethodManagementViewModel(
@@ -29,7 +30,9 @@ class PaymentMethodManagementViewModel(
 
     fun getPaymentMethods() {
         paymentMethodRepository.getPaymentMethods().apiFlow { response ->
-            paymentMethodItems = response.map { it.paymentMethod.mapperToVo() }
+            paymentMethodItems = response.map { it.mapperToVo() }
+
+            Napier.d("getPaymentMethods: $paymentMethodItems")
         }
     }
 

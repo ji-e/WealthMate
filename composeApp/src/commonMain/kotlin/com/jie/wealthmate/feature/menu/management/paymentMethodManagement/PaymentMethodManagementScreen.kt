@@ -45,8 +45,8 @@ fun PaymentMethodManagementScreen(
         PaymentMethodManagementContent(
             paymentMethodItems = viewModel.paymentMethodItems,
             onBack = { navController.popBackStack() },
-            onAddItem = { navController.navigate("addPaymentMethod") },
-            onItemClick = { navController.navigate("modifyPaymentMethod/${it.id}") },
+            onAddItem = { navController.navigate("editPaymentMethod/") },
+            onItemClick = { navController.navigate("editPaymentMethod/${it.id}") },
             onSaveSort = viewModel::savePaymentMethodSort,
             onReorderCancel = viewModel::getPaymentMethods,
             onMove = viewModel::handleReorderPaymentMethodItems,
@@ -128,6 +128,7 @@ fun PaymentMethodManagementContent(
                 }
             )
         }
+
         if (isShowSaveBackDialog) {
             WMSaveBackDialog(
                 onConfirm = {
