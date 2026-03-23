@@ -276,7 +276,7 @@ fun WMMenuButton(
             painter = painterResource(Res.drawable.ic_keyboard_arrow_right),
             contentDescription = label,
             modifier = Modifier.size(24.dp),
-            tint = ColorSetting.DisabledContent,
+            tint = ColorSetting.Info,
         )
     }
 }

@@ -22,6 +22,7 @@ import com.jie.wealthmate.feature.menu.component.MenuItem
 import com.jie.wealthmate.feature.menu.component.MenuItemData
 import com.jie.wealthmate.feature.menu.component.MenuTitleItem
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
+import com.jie.wealthmate.theme.Padding
 import com.jie.wealthmate.theme.WMTheme
 import com.jie.wealthmate.utils.default
 import com.mmk.kmpauth.google.GoogleButtonUiContainer
@@ -78,7 +79,10 @@ fun MenuContent(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(bottom = calculateAdjustedToastPadding(124)),
-            contentPadding = PaddingValues(top = 8.dp, bottom = 20.dp)
+            contentPadding = PaddingValues(
+                top = Padding.SpacerXS,
+                bottom = Padding.BackgroundBottom
+            )
         ) {
             items(uiState.menuEnums.size) { index ->
                 val menu = uiState.menuEnums[index]
@@ -87,7 +91,7 @@ fun MenuContent(
 
                 if (menu == MenuItemData.Sync) {
                     val isLoggedIn = uiState.userName.isNotEmpty()
-                    val label = if (isLoggedIn) uiState.userName else "계정 연결"
+                    val label = if (isLoggedIn) "${uiState.userName} 연결 해제" else "계정 연결"
 
                     GoogleButtonUiContainer(
                         onGoogleSignInResult = { googleUser ->
