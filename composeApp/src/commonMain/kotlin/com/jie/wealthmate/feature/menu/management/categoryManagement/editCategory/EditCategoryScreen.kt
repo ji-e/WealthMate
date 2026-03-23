@@ -140,7 +140,6 @@ fun EditCategoryContent(
         modifier = modifier
             .navigationBarsPadding()
             .fillMaxSize()
-            .verticalScroll(rememberScrollState()),
     ) {
         WMTopBar(
             title = TopBarItem.Title("${uiState.largeCategory.label} 카테고리 ${if (isEditMode) "수정" else "추가"}"),
@@ -202,7 +201,7 @@ fun EditCategoryContent(
                 },
             )
 
-            WMSpacer()
+            WMSpacer(size = SpacerSize.LARGE)
         }
 
         WMCheckBox(
