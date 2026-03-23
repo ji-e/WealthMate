@@ -1,4 +1,4 @@
-package com.jie.wealthmate.feature.menu.management.categoryManagement
+package com.jie.wealthmate.feature.menu.management.categoryManagement.main
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -6,6 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
 import com.jie.wealthmate.base.BaseViewModel
 import com.jie.wealthmate.component.reorderable.ItemPosition
+import com.jie.wealthmate.feature.menu.management.categoryManagement.CategoryManagementUiState
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.repository.CategoryRepository
 import com.jie.wealthmate.utils.default

@@ -18,7 +18,7 @@ import com.jie.wealthmate.feature.main.MainViewModel
 import com.jie.wealthmate.feature.menu.MenuViewModel
 import com.jie.wealthmate.feature.menu.data.googleCloudShare.GoogleCloudShareViewModel
 import com.jie.wealthmate.feature.menu.data.googleCloudSync.GoogleCloudSyncViewModel
-import com.jie.wealthmate.feature.menu.management.categoryManagement.CategoryManagementViewModel
+import com.jie.wealthmate.feature.menu.management.categoryManagement.main.CategoryManagementViewModel
 import com.jie.wealthmate.feature.menu.management.categoryManagement.editCategory.EditCategoryViewModel
 import com.jie.wealthmate.feature.menu.management.paymentMethodManagement.PaymentMethodManagementViewModel
 import com.jie.wealthmate.feature.menu.management.paymentMethodManagement.addPaymentMethod.AddPaymentMethodViewModel

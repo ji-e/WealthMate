@@ -52,7 +52,7 @@ import com.jie.wealthmate.feature.home.preparednessStatus.PreparednessStatusScre
 import com.jie.wealthmate.feature.menu.MenuScreen
 import com.jie.wealthmate.feature.menu.data.googleCloudShare.GoogleCloudShareScreen
 import com.jie.wealthmate.feature.menu.data.googleCloudSync.GoogleCloudSyncScreen
-import com.jie.wealthmate.feature.menu.management.categoryManagement.CategoryManagementScreen
+import com.jie.wealthmate.feature.menu.management.categoryManagement.main.CategoryManagementScreen
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.feature.menu.management.categoryManagement.editCategory.EditCategoryScreen
 import com.jie.wealthmate.feature.menu.management.paymentMethodManagement.PaymentMethodManagementScreen

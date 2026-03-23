@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalComposeUiApi::class)
 
-package com.jie.wealthmate.feature.menu.management.categoryManagement
+package com.jie.wealthmate.feature.menu.management.categoryManagement.main
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -19,7 +19,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.jie.wealthmate.base.BackHandlerWrapper
 import com.jie.wealthmate.base.BaseScreen
@@ -32,10 +31,12 @@ import com.jie.wealthmate.component.reorderable.rememberReorderableLazyListState
 import com.jie.wealthmate.component.topbar.TopBarItem
 import com.jie.wealthmate.component.topbar.WMTopBar
 import com.jie.wealthmate.feature.menu.component.MenuEnum
+import com.jie.wealthmate.feature.menu.management.categoryManagement.CategoryManagementUiState
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.Category
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.CategoryTab
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
-import com.jie.wealthmate.theme.ColorGray
+import com.jie.wealthmate.theme.ColorSetting
+import com.jie.wealthmate.theme.Padding
 import com.jie.wealthmate.theme.WMTheme
 import com.jie.wealthmate.utils.default
 import com.jie.wealthmate.vo.CategoryVo
@@ -103,8 +104,8 @@ fun CategoryManagementContent(
         )
     }
 
-    val isAddItemEnabled by remember(currentCategoryItems) {
-        derivedStateOf { currentCategoryItems?.size.default() < 20 }
+    val isAddItemEnabled by remember(currentCategoryItems?.size) {
+        derivedStateOf { currentCategoryItems?.size.default() < 15 }
     }
 
     val handleBack: () -> Unit = {
@@ -159,7 +160,9 @@ fun CategoryManagementContent(
 
             if (items.isEmpty()) {
                 EmptyListView(
-                    modifier = Modifier.fillMaxSize().padding(20.dp),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(Padding.BackgroundHorizontal),
                     contentText = "카테고리를 추가해주세요.",
                 )
             } else {
@@ -216,7 +219,7 @@ private fun CategoryManagementTopBar(
             trailingItem = listOf(
                 TopBarItem.TrailingItem(
                     iconRes = Res.drawable.ic_add,
-                    tint = if (isAddItemEnabled) ColorGray.Gray_700 else ColorGray.Gray_100,
+                    tint = if (isAddItemEnabled) ColorSetting.Default else ColorSetting.DisabledBackground,
                     action = { if (isAddItemEnabled) onAddClick() }
                 )
             )

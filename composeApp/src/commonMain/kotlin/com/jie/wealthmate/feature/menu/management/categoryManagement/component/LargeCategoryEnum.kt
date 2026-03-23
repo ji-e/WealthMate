@@ -37,12 +37,6 @@ enum class LargeCategoryEnum(
         tempMiddleCategoryLabel = "정기 저축",
         tempTagLabel = "주책 청약"
     ),
-//    TRANSFER(
-//        label = "이제",
-//        backgroundColor = ColorPrimary.Primary_300,
-//        tempMiddleCategoryLabel = "이체",
-//        tempTagLabel = "이체"
-//    )
     ;
 
     companion object {
