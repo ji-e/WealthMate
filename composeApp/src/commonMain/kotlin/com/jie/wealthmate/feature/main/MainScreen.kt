@@ -55,7 +55,6 @@ import com.jie.wealthmate.feature.menu.data.googleCloudSync.GoogleCloudSyncScree
 import com.jie.wealthmate.feature.menu.management.categoryManagement.CategoryManagementScreen
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.feature.menu.management.categoryManagement.editCategory.EditCategoryScreen
-import com.jie.wealthmate.feature.menu.management.categoryManagement.modifyCategory.ModifyCategoryScreen
 import com.jie.wealthmate.feature.menu.management.paymentMethodManagement.PaymentMethodManagementScreen
 import com.jie.wealthmate.feature.menu.management.paymentMethodManagement.addPaymentMethod.AddPaymentMethodScreen
 import com.jie.wealthmate.feature.menu.management.paymentMethodManagement.modifyPaymentMethod.ModifyPaymentMethodScreen
@@ -322,27 +321,6 @@ fun MainScreen(
                         val categoryId: String? = backStackEntry.savedStateHandle["categoryId"]
 
                         EditCategoryScreen(
-                            navController = innerNavController,
-                            largeCategory = largeCategory,
-                            categoryId = categoryId
-                        )
-                    }
-                    composable(
-                        route = "modifyCategory/{largeCategory}/{categoryId}",
-                        arguments = listOf(
-                            navArgument("largeCategory") { type = NavType.StringType },
-                            navArgument("categoryId") { type = NavType.StringType }
-                        )
-                    ) { backStackEntry ->
-                        val largeCategoryStr: String? =
-                            backStackEntry.savedStateHandle["largeCategory"]
-                        val categoryId: String = backStackEntry.savedStateHandle["categoryId"] ?: ""
-                        val largeCategory = try {
-                            LargeCategoryEnum.valueOf(largeCategoryStr ?: "EXPENSES")
-                        } catch (e: Exception) {
-                            LargeCategoryEnum.EXPENSES
-                        }
-                        ModifyCategoryScreen(
                             navController = innerNavController,
                             largeCategory = largeCategory,
                             categoryId = categoryId

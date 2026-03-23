@@ -20,7 +20,6 @@ import com.jie.wealthmate.feature.menu.data.googleCloudShare.GoogleCloudShareVie
 import com.jie.wealthmate.feature.menu.data.googleCloudSync.GoogleCloudSyncViewModel
 import com.jie.wealthmate.feature.menu.management.categoryManagement.CategoryManagementViewModel
 import com.jie.wealthmate.feature.menu.management.categoryManagement.editCategory.EditCategoryViewModel
-import com.jie.wealthmate.feature.menu.management.categoryManagement.modifyCategory.ModifyCategoryViewModel
 import com.jie.wealthmate.feature.menu.management.paymentMethodManagement.PaymentMethodManagementViewModel
 import com.jie.wealthmate.feature.menu.management.paymentMethodManagement.addPaymentMethod.AddPaymentMethodViewModel
 import com.jie.wealthmate.feature.menu.management.paymentMethodManagement.modifyPaymentMethod.ModifyPaymentMethodViewModel
@@ -84,7 +83,6 @@ val commonModule = module {
     viewModelOf(::BudgetYearDetailViewModel)
     viewModelOf(::MenuViewModel)
     viewModelOf(::EditCategoryViewModel)
-    viewModelOf(::ModifyCategoryViewModel)
     viewModelOf(::CategoryManagementViewModel)
     viewModelOf(::PaymentMethodManagementViewModel)
     viewModelOf(::PaymentMethodGroupViewModel)

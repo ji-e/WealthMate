@@ -4,6 +4,7 @@ import com.jie.wealthmate.account.AccountProvider
 import com.jie.wealthmate.base.BaseViewModel
 import com.jie.wealthmate.component.bottomNav.BottomNavItem
 import com.jie.wealthmate.repository.AuthRepository
+import io.github.aakira.napier.Napier
 
 class MainViewModel(
     private val authRepository: AuthRepository,
@@ -13,7 +14,11 @@ class MainViewModel(
     override val initialState: MainUiState = MainUiState()
 
     init {
-        accountProvider.updateAccount(authRepository.getUserName())
+        try {
+            accountProvider.updateAccount(authRepository.getUserName())
+        } catch (e: Exception) {
+            Napier.e("Failed to initialize MainViewModel", e)
+        }
     }
 
     fun onTabSelected(item: BottomNavItem) {
