@@ -97,4 +97,8 @@ class BudgetRepositoryImpl(private val databaseProvider: DatabaseProvider) : Bud
     override suspend fun syncRemoteToLocal() {
         // Delegate에서 처리
     }
+
+    override suspend fun syncLocalToRemote() {
+        // Delegate에서 처리
+    }
 }

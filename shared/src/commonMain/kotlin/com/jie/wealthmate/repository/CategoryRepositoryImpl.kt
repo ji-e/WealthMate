@@ -143,6 +143,10 @@ class CategoryRepositoryImpl(private val databaseProvider: DatabaseProvider) : C
     }
 
     override suspend fun syncRemoteToLocal() {
-        // Delegate에서 처리하므로 Impl에서는 비워둠 (또는 예외 처리)
+        // Delegate에서 처리
+    }
+
+    override suspend fun syncLocalToRemote() {
+        // Delegate에서 처리
     }
 }

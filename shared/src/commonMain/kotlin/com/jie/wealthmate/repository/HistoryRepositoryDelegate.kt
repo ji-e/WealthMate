@@ -47,6 +47,13 @@ class HistoryRepositoryDelegate(
         endDate: Long,
     ): Flow<List<HistoryWithDetails>> = d.flatFlow { it.getHistoriesByMonth(startDate, endDate) }
 
+    override suspend fun getHistoriesByMonthWithDeleted(
+        startDate: Long,
+        endDate: Long
+    ): List<HistoryWithDetails> = d.call {
+        it.getHistoriesByMonthWithDeleted(startDate, endDate)
+    }
+
     override fun getSumByMonth(startDate: Long, endDate: Long, categoryType: String): Flow<Long> =
         d.flatFlow { it.getSumByMonth(startDate, endDate, categoryType) }
 
@@ -106,6 +113,17 @@ class HistoryRepositoryDelegate(
             if (remoteData.isNotEmpty()) {
                 normal.deleteAllHistories()
                 normal.insertHistories(remoteData)
+            }
+        }
+    }
+
+    // ✅ 핵심 복원 로직: Local -> Firestore
+    override suspend fun syncLocalToRemote() {
+        d.restore { special, normal ->
+            val localData = normal.getAllHistoriesList()
+            if (localData.isNotEmpty()) {
+                special.deleteAllHistories()
+                special.insertHistories(localData)
             }
         }
     }

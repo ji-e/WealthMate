@@ -57,6 +57,13 @@ interface HistoryDao {
     """)
     fun getHistoriesByMonth(startDate: Long, endDate: Long): Flow<List<HistoryWithDetails>>
 
+    @Transaction
+    @Query("""
+        SELECT * FROM histories 
+        WHERE date BETWEEN :startDate AND :endDate 
+    """)
+    suspend fun getHistoriesByMonthWithDeleted(startDate: Long, endDate: Long): List<HistoryWithDetails>
+
     @Query("""
         SELECT SUM(amount) FROM histories 
         WHERE isDeleted = 0 

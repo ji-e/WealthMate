@@ -16,7 +16,6 @@ import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.withContext
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
@@ -168,6 +167,10 @@ class CategoryFirestoreRepositoryImpl(
     }
 
     override suspend fun syncRemoteToLocal() {
+        // Delegate에서 처리
+    }
+
+    override suspend fun syncLocalToRemote() {
         // Delegate에서 처리
     }
 }

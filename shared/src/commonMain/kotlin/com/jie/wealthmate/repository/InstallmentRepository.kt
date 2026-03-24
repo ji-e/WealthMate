@@ -3,7 +3,6 @@ package com.jie.wealthmate.repository
 import com.jie.wealthmate.database.eneity.InstallmentEntity
 import kotlinx.coroutines.flow.Flow
 
-
 interface InstallmentRepository {
 
     suspend fun insertInstallment(installment: InstallmentEntity)
@@ -19,4 +18,5 @@ interface InstallmentRepository {
     suspend fun insertInstallments(installments: List<InstallmentEntity>)
     suspend fun deleteAllInstallments()
     suspend fun syncRemoteToLocal()
+    suspend fun syncLocalToRemote()
 }

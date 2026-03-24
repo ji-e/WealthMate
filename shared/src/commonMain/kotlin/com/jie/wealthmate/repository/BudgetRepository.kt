@@ -18,4 +18,5 @@ interface BudgetRepository {
     suspend fun insertBudgets(budgets: List<BudgetEntity>)
     suspend fun deleteAllBudgets()
     suspend fun syncRemoteToLocal()
+    suspend fun syncLocalToRemote()
 }

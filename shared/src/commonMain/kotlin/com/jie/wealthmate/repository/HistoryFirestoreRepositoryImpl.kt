@@ -12,7 +12,6 @@ import dev.gitlive.firebase.firestore.where
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
@@ -26,7 +25,6 @@ class HistoryFirestoreRepositoryImpl(
     private val repeatCycleRepository: RepeatCycleRepository,
     private val installmentRepository: InstallmentRepository,
 ) : HistoryRepository {
-    private val repoName = "HistoryFirestoreRepository"
     private val firestore = Firebase.firestore
 
     private fun generateId(): String = uuid4().toString()
@@ -72,7 +70,7 @@ class HistoryFirestoreRepositoryImpl(
             category = history.categoryId?.let { categoryRepository.getCategoryById(it) },
             paymentMethod = history.paymentMethodId?.let { paymentMethodRepository.getPaymentMethodById(it)?.paymentMethod },
             repeatCycle = history.repeatCycleId?.let { repeatCycleRepository.getRepeatCycleById(it)?.repeatCycle },
-            installment = null
+            installment = history.installmentId?.let { installmentRepository.getAllInstallmentsList().find { i -> i.id == it } }
         )
     }
 
@@ -141,18 +139,43 @@ class HistoryFirestoreRepositoryImpl(
                 .snapshots
                 .map { snapshot -> snapshot.documents.map { it.data<HistoryEntity>() } },
             categoryRepository.getAllCategories(),
-            paymentMethodRepository.getPaymentMethods()
-        ) { histories, categories, paymentMethods ->
+            paymentMethodRepository.getPaymentMethods(),
+            repeatCycleRepository.getRepeatCycles(),
+            installmentRepository.getInstallments()
+        ) { histories, categories, paymentMethods, repeats, installments ->
             histories.map { history ->
                 HistoryWithDetails(
                     history = history,
                     category = categories.find { it.id == history.categoryId },
                     paymentMethod = paymentMethods.find { it.paymentMethod.id == history.paymentMethodId }?.paymentMethod,
-                    repeatCycle = null,
-                    installment = null
+                    repeatCycle = repeats.find { it.id == history.repeatCycleId },
+                    installment = installments.find { it.id == history.installmentId }
                 )
             }
         }.flowOn(Dispatchers.Default)
+
+    override suspend fun getHistoriesByMonthWithDeleted(startDate: Long, endDate: Long): List<HistoryWithDetails> = withContext(Dispatchers.Default) {
+        val snapshots = getHistoryCollection()
+            .where { "date" greaterThanOrEqualTo startDate }
+            .where { "date" lessThanOrEqualTo endDate }
+            .get()
+
+        val histories = snapshots.documents.map { it.data<HistoryEntity>() }
+        val categories = categoryRepository.getAllCategoriesList()
+        val paymentMethods = paymentMethodRepository.getAllPaymentMethodsList()
+        val repeats = repeatCycleRepository.getAllRepeatCyclesList()
+        val installments = installmentRepository.getAllInstallmentsList()
+
+        histories.map { history ->
+            HistoryWithDetails(
+                history = history,
+                category = categories.find { it.id == history.categoryId },
+                paymentMethod = paymentMethods.find { it.id == history.paymentMethodId },
+                repeatCycle = repeats.find { it.id == history.repeatCycleId },
+                installment = installments.find { it.id == history.installmentId }
+            )
+        }
+    }
 
     override fun getSumByMonth(startDate: Long, endDate: Long, categoryType: String): Flow<Long> =
         getHistoryCollection()
@@ -199,8 +222,19 @@ class HistoryFirestoreRepositoryImpl(
             matchesQuery && matchesLargeCategory && matchesCategory && matchesPayment
         }
         
+        val categories = categoryRepository.getAllCategoriesList()
+        val paymentMethods = paymentMethodRepository.getAllPaymentMethodsList()
+        val repeats = repeatCycleRepository.getAllRepeatCyclesList()
+        val installments = installmentRepository.getAllInstallmentsList()
+
         filtered.drop(offset).take(limit).map { history ->
-            HistoryWithDetails(history, null, null, null, null)
+            HistoryWithDetails(
+                history = history,
+                category = categories.find { it.id == history.categoryId },
+                paymentMethod = paymentMethods.find { it.id == history.paymentMethodId },
+                repeatCycle = repeats.find { it.id == history.repeatCycleId },
+                installment = installments.find { it.id == history.installmentId }
+            )
         }
     }
 
@@ -217,9 +251,8 @@ class HistoryFirestoreRepositoryImpl(
             .mapValues { it.value.sumOf { item -> item.history.amount } }
     }
 
-    // ✅ 복원용 추가 구현
     override suspend fun getAllHistoriesList(): List<HistoryEntity> = withContext(Dispatchers.Default) {
-        getHistoryCollection().where { "isDeleted" equalTo false }.get().documents.map { it.data() }
+        getHistoryCollection().where { "isDeleted" equalTo false }.get().documents.map { it.data<HistoryEntity>() }
     }
 
     override suspend fun deleteAllHistories() {
@@ -228,6 +261,10 @@ class HistoryFirestoreRepositoryImpl(
     }
 
     override suspend fun syncRemoteToLocal() {
+        // Delegate에서 처리
+    }
+
+    override suspend fun syncLocalToRemote() {
         // Delegate에서 처리
     }
 }

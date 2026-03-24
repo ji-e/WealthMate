@@ -3,7 +3,6 @@
 package com.jie.wealthmate.feature.menu.data.googleCloudSync
 
 import androidx.lifecycle.viewModelScope
-import com.jie.wealthmate.account.AccountAwareDelegate
 import com.jie.wealthmate.account.AccountProvider
 import com.jie.wealthmate.base.BaseViewModel
 import com.jie.wealthmate.database.DatabaseSyncManager
@@ -23,7 +22,7 @@ class GoogleCloudSyncViewModel(
     private val googleRepository: GoogleRepository,
     private val authRepository: AuthRepository,
     private val syncManager: DatabaseSyncManager,
-    private val accountProvider: AccountProvider
+    private val accountProvider: AccountProvider,
 ) : BaseViewModel<GoogleCloudSyncUiState>() {
 
     override val initialState: GoogleCloudSyncUiState
@@ -93,14 +92,19 @@ class GoogleCloudSyncViewModel(
     fun upload() {
         viewModelScope.launch {
             showLoading(true)
-            syncManager.syncFullToCloud()
-                .onSuccess {
-                    getLastSyncTime()
-                    showSnackbar(message = "클라우드에 저장되었습니다")
+            val upload =
+                if (accountProvider.isSpecialAccount()) {
+                    syncManager.uploadToFirestore()
+                } else {
+                    syncManager.syncFullToCloud()
                 }
-                .onFailure { error ->
-                    showSnackbar(message = error.message ?: "업로드 실패")
-                }
+
+            upload.onSuccess {
+                getLastSyncTime()
+                showSnackbar(message = "클라우드에 저장되었습니다")
+            }.onFailure { error ->
+                showSnackbar(message = error.message ?: "업로드 실패")
+            }
             showLoading(false)
         }
     }
@@ -108,24 +112,18 @@ class GoogleCloudSyncViewModel(
     fun download() {
         viewModelScope.launch {
             showLoading(true)
-            if(accountProvider.isSpecialAccount()){
-                syncManager.restoreFromFirestore()
-                    .onSuccess {
-                        getLastSyncTime()
-                        showSnackbar(message = "최신 데이터를 불러왔습니다")
-                    }
-                    .onFailure { error ->
-                        showSnackbar(message = error.message ?: "다운로드 실패")
-                    }
-            }else {
-                syncManager.syncFromCloud()
-                    .onSuccess {
-                        getLastSyncTime()
-                        showSnackbar(message = "최신 데이터를 불러왔습니다")
-                    }
-                    .onFailure { error ->
-                        showSnackbar(message = error.message ?: "다운로드 실패")
-                    }
+            val download =
+                if (accountProvider.isSpecialAccount()) {
+                    syncManager.restoreFromFirestore()
+                } else {
+                    syncManager.syncFromCloud()
+                }
+
+            download.onSuccess {
+                getLastSyncTime()
+                showSnackbar(message = "최신 데이터를 불러왔습니다")
+            }.onFailure { error ->
+                showSnackbar(message = error.message ?: "다운로드 실패")
             }
             showLoading(false)
         }

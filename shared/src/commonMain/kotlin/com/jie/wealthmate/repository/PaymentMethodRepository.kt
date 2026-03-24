@@ -5,7 +5,6 @@ import com.jie.wealthmate.database.eneity.PaymentMethodGroupEntity
 import com.jie.wealthmate.database.eneity.PaymentMethodWithGroupEntity
 import kotlinx.coroutines.flow.Flow
 
-
 interface PaymentMethodRepository {
     suspend fun insertPaymentMethod(
         paymentMethodLabel: String,
@@ -33,4 +32,5 @@ interface PaymentMethodRepository {
     suspend fun deleteAllPaymentMethods()
     suspend fun deleteAllPaymentMethodGroups()
     suspend fun syncRemoteToLocal()
+    suspend fun syncLocalToRemote()
 }

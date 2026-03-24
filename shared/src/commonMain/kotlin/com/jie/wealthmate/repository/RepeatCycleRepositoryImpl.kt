@@ -111,4 +111,8 @@ class RepeatCycleRepositoryImpl(private val databaseProvider: DatabaseProvider) 
     override suspend fun syncRemoteToLocal() {
         // Delegate에서 처리
     }
+
+    override suspend fun syncLocalToRemote() {
+        // Delegate에서 처리
+    }
 }

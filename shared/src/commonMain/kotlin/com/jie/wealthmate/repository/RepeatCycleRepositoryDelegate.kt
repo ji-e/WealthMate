@@ -53,4 +53,15 @@ class RepeatCycleRepositoryDelegate(
             }
         }
     }
+
+    // ✅ 핵심 복원 로직: Local -> Firestore
+    override suspend fun syncLocalToRemote() {
+        d.restore { special, normal ->
+            val localData = normal.getAllRepeatCyclesList()
+            if (localData.isNotEmpty()) {
+                special.deleteAllRepeatCycles()
+                special.insertRepeatCycles(localData)
+            }
+        }
+    }
 }

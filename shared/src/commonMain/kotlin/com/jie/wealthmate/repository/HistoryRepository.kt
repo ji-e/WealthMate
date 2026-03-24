@@ -4,7 +4,6 @@ import com.jie.wealthmate.database.eneity.HistoryEntity
 import com.jie.wealthmate.database.eneity.HistoryWithDetails
 import kotlinx.coroutines.flow.Flow
 
-
 interface HistoryRepository {
     fun getAllHistories(): Flow<List<HistoryEntity>>
 
@@ -25,6 +24,8 @@ interface HistoryRepository {
     suspend fun deleteHistoriesByInstallmentId(installmentId: String)
 
     fun getHistoriesByMonth(startDate: Long, endDate: Long): Flow<List<HistoryWithDetails>>
+
+    suspend fun getHistoriesByMonthWithDeleted(startDate: Long, endDate: Long): List<HistoryWithDetails>
 
     fun getSumByMonth(startDate: Long, endDate: Long, categoryType: String): Flow<Long>
 
@@ -55,4 +56,5 @@ interface HistoryRepository {
     suspend fun getAllHistoriesList(): List<HistoryEntity>
     suspend fun deleteAllHistories()
     suspend fun syncRemoteToLocal()
+    suspend fun syncLocalToRemote()
 }

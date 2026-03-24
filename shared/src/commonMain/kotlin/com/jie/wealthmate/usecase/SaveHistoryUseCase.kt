@@ -52,9 +52,8 @@ class SaveHistoryUseCase(
             )
             repeatRepository.insertRepeatCycle(repeatCycleEntity)
 
-            // 2. 생성된 ID를 연결하여 첫 내역 저장
-            val linkedHistory = history.copy(repeatCycleId = repeatCycleId)
-            historyRepository.insertHistory(linkedHistory)
+            // 2. 생성된 ID를 연결하여 첫 내역 저장은 CalendarViewModel에서
+            // RepeatCycleEntity 추가를 감지하여 자동으로 수행하므로 여기서는 별도로 저장하지 않습니다.
         } else if (totalInstallmentCount != null && totalInstallmentCount > 0) {
             // 1. 할부 정보 먼저 생성 및 저장
             val installmentId = generateId()
@@ -79,6 +78,7 @@ class SaveHistoryUseCase(
                 remainAmount -= installmentAmount
                 historyRepository.insertHistory(
                     history.copy(
+                        id = generateId(), // ✅ 매 회차마다 새로운 ID를 부여하여 덮어쓰기 방지
                         date = history.date.toLocalDate()
                             .plus(index, DateTimeUnit.MONTH)
                             .toEpochMilliseconds(),

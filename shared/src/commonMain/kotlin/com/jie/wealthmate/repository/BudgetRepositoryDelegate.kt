@@ -51,4 +51,15 @@ class BudgetRepositoryDelegate(
             }
         }
     }
+
+    // ✅ 핵심 복원 로직: Local -> Firestore
+    override suspend fun syncLocalToRemote() {
+        d.restore { special, normal ->
+            val localData = normal.getAllBudgetsList()
+            if (localData.isNotEmpty()) {
+                special.deleteAllBudgets()
+                special.insertBudgets(localData)
+            }
+        }
+    }
 }

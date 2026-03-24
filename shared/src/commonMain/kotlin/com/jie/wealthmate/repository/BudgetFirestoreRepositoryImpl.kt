@@ -32,7 +32,6 @@ class BudgetFirestoreRepositoryImpl(
         firestore.runTransaction {
             existing.documents.forEach { doc ->
                 val current = doc.data<BudgetEntity>()
-                // 최신 SDK 방식 권장 (deprecated 경고 방지 위해 builder 스타일 사용 가능하나 여기서는 기존 set 유지하되 필수 인자 확인)
                 set(doc.reference, current.copy(isDeleted = true, updatedAt = now), encodeDefaults = true)
             }
             budgets.forEach { budget ->
@@ -119,6 +118,10 @@ class BudgetFirestoreRepositoryImpl(
     }
 
     override suspend fun syncRemoteToLocal() {
+        // Delegate에서 비즈니스 로직 처리
+    }
+
+    override suspend fun syncLocalToRemote() {
         // Delegate에서 비즈니스 로직 처리
     }
 }

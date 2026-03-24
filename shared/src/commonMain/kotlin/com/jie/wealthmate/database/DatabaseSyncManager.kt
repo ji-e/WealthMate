@@ -38,7 +38,7 @@ class DatabaseSyncManager(
 
     /**
      * ✅ Firestore(Remote)의 모든 데이터를 로컬 DB로 복원합니다.
-     * isComposite(uohihi@gmail.com) 상태에서만 동작합니다.
+     * isComposite 상태에서만 동작합니다.
      */
     suspend fun restoreFromFirestore(): Result<Unit> = withContext(Dispatchers.IO) {
         return@withContext try {
@@ -53,6 +53,27 @@ class DatabaseSyncManager(
             Result.success(Unit)
         } catch (e: Exception) {
             Napier.e("Firestore 복원 실패", e)
+            Result.failure(e)
+        }
+    }
+
+    /**
+     * ✅ 로컬 DB의 모든 데이터를 Firestore(Remote)로 업로드합니다.
+     * 기존 Firestore 데이터는 삭제되고 로컬 데이터로 대체됩니다.
+     */
+    suspend fun uploadToFirestore(): Result<Unit> = withContext(Dispatchers.IO) {
+        return@withContext try {
+            Napier.d("로컬 DB -> Firestore 전체 업로드 시작")
+            categoryRepository.syncLocalToRemote()
+            paymentMethodRepository.syncLocalToRemote()
+            repeatCycleRepository.syncLocalToRemote()
+            installmentRepository.syncLocalToRemote()
+            budgetRepository.syncLocalToRemote()
+            historyRepository.syncLocalToRemote()
+            Napier.d("로컬 DB -> Firestore 전체 업로드 완료")
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Napier.e("Firestore 업로드 실패", e)
             Result.failure(e)
         }
     }

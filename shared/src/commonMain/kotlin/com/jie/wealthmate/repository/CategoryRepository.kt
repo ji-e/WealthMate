@@ -3,7 +3,6 @@ package com.jie.wealthmate.repository
 import com.jie.wealthmate.database.eneity.CategoryEntity
 import kotlinx.coroutines.flow.Flow
 
-
 interface CategoryRepository {
     suspend fun insertCategory(
         icon: String,
@@ -35,4 +34,5 @@ interface CategoryRepository {
 
     // ✅ 공통 복원 로직
     suspend fun syncRemoteToLocal()
+    suspend fun syncLocalToRemote()
 }

@@ -4,7 +4,6 @@ import com.jie.wealthmate.database.eneity.RepeatCycleEntity
 import com.jie.wealthmate.database.eneity.RepeatCycleWithDetails
 import kotlinx.coroutines.flow.Flow
 
-
 interface RepeatCycleRepository {
 
     suspend fun insertRepeatCycle(repeatCycle: RepeatCycleEntity)
@@ -26,4 +25,5 @@ interface RepeatCycleRepository {
     suspend fun insertRepeatCycles(repeatCycles: List<RepeatCycleEntity>)
     suspend fun deleteAllRepeatCycles()
     suspend fun syncRemoteToLocal()
+    suspend fun syncLocalToRemote()
 }

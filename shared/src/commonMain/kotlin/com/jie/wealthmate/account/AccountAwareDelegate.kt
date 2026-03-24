@@ -17,7 +17,9 @@ class AccountAwareDelegate<T>(
         get() = accountProvider.currentAccount.value == "uohihi@gmail.com"
 
     val current: T
-        get() = if (accountProvider.isSpecialAccount()) special else normal
+        get() =
+//            normal
+            if (accountProvider.isSpecialAccount()) special else normal
 
     // ✅ 쓰기용 - composite 계정이면 양쪽 모두 호출
     suspend fun dualCall(block: suspend (T) -> Unit) {
@@ -36,7 +38,7 @@ class AccountAwareDelegate<T>(
 
     // ✅ 복원용 (Special -> Normal)
     suspend fun restore(block: suspend (special: T, normal: T) -> Unit) {
-        if (isComposite) {
+        if (accountProvider.isSpecialAccount()) {
             block(special, normal)
         }
     }
@@ -44,7 +46,7 @@ class AccountAwareDelegate<T>(
     // Flow 읽기용 - composite이어도 special(firestore) 하나만 관찰
     fun <R> flatFlow(block: (T) -> Flow<R>): Flow<R> =
         accountProvider.currentAccount
-            .map { account -> current }
+            .map { _ -> current }
             .flatMapLatest(block)
 
     // Flow 읽기용 - composite일 때 양쪽 merge가 필요하면 이걸 사용

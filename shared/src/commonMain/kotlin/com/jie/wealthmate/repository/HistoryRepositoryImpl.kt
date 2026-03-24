@@ -142,6 +142,19 @@ class HistoryRepositoryImpl(private val databaseProvider: DatabaseProvider) : Hi
             dao.getHistoriesByMonth(startDate, endDate)
         }.flowOn(Dispatchers.Default)
 
+    override suspend fun getHistoriesByMonthWithDeleted(
+        startDate: Long,
+        endDate: Long
+    ): List<HistoryWithDetails> = withContext(Dispatchers.Default) {
+        loggedCall(
+            repositoryName = repoName,
+            methodName = "getHistoriesByMonthWithDeleted",
+            params = mapOf("startDate" to startDate, "endDate" to endDate)
+        ) {
+            dao.getHistoriesByMonthWithDeleted(startDate, endDate)
+        }
+    }
+
     override fun getSumByMonth(startDate: Long, endDate: Long, categoryType: String): Flow<Long> =
         loggedFlow(
             repositoryName = repoName,
@@ -260,6 +273,10 @@ class HistoryRepositoryImpl(private val databaseProvider: DatabaseProvider) : Hi
     }
 
     override suspend fun syncRemoteToLocal() {
+        // Delegate에서 처리
+    }
+
+    override suspend fun syncLocalToRemote() {
         // Delegate에서 처리
     }
 

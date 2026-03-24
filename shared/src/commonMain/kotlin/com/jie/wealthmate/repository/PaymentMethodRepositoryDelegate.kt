@@ -77,18 +77,37 @@ class PaymentMethodRepositoryDelegate(
     // ✅ 핵심 복원 로직: Firestore -> Local
     override suspend fun syncRemoteToLocal() {
         d.restore { special, normal ->
-            // 그룹 먼저 복원
-            val remoteGroups = special.getAllPaymentMethodGroupsList()
-            if (remoteGroups.isNotEmpty()) {
-                normal.deleteAllPaymentMethodGroups()
-                normal.insertPaymentMethodGroups(remoteGroups)
-            }
+//            // 그룹 먼저 복원
+//            val remoteGroups = special.getAllPaymentMethodGroupsList()
+//            if (remoteGroups.isNotEmpty()) {
+//                normal.deleteAllPaymentMethodGroups()
+//                normal.insertPaymentMethodGroups(remoteGroups)
+//            }
             
             // 결제 수단 복원
             val remoteMethods = special.getAllPaymentMethodsList()
             if (remoteMethods.isNotEmpty()) {
                 normal.deleteAllPaymentMethods()
                 normal.insertPaymentMethods(remoteMethods)
+            }
+        }
+    }
+
+    // ✅ 핵심 복원 로직: Local -> Firestore
+    override suspend fun syncLocalToRemote() {
+        d.restore { special, normal ->
+//            // 그룹 먼저
+//            val localGroups = normal.getAllPaymentMethodGroupsList()
+//            if (localGroups.isNotEmpty()) {
+//                special.deleteAllPaymentMethodGroups()
+//                special.insertPaymentMethodGroups(localGroups)
+//            }
+            
+            // 결제 수단
+            val localMethods = normal.getAllPaymentMethodsList()
+            if (localMethods.isNotEmpty()) {
+                special.deleteAllPaymentMethods()
+                special.insertPaymentMethods(localMethods)
             }
         }
     }

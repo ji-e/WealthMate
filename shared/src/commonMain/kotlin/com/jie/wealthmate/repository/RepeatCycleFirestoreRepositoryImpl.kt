@@ -123,4 +123,8 @@ class RepeatCycleFirestoreRepositoryImpl(
     override suspend fun syncRemoteToLocal() {
         // Delegate에서 비즈니스 로직 처리
     }
+
+    override suspend fun syncLocalToRemote() {
+        // Delegate에서 비즈니스 로직 처리
+    }
 }
