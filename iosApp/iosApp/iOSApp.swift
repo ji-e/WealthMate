@@ -14,15 +14,20 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
     ) -> Bool {
         FirebaseApp.configure()
 
-        // Info.plist에서 ID 값 읽어오기
-        let clientID = Bundle.main.object(forInfoDictionaryKey: "GIDClientID") as? String ?? ""
-        let serverClientID = Bundle.main.object(forInfoDictionaryKey: "GIDServerClientID") as? String ?? ""
 
-        GIDSignIn.sharedInstance.configuration = GIDConfiguration(
-            clientID: clientID,
-            serverClientID: serverClientID
-        )
-        
+        let clientID = Bundle.main.infoDictionary?["GIDClientID"] as? String ?? ""
+        let serverClientID = Bundle.main.infoDictionary?["GIDServerClientID"] as? String ?? ""
+
+        if !clientID.isEmpty {
+            GIDSignIn.sharedInstance.configuration = GIDConfiguration(
+                clientID: clientID,
+                serverClientID: serverClientID.isEmpty ? nil : serverClientID
+            )
+        } else {
+            print("ERROR: GIDClientID is empty. Check your Info.plist.")
+        }
+
+
         // Messaging delegate 설정
         Messaging.messaging().delegate = self
         
