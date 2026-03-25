@@ -61,7 +61,7 @@ private object CategorySelectionDefaults {
     val CategoryItemSize = 70.dp
     val CategoryIconSize = 40.dp
     val BadgeIconSize = 22.dp
-    val MaxContainerHeight = 200.dp
+    val MaxContainerHeight = 400.dp
 }
 
 @OptIn(ExperimentalLayoutApi::class)
