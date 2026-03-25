@@ -12,7 +12,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -55,7 +54,7 @@ fun CategoryMultiSelectModalBottomSheet(
             LargeCategoryEnum.SAVING,
             LargeCategoryEnum.EXPENSES
         )
-        
+
         // 필터가 있으면 필터 항목들 중 기준 순서대로 정렬, 없으면 전체 기준 순서 사용
         val activeLargeCategories = if (largeCategoryFilter.isEmpty()) {
             preferredOrder
@@ -157,7 +156,7 @@ fun CategoryMultiSelectModalBottomSheet(
                                     .padding(horizontal = 28.dp),
                                 iconModifier = Modifier.size(28.dp),
                                 label = label,
-                                labelStyle = Typography().bodyLarge,
+                                labelStyle = MaterialTheme.typography.bodyLarge,
                                 checked = isSelected,
                                 onCheckedChange = { checked ->
                                     tempSelectedIds =

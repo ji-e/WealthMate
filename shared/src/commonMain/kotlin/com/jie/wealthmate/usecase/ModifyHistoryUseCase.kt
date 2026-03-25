@@ -7,7 +7,6 @@ import com.jie.wealthmate.repository.RepeatCycleRepository
 import com.jie.wealthmate.utils.default
 import com.jie.wealthmate.utils.toEpochMilliseconds
 import kotlinx.datetime.LocalDate
-import kotlinx.datetime.isoDayNumber
 
 class ModifyHistoryUseCase(
     private val historyRepository: HistoryRepository,
@@ -33,8 +32,8 @@ class ModifyHistoryUseCase(
                     categoryTagId = newCategoryTagId,
                     paymentMethodId = newPaymentMethodId,
                     content = newContent,
-                    dayOfWeek = if (repeatCycle.repeatCycle == "WEEKLY") newDate.dayOfWeek.isoDayNumber else null,
-                    dayOfMonth = if (repeatCycle.repeatCycle == "MONTHLY") newDate.day else null,
+//                    dayOfWeek = if (repeatCycle.repeatCycle == "WEEKLY") newDate.dayOfWeek.isoDayNumber else null,
+//                    dayOfMonth = if (repeatCycle.repeatCycle == "MONTHLY") newDate.day else null,
                 )
             )
         }

@@ -3,7 +3,6 @@ package com.jie.wealthmate.feature.budget
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -18,7 +17,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.jie.wealthmate.base.BaseScreen
-import com.jie.wealthmate.component.EmptyListView
 import com.jie.wealthmate.component.calculateAdjustedToastPadding
 import com.jie.wealthmate.component.topbar.TopBarItem
 import com.jie.wealthmate.component.topbar.WMTopBar
@@ -58,6 +56,9 @@ fun BudgetScreen(
             onDetailClick = { month ->
                 val monthStr = month.convertLocalDateToString(formatDateHyphenYM)
                 navController.navigate("budgetDetail/$monthStr")
+            },
+            onTransactionCountClick = { largeCategory, categoryId ->
+                navController.navigate("categoryExpenses/MONTH/$largeCategory/$categoryId")
             }
         )
     }
@@ -70,6 +71,7 @@ fun BudgetContent(
     onSelectedMonthClick: () -> Unit,
     onMonthChanged: (LocalDate) -> Unit,
     onDetailClick: (LocalDate) -> Unit,
+    onTransactionCountClick: (String, String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var isShowSelectedCalendarModalBottomSheet by remember { mutableStateOf(false) }
@@ -111,45 +113,39 @@ fun BudgetContent(
             // 전체 카테고리 중 설정된 예산이 하나도 없는 경우 확인
             val hasAnyBudget = uiState.budgetSummaryItems.any { it.budgetAmount > 0L }
 
-            if (hasAnyBudget.not()) {
-                EmptyListView(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f),
-                    contentText = "설정된 예산이 없습니다."
-                )
-            } else {
-                HorizontalDivider(
-                    modifier = Modifier.padding(vertical = 24.dp),
-                    color = ColorGray.Gray_50,
-                    thickness = 12.dp
-                )
+            HorizontalDivider(
+                modifier = Modifier.padding(vertical = 24.dp),
+                color = ColorGray.Gray_50,
+                thickness = 12.dp
+            )
 
-                // 상태별 예산 정보 섹션
-                when {
-                    uiState.budgetOverItems.isNotEmpty() -> {
-                        BudgetOverPager(items = uiState.budgetOverItems)
-                    }
-
-                    uiState.totalBudgetAmount > 0L && (uiState.totalBudgetAmount - uiState.usedAmount) > 0 -> {
-                        BudgetSuccess()
-                    }
-
-                    else -> {
-                        BudgetInfo(
-                            isNotBudgetSetting = uiState.totalBudgetAmount == 0L,
-                            topExpenses = uiState.topExpenses
-                        )
-                    }
+            // 상태별 예산 정보 섹션
+            when {
+                uiState.budgetOverItems.isNotEmpty() -> {
+                    BudgetOverPager(
+                        items = uiState.budgetOverItems,
+                        onTransactionCountClick = onTransactionCountClick
+                    )
                 }
 
-                Spacer(modifier = Modifier.height(32.dp))
-                BudgetSummary(
-                    items = uiState.budgetSummaryItems,
-                    onDetailClick = { onDetailClick(uiState.selectedMonth) }
-                )
-                Spacer(modifier = Modifier.height(32.dp))
+                uiState.totalBudgetAmount > 0L && (uiState.totalBudgetAmount - uiState.usedAmount) > 0 -> {
+                    BudgetSuccess()
+                }
+
+                else -> {
+                    BudgetInfo(
+                        isNotBudgetSetting = uiState.totalBudgetAmount == 0L,
+                        topExpenses = uiState.topExpenses
+                    )
+                }
             }
+
+            Spacer(modifier = Modifier.height(32.dp))
+            BudgetSummary(
+                items = uiState.budgetSummaryItems,
+                onDetailClick = { onDetailClick(uiState.selectedMonth) }
+            )
+            Spacer(modifier = Modifier.height(32.dp))
         }
     }
 

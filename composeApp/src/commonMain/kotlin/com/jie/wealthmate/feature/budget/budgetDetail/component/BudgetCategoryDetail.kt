@@ -42,11 +42,14 @@ import com.jie.wealthmate.theme.ColorBlue
 import com.jie.wealthmate.theme.ColorGray
 import com.jie.wealthmate.theme.ColorPrimary
 import com.jie.wealthmate.theme.ColorRed
+import com.jie.wealthmate.theme.ColorSetting
+import com.jie.wealthmate.theme.Padding
 import com.jie.wealthmate.theme.noRippleClickable
 import com.jie.wealthmate.utils.formatWithCommas
 import org.jetbrains.compose.resources.painterResource
 import wealthmate.composeapp.generated.resources.Res
 import wealthmate.composeapp.generated.resources.ic_arrow_drop_down
+import wealthmate.composeapp.generated.resources.ic_keyboard_arrow_right
 
 /**
  * 대분류(수입, 지출, 저축)별 예산 섹션의 헤더를 표시합니다.
@@ -178,6 +181,7 @@ fun SectionHeader(
 fun CategoryBudgetGroup(
     group: CategoryBudgetGroupVo,
     largeCategory: LargeCategoryEnum,
+    onClickDetail: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     var isTagsExpanded by remember { mutableStateOf(false) }
@@ -199,7 +203,8 @@ fun CategoryBudgetGroup(
             isMain = true,
             hasTags = group.tagBudgets.isNotEmpty(),
             isTagsExpanded = isTagsExpanded,
-            onToggleTags = { isTagsExpanded = !isTagsExpanded }
+            onToggleTags = { isTagsExpanded = !isTagsExpanded },
+            onClickDetail = onClickDetail
         )
 
         // 태그(상세) 정보가 있는 경우 애니메이션과 함께 표시
@@ -235,7 +240,8 @@ fun CategoryBudgetGroup(
                             budgetAmount = tagBudget.budgetAmount,
                             percentage = tagBudget.percentage,
                             largeCategory = largeCategory,
-                            isMain = false
+                            isMain = false,
+                            onClickDetail = onClickDetail
                         )
                         if (index < group.tagBudgets.lastIndex) {
                             Spacer(modifier = Modifier.height(24.dp))
@@ -264,6 +270,7 @@ private fun CategoryBudgetItem(
     hasTags: Boolean = false,
     isTagsExpanded: Boolean = false,
     onToggleTags: () -> Unit = {},
+    onClickDetail: () -> Unit = {},
 ) {
     val barRatio = remember(budgetAmount, usedAmount) {
         if (budgetAmount > 0) (usedAmount.toFloat() / budgetAmount).coerceIn(0f, 1f)
@@ -297,7 +304,9 @@ private fun CategoryBudgetItem(
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
+                .noRippleClickable { onClickDetail() }
         ) {
             if (isMain) {
                 CategoryIcon(
@@ -351,6 +360,15 @@ private fun CategoryBudgetItem(
                     textAlign = TextAlign.End
                 )
             }
+
+            Icon(
+                painter = painterResource(Res.drawable.ic_keyboard_arrow_right),
+                contentDescription = "카테고리 이동",
+                tint = ColorSetting.Info,
+                modifier = Modifier
+                    .padding(start = Padding.SpacerXXS)
+                    .size(24.dp)
+            )
         }
 
         Spacer(modifier = Modifier.height(16.dp))

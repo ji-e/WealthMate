@@ -28,6 +28,8 @@ import androidx.navigation.NavController
 import com.jie.wealthmate.base.BaseScreen
 import com.jie.wealthmate.component.ButtonSize
 import com.jie.wealthmate.component.WMFloatingButton
+import com.jie.wealthmate.component.WMRemoveDialog
+import com.jie.wealthmate.component.WMSaveBackDialog
 import com.jie.wealthmate.component.WMText
 import com.jie.wealthmate.component.textField.WMTextField
 import com.jie.wealthmate.component.textField.rememberIntegerVisualTransformation
@@ -64,6 +66,17 @@ fun RepeatHistoryDetailScreen(
     viewModel: RepeatHistoryDetailViewModel = koinViewModel(),
 ) {
     val uiState by viewModel.container.uiState.collectAsState()
+    var isShowSaveBackDialog by remember { mutableStateOf(false) }
+    var isShowRemoveDialog by remember { mutableStateOf(false) }
+
+    val onBack: () -> Unit = {
+        if (viewModel.container.uiState.value.isDataChanged) {
+            isShowSaveBackDialog = true
+        } else {
+            navController.popBackStack()
+        }
+    }
+
 
     LaunchedEffect(repeatCycleId) {
         viewModel.updateInit(repeatCycleId)
@@ -71,6 +84,7 @@ fun RepeatHistoryDetailScreen(
 
     BaseScreen(
         viewModel = viewModel,
+        onBack = onBack,
         onSideEffect = { sideEffect ->
             when (sideEffect) {
                 is RepeatHistoryDetailUiSideEffect.OnSuccess -> {
@@ -81,11 +95,8 @@ fun RepeatHistoryDetailScreen(
     ) {
         RepeatHistoryDetailContent(
             uiState = uiState,
-            onBack = {
-                // TODO: Show save back dialog
-                navController.popBackStack()
-            },
-            onRemove = viewModel::removeRepeatCycle,
+            onBack = onBack,
+            onRemove = { isShowRemoveDialog = true },
             onUpdateDate = viewModel::updateDate,
             onUpdateRepeatCycle = viewModel::updateRepeatCycle,
             onUpdateRepeatCycleDate = viewModel::updateRepeatCycleDate,
@@ -97,6 +108,26 @@ fun RepeatHistoryDetailScreen(
             onUpdatePaymentMethod = viewModel::updatePaymentMethod,
             onModifyRepeatCycle = viewModel::modifyRepeatCycle
         )
+
+        if (isShowSaveBackDialog) {
+            WMSaveBackDialog(
+                onConfirm = {
+                    isShowSaveBackDialog = false
+                    navController.popBackStack()
+                },
+                onDismiss = { isShowSaveBackDialog = false }
+            )
+        }
+
+        if (isShowRemoveDialog) {
+            WMRemoveDialog(
+                onConfirm = {
+                    isShowRemoveDialog = false
+                    viewModel.removeRepeatCycle()
+                },
+                onDismiss = { isShowRemoveDialog = false }
+            )
+        }
     }
 }
 
@@ -123,7 +154,6 @@ fun RepeatHistoryDetailContent(
     var isShowRepeatDateModalBottomSheet by remember { mutableStateOf(false) }
     var isShowCategorySelectModalBottomSheet by remember { mutableStateOf(false) }
     var isShowPaymentMethodModalBottomSheet by remember { mutableStateOf(false) }
-    var isShowRemoveDialog by remember { mutableStateOf(false) }
 
     Column(modifier = modifier
         .navigationBarsPadding()
@@ -135,7 +165,7 @@ fun RepeatHistoryDetailContent(
             trailingItem = listOf(
                 TopBarItem.TrailingItem(
                     iconRes = Res.drawable.ic_delete_outline,
-                    action = { isShowRemoveDialog = true }
+                    action = onRemove
                 )
             )
         )

@@ -15,6 +15,7 @@ import com.jie.wealthmate.vo.CategoryTagVo
 import com.jie.wealthmate.vo.CategoryVo
 import com.jie.wealthmate.vo.CategoryVo.Companion.mapperToVo
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.collections.immutable.toPersistentMap
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.datetime.DateTimeUnit
@@ -32,6 +33,17 @@ class BudgetDetailViewModel(
 
     init {
         observeData()
+    }
+
+    fun toggleSection(largeCategory: LargeCategoryEnum) {
+        reduceState { state ->
+            val current = state.expandedStates[largeCategory] ?: false
+            state.copy(
+                expandedStates = state.expandedStates.toMutableMap().apply {
+                    put(largeCategory, !current)
+                }.toPersistentMap()
+            )
+        }
     }
 
     private fun observeData() {

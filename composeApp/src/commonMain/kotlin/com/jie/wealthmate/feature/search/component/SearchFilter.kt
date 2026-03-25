@@ -145,7 +145,7 @@ fun SearchFilterRow(
 private fun <T> getFilterLabel(
     items: List<T>,
     defaultLabel: String,
-    labelSelector: (T) -> String
+    labelSelector: (T) -> String,
 ): String {
     return when {
         items.isEmpty() -> defaultLabel
@@ -176,10 +176,9 @@ fun SearchFilterChip(
     ) {
         WMText(
             text = label,
-            style = MaterialTheme.typography.bodyMedium.copy(
-                color = contentColor,
-                fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal
-            )
+            style = MaterialTheme.typography.bodyMedium,
+            color = contentColor,
+            fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal
         )
         Icon(
             painter = painterResource(Res.drawable.ic_arrow_drop_down),

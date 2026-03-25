@@ -18,7 +18,6 @@ import com.russhwolf.settings.Settings
 import com.russhwolf.settings.set
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
@@ -138,10 +137,12 @@ class CalendarViewModel(
                 return
             }
 
-            val histories = historyRepository.getHistoriesByMonth(
+            // 삭제된 내역을 포함하여 이번 달의 모든 내역을 가져옵니다.
+            // 이를 통해 사용자가 삭제한 반복 내역이 다시 생성되는 것을 방지합니다.
+            val histories = historyRepository.getHistoriesByMonthWithDeleted(
                 startDate = selectedMonth.firstDayOfMonth().toEpochMilliseconds(),
                 endDate = selectedMonth.lastDayOfMonth().toEpochMilliseconds()
-            ).first()
+            )
 
             val activeRepeatCycles = repeatCycles.filter { it.repeatCycle.isActive }
             if (activeRepeatCycles.isEmpty()) return
@@ -162,6 +163,7 @@ class CalendarViewModel(
                 val generationDates = getGenerationDatesForMonth(repeatCycle, selectedMonth)
 
                 for (date in generationDates) {
+                    // 삭제된 내역을 포함하여 이미 내역이 존재하는지 체크합니다.
                     val alreadyExists = histories.any {
                         it.history.repeatCycleId == repeatCycle.id && it.history.date.toLocalDate() == date
                     } || newHistories.any {
@@ -187,7 +189,6 @@ class CalendarViewModel(
 
             if (newHistories.isNotEmpty()) {
                 historyRepository.insertHistories(newHistories)
-                // insertHistories 호출 시 observeCalendarData의 Flow가 자동으로 반응하여 UI가 갱신됩니다.
             }
         } finally {
             isCreatingRepeatHistories = false

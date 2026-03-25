@@ -5,7 +5,9 @@ import com.jie.wealthmate.feature.menu.management.categoryManagement.component.L
 import com.jie.wealthmate.vo.CategoryTagVo
 import com.jie.wealthmate.vo.CategoryVo
 import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.persistentMapOf
 import kotlinx.datetime.LocalDate
 
 data class BudgetDetailUiState(
@@ -18,6 +20,7 @@ data class BudgetDetailUiState(
     val lastTotalExpense: Long = 0L,
     val lastTotalSaving: Long = 0L,
     val sections: ImmutableList<BudgetSectionVo> = persistentListOf(),
+    val expandedStates: ImmutableMap<LargeCategoryEnum, Boolean> = persistentMapOf(),
 ) : BaseUiState
 
 data class BudgetSectionVo(

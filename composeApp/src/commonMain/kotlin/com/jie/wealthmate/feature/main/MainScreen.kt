@@ -52,9 +52,9 @@ import com.jie.wealthmate.feature.home.preparednessStatus.PreparednessStatusScre
 import com.jie.wealthmate.feature.menu.MenuScreen
 import com.jie.wealthmate.feature.menu.data.googleCloudShare.GoogleCloudShareScreen
 import com.jie.wealthmate.feature.menu.data.googleCloudSync.GoogleCloudSyncScreen
+import com.jie.wealthmate.feature.menu.management.categoryManagement.CategoryManagementScreen
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.feature.menu.management.categoryManagement.editCategory.EditCategoryScreen
-import com.jie.wealthmate.feature.menu.management.categoryManagement.main.CategoryManagementScreen
 import com.jie.wealthmate.feature.menu.management.paymentMethodManagement.PaymentMethodManagementScreen
 import com.jie.wealthmate.feature.menu.management.paymentMethodManagement.editPaymentMethod.EditPaymentMethodScreen
 import com.jie.wealthmate.feature.menu.management.repeatHistoryManagement.RepeatHistoryManagementScreen
@@ -146,9 +146,14 @@ fun MainScreen(
                         )
                     }
                     composable(BottomNavItem.Add.route) {
+                        val initialDate = if (uiState.previousItem == BottomNavItem.Calendar) {
+                            mainUiState.selectedDate
+                        } else {
+                            today
+                        }
                         AddHistoryScreen(
                             navController = innerNavController,
-                            initialSelectedDate = mainUiState.selectedDate,
+                            initialSelectedDate = initialDate,
                             onBack = { viewModel.navigateBackToPreviousTab() }
                         )
                     }
@@ -186,9 +191,9 @@ fun MainScreen(
                         }
 
                         HistoryDetailScreen(
+                            navController = innerNavController,
                             largeCategory = largeCategory,
                             historyId = historyId,
-                            onBack = { innerNavController.popBackStack() },
                             onNavigateToRepeatDetail = { id ->
                                 innerNavController.navigate("repeatHistoryDetail/$id")
                             }

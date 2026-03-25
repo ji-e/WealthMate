@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalComposeUiApi::class)
 
-package com.jie.wealthmate.feature.menu.management.categoryManagement.main
+package com.jie.wealthmate.feature.menu.management.categoryManagement
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -31,7 +31,6 @@ import com.jie.wealthmate.component.reorderable.rememberReorderableLazyListState
 import com.jie.wealthmate.component.topbar.TopBarItem
 import com.jie.wealthmate.component.topbar.WMTopBar
 import com.jie.wealthmate.feature.menu.component.MenuEnum
-import com.jie.wealthmate.feature.menu.management.categoryManagement.CategoryManagementUiState
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.Category
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.CategoryTab
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum

@@ -30,6 +30,7 @@ import com.jie.wealthmate.feature.menu.management.categoryManagement.component.L
 import com.jie.wealthmate.theme.ColorBlue
 import com.jie.wealthmate.theme.ColorGray
 import com.jie.wealthmate.theme.ColorRed
+import com.jie.wealthmate.theme.ColorSetting
 import com.jie.wealthmate.theme.noRippleClickable
 import com.jie.wealthmate.utils.default
 import com.jie.wealthmate.utils.formatWithCommas
@@ -209,7 +210,7 @@ private fun StatusCategoryComparisonItem(
                         Icon(
                             painter = painterResource(Res.drawable.ic_keyboard_arrow_right),
                             contentDescription = null,
-                            tint = ColorGray.Gray_500,
+                            tint = ColorSetting.Info,
                             modifier = Modifier
                                 .padding(start = 2.dp)
                                 .size(16.dp)

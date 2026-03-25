@@ -90,7 +90,8 @@ class BudgetViewModel(
                                     overAmount = categorySpent - totalCategoryBudget,
                                     transactionCount = categoryHistories.size,
                                     topExpenseTitle = topExpense?.history?.content,
-                                    topExpenseAmount = topExpense?.history?.amount
+                                    topExpenseAmount = topExpense?.history?.amount,
+                                    topExpenseId = topExpense?.history?.id
                                 )
                             } else null
                         }.toImmutableList()

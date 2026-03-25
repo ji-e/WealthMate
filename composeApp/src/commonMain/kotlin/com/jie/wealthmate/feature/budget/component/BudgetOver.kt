@@ -1,6 +1,7 @@
 package com.jie.wealthmate.feature.budget.component
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -31,12 +32,14 @@ import androidx.compose.ui.unit.sp
 import com.jie.wealthmate.component.WMText
 import com.jie.wealthmate.theme.ColorGray
 import com.jie.wealthmate.theme.ColorRed
+import com.jie.wealthmate.theme.ColorSetting
 import com.jie.wealthmate.utils.formatWithCommas
 import com.jie.wealthmate.vo.CategoryVo
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import org.jetbrains.compose.resources.painterResource
 import wealthmate.composeapp.generated.resources.Res
+import wealthmate.composeapp.generated.resources.ic_keyboard_arrow_right
 import wealthmate.composeapp.generated.resources.ic_push_pin
 
 @Immutable
@@ -48,12 +51,14 @@ data class BudgetOverUsageVo(
     val transactionCount: Int,
     val topExpenseTitle: String? = null,
     val topExpenseAmount: Long? = null,
+    val topExpenseId: String? = null,
 )
 
 @Composable
 fun BudgetOverPager(
     modifier: Modifier = Modifier,
     items: ImmutableList<BudgetOverUsageVo> = persistentListOf(),
+    onTransactionCountClick: (largeCategory: String, categoryId: String) -> Unit = { _, _ -> },
 ) {
     val pagerState = rememberPagerState(pageCount = { items.size })
 
@@ -79,7 +84,8 @@ fun BudgetOverPager(
                     modifier = Modifier.fillMaxWidth(),
                     totalSize = items.size,
                     index = page + 1,
-                    item = items[page]
+                    item = items[page],
+                    onTransactionCountClick = onTransactionCountClick
                 )
             }
         }
@@ -93,6 +99,7 @@ fun BudgetOverItem(
     index: Int,
     item: BudgetOverUsageVo,
     modifier: Modifier = Modifier,
+    onTransactionCountClick: (largeCategory: String, categoryId: String) -> Unit = { _, _ -> },
 ) {
     Column(
         modifier = modifier
@@ -176,12 +183,15 @@ fun BudgetOverItem(
                 modifier = Modifier.weight(1f),
                 label = "초과 금액",
                 value = "${item.overAmount.formatWithCommas()}원",
-                valueColor = ColorRed.Red_300
+                valueColor = ColorRed.Red_300,
             )
             InfoCard(
                 modifier = Modifier.weight(1f),
                 label = "거래 건수",
                 value = "${item.transactionCount}건",
+                onClick = {
+                    onTransactionCountClick(item.category.largeCategory.name, item.category.id)
+                }
             )
         }
     }
@@ -223,20 +233,32 @@ private fun InfoCard(
     value: String,
     modifier: Modifier = Modifier,
     valueColor: Color = ColorGray.Gray_700,
+    onClick: (() -> Unit)? = null,
 ) {
     Column(
         modifier = modifier
             .clip(RoundedCornerShape(8.dp))
             .background(Color.White.copy(alpha = 0.6f))
+            .clickable(onClick != null) { onClick?.invoke() }
             .padding(10.dp)
     ) {
-        WMText(
-            text = label,
-            style = typography.labelMedium.copy(
-                fontWeight = FontWeight.Medium,
-                color = if (valueColor == ColorRed.Red_300) ColorRed.Red_300 else ColorGray.Gray_500
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            WMText(
+                text = label,
+                style = typography.labelMedium.copy(
+                    fontWeight = FontWeight.Medium,
+                    color = if (valueColor == ColorRed.Red_300) ColorRed.Red_300 else ColorGray.Gray_500
+                )
             )
-        )
+            if (onClick != null) {
+                Icon(
+                    painter = painterResource(Res.drawable.ic_keyboard_arrow_right),
+                    contentDescription = "카테고리 이동",
+                    tint = ColorSetting.Info,
+                    modifier = Modifier.size(12.dp)
+                )
+            }
+        }
         WMText(
             text = value,
             maxLines = 1,

@@ -6,7 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Typography
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -53,7 +53,7 @@ fun GoogleLoginButton(
             )
             WMText(
                 text = "구글 계정으로 로그인하기",
-                style = Typography().labelLarge
+                style = MaterialTheme.typography.labelLarge
             )
         }
     }

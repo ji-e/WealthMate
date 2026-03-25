@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -15,7 +16,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.jie.wealthmate.base.BaseScreen
 import com.jie.wealthmate.component.EmptyListView
@@ -26,7 +26,8 @@ import com.jie.wealthmate.feature.menu.component.MenuEnum
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.CategoryTab
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.feature.menu.management.repeatHistoryManagement.component.RepeatHistoryList
-import com.jie.wealthmate.theme.ColorGray
+import com.jie.wealthmate.theme.ColorSetting
+import com.jie.wealthmate.theme.Padding
 import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinViewModel
 import wealthmate.composeapp.generated.resources.Res
@@ -75,7 +76,7 @@ fun RepeatHistoryManagementScreen(
 @Composable
 fun RepeatHistoryManagementContent(
     uiState: RepeatHistoryManagementUiState,
-    pagerState: androidx.compose.foundation.pager.PagerState,
+    pagerState: PagerState,
     largeCategoryItems: List<LargeCategoryEnum>,
     isAddItemEnabled: Boolean,
     onBack: () -> Unit,
@@ -96,7 +97,7 @@ fun RepeatHistoryManagementContent(
             trailingItem = listOf(
                 TopBarItem.TrailingItem(
                     iconRes = Res.drawable.ic_add,
-                    tint = if (isAddItemEnabled) ColorGray.Gray_700 else ColorGray.Gray_100,
+                    tint = if (isAddItemEnabled) ColorSetting.Default else ColorSetting.DisabledContent,
                     action = { if (isAddItemEnabled) onAddClick() }
                 )
             )
@@ -114,12 +115,12 @@ fun RepeatHistoryManagementContent(
             beyondViewportPageCount = 1
         ) { pageIndex ->
             val items = uiState.repeatHistoryItems.filter {
-                it.category?.largeCategory == largeCategoryItems[pageIndex].name
+                it.repeatCycle.largeCategory == largeCategoryItems[pageIndex].name
             }
 
             if (items.isEmpty()) {
                 EmptyListView(
-                    modifier = Modifier.fillMaxSize().padding(20.dp),
+                    modifier = Modifier.fillMaxSize().padding(Padding.BackgroundHorizontal),
                     contentText = "반복 내역이 없습니다.",
                 )
             } else {

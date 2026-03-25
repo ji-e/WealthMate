@@ -2,7 +2,6 @@ package com.jie.wealthmate.feature.menu.management.repeatHistoryManagement.compo
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
@@ -11,18 +10,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.jie.wealthmate.component.EmojiIcon
+import com.jie.wealthmate.component.EmojiIconSize
 import com.jie.wealthmate.component.SwitchSize
 import com.jie.wealthmate.component.WMSwitch
 import com.jie.wealthmate.component.WMText
@@ -32,13 +28,11 @@ import com.jie.wealthmate.feature.calendar.addHistory.component.RepeatCycleEnum
 import com.jie.wealthmate.feature.calendar.addHistory.component.formattedShortDescription
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.theme.ColorGray
-import com.jie.wealthmate.theme.ColorRed
+import com.jie.wealthmate.theme.ColorSetting
+import com.jie.wealthmate.theme.Padding
 import com.jie.wealthmate.utils.default
 import com.jie.wealthmate.utils.formatWithCommas
 import com.jie.wealthmate.utils.toLocalDate
-import org.jetbrains.compose.resources.painterResource
-import wealthmate.composeapp.generated.resources.Res
-import wealthmate.composeapp.generated.resources.ic_push_pin
 
 @Composable
 fun ColumnScope.RepeatHistoryList(
@@ -49,7 +43,7 @@ fun ColumnScope.RepeatHistoryList(
 ) {
     LazyColumn(
         modifier = modifier.fillMaxSize(),
-        contentPadding = PaddingValues(vertical = 20.dp)
+        contentPadding = PaddingValues(top = Padding.SpacerXS, bottom = Padding.BackgroundBottom)
     ) {
         items(
             count = repeatHistoryItems.size,
@@ -81,37 +75,23 @@ private fun RepeatHistoryItem(
             .fillMaxWidth()
             .height(56.dp)
             .background(ColorGray.White)
-            .padding(start = 20.dp, end = 28.dp),
+            .padding(
+                start = Padding.BackgroundHorizontal - EmojiIconSize.MEDIUM.fixedIconSize / 3,
+                end = Padding.BackgroundHorizontal
+            ),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Box(modifier = Modifier.width(60.dp)) {
-            Box(
-                modifier = Modifier
-                    .clip(CircleShape)
-                    .background(LargeCategoryEnum.creator(data.repeatCycle.largeCategory).backgroundColor)
-                    .size(40.dp)
-                    .align(Alignment.Center),
-                contentAlignment = Alignment.Center
-            ) {
-                WMText(
-                    text = category?.icon ?: "❓",
-                    style = typography.titleLarge
-                )
-            }
-            if (category?.isFixed.default()) {
-                Icon(
-                    painter = painterResource(Res.drawable.ic_push_pin),
-                    contentDescription = null,
-                    tint = ColorRed.Red_300,
-                    modifier = Modifier
-                        .size(24.dp)
-                        .align(Alignment.TopStart)
-                )
-            }
-        }
+        EmojiIcon(
+            icon = category?.icon,
+            color = LargeCategoryEnum.creator(data.repeatCycle.largeCategory).backgroundColor,
+            isFixedUsed = true,
+            isFixed = category?.isFixed.default()
+        )
 
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .padding(start = Padding.SpacerXS)
+                .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(
@@ -120,20 +100,22 @@ private fun RepeatHistoryItem(
                     .weight(1f)
             ) {
                 WMText(
-                    text = "${formatWithCommas(repeatCycle.amount.toString())}원",
-                    style = typography.titleMedium.copy(fontWeight = FontWeight.Medium),
+                    text = "${repeatCycle.amount.formatWithCommas()}원",
+                    style = typography.titleMedium,
+                    fontWeight = FontWeight.Medium,
                     maxLines = 1,
                 )
                 WMText(
                     text = repeatCycleInfoText(data.repeatCycle),
-                    style = typography.bodySmall.copy(color = ColorGray.Gray_500),
+                    style = typography.bodySmall,
+                    color = ColorSetting.Info,
                     maxLines = 2,
                 )
             }
 
             WMSwitch(
                 checked = data.repeatCycle.isActive,
-                switchSize = SwitchSize.X_SMALL,
+                switchSize = SwitchSize.SMALL,
                 onCheckedChange = { onIsActiveChange(data.repeatCycle, it) }
             )
         }

@@ -99,7 +99,7 @@ private fun BudgetSlider(
         LocalMinimumInteractiveComponentSize provides 0.dp
     ) {
         Slider(
-            value = value,
+            value = value.coerceIn(0f, 1f), // 슬라이더 조작은 0~100% 범위로 제한 (안전성)
             onValueChange = onValueChange,
             enabled = enabled,
             colors = SliderDefaults.colors(
@@ -156,10 +156,9 @@ fun BudgetCategorySliderItem(
 ) {
     val amount = remember(textFieldValue.text) { textFieldValue.text.toLongOrNull() ?: 0L }
     val percent = remember(amount, totalBudget) {
-        if (totalBudget > 0) (amount.toFloat() / totalBudget).coerceIn(0f, 1f) else 0f
+        if (totalBudget > 0) (amount.toFloat() / totalBudget) else 0f
     }
     val isReadOnly = isCategoryTagInclude && item.tags.isNotEmpty()
-    val maxAllowed = amount + remainBudget
 
     Column(
         modifier = modifier
@@ -191,10 +190,7 @@ fun BudgetCategorySliderItem(
             WMTextField(
                 value = textFieldValue,
                 onValueChange = {
-                    val inputAmount = it.text.toLongOrNull().default()
-                    if (inputAmount <= maxAllowed || selectedLargeCategory == LargeCategoryEnum.INCOME) {
-                        onValueChange(item.id, it)
-                    }
+                    onValueChange(item.id, it)
                 },
                 readOnly = isReadOnly,
                 maxLength = 10,
@@ -219,8 +215,7 @@ fun BudgetCategorySliderItem(
                 value = percent,
                 onValueChange = {
                     val roundedAmount = ((it * totalBudget) / 10).roundToLong() * 10
-                    val newAmount = roundedAmount.coerceAtMost(maxAllowed)
-                    onValueChange(item.id, TextFieldValue(newAmount.toString()))
+                    onValueChange(item.id, TextFieldValue(roundedAmount.toString()))
                 },
                 enabled = isReadOnly.not(),
                 thumbStartPadding = 26f,
@@ -252,13 +247,8 @@ fun BudgetCategorySliderItem(
                         val tagAmount =
                             remember(tagValue.text) { tagValue.text.toLongOrNull() ?: 0L }
                         val tagPercent = remember(tagAmount, totalBudget) {
-                            if (totalBudget > 0) (tagAmount.toFloat() / totalBudget).coerceIn(
-                                0f,
-                                1f
-                            )
-                            else 0f
+                            if (totalBudget > 0) (tagAmount.toFloat() / totalBudget) else 0f
                         }
-                        val tagMaxAllowed = tagAmount + remainBudget
 
                         Column(modifier = Modifier.fillMaxWidth()) {
                             Row(
@@ -282,10 +272,7 @@ fun BudgetCategorySliderItem(
                                 WMTextField(
                                     value = tagValue,
                                     onValueChange = {
-                                        val inputAmount = it.text.toLongOrNull().default()
-                                        if (inputAmount <= tagMaxAllowed || selectedLargeCategory == LargeCategoryEnum.INCOME) {
-                                            onValueChange(tagId, it)
-                                        }
+                                        onValueChange(tagId, it)
                                     },
                                     maxLength = 10,
                                     maxLines = 1,
@@ -310,8 +297,7 @@ fun BudgetCategorySliderItem(
                                     onValueChange = {
                                         val roundedAmount =
                                             ((it * totalBudget) / 10).roundToLong() * 10
-                                        val newAmount = roundedAmount.coerceAtMost(tagMaxAllowed)
-                                        onValueChange(tagId, TextFieldValue(newAmount.toString()))
+                                        onValueChange(tagId, TextFieldValue(roundedAmount.toString()))
                                     },
                                     sliderHeight = 12.dp,
                                     thumbStartPadding = 12f,
