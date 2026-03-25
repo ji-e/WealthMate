@@ -20,7 +20,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.items
@@ -155,11 +155,11 @@ fun CategorySelectionRow(
         val index = categoryItems.indexOfFirst { it.id == selectedCategory?.id }
         if (index >= 0) {
             val layoutInfo = categoryGridState.layoutInfo
-            val viewportWidth = layoutInfo.viewportSize.width
-            if (viewportWidth > 0) {
-                val itemWidthPx =
+            val viewportHeight = layoutInfo.viewportSize.height
+            if (viewportHeight > 0) {
+                val itemHeightPx =
                     with(density) { CategorySelectionDefaults.CategoryItemSize.roundToPx() }
-                val centerOffset = (viewportWidth - itemWidthPx) / 2
+                val centerOffset = (viewportHeight - itemHeightPx) / 2
                 categoryGridState.animateScrollToItem(index, -centerOffset)
             }
         }
@@ -186,10 +186,10 @@ fun CategorySelectionRow(
                         .padding(Padding.SpacerL)
                 )
             } else {
-                LazyHorizontalGrid(
-                    rows = GridCells.Fixed(2),
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(5),
                     state = categoryGridState,
-                    modifier = Modifier.height(170.dp),
+                    modifier = Modifier.heightIn(max = CategorySelectionDefaults.MaxContainerHeight),
                     contentPadding = PaddingValues(
                         vertical = Padding.ContainerVertical,
                         horizontal = Padding.SpacerXS
@@ -213,17 +213,17 @@ fun CategorySelectionRow(
                         selectedCategory.tags.isNotEmpty()
 
 
-                WMHorizontalDivider()
+                if (showTags) {
+                    WMHorizontalDivider()
 
-                LazyRow(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(48.dp),
-                    contentPadding = PaddingValues(horizontal = Padding.ContainerHorizontal),
-                    horizontalArrangement = Arrangement.spacedBy(Padding.SpacerXS),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    if (showTags) {
+                    LazyRow(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(48.dp),
+                        contentPadding = PaddingValues(horizontal = Padding.ContainerHorizontal),
+                        horizontalArrangement = Arrangement.spacedBy(Padding.SpacerXS),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
                         items(selectedCategory.tags, key = { it.id.default() }) { tag ->
                             CategoryTagItem(
                                 tag = tag,

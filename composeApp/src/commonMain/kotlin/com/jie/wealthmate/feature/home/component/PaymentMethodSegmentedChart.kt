@@ -156,9 +156,7 @@ fun PaymentMethodSegmentedChart(
                 val color = colors[index % colors.size]
                 SegmentedItem(
                     icon = "", // 결제수단은 현재 아이콘이 없으므로 null 처리
-                    label = (item.paymentMethod?.label ?: "결제수단 없음") +
-                            if (item.paymentMethod?.groupLabel != null) " | ${item.paymentMethod.groupLabel}"
-                            else "",
+                    label = (item.paymentMethod?.label ?: "결제수단 없음"),
                     color = color,
                     totalAmount = totalAmountForCalc,
                     amount = item.amount,

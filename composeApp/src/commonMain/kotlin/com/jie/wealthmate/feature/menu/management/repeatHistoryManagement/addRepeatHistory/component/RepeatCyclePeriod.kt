@@ -41,6 +41,7 @@ fun RepeatCyclePeriod(
             onValueChange = {},
             readOnly = true,
             onReadOnlyClick = onStartDateClick,
+            isSupport = false,
             modifier = Modifier.weight(1f)
         )
         WMText(
@@ -56,6 +57,7 @@ fun RepeatCyclePeriod(
                 ),
                 onValueChange = {},
                 readOnly = true,
+                isSupport = false,
                 onReadOnlyClick = onEndDateClick,
             )
 

@@ -1,17 +1,15 @@
 package com.jie.wealthmate.feature.menu.management.repeatHistoryManagement.repeatHistoryDetail
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Typography
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -27,9 +25,11 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.jie.wealthmate.base.BaseScreen
 import com.jie.wealthmate.component.ButtonSize
+import com.jie.wealthmate.component.SpacerSize
 import com.jie.wealthmate.component.WMFloatingButton
 import com.jie.wealthmate.component.WMRemoveDialog
 import com.jie.wealthmate.component.WMSaveBackDialog
+import com.jie.wealthmate.component.WMSpacer
 import com.jie.wealthmate.component.WMText
 import com.jie.wealthmate.component.textField.WMTextField
 import com.jie.wealthmate.component.textField.rememberIntegerVisualTransformation
@@ -50,6 +50,7 @@ import com.jie.wealthmate.feature.menu.management.repeatHistoryManagement.addRep
 import com.jie.wealthmate.feature.menu.management.repeatHistoryManagement.addRepeatHistory.component.RepeatCycleDateFullModalBottomSheet
 import com.jie.wealthmate.feature.menu.management.repeatHistoryManagement.addRepeatHistory.component.RepeatCycleDateModalBottomSheet
 import com.jie.wealthmate.feature.menu.management.repeatHistoryManagement.addRepeatHistory.component.RepeatCyclePeriod
+import com.jie.wealthmate.theme.Padding
 import com.jie.wealthmate.vo.CategoryTagVo
 import com.jie.wealthmate.vo.CategoryVo
 import com.jie.wealthmate.vo.PaymentMethodVo
@@ -155,10 +156,12 @@ fun RepeatHistoryDetailContent(
     var isShowCategorySelectModalBottomSheet by remember { mutableStateOf(false) }
     var isShowPaymentMethodModalBottomSheet by remember { mutableStateOf(false) }
 
-    Column(modifier = modifier
-        .navigationBarsPadding()
-        .fillMaxSize()
-        .imePadding()) {
+    Column(
+        modifier = modifier
+            .navigationBarsPadding()
+            .fillMaxSize()
+            .imePadding()
+    ) {
         WMTopBar(
             title = TopBarItem.Title("${uiState.selectedLargeCategory.label} ${MenuEnum.REPEAT_HISTORY.label} 상세"),
             readingItem = TopBarItem.ReadingItem(action = onBack),
@@ -172,11 +175,11 @@ fun RepeatHistoryDetailContent(
         Column(
             modifier = Modifier
                 .weight(1f)
-                .padding(horizontal = 28.dp)
+                .padding(horizontal = Padding.BackgroundHorizontal)
                 .verticalScroll(rememberScrollState())
         ) {
+            WMSpacer(size = SpacerSize.XX_SMALL)
             RepeatCyclePeriod(
-                modifier = Modifier.padding(top = 4.dp),
                 startDate = uiState.startDate,
                 endDate = uiState.endDate,
                 onStartDateClick = { isShowStartDateSelectModalBottomSheet = true },
@@ -184,6 +187,7 @@ fun RepeatHistoryDetailContent(
                 onEndDateResetClick = { onUpdateDate(END_DATE, null) }
             )
 
+            WMSpacer(size = SpacerSize.LARGE)
             WMTextField(
                 value = uiState.repeatCycle.shortDescription,
                 onValueChange = {},
@@ -191,11 +195,12 @@ fun RepeatHistoryDetailContent(
                 readOnly = true,
                 isRequire = true,
                 placeholder = "반복 주기를 설정해 주세요.",
-                modifier = Modifier.padding(top = 4.dp),
+                isSupport = false,
                 onReadOnlyClick = { isShowRepeatCycleModalBottomSheet = true },
             )
 
             if (uiState.repeatCycle == RepeatCycleEnum.WEEKLY || uiState.repeatCycle == RepeatCycleEnum.MONTHLY || uiState.repeatCycle == RepeatCycleEnum.YEARLY) {
+                WMSpacer(size = SpacerSize.LARGE)
                 WMTextField(
                     value = uiState.repeatCycleDateText,
                     onValueChange = {},
@@ -203,13 +208,14 @@ fun RepeatHistoryDetailContent(
                     readOnly = true,
                     isRequire = true,
                     placeholder = "반복될 날짜를 설정해 주세요.",
-                    modifier = Modifier.padding(top = 4.dp),
+                    isSupport = false,
                     onReadOnlyClick = { isShowRepeatDateModalBottomSheet = true },
                 )
             }
 
+            WMSpacer(size = SpacerSize.LARGE)
             WMTextField(
-                modifier = Modifier.padding(top = 4.dp),
+                isSupport = false,
                 value = uiState.amount,
                 onValueChange = { onUpdateAmount(it.toIntegerTextFieldValue()) },
                 label = "금액",
@@ -219,31 +225,26 @@ fun RepeatHistoryDetailContent(
                 suffix = {
                     WMText(
                         text = "원",
-                        style = Typography().bodyLarge.copy(fontWeight = FontWeight.SemiBold)
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.SemiBold
                     )
                 },
                 visualTransformation = rememberIntegerVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             )
 
+            WMSpacer(size = SpacerSize.LARGE)
             WMTextField(
                 value = uiState.content,
                 onValueChange = onUpdateContent,
                 label = "내용",
                 maxLength = 20,
-                isRequire = true,
                 placeholder = "내용을 입력해 주세요.",
-                modifier = Modifier.padding(top = 4.dp)
-            )
-
-            Category(
-                modifier = Modifier.padding(top = 4.dp, bottom = 24.dp),
-                category = uiState.category,
-                categoryTag = uiState.categoryTag,
-                onCategoryClick = { isShowCategorySelectModalBottomSheet = true }
+                isSupport = false
             )
 
             if (uiState.selectedLargeCategory == LargeCategoryEnum.EXPENSES) {
+                WMSpacer(size = SpacerSize.LARGE)
                 PaymentMethodTextField(
                     selectedLargeCategory = uiState.selectedLargeCategory,
                     selectedPaymentMethod = uiState.paymentMethod,
@@ -251,16 +252,19 @@ fun RepeatHistoryDetailContent(
                 )
             }
 
-            Spacer(modifier = Modifier.height(32.dp))
+            WMSpacer(size = SpacerSize.LARGE)
+            Category(
+                category = uiState.category,
+                categoryTag = uiState.categoryTag,
+                onCategoryClick = { isShowCategorySelectModalBottomSheet = true }
+            )
+
+            WMSpacer(size = SpacerSize.LARGE)
         }
 
         WMFloatingButton(
             text = "수정",
             buttonSize = ButtonSize.LARGE,
-            modifier = Modifier
-                .padding(horizontal = 28.dp)
-                .padding(bottom = 20.dp)
-                .fillMaxWidth(),
             enabled = uiState.isSaveButtonEnable,
             onClick = onModifyRepeatCycle
         )

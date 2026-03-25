@@ -268,13 +268,15 @@ fun HistoryDetailContent(
             )
 
             // 결제수단/자산
-            WMSpacer()
-            PaymentMethodTextField(
-                selectedLargeCategory = uiState.largeCategory,
-                selectedPaymentMethod = uiState.paymentMethod,
-                placeholder = " 없음",
-                onPaymentMethodClick = { isShowPaymentMethodModalBottomSheet = true }
-            )
+            if (uiState.largeCategory == LargeCategoryEnum.EXPENSES) {
+                WMSpacer()
+                PaymentMethodTextField(
+                    selectedLargeCategory = uiState.largeCategory,
+                    selectedPaymentMethod = uiState.paymentMethod,
+                    placeholder = " 없음",
+                    onPaymentMethodClick = { isShowPaymentMethodModalBottomSheet = true }
+                )
+            }
 
             // 카테고리
             WMSpacer()

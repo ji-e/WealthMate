@@ -323,8 +323,9 @@ class HomeViewModel(
                     id = repeatCycle.id,
                     categoryIcon = item.category?.icon ?: DEFAULT_CATEGORY_ICON,
                     largeCategory = LargeCategoryEnum.creator(repeatCycle.largeCategory),
-                    content = repeatCycle.content ?: item.category?.middleLabel
-                    ?: DEFAULT_RECURRING_CONTENT,
+                    content = repeatCycle.content.default()
+                        .ifEmpty {  item.category?.middleLabel + if(item.categoryTag?.tagLabel.isNullOrBlank().not()) " > ${item.categoryTag?.tagLabel}" else ""}
+                        .ifEmpty { DEFAULT_RECURRING_CONTENT },
                     singleAmount = repeatCycle.amount,
                     monthlyTotalAmount = if (actualHistories.isNotEmpty()) actualHistories.sumOf { it.history.amount } else repeatCycle.amount,
                     recurringDateText = info.dateText,

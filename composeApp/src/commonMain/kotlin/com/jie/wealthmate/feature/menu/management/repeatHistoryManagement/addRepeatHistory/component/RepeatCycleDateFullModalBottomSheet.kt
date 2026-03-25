@@ -3,7 +3,6 @@ package com.jie.wealthmate.feature.menu.management.repeatHistoryManagement.addRe
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -13,7 +12,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Typography
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -28,12 +27,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.jie.wealthmate.component.ButtonSize
-import com.jie.wealthmate.component.ButtonStyle
 import com.jie.wealthmate.component.WMButton
 import com.jie.wealthmate.component.WMModalBottomSheet
 import com.jie.wealthmate.component.WMText
 import com.jie.wealthmate.theme.ColorGray
 import com.jie.wealthmate.theme.ColorPrimary
+import com.jie.wealthmate.theme.Padding
 import com.jie.wealthmate.utils.default
 import kotlin.math.max
 
@@ -46,8 +45,8 @@ fun RepeatCycleDateFullModalBottomSheet(
 ) {
     val listStateMonth = rememberLazyListState()
     val listStateDay = rememberLazyListState()
-    var tempSelectedRepeatCycleMonth by remember { mutableStateOf(repeatCycleDateMonth) }
-    var tempSelectedRepeatCycleDay by remember { mutableStateOf(repeatCycleDateDay) }
+    var tempSelectedRepeatCycleMonth by remember { mutableStateOf(repeatCycleDateMonth ?: 1) }
+    var tempSelectedRepeatCycleDay by remember { mutableStateOf(repeatCycleDateDay ?: 1) }
 
     val repeatCycleDateMonthItems = remember {
         (1..12).map { it to "${it}월" }
@@ -55,8 +54,7 @@ fun RepeatCycleDateFullModalBottomSheet(
 
     // 선택된 월에 따라 일수 계산 (윤년 고려하여 2월은 29일까지 허용)
     val repeatCycleDateDayItems = remember(tempSelectedRepeatCycleMonth) {
-        val month = tempSelectedRepeatCycleMonth ?: return@remember emptyList()
-        val days = when (month) {
+        val days = when (tempSelectedRepeatCycleMonth) {
             2 -> 29
             4, 6, 9, 11 -> 30
             else -> 31
@@ -68,7 +66,7 @@ fun RepeatCycleDateFullModalBottomSheet(
     LaunchedEffect(repeatCycleDateDayItems) {
         if (repeatCycleDateDayItems.isEmpty()) return@LaunchedEffect
         val maxDay = repeatCycleDateDayItems.last().first
-        if (tempSelectedRepeatCycleDay.default() > maxDay) {
+        if (tempSelectedRepeatCycleDay > maxDay) {
             tempSelectedRepeatCycleDay = maxDay
         }
     }
@@ -91,54 +89,48 @@ fun RepeatCycleDateFullModalBottomSheet(
         title = "반복 날짜",
         onDismissRequest = onDismissRequest,
     ) {
-        Column(
+        Row(
             modifier = Modifier
-                .height(300.dp)
-                .padding(horizontal = 28.dp)
-                .padding(bottom = 20.dp)
+                .fillMaxWidth()
+                .padding(horizontal = Padding.BackgroundHorizontal)
+                .height(300.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Row(
-                modifier = Modifier.weight(1f)
-            ) {
-                RepeatCycleDateFullList(
-                    listState = listStateMonth,
-                    repeatCycleDateItems = repeatCycleDateMonthItems,
-                    tempSelectedRepeatCycleDate = tempSelectedRepeatCycleMonth,
-                    onRepeatCycleClick = {
-                        tempSelectedRepeatCycleMonth = it
-                    }
-                )
+            RepeatCycleDateFullList(
+                modifier = Modifier.weight(1f),
+                listState = listStateMonth,
+                repeatCycleDateItems = repeatCycleDateMonthItems,
+                tempSelectedRepeatCycleDate = tempSelectedRepeatCycleMonth,
+                onRepeatCycleClick = { tempSelectedRepeatCycleMonth = it }
+            )
 
-                VerticalDivider(
-                    modifier = Modifier.padding(horizontal = 8.dp),
-                    color = ColorGray.Gray_50
-                )
-
-                RepeatCycleDateFullList(
-                    listState = listStateDay,
-                    repeatCycleDateItems = repeatCycleDateDayItems,
-                    tempSelectedRepeatCycleDate = tempSelectedRepeatCycleDay,
-                    onRepeatCycleClick = {
-                        tempSelectedRepeatCycleDay = it
-                    }
-                )
-            }
-            WMButton(
-                text = "수정",
-                buttonStyle = ButtonStyle.FILLED,
-                buttonSize = ButtonSize.LARGE,
+            VerticalDivider(
                 modifier = Modifier
-                    .padding(top = 16.dp)
-                    .fillMaxWidth(),
-                enabled = tempSelectedRepeatCycleMonth != null && tempSelectedRepeatCycleDay != null,
-                onClick = {
-                    val month = tempSelectedRepeatCycleMonth ?: return@WMButton
-                    val day = tempSelectedRepeatCycleDay ?: return@WMButton
-                    onConfirmClick(month, day)
-                    onDismissRequest()
-                }
+                    .padding(vertical = Padding.SpacerM)
+                    .height(240.dp),
+                color = ColorGray.Gray_200
+            )
+
+            RepeatCycleDateFullList(
+                modifier = Modifier.weight(1f),
+                listState = listStateDay,
+                repeatCycleDateItems = repeatCycleDateDayItems,
+                tempSelectedRepeatCycleDate = tempSelectedRepeatCycleDay,
+                onRepeatCycleClick = { tempSelectedRepeatCycleDay = it }
             )
         }
+
+        WMButton(
+            text = "확인",
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(Padding.BackgroundHorizontal),
+            buttonSize = ButtonSize.LARGE,
+            onClick = {
+                onConfirmClick(tempSelectedRepeatCycleMonth, tempSelectedRepeatCycleDay)
+                onDismissRequest()
+            }
+        )
     }
 }
 
@@ -151,7 +143,7 @@ private fun RowScope.RepeatCycleDateFullList(
     onRepeatCycleClick: (Int) -> Unit = {},
 ) {
     LazyColumn(
-        modifier = modifier.weight(1f),
+        modifier = modifier,
         state = listState,
     ) {
         items(
@@ -178,7 +170,7 @@ private fun RepeatCycleDateFullItem(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(44.dp)
+            .height(48.dp)
             .clip(CircleShape)
             .background(if (isSelected) ColorPrimary.Primary_200 else ColorGray.White)
             .clickable { onClick() },
@@ -186,7 +178,7 @@ private fun RepeatCycleDateFullItem(
     ) {
         WMText(
             text = label,
-            style = Typography().bodyLarge.copy(
+            style = MaterialTheme.typography.bodyLarge.copy(
                 fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
                 color = if (isSelected) ColorPrimary.Primary_700 else ColorGray.Gray_700,
                 fontSize = if (isSelected) 18.sp else 16.sp

@@ -181,6 +181,8 @@ private fun RecurringHistoryItem(
                 .weight(1f),
             verticalArrangement = Arrangement.spacedBy(Padding.SpacerXXS)
         ) {
+            val content = item.content.ifEmpty {
+            }
             WMText(
                 text = item.content,
                 style = typography.titleMedium,

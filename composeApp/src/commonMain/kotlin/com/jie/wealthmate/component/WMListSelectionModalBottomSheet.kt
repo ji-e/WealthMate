@@ -4,7 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -24,15 +24,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.isSpecified
 import androidx.compose.ui.unit.sp
 import com.jie.wealthmate.theme.ColorGray
 import com.jie.wealthmate.theme.ColorPrimary
 import com.jie.wealthmate.theme.ColorSetting
 import com.jie.wealthmate.theme.Padding
-import com.jie.wealthmate.theme.WMTheme
 
 /**
  * 단일 항목 선택을 위한 바텀 시트
@@ -61,10 +61,18 @@ fun <T> WMListSelectionModalBottomSheet(
         onDismissRequest = onDismissRequest,
     ) {
         BoxWithConstraints {
+            // maxHeight가 Infinity인 경우(ModalBottomSheet 등의 내부 측정 시)를 대비하여 고정값 또는 비율로 제한
+            val maxHeightPx = constraints.maxHeight
+            val displayHeight = if (maxHeightPx > 0 && maxHeightPx < Int.MAX_VALUE) {
+                maxHeight
+            } else {
+                600.dp // Fallback height if constraints are infinite
+            }
+
             LazyColumn(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .heightIn(min = maxHeight * 0.2f, max = maxHeight * 0.6f),
+                    .heightIn(max = displayHeight * 0.6f),
                 contentPadding = PaddingValues(bottom = Padding.SpacerS),
                 state = listState
             ) {
@@ -98,23 +106,3 @@ fun <T> WMListSelectionModalBottomSheet(
         }
     }
 }
-
-
-@Preview
-@Composable
-private fun WMListSelectionModalBottomSheetPreview() {
-    val items = listOf("항목 1", "항목 2", "항목 3", "항목 4")
-    WMTheme {
-        Column {
-            WMListSelectionModalBottomSheet(
-                title = "단일 선택 테스트",
-                items = items,
-                selectedItem = items[1],
-                itemLabel = { it },
-                onItemSelected = {},
-                onDismissRequest = {}
-            )
-        }
-    }
-}
-

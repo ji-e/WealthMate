@@ -19,7 +19,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.jie.wealthmate.component.EmojiIcon
 import com.jie.wealthmate.component.EmojiIconSize
+import com.jie.wealthmate.component.SpacerSize
 import com.jie.wealthmate.component.SwitchSize
+import com.jie.wealthmate.component.WMSpacer
 import com.jie.wealthmate.component.WMSwitch
 import com.jie.wealthmate.component.WMText
 import com.jie.wealthmate.database.eneity.RepeatCycleEntity
@@ -105,8 +107,9 @@ private fun RepeatHistoryItem(
                     fontWeight = FontWeight.Medium,
                     maxLines = 1,
                 )
+                WMSpacer(size = SpacerSize.XX_SMALL)
                 WMText(
-                    text = repeatCycleInfoText(data.repeatCycle),
+                    text = repeatCycleInfoText(data),
                     style = typography.bodySmall,
                     color = ColorSetting.Info,
                     maxLines = 2,
@@ -122,25 +125,33 @@ private fun RepeatHistoryItem(
     }
 }
 
-private fun repeatCycleInfoText(data: RepeatCycleEntity): String {
-    val content = data.content
+private fun repeatCycleInfoText(data: RepeatCycleWithDetails): String {
+    val repeatCycle = data.repeatCycle
+    val category = data.category
+    val categoryTag = data.categoryTag
+
+    val content = repeatCycle.content
+    val totalCategory =
+        category?.middleLabel.default() + if (data.categoryTag?.tagLabel.isNullOrBlank()) "" else " > ${categoryTag?.tagLabel}"
+
     val repeatDescription =
-        when (val repeatCycleEnum = RepeatCycleEnum.create(data.repeatCycle)) {
+        when (val repeatCycleEnum = RepeatCycleEnum.create(repeatCycle.repeatCycle)) {
             RepeatCycleEnum.WEEKLY -> {
-                repeatCycleEnum.formattedShortDescription(data.dayOfWeek ?: 1)
+                repeatCycleEnum.formattedShortDescription(repeatCycle.dayOfWeek ?: 1)
             }
 
             RepeatCycleEnum.MONTHLY -> {
-                repeatCycleEnum.formattedShortDescription(data.dayOfMonth ?: 1)
+                repeatCycleEnum.formattedShortDescription(repeatCycle.dayOfMonth ?: 1)
             }
 
             else -> {
-                repeatCycleEnum.formattedShortDescription(data.date.toLocalDate())
+                repeatCycleEnum.formattedShortDescription(repeatCycle.date.toLocalDate())
             }
         }
 
     val parts = listOfNotNull(
         content.takeIf { it.isNullOrBlank().not() },
+        totalCategory.takeIf { it.isNullOrBlank().not() },
         repeatDescription,
     )
 
