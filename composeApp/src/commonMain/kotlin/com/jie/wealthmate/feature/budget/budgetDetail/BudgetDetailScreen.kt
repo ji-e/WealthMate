@@ -32,6 +32,7 @@ import com.jie.wealthmate.theme.Padding
 import com.jie.wealthmate.utils.convertLocalDateToString
 import com.jie.wealthmate.utils.default
 import com.jie.wealthmate.utils.formatDateHyphenYM
+import io.github.aakira.napier.Napier
 import kotlinx.datetime.LocalDate
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
@@ -53,7 +54,8 @@ fun BudgetDetailScreen(
                 navController.navigate("addBudget?selectedYearMonth=$monthStr&isEditMode=true")
             },
             onClickDetail = { largeCategory, categoryId ->
-                navController.navigate("categoryExpenses/${StatusType.MONTH.name}/${largeCategory.name}/$categoryId/${selectedMonth.toString()}")
+                Napier.e("selectedMonth: ${selectedMonth.toString()}, ${uiState.selectedMonth.toString()}")
+                navController.navigate("categoryExpenses/${StatusType.MONTH.name}/${largeCategory.name}/$categoryId/${uiState.selectedMonth.toString()}")
             },
             onToggleSection = viewModel::toggleSection
         )

@@ -38,15 +38,17 @@ class CategoryExpensesViewModel(
     private val categoryId: String?
 ) : BaseViewModel<CategoryExpensesUiState>() {
 
+    private val initialMonth = selectedDate.convertDateToLocalDate() ?: today
+
     override val initialState: CategoryExpensesUiState = CategoryExpensesUiState(
         statusType = initialStatusType,
         largeCategory = initialLargeCategory,
-        selectedMonth = selectedDate.convertDateToLocalDate(),
+        selectedMonth = initialMonth,
         isHome = selectedDate.isNullOrBlank()
     )
 
     private val filterFlow = MutableStateFlow(initialStatusType to initialLargeCategory)
-    private val selectedMonthFlow = MutableStateFlow(today)
+    private val selectedMonthFlow = MutableStateFlow(initialMonth)
 
     init {
         Napier.e("selectedDate: $selectedDate")
@@ -213,6 +215,7 @@ class CategoryExpensesViewModel(
     private fun getPeriodsByMonth(month: LocalDate): PeriodsVo {
         val currentStart = month.firstDayOfMonth()
         val currentEnd = month.lastDayOfMonth()
+
         val lastMonth = month.minus(1, DateTimeUnit.MONTH)
         val lastStart = lastMonth.firstDayOfMonth()
         val lastEnd = lastMonth.lastDayOfMonth()
@@ -221,7 +224,7 @@ class CategoryExpensesViewModel(
             currentStart = currentStart.toEpochMilliseconds(),
             currentEnd = currentEnd.toEpochMilliseconds() + DAY_END_MILLIS_OFFSET,
             lastStart = lastStart.toEpochMilliseconds(),
-            lastEnd = lastStart.toEpochMilliseconds() + DAY_END_MILLIS_OFFSET
+            lastEnd = lastEnd.toEpochMilliseconds() + DAY_END_MILLIS_OFFSET
         )
     }
 }

@@ -58,6 +58,7 @@ import com.jie.wealthmate.utils.formatDateKorYM
 import com.jie.wealthmate.utils.toEpochMilliseconds
 import com.jie.wealthmate.utils.today
 import com.jie.wealthmate.vo.CategoryVo
+import io.github.aakira.napier.Napier
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
@@ -157,6 +158,7 @@ fun CategoryExpensesContent(
                         },
                         verticalAlignment = Alignment.CenterVertically
                     ) {
+                        Napier.e("uiState.selectedMonth: ${uiState.selectedMonth}")
                         WMText(
                             text = uiState.selectedMonth.convertLocalDateToString(formatDateKorYM),
                             style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold)
