@@ -59,7 +59,7 @@ fun PreparednessStatusScreen(
             onUpdateStatusType = viewModel::updateStatusType,
             onUpdateLargeCategory = viewModel::updateLargeCategory,
             onCategoryClick = { categoryId ->
-                navController.navigate("categoryExpenses/${uiState.statusType.name}/${uiState.largeCategory.name}/$categoryId")
+                navController.navigate("categoryExpenses/${uiState.statusType.name}/${uiState.largeCategory.name}/$categoryId/")
             },
             onPaymentMethodClick = { paymentMethodId ->
                 navController.navigate("paymentMethodExpenses/${uiState.statusType.name}/${uiState.largeCategory.name}/$paymentMethodId")
@@ -87,12 +87,16 @@ fun PreparednessStatusContent(
         if (scrollToPosition > 0) {
             // scrollToPosition 5는 결제수단 섹션인데, 데이터가 아직 없을 때 스크롤하면 무시될 수 있음
             // 데이터가 로드된 후(비어있지 않을 때) 스크롤 수행
-            if (scrollToPosition >= 4 && uiState.paymentMethodComparisons.isNotEmpty()) {
-                listState.animateScrollToItem(scrollToPosition)
-            } else if (scrollToPosition >= 2 && uiState.categoryComparisons.isNotEmpty()) {
-                listState.animateScrollToItem(scrollToPosition)
-            } else if (scrollToPosition < 2) {
-                listState.animateScrollToItem(scrollToPosition)
+            when {
+                scrollToPosition >= 4 && uiState.paymentMethodComparisons.isNotEmpty() -> {
+                    listState.animateScrollToItem(scrollToPosition)
+                }
+                scrollToPosition >= 2 && uiState.categoryComparisons.isNotEmpty() -> {
+                    listState.animateScrollToItem(scrollToPosition)
+                }
+                scrollToPosition < 2 -> {
+                    listState.animateScrollToItem(scrollToPosition)
+                }
             }
         }
     }

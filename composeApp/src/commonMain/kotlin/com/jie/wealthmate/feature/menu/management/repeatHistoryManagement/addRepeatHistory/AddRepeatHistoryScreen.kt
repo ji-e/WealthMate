@@ -329,7 +329,7 @@ fun AddRepeatHistoryContent(
 
     if (isShowPaymentMethodModalBottomSheet) {
         PaymentMethodModalBottomSheet(
-            selectedPaymentMethod = uiState.paymentMethod,
+            selectedPaymentMethod = uiState.paymentMethodItems.find { it.id  == uiState.paymentMethod?.id},
             paymentMethodItems = uiState.paymentMethodItems,
             onConfirmClick = onUpdatePaymentMethod,
             onDismissRequest = { isShowPaymentMethodModalBottomSheet = false }

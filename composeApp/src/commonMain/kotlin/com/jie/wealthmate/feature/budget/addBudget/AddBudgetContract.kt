@@ -27,20 +27,27 @@ data class AddBudgetUiState(
     val savingCategoryTextFieldMap: ImmutableMap<String, TextFieldValue> = persistentMapOf(),
 ) : BaseUiState {
     val totalBudget: Long
-        get() {
-            return incomeCategoryItems.sumOf { category ->
-                if (isCategoryTagInclude && category.tags.isNotEmpty()) {
-                    category.tags.sumOf { tag ->
-                        incomeCategoryTextFieldMap[tag.id]?.text?.toLongOrNull().default()
-                    }
-                } else {
-                    incomeCategoryTextFieldMap[category.id]?.text?.toLongOrNull().default()
+        get() = calculateSum(incomeCategoryItems, incomeCategoryTextFieldMap)
+
+    val expensesSum: Long
+        get() = calculateSum(expensesCategoryItems, expensesCategoryTextFieldMap)
+
+    val savingSum: Long
+        get() = calculateSum(savingCategoryItems, savingCategoryTextFieldMap)
+
+    private fun calculateSum(items: List<CategoryVo>, map: Map<String, TextFieldValue>): Long {
+        return items.sumOf { category ->
+            if (isCategoryTagInclude && category.tags.isNotEmpty()) {
+                category.tags.sumOf { tag ->
+                    map[tag.id]?.text?.toLongOrNull().default()
                 }
+            } else {
+                map[category.id]?.text?.toLongOrNull().default()
             }
         }
+    }
 }
 
 sealed class AddBudgetUiSideEffect : UiSideEffect {
     data object OnSuccess : AddBudgetUiSideEffect()
 }
-

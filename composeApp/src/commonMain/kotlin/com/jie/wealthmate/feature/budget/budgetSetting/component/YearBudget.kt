@@ -128,25 +128,25 @@ private fun SummaryCard(
     ) {
         WMText(
             text = label,
-            style = typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold),
+            fontWeight = FontWeight.SemiBold,
         )
         WMText(
             text = "${formatWithCommas(value.toString())}원",
-            style = typography.titleLarge.copy(
-                fontWeight = FontWeight.SemiBold,
-                color = valueColor
-            ),
+            style = typography.titleLarge,
+            fontWeight = FontWeight.SemiBold,
+            color = valueColor,
             maxLines = 1,
             autoSize = TextAutoSize.StepBased(
                 minFontSize = 9.sp,
-                maxFontSize = 22.sp,
+                maxFontSize = 20.sp,
                 stepSize = 1.sp
             )
         )
         Row {
             WMText(
                 text = bottomLabel,
-                style = typography.bodySmall.copy(fontWeight = FontWeight.SemiBold),
+                style = typography.bodySmall,
+                fontWeight = FontWeight.SemiBold,
             )
             WMText(
                 text = " $bottomValue",

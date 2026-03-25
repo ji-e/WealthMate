@@ -53,7 +53,7 @@ fun BudgetDetailScreen(
                 navController.navigate("addBudget?selectedYearMonth=$monthStr&isEditMode=true")
             },
             onClickDetail = { largeCategory, categoryId ->
-                navController.navigate("categoryExpenses/${StatusType.MONTH.name}/${largeCategory.name}/$categoryId")
+                navController.navigate("categoryExpenses/${StatusType.MONTH.name}/${largeCategory.name}/$categoryId/${selectedMonth.toString()}")
             },
             onToggleSection = viewModel::toggleSection
         )

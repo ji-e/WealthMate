@@ -106,7 +106,8 @@ fun BudgetHeader(
             ) {
                 WMText(
                     text = displaySelectedMonth,
-                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold)
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold
                 )
                 Icon(
                     painter = painterResource(Res.drawable.ic_arrow_drop_down),
@@ -118,7 +119,8 @@ fun BudgetHeader(
 
             WMText(
                 text = "예산 현황",
-                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
                 modifier = Modifier.padding(start = 4.dp)
             )
         }
@@ -130,13 +132,15 @@ fun BudgetHeader(
         ) {
             WMText(
                 text = "${animatedUsed.roundToLong().formatWithCommas()}원",
-                style = MaterialTheme.typography.displaySmall.copy(fontWeight = FontWeight.SemiBold),
+                style = MaterialTheme.typography.displaySmall,
+                fontWeight = FontWeight.SemiBold,
             )
 
             WMText(
                 text = " / ${budgetAmount.formatWithCommas()}원",
                 modifier = Modifier.padding(bottom = 4.dp),
-                style = MaterialTheme.typography.bodyLarge.copy(color = ColorGray.Gray_500),
+                style = MaterialTheme.typography.bodyLarge,
+                color = ColorGray.Gray_500,
             )
         }
 
@@ -150,16 +154,15 @@ fun BudgetHeader(
             ) {
                 WMText(
                     text = "지출 예산 사용률 $percentageText",
-                    style = MaterialTheme.typography.bodyMedium.copy(color = ColorGray.Gray_500),
+                    color = ColorGray.Gray_500,
                     modifier = Modifier.weight(1f)
                 )
 
                 WMText(
                     text = if (remainAmount >= 0) "잔액 ${remainAmount.formatWithCommas()}원" else "초과 ${(-remainAmount).formatWithCommas()}원",
-                    style = MaterialTheme.typography.bodyMedium.copy(
-                        fontWeight = FontWeight.SemiBold,
-                        color = if (barRatio > 0.8f) ColorRed.Red_300 else ColorGray.Gray_700
-                    )
+                    fontWeight = FontWeight.SemiBold,
+                    color = if (barRatio > 0.8f) ColorRed.Red_300 else ColorGray.Gray_700
+
                 )
             }
 

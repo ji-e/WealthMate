@@ -10,6 +10,7 @@ import kotlinx.datetime.LocalDate
 
 data class CategoryExpensesUiState(
     val statusType: StatusType = StatusType.MONTH,
+    val selectedMonth: LocalDate? = null,
     val largeCategory: LargeCategoryEnum = LargeCategoryEnum.EXPENSES,
     val category: CategoryVo? = null,
     val totalAmount: Long = 0,
@@ -17,7 +18,8 @@ data class CategoryExpensesUiState(
     val histories: List<HistoryWithDetails> = emptyList(),
     val isPagingLoading: Boolean = false,
     val isLastPage: Boolean = false,
-    val page: Int = 0
+    val page: Int = 0,
+    val isHome: Boolean = true
 ) : BaseUiState {
     val diffAmount: Long = totalAmount - lastTotalAmount
 

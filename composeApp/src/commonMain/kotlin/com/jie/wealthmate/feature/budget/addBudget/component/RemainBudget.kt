@@ -37,8 +37,8 @@ fun RemainBudget(
     selectedLargeCategory: LargeCategoryEnum,
     totalBudget: Long,
     remainBudget: Long,
+    allocatedAmount: Long,
 ) {
-    val allocatedAmount = remember(totalBudget, remainBudget) { totalBudget - remainBudget }
     val progress = remember(totalBudget, allocatedAmount) {
         if (totalBudget > 0) (allocatedAmount.toFloat() / totalBudget).coerceIn(0f, 1.1f) else 0f
     }
@@ -75,12 +75,8 @@ fun RemainBudget(
                 modifier = Modifier.weight(1f),
             )
 
-            val displayAllocated =
-                if (selectedLargeCategory == LargeCategoryEnum.INCOME) totalBudget
-                else allocatedAmount
-
             WMText(
-                text = "${displayAllocated.formatWithCommas()}원",
+                text = "${allocatedAmount.formatWithCommas()}원",
                 style = typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
             )
         }

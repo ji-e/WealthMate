@@ -235,16 +235,21 @@ fun MainScreen(
                         )
                     }
                     composable(
-                        route = "categoryExpenses/{statusType}/{largeCategory}/{categoryId}",
+                        route = "categoryExpenses/{statusType}/{largeCategory}/{categoryId}/{selectedDate}",
                         arguments = listOf(
                             navArgument("statusType") { type = NavType.StringType },
                             navArgument("largeCategory") { type = NavType.StringType },
                             navArgument("categoryId") {
                                 type = NavType.StringType
                                 nullable = true
-                            }
+                            },
+                            navArgument("selectedDate") {
+                                type = NavType.StringType
+                                nullable = true
+                            },
                         )
                     ) { backStackEntry ->
+                        val selectedDate: String? = backStackEntry.savedStateHandle["selectedDate"]
                         val statusTypeStr: String? = backStackEntry.savedStateHandle["statusType"]
                         val largeCategoryStr: String? =
                             backStackEntry.savedStateHandle["largeCategory"]
@@ -263,6 +268,7 @@ fun MainScreen(
 
                         CategoryExpensesScreen(
                             navController = innerNavController,
+                            selectedDate = selectedDate,
                             initialStatusType = statusType,
                             initialLargeCategory = largeCategory,
                             categoryId = categoryId

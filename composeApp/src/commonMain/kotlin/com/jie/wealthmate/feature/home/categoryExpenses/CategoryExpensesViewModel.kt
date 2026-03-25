@@ -8,6 +8,7 @@ import com.jie.wealthmate.feature.home.component.vo.PeriodsVo
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.repository.CategoryRepository
 import com.jie.wealthmate.repository.HistoryRepository
+import com.jie.wealthmate.utils.convertDateToLocalDate
 import com.jie.wealthmate.utils.default
 import com.jie.wealthmate.utils.firstDayOfMonth
 import com.jie.wealthmate.utils.lastDayOfMonth
@@ -15,7 +16,9 @@ import com.jie.wealthmate.utils.toEpochMilliseconds
 import com.jie.wealthmate.utils.today
 import com.jie.wealthmate.vo.CategoryVo
 import com.jie.wealthmate.vo.CategoryVo.Companion.mapperToVo
+import io.github.aakira.napier.Napier
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -29,6 +32,7 @@ import kotlinx.datetime.plus
 class CategoryExpensesViewModel(
     private val historyRepository: HistoryRepository,
     private val categoryRepository: CategoryRepository,
+    private val selectedDate: String?,
     private val initialStatusType: StatusType,
     private val initialLargeCategory: LargeCategoryEnum,
     private val categoryId: String?
@@ -36,13 +40,23 @@ class CategoryExpensesViewModel(
 
     override val initialState: CategoryExpensesUiState = CategoryExpensesUiState(
         statusType = initialStatusType,
-        largeCategory = initialLargeCategory
+        largeCategory = initialLargeCategory,
+        selectedMonth = selectedDate.convertDateToLocalDate(),
+        isHome = selectedDate.isNullOrBlank()
     )
 
     private val filterFlow = MutableStateFlow(initialStatusType to initialLargeCategory)
+    private val selectedMonthFlow = MutableStateFlow(today)
 
     init {
-        filterFlow.onEach {
+        Napier.e("selectedDate: $selectedDate")
+        Napier.e("initialStatusType: $initialStatusType")
+        Napier.e("initialLargeCategory: $initialLargeCategory")
+        Napier.e("categoryId: $categoryId")
+
+        combine(filterFlow, selectedMonthFlow) { filter, month ->
+            filter to month
+        }.onEach {
             loadHistories(isRefresh = true)
         }.launchIn(viewModelScope)
     }
@@ -53,6 +67,14 @@ class CategoryExpensesViewModel(
     fun updateStatusType(statusType: StatusType) {
         if (container.uiState.value.statusType == statusType) return
         filterFlow.value = statusType to filterFlow.value.second
+    }
+
+    /**
+     * 선택된 월을 업데이트합니다.
+     */
+    fun updateSelectedMonth(month: LocalDate) {
+        if (container.uiState.value.selectedMonth == month) return
+        selectedMonthFlow.value = month
     }
 
     /**
@@ -71,13 +93,20 @@ class CategoryExpensesViewModel(
         if (!isRefresh && (currentState.isPagingLoading || currentState.isLastPage)) return
 
         val (statusType, largeCategory) = filterFlow.value
+        val selectedMonth = selectedMonthFlow.value
         val currentPage = if (isRefresh) 0 else currentState.page
         val limit = 20
 
         flow {
-            val periods = getPeriods(statusType)
             val isUnsetSearch = categoryId.isNullOrBlank() || categoryId.startsWith(CategoryVo.UNSET_ID_PREFIX)
             val searchCategoryIds = if (isUnsetSearch) listOf(CategoryVo.UNSET_ID_PREFIX) else listOfNotNull(categoryId)
+            
+            // 홈 여부에 따른 기간 설정
+            val periods = if (currentState.isHome) {
+                getPeriods(statusType)
+            } else {
+                getPeriodsByMonth(selectedMonth)
+            }
 
             // 1. 내역 페이징 조회
             val histories = historyRepository.searchHistories(
@@ -133,6 +162,7 @@ class CategoryExpensesViewModel(
             reduceState { state ->
                 state.copy(
                     statusType = statusType,
+                    selectedMonth = selectedMonth,
                     largeCategory = largeCategory,
                     category = summary?.third ?: state.category,
                     totalAmount = summary?.first ?: state.totalAmount,
@@ -174,6 +204,24 @@ class CategoryExpensesViewModel(
             currentEnd = currentRange.second.toEpochMilliseconds() + DAY_END_MILLIS_OFFSET,
             lastStart = lastRange.first.toEpochMilliseconds(),
             lastEnd = lastRange.second.toEpochMilliseconds() + DAY_END_MILLIS_OFFSET
+        )
+    }
+
+    /**
+     * 선택된 월을 기준으로 현재 월 및 이전 월 기간을 계산합니다.
+     */
+    private fun getPeriodsByMonth(month: LocalDate): PeriodsVo {
+        val currentStart = month.firstDayOfMonth()
+        val currentEnd = month.lastDayOfMonth()
+        val lastMonth = month.minus(1, DateTimeUnit.MONTH)
+        val lastStart = lastMonth.firstDayOfMonth()
+        val lastEnd = lastMonth.lastDayOfMonth()
+
+        return PeriodsVo(
+            currentStart = currentStart.toEpochMilliseconds(),
+            currentEnd = currentEnd.toEpochMilliseconds() + DAY_END_MILLIS_OFFSET,
+            lastStart = lastStart.toEpochMilliseconds(),
+            lastEnd = lastStart.toEpochMilliseconds() + DAY_END_MILLIS_OFFSET
         )
     }
 }

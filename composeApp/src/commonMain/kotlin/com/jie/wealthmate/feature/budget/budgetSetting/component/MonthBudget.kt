@@ -166,14 +166,14 @@ fun MonthBudgetItem(
 
             if (isCurrentMonth || !summary.hasAnyBudget) {
                 val badgeText = if (summary.hasAnyBudget) "진행중" else "미설정"
-                val badgeColor = if (summary.hasAnyBudget) ColorPrimary.Primary_500 else ColorRed.Red_300
+                val badgeColor =
+                    if (summary.hasAnyBudget) ColorPrimary.Primary_500 else ColorRed.Red_300
 
                 WMText(
                     text = badgeText,
-                    style = typography.labelSmall.copy(
-                        fontWeight = FontWeight.SemiBold,
-                        color = ColorGray.White
-                    ),
+                    style = typography.labelSmall,
+                    fontWeight = FontWeight.SemiBold,
+                    color = ColorGray.White,
                     modifier = Modifier
                         .padding(start = 4.dp)
                         .background(

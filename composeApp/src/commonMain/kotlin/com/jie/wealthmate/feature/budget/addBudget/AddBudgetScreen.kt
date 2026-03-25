@@ -193,13 +193,20 @@ fun AddBudgetContent(
             }
 
             item {
+                val allocatedAmount = when (uiState.selectedLargeCategory) {
+                    LargeCategoryEnum.INCOME -> uiState.totalBudget
+                    LargeCategoryEnum.EXPENSES -> uiState.expensesSum
+                    LargeCategoryEnum.SAVING -> uiState.savingSum
+                }
+
                 RemainBudget(
                     modifier = Modifier
                         .padding(horizontal = 28.dp)
                         .padding(top = 12.dp),
                     selectedLargeCategory = uiState.selectedLargeCategory,
                     totalBudget = uiState.totalBudget,
-                    remainBudget = uiState.remainBudget
+                    remainBudget = uiState.remainBudget,
+                    allocatedAmount = allocatedAmount
                 )
             }
 

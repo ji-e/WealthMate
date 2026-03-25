@@ -7,6 +7,7 @@ import com.jie.wealthmate.base.BaseViewModel
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.repository.BudgetRepository
 import com.jie.wealthmate.repository.HistoryRepository
+import com.jie.wealthmate.utils.lastMomentOfMonth
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
@@ -93,15 +94,9 @@ class BudgetSettingViewModel(
                             val yearMonth = "$year-${m.toString().padStart(2, '0')}"
                             val budgets = budgetsByMonth[yearMonth] ?: emptyList()
 
-                            val start = LocalDate(targetYear, Month(m), 1).atStartOfDayIn(timeZone)
-                                .toEpochMilliseconds()
-                            val end = if (m == 12) {
-                                LocalDate(targetYear + 1, 1, 1).atStartOfDayIn(timeZone)
-                                    .toEpochMilliseconds()
-                            } else {
-                                LocalDate(targetYear, Month(m + 1), 1).atStartOfDayIn(timeZone)
-                                    .toEpochMilliseconds()
-                            }
+                            val startLocalDate = LocalDate(targetYear, Month(m), 1)
+                            val start = startLocalDate.atStartOfDayIn(timeZone).toEpochMilliseconds()
+                            val end = startLocalDate.lastMomentOfMonth()
 
                             combine(
                                 historyRepository.getSumByMonth(

@@ -9,7 +9,7 @@ import com.jie.wealthmate.repository.HistoryRepository
 import com.jie.wealthmate.utils.convertLocalDateToString
 import com.jie.wealthmate.utils.firstDayOfMonth
 import com.jie.wealthmate.utils.formatDateHyphenYM
-import com.jie.wealthmate.utils.lastDayOfMonth
+import com.jie.wealthmate.utils.lastMomentOfMonth
 import com.jie.wealthmate.utils.toEpochMilliseconds
 import com.jie.wealthmate.vo.CategoryTagVo
 import com.jie.wealthmate.vo.CategoryVo
@@ -49,11 +49,11 @@ class BudgetDetailViewModel(
     private fun observeData() {
         val monthStr = initialMonth.convertLocalDateToString(formatDateHyphenYM)
         val start = initialMonth.firstDayOfMonth().toEpochMilliseconds()
-        val end = initialMonth.lastDayOfMonth().toEpochMilliseconds()
+        val end = initialMonth.lastMomentOfMonth()
 
         val lastMonth = initialMonth.minus(1, DateTimeUnit.MONTH)
         val lastStart = lastMonth.firstDayOfMonth().toEpochMilliseconds()
-        val lastEnd = lastMonth.lastDayOfMonth().toEpochMilliseconds()
+        val lastEnd = lastMonth.lastMomentOfMonth()
 
         val lastMonthSumsFlow = combine(
             historyRepository.getSumByMonth(lastStart, lastEnd, LargeCategoryEnum.INCOME.name),

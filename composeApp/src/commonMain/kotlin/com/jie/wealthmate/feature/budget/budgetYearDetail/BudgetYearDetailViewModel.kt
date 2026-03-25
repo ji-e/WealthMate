@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalCoroutinesApi::class)
+@file:OptIn(ExperimentalCoroutinesApi::class, ExperimentalTime::class)
 
 package com.jie.wealthmate.feature.budget.budgetYearDetail
 
@@ -12,12 +12,13 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atStartOfDayIn
 import kotlinx.datetime.number
 import kotlinx.datetime.toLocalDateTime
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 class BudgetYearDetailViewModel(
     private val selectedYear: String,
@@ -77,9 +78,10 @@ class BudgetYearDetailViewModel(
                 val month = Instant.fromEpochMilliseconds(h.history.date).toLocalDateTime(tz).month.number
                 val amount = h.history.amount
                 val largeCategory = h.history.largeCategory
-                val isFixed = h.history.repeatCycleId != null
+                val isFixed = h.history.repeatCycleId != null || h.history.installmentId != null
                 val categoryLabel = h.category?.middleLabel ?: "카테고리 없음"
                 val icon = h.category?.icon ?: "❓"
+                val categoryId = h.history.categoryId ?: "unknown"
 
                 val acc = monthlySummary[month - 1]
                 when (largeCategory) {
@@ -95,13 +97,12 @@ class BudgetYearDetailViewModel(
                         totalActualExpense += amount
                         if (isFixed) {
                             acc.fixed += amount
-                            val fixedName = h.history.content ?: categoryLabel
-                            val fixedAcc = fixedMap.getOrPut(fixedName) { CategoryAcc(icon) }
+                            val fixedAcc = fixedMap.getOrPut(categoryId) { CategoryAcc(categoryLabel, icon) }
                             fixedAcc.amount += amount
                         } else {
                             acc.variable += amount
                             totalVariableExpense += amount
-                            val varAcc = variableMap.getOrPut(categoryLabel) { CategoryAcc(icon) }
+                            val varAcc = variableMap.getOrPut(categoryId) { CategoryAcc(categoryLabel, icon) }
                             varAcc.amount += amount
                         }
                     }
@@ -119,18 +120,18 @@ class BudgetYearDetailViewModel(
                 )
             }
 
-            val topCategories = variableMap.map { (name, acc) ->
+            val topCategories = variableMap.values.map { acc ->
                 CategoryExpense(
-                    name = name,
+                    name = acc.name,
                     amount = acc.amount,
                     icon = acc.icon,
                     ratio = if (totalVariableExpense > 0) acc.amount.toFloat() / totalVariableExpense else 0f
                 )
             }.sortedByDescending { it.amount }.take(5)
 
-            val fixedExpenses = fixedMap.map { (name, acc) ->
+            val fixedExpenses = fixedMap.values.map { acc ->
                 FixedExpense(
-                    name = name,
+                    name = acc.name,
                     amount = acc.amount,
                     icon = acc.icon
                 )
@@ -186,7 +187,7 @@ class BudgetYearDetailViewModel(
         var variable = 0L
     }
 
-    private class CategoryAcc(val icon: String) {
+    private class CategoryAcc(val name: String, val icon: String) {
         var amount = 0L
     }
 }

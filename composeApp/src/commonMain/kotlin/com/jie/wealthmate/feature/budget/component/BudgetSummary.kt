@@ -1,7 +1,6 @@
 package com.jie.wealthmate.feature.budget.component
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -10,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -27,6 +25,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.jie.wealthmate.component.EmojiIcon
+import com.jie.wealthmate.component.SpacerSize
+import com.jie.wealthmate.component.WMSpacer
 import com.jie.wealthmate.component.WMText
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.theme.ColorBlue
@@ -34,6 +35,7 @@ import com.jie.wealthmate.theme.ColorGray
 import com.jie.wealthmate.theme.ColorPrimary
 import com.jie.wealthmate.theme.ColorRed
 import com.jie.wealthmate.theme.ColorSetting
+import com.jie.wealthmate.theme.Padding
 import com.jie.wealthmate.theme.noRippleClickable
 import com.jie.wealthmate.utils.formatWithCommas
 import kotlinx.collections.immutable.ImmutableList
@@ -127,46 +129,43 @@ private fun StatusItem(
         verticalAlignment = Alignment.CenterVertically
     ) {
         // 카테고리 아이콘
-        Box(
-            modifier = Modifier
-                .padding(end = 12.dp)
-                .size(40.dp)
-                .clip(CircleShape)
-                .background(item.largeCategory.backgroundColor),
-            contentAlignment = Alignment.Center
-        ) {
-            WMText(text = item.icon, style = typography.titleLarge)
-        }
+        EmojiIcon(
+            icon = item.icon,
+            color = item.largeCategory.backgroundColor,
+        )
 
         // 정보 영역
         Column(
             modifier = Modifier
+                .padding(start = Padding.SpacerXS)
                 .weight(1f)
                 .height(44.dp),
-            verticalArrangement = Arrangement.SpaceBetween
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 WMText(
                     text = item.largeCategory.label,
-                    style = typography.titleMedium.copy(fontWeight = FontWeight.SemiBold)
+                    style = typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold
                 )
                 WMText(
                     text = "$percentage%",
-                    style = typography.bodySmall.copy(color = ColorGray.Gray_500),
+                    style = typography.bodySmall,
+                    color = ColorGray.Gray_500,
                     modifier = Modifier.padding(start = 4.dp)
                 )
 
                 WMText(
                     text = "${item.currentAmount.formatWithCommas()}원",
-                    style = typography.titleMedium.copy(
+                    style = typography.titleMedium,
                         fontSize = 18.sp,
                         fontWeight = FontWeight.SemiBold
-                    ),
+                    ,
                     maxLines = 1,
                     textAlign = TextAlign.End,
                     modifier = Modifier.weight(1f)
                 )
             }
+            WMSpacer(size = SpacerSize.XX_SMALL)
 
             Row(verticalAlignment = Alignment.CenterVertically) {
                 // 프로그레스 바
@@ -188,7 +187,8 @@ private fun StatusItem(
 
                 WMText(
                     text = "/ ${item.budgetAmount.formatWithCommas()}원",
-                    style = typography.bodySmall.copy(color = ColorGray.Gray_500),
+                    style = typography.bodySmall,
+                    color = ColorGray.Gray_500,
                     maxLines = 1,
                     textAlign = TextAlign.End,
                     modifier = Modifier.weight(1f)

@@ -3,7 +3,6 @@ package com.jie.wealthmate.feature.budget.component
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -29,18 +28,24 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.jie.wealthmate.component.EmojiIcon
+import com.jie.wealthmate.component.SpacerSize
+import com.jie.wealthmate.component.WMSpacer
 import com.jie.wealthmate.component.WMText
+import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.theme.ColorGray
 import com.jie.wealthmate.theme.ColorRed
 import com.jie.wealthmate.theme.ColorSetting
+import com.jie.wealthmate.theme.Padding
+import com.jie.wealthmate.theme.WMTheme
 import com.jie.wealthmate.utils.formatWithCommas
 import com.jie.wealthmate.vo.CategoryVo
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import org.jetbrains.compose.resources.painterResource
+import androidx.compose.ui.tooling.preview.Preview
 import wealthmate.composeapp.generated.resources.Res
 import wealthmate.composeapp.generated.resources.ic_keyboard_arrow_right
-import wealthmate.composeapp.generated.resources.ic_push_pin
 
 @Immutable
 data class BudgetOverUsageVo(
@@ -60,6 +65,8 @@ fun BudgetOverPager(
     items: ImmutableList<BudgetOverUsageVo> = persistentListOf(),
     onTransactionCountClick: (largeCategory: String, categoryId: String) -> Unit = { _, _ -> },
 ) {
+    if (items.isEmpty()) return
+
     val pagerState = rememberPagerState(pageCount = { items.size })
 
     Column(
@@ -77,17 +84,16 @@ fun BudgetOverPager(
             state = pagerState,
             contentPadding = PaddingValues(horizontal = 28.dp),
             pageSpacing = 12.dp,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            key = { index -> items[index].category.id }
         ) { page ->
-            Box {
-                BudgetOverItem(
-                    modifier = Modifier.fillMaxWidth(),
-                    totalSize = items.size,
-                    index = page + 1,
-                    item = items[page],
-                    onTransactionCountClick = onTransactionCountClick
-                )
-            }
+            BudgetOverItem(
+                modifier = Modifier.fillMaxWidth(),
+                totalSize = items.size,
+                index = page + 1,
+                item = items[page],
+                onTransactionCountClick = onTransactionCountClick
+            )
         }
     }
 }
@@ -135,20 +141,20 @@ fun BudgetOverItem(
                 )
             }
 
-            CategoryIconWithPin(
+            EmojiIcon(
                 icon = item.category.icon,
-                backgroundColor = item.category.largeCategory.backgroundColor,
+                color = item.category.largeCategory.backgroundColor,
                 isFixed = item.category.isFixed
             )
         }
 
-        Spacer(modifier = Modifier.height(8.dp))
-
+        WMSpacer(size = SpacerSize.X_SMALL)
         WMText(
             text = "지출 금액",
             style = typography.bodySmall.copy(color = ColorGray.Gray_500)
         )
-
+        
+        WMSpacer(size = SpacerSize.XX_SMALL)
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.Bottom
@@ -166,8 +172,16 @@ fun BudgetOverItem(
             )
         }
 
+        val topExpenseText = buildString {
+            append("가장 많이 쓴 내역: ")
+            append(item.topExpenseTitle.orEmpty().ifEmpty { "미입력" })
+            item.topExpenseAmount?.let {
+                append(" (${it.formatWithCommas()}원)")
+            }
+        }
+
         WMText(
-            text = "가장 많이 쓴 내역: ${item.topExpenseTitle?.ifEmpty { "미입력" }} (${item.topExpenseAmount?.formatWithCommas()}원)",
+            text = topExpenseText,
             style = typography.bodySmall.copy(color = ColorGray.Gray_500),
             modifier = Modifier.padding(top = 4.dp),
             maxLines = 1,
@@ -198,36 +212,6 @@ fun BudgetOverItem(
 }
 
 @Composable
-private fun CategoryIconWithPin(
-    icon: String,
-    backgroundColor: Color,
-    isFixed: Boolean,
-) {
-    Box(modifier = Modifier.size(48.dp)) {
-        Box(
-            modifier = Modifier
-                .size(40.dp)
-                .clip(CircleShape)
-                .background(backgroundColor)
-                .align(Alignment.Center),
-            contentAlignment = Alignment.Center
-        ) {
-            WMText(text = icon, style = typography.titleLarge)
-        }
-        if (isFixed) {
-            Icon(
-                painter = painterResource(Res.drawable.ic_push_pin),
-                contentDescription = null,
-                tint = ColorRed.Red_300,
-                modifier = Modifier
-                    .size(20.dp)
-                    .align(Alignment.TopStart)
-            )
-        }
-    }
-}
-
-@Composable
 private fun InfoCard(
     label: String,
     value: String,
@@ -235,12 +219,19 @@ private fun InfoCard(
     valueColor: Color = ColorGray.Gray_700,
     onClick: (() -> Unit)? = null,
 ) {
+    val clickableModifier = if (onClick != null) {
+        Modifier.clickable(onClick = onClick)
+    } else {
+        Modifier
+    }
+
     Column(
         modifier = modifier
             .clip(RoundedCornerShape(8.dp))
             .background(Color.White.copy(alpha = 0.6f))
-            .clickable(onClick != null) { onClick?.invoke() }
-            .padding(10.dp)
+            .then(clickableModifier)
+            .padding(10.dp),
+        verticalArrangement = Arrangement.spacedBy(Padding.SpacerXXS)
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             WMText(
@@ -270,6 +261,41 @@ private fun InfoCard(
                 minFontSize = 10.sp,
                 maxFontSize = 14.sp,
                 stepSize = 1.sp
+            )
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun BudgetOverPagerPreview() {
+    WMTheme {
+        BudgetOverPager(
+            items = persistentListOf(
+                BudgetOverUsageVo(
+                    category = CategoryVo.unset(LargeCategoryEnum.EXPENSES).copy(
+                        icon = "🍔",
+                        middleLabel = "식비"
+                    ),
+                    spentAmount = 150000,
+                    budgetAmount = 100000,
+                    overAmount = 50000,
+                    transactionCount = 12,
+                    topExpenseTitle = "점심 식사",
+                    topExpenseAmount = 15000
+                ),
+                BudgetOverUsageVo(
+                    category = CategoryVo.unset(LargeCategoryEnum.EXPENSES).copy(
+                        icon = "☕️",
+                        middleLabel = "카페"
+                    ),
+                    spentAmount = 60000,
+                    budgetAmount = 30000,
+                    overAmount = 30000,
+                    transactionCount = 8,
+                    topExpenseTitle = "스타벅스",
+                    topExpenseAmount = 6500
+                )
             )
         )
     }

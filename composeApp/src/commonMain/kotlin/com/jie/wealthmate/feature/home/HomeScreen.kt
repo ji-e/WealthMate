@@ -65,7 +65,7 @@ fun HomeScreen(
                 navController.navigate("preparednessStatus/${uiState.statusType.name}/${LargeCategoryEnum.EXPENSES.name}?scrollToPosition=2")
             },
             onCategoryItemClick = { categoryId ->
-                navController.navigate("categoryExpenses/${uiState.statusType.name}/${LargeCategoryEnum.EXPENSES.name}/$categoryId")
+                navController.navigate("categoryExpenses/${uiState.statusType.name}/${LargeCategoryEnum.EXPENSES.name}/$categoryId/")
             },
             onPaymentMethodChartClick = {
                 navController.navigate("preparednessStatus/${uiState.statusType.name}/${LargeCategoryEnum.EXPENSES.name}?scrollToPosition=5")

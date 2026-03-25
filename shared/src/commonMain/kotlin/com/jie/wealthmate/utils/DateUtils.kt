@@ -116,6 +116,15 @@ fun LocalDate.lastDayOfMonth(): LocalDate {
 }
 
 /**
+ * 월의 마지막 날짜의 마지막 시간 (23:59:59.999)
+ */
+fun LocalDate.lastMomentOfMonth(): Long {
+    val nextMonth = this.plus(1, DateTimeUnit.MONTH)
+    val firstDayOfNextMonth = LocalDate(nextMonth.year, nextMonth.month, 1)
+    return firstDayOfNextMonth.atStartOfDayIn(TimeZone.currentSystemDefault()).toEpochMilliseconds() - 1
+}
+
+/**
  * 월의 첫번째 날짜
  */
 fun LocalDate.firstDayOfMonth(): LocalDate {

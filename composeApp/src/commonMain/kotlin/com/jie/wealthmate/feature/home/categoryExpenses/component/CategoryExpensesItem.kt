@@ -4,10 +4,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -20,6 +18,7 @@ import com.jie.wealthmate.component.InfoText
 import com.jie.wealthmate.component.WMText
 import com.jie.wealthmate.database.eneity.HistoryWithDetails
 import com.jie.wealthmate.theme.ColorGray
+import com.jie.wealthmate.theme.Padding
 import com.jie.wealthmate.utils.default
 import com.jie.wealthmate.utils.formatWithCommas
 
@@ -54,17 +53,20 @@ fun CategoryExpensesItem(
         ).joinToString(" | ")
     }
 
-
-
     Row(
         modifier = Modifier
             .clickable { onClickHistory(history.history.id) }
             .fillMaxWidth()
-            .padding(horizontal = 28.dp, vertical = 8.dp),
+            .padding(horizontal = Padding.BackgroundHorizontal, vertical = 8.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Column(modifier = Modifier.weight(1f)) {
+        Column(
+            modifier = Modifier
+                .padding(end = Padding.SpacerXXS)
+                .weight(1f),
+            verticalArrangement = Arrangement.spacedBy(Padding.SpacerXXS)
+        ) {
             val content = history.history.content.default()
                 .ifEmpty {
                     history.category?.tags?.find { it.id == history.history.categoryTagId }?.tagLabel
@@ -83,7 +85,7 @@ fun CategoryExpensesItem(
                 )
             }
         }
-        Spacer(modifier = Modifier.size(4.dp))
+
         WMText(
             text = "${history.history.amount.formatWithCommas()}원",
             style = MaterialTheme.typography.titleMedium,

@@ -58,7 +58,7 @@ fun BudgetScreen(
                 navController.navigate("budgetDetail/$monthStr")
             },
             onTransactionCountClick = { largeCategory, categoryId ->
-                navController.navigate("categoryExpenses/MONTH/$largeCategory/$categoryId")
+                navController.navigate("categoryExpenses/MONTH/$largeCategory/$categoryId/${uiState.selectedMonth.toString()}")
             }
         )
     }
