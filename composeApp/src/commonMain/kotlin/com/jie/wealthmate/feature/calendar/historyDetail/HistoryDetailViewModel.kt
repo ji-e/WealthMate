@@ -30,11 +30,12 @@ class HistoryDetailViewModel(
     private val updateInstallmentUseCase: UpdateInstallmentUseCase,
     private val updateRepeatCycleUseCase: UpdateRepeatCycleUseCase,
     private val modifyHistoryUseCase: ModifyHistoryUseCase,
+    private val historyId: String,
 ) : BaseViewModel<HistoryDetailUiState>() {
 
     override val initialState: HistoryDetailUiState = HistoryDetailUiState()
 
-    fun updateInit(historyId: String) {
+    init {
         getHistory(historyId)
         getPaymentMethods()
     }
@@ -164,7 +165,7 @@ class HistoryDetailViewModel(
         }.apiFlow { response ->
             reduceState { state ->
                 state.copy(
-                    installmentHistoryItems = response
+                    installmentHistoryItems = response.map { it.mapperToVo() }
                 )
             }
         }

@@ -183,8 +183,6 @@ fun WMTextField(
                 textColor = if (enabled.not()) ColorSetting.DisabledContent else ColorSetting.Default,
                 isRequire = isRequire,
             )
-
-            WMSpacer(size = SpacerSize.XX_SMALL)
         }
 
         Box(contentAlignment = Alignment.CenterStart) {

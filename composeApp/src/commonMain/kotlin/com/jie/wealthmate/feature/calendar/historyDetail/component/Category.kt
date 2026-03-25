@@ -8,26 +8,24 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.jie.wealthmate.component.EmojiIcon
 import com.jie.wealthmate.component.LabelText
 import com.jie.wealthmate.component.WMText
-import com.jie.wealthmate.theme.ColorGray
-import com.jie.wealthmate.theme.ColorRed
+import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
+import com.jie.wealthmate.theme.ColorSetting
+import com.jie.wealthmate.theme.Padding
+import com.jie.wealthmate.theme.Shapes
+import com.jie.wealthmate.theme.WMTheme
 import com.jie.wealthmate.vo.CategoryTagVo
 import com.jie.wealthmate.vo.CategoryVo
-import org.jetbrains.compose.resources.painterResource
-import wealthmate.composeapp.generated.resources.Res
-import wealthmate.composeapp.generated.resources.ic_push_pin
+import kotlinx.collections.immutable.persistentListOf
 
 @Composable
 fun Category(
@@ -40,69 +38,83 @@ fun Category(
         LabelText(text = "카테고리")
 
         Row(
-            modifier = Modifier.fillMaxWidth()
-                .padding(top = 12.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = Padding.ContainerVertical)
                 .height(60.dp)
-                .clip(RoundedCornerShape(8.dp))
-                .background(ColorGray.Gray_50)
+                .clip(Shapes.medium)
+                .background(ColorSetting.EmptyBackground)
                 .clickable { onCategoryClick() }
-                .padding(horizontal = 8.dp),
+                .padding(start = Padding.SpacerXXS, end = Padding.SpacerS),
             verticalAlignment = Alignment.CenterVertically
         ) {
             if (category == null) {
                 Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(60.dp),
+                    modifier = Modifier.fillMaxWidth(),
                     contentAlignment = Alignment.Center
                 ) {
                     WMText(
                         text = "카테고리 없음",
                         style = MaterialTheme.typography.titleSmall,
-                        color = ColorGray.Gray_300,
+                        color = ColorSetting.DisabledContent
                     )
                 }
-                return@Row
-            }
-            Box(modifier = Modifier.width(60.dp)) {
-                Box(
-                    modifier = Modifier
-                        .clip(CircleShape)
-                        .background(category.largeCategory.backgroundColor)
-                        .size(40.dp)
-                        .align(Alignment.Center),
-                    contentAlignment = Alignment.Center
-                ) {
-                    WMText(
-                        text = category.icon,
-                        style = MaterialTheme.typography.titleLarge
-                    )
-                }
-                if (category.isFixed) {
-                    Icon(
-                        painter = painterResource(Res.drawable.ic_push_pin),
-                        contentDescription = null,
-                        tint = ColorRed.Red_300,
-                        modifier = Modifier
-                            .size(24.dp)
-                            .align(Alignment.TopStart)
-                    )
-                }
-            }
+            } else {
+                EmojiIcon(
+                    icon = category.icon,
+                    color = category.largeCategory.backgroundColor,
+                    isFixedUsed = true,
+                    isFixed = category.isFixed
+                )
 
-            WMText(
-                text = category.middleLabel,
-                style = MaterialTheme.typography.titleMedium,
-                maxLines = 1
+                WMText(
+                    text = category.middleLabel,
+                    style = MaterialTheme.typography.titleMedium,
+                    maxLines = 1,
+                    modifier = Modifier.padding(start = Padding.SpacerXS)
+                )
+
+                categoryTag?.let {
+                    WMText(
+                        text = " > ${it.label}",
+                        style = MaterialTheme.typography.titleMedium,
+                        maxLines = 1
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun CategoryPreview() {
+    WMTheme {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(Padding.BackgroundHorizontal)
+        ) {
+            Category(
+                category = CategoryVo(
+                    id = "1",
+                    icon = "🍔",
+                    largeCategory = LargeCategoryEnum.EXPENSES,
+                    middleLabel = "식비",
+                    sort = 1,
+                    isFixed = false,
+                    tags = persistentListOf()
+                ),
+                categoryTag = CategoryTagVo(id = "1", label = "외식"),
+                onCategoryClick = {}
             )
 
-            categoryTag?.let {
-                WMText(
-                    text = " > ${it.label}",
-                    style = MaterialTheme.typography.titleMedium,
-                    maxLines = 1
-                )
-            }
+            Category(
+                modifier = Modifier.padding(top = Padding.SpacerS),
+                category = null,
+                categoryTag = null,
+                onCategoryClick = {}
+            )
         }
     }
 }

@@ -10,14 +10,16 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.jie.wealthmate.component.SwitchSize
 import com.jie.wealthmate.component.WMIconButton
@@ -25,8 +27,12 @@ import com.jie.wealthmate.component.WMSwitch
 import com.jie.wealthmate.component.WMText
 import com.jie.wealthmate.feature.calendar.addHistory.component.RepeatCycleEnum
 import com.jie.wealthmate.feature.calendar.addHistory.component.formattedShortDescription
+import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.theme.ColorGray
 import com.jie.wealthmate.theme.ColorSetting
+import com.jie.wealthmate.theme.Padding
+import com.jie.wealthmate.theme.Shapes
+import com.jie.wealthmate.theme.WMTheme
 import com.jie.wealthmate.utils.convertLocalDateToString
 import com.jie.wealthmate.utils.formatDateDotYYMDE
 import com.jie.wealthmate.vo.RepeatCycleVo
@@ -45,8 +51,9 @@ fun RepeatCycle(
     onModifyRepeatCycleClick: () -> Unit,
 ) {
     val isActivated = repeatCycle.isActive
-    val contentColor = if (isActivated) ColorGray.Gray_700 else ColorGray.Gray_500
-    val repeatDescription =
+    val contentColor = if (isActivated) ColorSetting.Default else ColorSetting.Info
+
+    val repeatDescription = remember(repeatCycle) {
         when (val repeatCycleEnum = repeatCycle.repeatCycle) {
             RepeatCycleEnum.WEEKLY -> {
                 repeatCycleEnum.formattedShortDescription(repeatCycle.dayOfWeek ?: 1)
@@ -60,15 +67,22 @@ fun RepeatCycle(
                 repeatCycleEnum.formattedShortDescription(repeatCycle.date)
             }
         }
+    }
+
+    val isModifiedInCurrentMonth = remember(repeatCycle, date) {
+        repeatCycle.isModified &&
+                repeatCycle.updateAt?.year == date.year &&
+                repeatCycle.updateAt.month == date.month
+    }
+
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(8.dp))
+            .clip(Shapes.medium)
             .background(ColorGray.Gray_50)
-            .padding(horizontal = 16.dp)
-            .padding(top = 6.dp, bottom = 16.dp),
+            .padding(horizontal = Padding.ContainerHorizontal)
+            .padding(top = 6.dp, bottom = Padding.SpacerS),
     ) {
-
         Row(
             modifier = Modifier
                 .padding(bottom = 6.dp)
@@ -94,71 +108,121 @@ fun RepeatCycle(
 
             WMSwitch(
                 checked = isActivated,
-                switchSize = SwitchSize.X_SMALL,
+                switchSize = SwitchSize.SMALL,
                 onCheckedChange = onIsActiveChange,
             )
         }
 
-        Row(
+        DateInfoRow(
+            label = "시작일",
+            date = repeatCycle.startDate,
+            contentColor = contentColor
+        )
+
+        DateInfoRow(
+            label = "종료일",
+            date = repeatCycle.endDate,
+            contentColor = contentColor,
+            modifier = Modifier.padding(top = Padding.SpacerXXS)
+        )
+
+        if (isModifiedInCurrentMonth) {
+            ModifiedNoticeRow(modifier = Modifier.padding(top = Padding.ContainerVertical))
+        }
+    }
+}
+
+@Composable
+private fun DateInfoRow(
+    modifier: Modifier = Modifier,
+    label: String,
+    date: LocalDate?,
+    contentColor: Color,
+) {
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        WMText(
+            text = label,
+            fontWeight = FontWeight.SemiBold,
+            color = ColorGray.Gray_500,
+            modifier = Modifier.width(50.dp)
+        )
+
+        WMText(
+            text = date.convertLocalDateToString(formatDateDotYYMDE, "없음"),
+            color = contentColor
+        )
+    }
+}
+
+@Composable
+private fun ModifiedNoticeRow(
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier = modifier,
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(Padding.SpacerXXS)
+    ) {
+        Icon(
+            painter = painterResource(Res.drawable.ic_error_outline),
+            contentDescription = null,
+            modifier = Modifier.size(14.dp),
+            tint = ColorSetting.Info
+        )
+
+        WMText(
+            text = "내역 작성 이후 반복 설정이 변경되었습니다.",
+            style = MaterialTheme.typography.bodySmall,
+            color = ColorSetting.Info
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun RepeatCyclePreview() {
+    val mockDate = LocalDate(2024, 1, 15)
+    val mockRepeatCycle = RepeatCycleVo(
+        id = "1",
+        largeCategory = LargeCategoryEnum.EXPENSES,
+        content = "정기 결제",
+        amount = 10000,
+        repeatCycle = RepeatCycleEnum.MONTHLY,
+        dayOfMonth = 15,
+        date = LocalDate(2024, 1, 15),
+        startDate = LocalDate(2024, 1, 1),
+        endDate = null,
+        categoryId = "cat_1",
+        paymentMethodId = "pay_1",
+        isActive = true,
+        isModified = true,
+        isDeleted = false,
+        updateAt = LocalDate(2024, 1, 10)
+    )
+
+    WMTheme {
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 4.dp),
-            verticalAlignment = Alignment.CenterVertically
+                .padding(Padding.BackgroundHorizontal),
+            verticalArrangement = Arrangement.spacedBy(Padding.SpacerS)
         ) {
-            WMText(
-                text = "시작일",
-
-                fontWeight = FontWeight.SemiBold,
-                color = ColorGray.Gray_500,
-                modifier = Modifier.width(50.dp)
+            RepeatCycle(
+                date = mockDate,
+                repeatCycle = mockRepeatCycle,
+                onIsActiveChange = {},
+                onModifyRepeatCycleClick = {}
             )
 
-            WMText(
-                text = repeatCycle.startDate.convertLocalDateToString(formatDateDotYYMDE),
-                color = contentColor
+            RepeatCycle(
+                date = mockDate,
+                repeatCycle = mockRepeatCycle.copy(isActive = false, isModified = false),
+                onIsActiveChange = {},
+                onModifyRepeatCycleClick = {}
             )
-        }
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                WMText(
-                    text = "종료일",
-                    fontWeight = FontWeight.SemiBold,
-                    color = ColorGray.Gray_500,
-                    modifier = Modifier.width(50.dp)
-                )
-
-                WMText(
-                    text = repeatCycle.endDate.convertLocalDateToString(formatDateDotYYMDE, "없음"),
-                    color = contentColor
-                )
-            }
-        }
-
-        if (repeatCycle.isModified && repeatCycle.updateAt?.year == date.year && repeatCycle.updateAt.month == date.month) {
-            Row(
-                modifier = Modifier.padding(top = 12.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                Icon(
-                    painter = painterResource(Res.drawable.ic_error_outline),
-                    contentDescription = null,
-                    modifier = Modifier.size(14.dp),
-                    tint = ColorSetting.Info
-                )
-
-                WMText(
-                    text = "내역 작성 이후 반복 설정이 변경되었습니다.",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = ColorSetting.Info
-                )
-            }
         }
     }
 }

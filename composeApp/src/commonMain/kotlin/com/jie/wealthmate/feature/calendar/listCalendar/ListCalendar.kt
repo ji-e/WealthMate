@@ -15,6 +15,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
@@ -65,6 +66,10 @@ fun ListCalendar(
 
     var isProgrammaticScroll by remember { mutableStateOf(false) }
     var isInitialScroll by remember { mutableStateOf(true) }
+
+    // 최신 상태를 참조하기 위해 rememberUpdatedState 사용
+    val currentSelectedDate by rememberUpdatedState(selectedDate)
+    val currentOnDateSelected by rememberUpdatedState(onDateSelected)
 
     // 2. 외부(상단 캘린더 등)에서 날짜 변경 시 리스트 스크롤 동기화
     LaunchedEffect(selectedDate, groupStartIndices) {
@@ -120,8 +125,8 @@ fun ListCalendar(
             .map { it.first }
             .distinctUntilChanged()
             .collect { date ->
-                if (date != null && date != selectedDate) {
-                    onDateSelected(date)
+                if (date != null && date != currentSelectedDate) {
+                    currentOnDateSelected(date)
                 }
             }
     }

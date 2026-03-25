@@ -30,6 +30,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -96,12 +97,17 @@ fun MonthCalendar(
         pageCount = { pageCount }
     )
 
+    // 최신 상태를 참조하기 위해 rememberUpdatedState 사용
+    val currentSelectedMonth by rememberUpdatedState(selectedMonth)
+    val currentOnMonthChanged by rememberUpdatedState(onMonthChanged)
+
     // 페이지 변경 시 월 업데이트
     LaunchedEffect(pagerState) {
         snapshotFlow { pagerState.settledPage }.collect { page ->
             val newMonth = START_DATE.plus(value = page, unit = DateTimeUnit.MONTH)
-            if (selectedMonth.month != newMonth.month || selectedMonth.year != newMonth.year) {
-                onMonthChanged(newMonth)
+            // 캡처된 값이 아닌 최신 값(currentSelectedMonth)과 비교
+            if (currentSelectedMonth.month != newMonth.month || currentSelectedMonth.year != newMonth.year) {
+                currentOnMonthChanged(newMonth)
             }
         }
     }

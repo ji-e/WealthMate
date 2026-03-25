@@ -1,5 +1,6 @@
 package com.jie.wealthmate.feature.calendar.addHistory.component
 
+import androidx.compose.foundation.layout.Row
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.jie.wealthmate.component.textField.WMTextField
@@ -18,14 +19,16 @@ fun PaymentMethodTextField(
 ) {
     val label = if (selectedLargeCategory == LargeCategoryEnum.EXPENSES) "결제수단" else "자산"
 
-    WMTextField(
-        value = selectedPaymentMethod?.label.default(),
-        onValueChange = {},
-        modifier = modifier,
-        label = label,
-        readOnly = true,
-        placeholder = "$label$placeholder",
-        onReadOnlyClick = onPaymentMethodClick,
-    )
+    Row(modifier = modifier) {
+        WMTextField(
+            value = selectedPaymentMethod?.label.default(),
+            onValueChange = {},
+            label = label,
+            readOnly = true,
+            placeholder = "$label$placeholder",
+            onReadOnlyClick = onPaymentMethodClick,
+            isSupport = false
+        )
+    }
 }
 

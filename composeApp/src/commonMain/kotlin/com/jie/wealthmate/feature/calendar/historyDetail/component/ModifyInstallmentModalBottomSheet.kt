@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -24,6 +23,7 @@ import com.jie.wealthmate.component.WMText
 import com.jie.wealthmate.component.textField.WMTextField
 import com.jie.wealthmate.component.textField.rememberIntegerVisualTransformation
 import com.jie.wealthmate.component.textField.toIntegerTextFieldValue
+import com.jie.wealthmate.theme.Padding
 import com.jie.wealthmate.utils.default
 
 @Composable
@@ -51,8 +51,8 @@ fun ModifyInstallmentModalBottomSheet(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 28.dp)
-                .padding(bottom = 20.dp)
+                .padding(horizontal = Padding.BackgroundHorizontal)
+                .padding(bottom = Padding.BackgroundBottom)
         ) {
             WMTextField(
                 value = totalAmount,
@@ -63,7 +63,9 @@ fun ModifyInstallmentModalBottomSheet(
                 suffix = {
                     WMText(
                         text = "원",
-                        style = androidx.compose.material3.MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold)
+                        style = androidx.compose.material3.MaterialTheme.typography.bodyLarge.copy(
+                            fontWeight = FontWeight.SemiBold
+                        )
                     )
                 },
                 placeholder = "총 결제 금액을 입력해 주세요.",

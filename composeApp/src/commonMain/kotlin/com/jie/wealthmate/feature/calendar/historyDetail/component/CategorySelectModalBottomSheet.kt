@@ -8,13 +8,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import com.jie.wealthmate.component.ButtonSize
 import com.jie.wealthmate.component.ButtonStyle
 import com.jie.wealthmate.component.WMButton
 import com.jie.wealthmate.component.WMModalBottomSheet
+import com.jie.wealthmate.component.WMSpacer
 import com.jie.wealthmate.feature.calendar.addHistory.component.CategorySelectionRow
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
+import com.jie.wealthmate.theme.Padding
 import com.jie.wealthmate.vo.CategoryTagVo
 import com.jie.wealthmate.vo.CategoryVo
 
@@ -35,7 +36,7 @@ fun CategorySelectModalBottomSheet(
         onDismissRequest = onDismissRequest
     ) {
         CategorySelectionRow(
-            modifier = Modifier.padding(horizontal = 28.dp),
+            modifier = Modifier.padding(horizontal = Padding.BackgroundHorizontal),
             title = null,
             categoryItems = categoryItems,
             selectedLargeCategory = selectedLargeCategory,
@@ -48,13 +49,15 @@ fun CategorySelectModalBottomSheet(
             onCategoryTagClick = { tempSelectedCategoryTag = it }
         )
 
+        WMSpacer()
+
         WMButton(
             text = "확인",
             buttonStyle = ButtonStyle.FILLED,
             buttonSize = ButtonSize.LARGE,
             modifier = Modifier
-                .padding(horizontal = 28.dp)
-                .padding(top = 20.dp)
+                .padding(horizontal = Padding.BackgroundHorizontal)
+                .padding(bottom = Padding.BackgroundBottom)
                 .fillMaxWidth(),
             onClick = {
                 onDismissRequest()

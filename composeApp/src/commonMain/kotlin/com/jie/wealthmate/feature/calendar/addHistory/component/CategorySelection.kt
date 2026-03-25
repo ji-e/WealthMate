@@ -19,8 +19,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
@@ -34,12 +37,15 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.jie.wealthmate.component.EmojiIcon
+import com.jie.wealthmate.component.EmojiIconSize
 import com.jie.wealthmate.component.LabelText
+import com.jie.wealthmate.component.WMHorizontalDivider
 import com.jie.wealthmate.component.WMText
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.theme.ColorGray
-import com.jie.wealthmate.theme.ColorPrimary
-import com.jie.wealthmate.theme.ColorRed
+import com.jie.wealthmate.theme.ColorSetting
+import com.jie.wealthmate.theme.Padding
 import com.jie.wealthmate.theme.noRippleClickable
 import com.jie.wealthmate.utils.default
 import com.jie.wealthmate.vo.CategoryTagVo
@@ -47,7 +53,6 @@ import com.jie.wealthmate.vo.CategoryVo
 import org.jetbrains.compose.resources.painterResource
 import wealthmate.composeapp.generated.resources.Res
 import wealthmate.composeapp.generated.resources.ic_check_circle
-import wealthmate.composeapp.generated.resources.ic_push_pin
 
 private object CategorySelectionDefaults {
     val ContainerShape = RoundedCornerShape(8.dp)
@@ -143,19 +148,19 @@ fun CategorySelectionRow(
     onCategoryClick: (CategoryVo) -> Unit,
     onCategoryTagClick: (CategoryTagVo) -> Unit,
 ) {
-    val categoryLazyListState = rememberLazyListState()
+    val categoryGridState = rememberLazyGridState()
     val density = LocalDensity.current
 
     LaunchedEffect(selectedCategory?.id) {
         val index = categoryItems.indexOfFirst { it.id == selectedCategory?.id }
         if (index >= 0) {
-            val layoutInfo = categoryLazyListState.layoutInfo
+            val layoutInfo = categoryGridState.layoutInfo
             val viewportWidth = layoutInfo.viewportSize.width
             if (viewportWidth > 0) {
                 val itemWidthPx =
                     with(density) { CategorySelectionDefaults.CategoryItemSize.roundToPx() }
                 val centerOffset = (viewportWidth - itemWidthPx) / 2
-                categoryLazyListState.animateScrollToItem(index, -centerOffset)
+                categoryGridState.animateScrollToItem(index, -centerOffset)
             }
         }
     }
@@ -175,12 +180,22 @@ fun CategorySelectionRow(
                 .background(CategorySelectionDefaults.ContainerBackground)
         ) {
             if (categoryItems.isEmpty()) {
-                EmptyCategoryMessage(modifier = Modifier.fillMaxWidth().padding(32.dp))
+                EmptyCategoryMessage(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(Padding.SpacerL)
+                )
             } else {
-                LazyRow(
-                    state = categoryLazyListState,
-                    contentPadding = PaddingValues(vertical = 12.dp, horizontal = 8.dp),
-                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                LazyHorizontalGrid(
+                    rows = GridCells.Fixed(2),
+                    state = categoryGridState,
+                    modifier = Modifier.height(170.dp),
+                    contentPadding = PaddingValues(
+                        vertical = Padding.ContainerVertical,
+                        horizontal = Padding.SpacerXS
+                    ),
+                    horizontalArrangement = Arrangement.spacedBy(Padding.SpacerXXS),
+                    verticalArrangement = Arrangement.spacedBy(Padding.SpacerXXS)
                 ) {
                     items(categoryItems, key = { it.id }) { category ->
                         CategorySelectionItem(
@@ -197,20 +212,15 @@ fun CategorySelectionRow(
                         selectedLargeCategory == selectedCategory.largeCategory &&
                         selectedCategory.tags.isNotEmpty()
 
-//                if (showTags) {
-                    Spacer(
-                        modifier = Modifier
-                            .height(1.dp)
-                            .fillMaxWidth()
-                            .background(CategorySelectionDefaults.DividerColor)
-                    )
+
+                WMHorizontalDivider()
 
                 LazyRow(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(48.dp),
-                    contentPadding = PaddingValues(horizontal = 16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    contentPadding = PaddingValues(horizontal = Padding.ContainerHorizontal),
+                    horizontalArrangement = Arrangement.spacedBy(Padding.SpacerXS),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     if (showTags) {
@@ -235,7 +245,7 @@ private fun EmptyCategoryMessage(modifier: Modifier = Modifier) {
         modifier = modifier,
         textAlign = TextAlign.Center,
         style = MaterialTheme.typography.bodyMedium,
-        color = ColorGray.Gray_300
+        color = ColorSetting.DisabledContent
     )
 }
 
@@ -248,7 +258,7 @@ private fun CategoryTagItem(
     Box(
         modifier = Modifier
             .clip(CircleShape)
-            .background(color = if (isSelected) ColorPrimary.Primary_500 else ColorGray.White)
+            .background(color = if (isSelected) ColorSetting.Primary else ColorGray.White)
             .clickable { onClick() }
             .padding(horizontal = 12.dp, vertical = 6.dp),
         contentAlignment = Alignment.Center
@@ -256,7 +266,7 @@ private fun CategoryTagItem(
         WMText(
             text = tag.label,
             style = MaterialTheme.typography.labelMedium,
-            color = if (isSelected) ColorGray.White else ColorGray.Gray_700
+            color = if (isSelected) ColorGray.White else ColorSetting.Default
         )
     }
 }
@@ -272,39 +282,26 @@ private fun CategorySelectionItem(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
+
         Box(
-            modifier = Modifier.width(56.dp),
+            modifier = Modifier
+                .padding(end = EmojiIconSize.MEDIUM.fixedIconSize / 3)
+                .width(56.dp),
             contentAlignment = Alignment.Center
         ) {
-            Box(
-                modifier = Modifier
-                    .size(CategorySelectionDefaults.CategoryIconSize)
-                    .clip(CircleShape)
-                    .background(category.largeCategory.backgroundColor),
-                contentAlignment = Alignment.Center
-            ) {
-                WMText(
-                    text = category.icon,
-                    style = MaterialTheme.typography.titleLarge
-                )
-            }
 
-            if (category.isFixed) {
-                Icon(
-                    painter = painterResource(Res.drawable.ic_push_pin),
-                    contentDescription = null,
-                    tint = ColorRed.Red_300,
-                    modifier = Modifier
-                        .size(CategorySelectionDefaults.BadgeIconSize)
-                        .align(Alignment.TopStart)
-                )
-            }
+            EmojiIcon(
+                icon = category.icon,
+                color = category.largeCategory.backgroundColor,
+                isFixed = category.isFixed,
+                isFixedUsed = true
+            )
 
             if (isSelectedCategory) {
                 Icon(
                     painter = painterResource(Res.drawable.ic_check_circle),
                     contentDescription = null,
-                    tint = ColorPrimary.Primary_500,
+                    tint = ColorSetting.Primary,
                     modifier = Modifier
                         .size(CategorySelectionDefaults.BadgeIconSize)
                         .align(Alignment.BottomEnd)
@@ -316,7 +313,7 @@ private fun CategorySelectionItem(
             text = category.middleLabel,
             style = MaterialTheme.typography.titleSmall,
             fontWeight = if (isSelectedCategory) FontWeight.SemiBold else FontWeight.Normal,
-            modifier = Modifier.padding(top = 4.dp),
+            modifier = Modifier.padding(top = Padding.SpacerXXS),
             maxLines = 1,
             textAlign = TextAlign.Center
         )

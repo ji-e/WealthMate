@@ -79,6 +79,9 @@ fun TextFieldValue.toIntegerTextFieldValue(): TextFieldValue {
 
     return copy(
         text = sanitizedText,
-        selection = TextRange(sanitizedText.length)
+        selection = TextRange(
+            selection.start.coerceIn(0, sanitizedText.length),
+            selection.end.coerceIn(0, sanitizedText.length)
+        )
     )
 }

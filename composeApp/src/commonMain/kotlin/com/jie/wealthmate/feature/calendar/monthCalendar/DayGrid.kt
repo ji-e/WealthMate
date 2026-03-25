@@ -318,6 +318,7 @@ private fun RepeatHistoryList(
     if (maxVisibleItems > 0) {
         Column {
             repeatItems.take(maxVisibleItems).forEach { item ->
+                val content = item.content.default().ifEmpty { item.categoryInfo }
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -332,7 +333,7 @@ private fun RepeatHistoryList(
                             .background(item.largeCategory.accentColor)
                     )
                     WMText(
-                        text = item.content.default(),
+                        text = content,
                         style = MaterialTheme.typography.labelSmall,
                         maxLines = 1,
                         modifier = Modifier.padding(start = 2.dp),

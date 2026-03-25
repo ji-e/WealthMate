@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -52,12 +53,13 @@ fun DateTextField(
 ) {
     Box(modifier = modifier) {
         WMTextField(
+            label = "날짜",
             value = selectedDate.convertLocalDateToString(formatDateDotYYYYMDE),
             onValueChange = {},
-            label = "날짜",
             readOnly = true,
             isRequire = true,
             onReadOnlyClick = onDateClick,
+            isSupport = repeatCycle != null || totalInstallmentCount != null,
             supportingContent = {
                 val supportingText = when {
                     repeatCycle != null -> repeatCycle.formattedDescription(selectedDate)
@@ -98,8 +100,9 @@ fun DateTextField(
         if (isTrailingIconVisible) {
             Row(
                 modifier = Modifier
-                    .padding(bottom = 4.dp)
-                    .align(Alignment.CenterEnd),
+                    .padding(top = 18.dp)
+                    .height(50.dp)
+                    .align(Alignment.TopEnd),
                 horizontalArrangement = Arrangement.spacedBy(6.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {

@@ -1,5 +1,6 @@
 package com.jie.wealthmate.vo
 
+import com.jie.wealthmate.database.eneity.HistoryEntity
 import com.jie.wealthmate.database.eneity.HistoryWithDetails
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.utils.default
@@ -71,6 +72,18 @@ data class HistoryVo(
             content = this?.history?.content,
             isVisibility = this?.history?.isVisibility ?: true,
             userId = this?.history?.userId
+        )
+
+        fun HistoryEntity.mapperToVo() = HistoryVo(
+            id = id,
+            largeCategory = LargeCategoryEnum.creator(largeCategory),
+            date = date.toLocalDate(),
+            amount = amount,
+            installmentTime = installment?.installmentTime,
+            installmentRemainAmount = installment?.installmentRemainAmount,
+            content = content,
+            isVisibility = isVisibility,
+            userId = userId
         )
     }
 }

@@ -66,19 +66,42 @@ class AddHistoryViewModel(
         paymentMethodRepository.getPaymentMethods()
             .apiFlow { response ->
                 reduceState { state ->
+                    val paymentMethodItems = response.map {
+                        PaymentMethodVo(
+                            id = it.paymentMethod.id,
+                            label = it.paymentMethod.label,
+                            groupId = it.group?.id,
+                            groupLabel = it.group?.label,
+                            sort = it.paymentMethod.sort
+                        )
+                    }
                     state.copy(
-                        paymentMethodItems = response.map {
-                            PaymentMethodVo(
-                                id = it.paymentMethod.id,
-                                label = it.paymentMethod.label,
-                                groupId = it.group?.id,
-                                groupLabel = it.group?.label,
-                                sort = it.paymentMethod.sort
-                            )
-                        }
+                        paymentMethodItems = paymentMethodItems,
+                        paymentMethod = paymentMethodItems.firstOrNull()
                     )
                 }
             }
+    }
+
+    /**
+     * 입력을 초기화합니다.
+     */
+    fun reset(date: LocalDate) {
+        reduceState { state ->
+            state.copy(
+                isDataChanged = false,
+                selectedLargeCategory = LargeCategoryEnum.EXPENSES,
+                date = date,
+                repeatCycle = null,
+                totalInstallmentCount = null,
+                content = TextFieldValue(""),
+                amount = TextFieldValue(""),
+                category = null,
+                categoryTag = null,
+                paymentMethod = state.paymentMethodItems.firstOrNull()
+            )
+        }
+        largeCategoryFlow.value = LargeCategoryEnum.EXPENSES
     }
 
     fun updateLargeCategory(largeCategory: LargeCategoryEnum) {

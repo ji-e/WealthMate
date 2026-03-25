@@ -8,10 +8,10 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -21,23 +21,24 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.jie.wealthmate.base.BaseScreen
 import com.jie.wealthmate.component.ButtonSize
+import com.jie.wealthmate.component.SpacerSize
 import com.jie.wealthmate.component.WMDialog
 import com.jie.wealthmate.component.WMFloatingButton
 import com.jie.wealthmate.component.WMListSelectionModalBottomSheet
 import com.jie.wealthmate.component.WMSaveBackDialog
+import com.jie.wealthmate.component.WMSpacer
 import com.jie.wealthmate.component.WMText
-import com.jie.wealthmate.component.textField.WMTextField
-import com.jie.wealthmate.component.textField.rememberIntegerVisualTransformation
-import com.jie.wealthmate.component.textField.toIntegerTextFieldValue
 import com.jie.wealthmate.component.topbar.TopBarItem
 import com.jie.wealthmate.component.topbar.WMTopBar
+import com.jie.wealthmate.feature.calendar.addHistory.component.AmountTextField
 import com.jie.wealthmate.feature.calendar.addHistory.component.CategorySelectionRow
+import com.jie.wealthmate.feature.calendar.addHistory.component.ContentTextField
 import com.jie.wealthmate.feature.calendar.addHistory.component.DateSelectModalBottomSheet
 import com.jie.wealthmate.feature.calendar.addHistory.component.DateTextField
 import com.jie.wealthmate.feature.calendar.addHistory.component.InstallmentModalBottomSheet
@@ -47,7 +48,7 @@ import com.jie.wealthmate.feature.calendar.addHistory.component.PaymentMethodTex
 import com.jie.wealthmate.feature.calendar.addHistory.component.RepeatCycleEnum
 import com.jie.wealthmate.feature.menu.management.categoryManagement.component.LargeCategoryEnum
 import com.jie.wealthmate.theme.ColorGray
-import com.jie.wealthmate.utils.default
+import com.jie.wealthmate.theme.WMTheme
 import com.jie.wealthmate.vo.CategoryTagVo
 import com.jie.wealthmate.vo.CategoryVo
 import com.jie.wealthmate.vo.PaymentMethodVo
@@ -68,6 +69,10 @@ fun AddHistoryScreen(
     var isShowConfirmDialog by remember { mutableStateOf(false) }
     var confirmContent by remember { mutableStateOf("") }
     var confirmCallback by remember { mutableStateOf<() -> Unit>({}) }
+
+    LaunchedEffect(Unit) {
+        viewModel.reset(initialSelectedDate)
+    }
 
     BaseScreen(
         viewModel = viewModel,
@@ -161,6 +166,10 @@ fun AddHistoryContent(
     val scrollState = rememberScrollState()
     val density = LocalDensity.current
 
+    LaunchedEffect(Unit) {
+        scrollState.scrollTo(0)
+    }
+
     val isLargeCategoryVisible by remember {
         derivedStateOf {
             scrollState.value > with(density) { 56.dp.toPx() }
@@ -202,16 +211,18 @@ fun AddHistoryContent(
                 .padding(horizontal = 28.dp)
                 .verticalScroll(scrollState)
         ) {
+            WMSpacer(size = SpacerSize.XX_SMALL)
+
             // 수입, 지출, 저출 카테고리 선택
             LargeCategorySelectBox(
-                modifier = Modifier.padding(top = 4.dp),
                 selectedLargeCategory = uiState.selectedLargeCategory,
                 onLargeCategoryClick = onUpdateLargeCategory
             )
 
+            WMSpacer()
+
             // 날짜 선택
             DateTextField(
-                modifier = Modifier.padding(top = 24.dp),
                 selectedDate = uiState.date,
                 amount = uiState.amount,
                 repeatCycle = uiState.repeatCycle,
@@ -247,68 +258,48 @@ fun AddHistoryContent(
                 }
             )
 
+            WMSpacer()
+
             // 금액 입력
-            WMTextField(
-                modifier = Modifier.padding(top = 20.dp),
-                value = uiState.amount,
-                onValueChange = {
-                    onUpdateAmount(it.toIntegerTextFieldValue())
-                },
-                label = "금액",
-                isRequire = true,
-                maxLength = 10,
-                placeholder = "금액을 입력해 주세요.",
-                suffix = {
-                    WMText(
-                        text = "원",
-                        style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold)
-                    )
-                },
-                visualTransformation = rememberIntegerVisualTransformation(),
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Number
-                ),
+            AmountTextField(
+                amount = uiState.amount,
+                onUpdateAmount = onUpdateAmount
             )
 
+            WMSpacer()
+
+            // 내용 입력
+            ContentTextField(
+                content = uiState.content,
+                onUpdateContent = onUpdateContent
+            )
+
+            WMSpacer()
+
+            if (uiState.selectedLargeCategory == LargeCategoryEnum.EXPENSES) {
+                // 결제 수단 선택
+                PaymentMethodTextField(
+                    selectedLargeCategory = uiState.selectedLargeCategory,
+                    selectedPaymentMethod = uiState.paymentMethod,
+                    onPaymentMethodClick = {
+                        isShowPaymentMethodModalBottomSheet = true
+                    }
+                )
+            }
+
+            WMSpacer()
+
             CategorySelectionRow(
-                modifier = Modifier.padding(bottom = 24.dp),
+                modifier = Modifier.padding(),
                 categoryItems = uiState.categoryItems,
                 selectedLargeCategory = uiState.selectedLargeCategory,
                 selectedCategory = uiState.category,
                 selectedCategoryTag = uiState.categoryTag,
-                onCategoryClick = { category ->
-                    if (category.isFixed && uiState.repeatCycle == null) {
-                        onShowConfirmDialog(
-                            "고정 카테고리는 반복 설정이 필요합니다.\n반복 설정을 하시겠습니까?",
-                        ) {
-                            onUpdateCategory(category)
-                            isShowRepeatCycleModalBottomSheet = true
-                        }
-                    } else {
-                        onUpdateCategory(category)
-                    }
-                },
+                onCategoryClick = onUpdateCategory,
                 onCategoryTagClick = onUpdateCategoryTag
             )
 
-            // 결제 수단 선택
-            PaymentMethodTextField(
-                modifier = Modifier.padding(top = 24.dp),
-                selectedLargeCategory = uiState.selectedLargeCategory,
-                selectedPaymentMethod = uiState.paymentMethod,
-                onPaymentMethodClick = { isShowPaymentMethodModalBottomSheet = true }
-            )
-
-            // 내용 입력
-            WMTextField(
-                modifier = Modifier.padding(top = 24.dp, bottom = 48.dp),
-                value = uiState.content,
-                onValueChange = onUpdateContent,
-                label = "내용",
-                maxLength = 20,
-                isRequire = uiState.category?.isFixed.default() || uiState.repeatCycle != null,
-                placeholder = "내용을 입력해 주세요.",
-            )
+            WMSpacer(size = SpacerSize.LARGE)
         }
 
         WMFloatingButton(
@@ -353,6 +344,28 @@ fun AddHistoryContent(
             onConfirmClick = onUpdatePaymentMethod,
             selectedPaymentMethod = uiState.paymentMethod,
             paymentMethodItems = uiState.paymentMethodItems
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun AddHistoryContentPreview() {
+    WMTheme {
+        AddHistoryContent(
+            uiState = AddHistoryUiState(),
+            onBack = {},
+            onUpdateLargeCategory = {},
+            onUpdateDate = {},
+            onUpdateRepeatCycle = {},
+            onUpdateTotalInstallmentCount = {},
+            onUpdateAmount = {},
+            onUpdateCategory = {},
+            onUpdateCategoryTag = {},
+            onUpdatePaymentMethod = {},
+            onUpdateContent = {},
+            onSaveHistory = {},
+            onShowConfirmDialog = { _, _ -> }
         )
     }
 }

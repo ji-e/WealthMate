@@ -25,9 +25,7 @@ data class AddHistoryUiState(
     val categoryItems: List<CategoryVo> = emptyList(),
     val paymentMethodItems: List<PaymentMethodVo> = emptyList(),
 ) : BaseUiState {
-    val isSaveButtonEnable = amount.text.isNotBlank() &&
-            (category?.isFixed != true || content.text.isNotBlank()) &&
-            (repeatCycle == null || content.text.isNotBlank())
+    val isSaveButtonEnable = amount.text.isNotBlank()
 }
 
 sealed class AddHistoryUiSideEffect : UiSideEffect {
