@@ -6,15 +6,20 @@ WealthMate는 일상의 거래 내역을 기록·분류하고, 예산을 세워 
 
 ## 📱 스크린샷
 
-| 홈 (대시보드) | 카테고리별 통계 | 캘린더 |
+| 홈 (대시보드) | 캘린더 | 예산 관리 |
 |:---:|:---:|:---:|
-| <img src="docs/01_home.png" width="220"/> | <img src="docs/02_stats.png" width="220"/> | <img src="docs/03_calendar.png" width="220"/> |
-| 오늘·이번 달 지출, 예산 대비 현황 | 카테고리·결제수단별 지출 분석 | 날짜별 내역 + 월간 패턴 |
+| <img src="docs/01_home.png" width="220"/> | <img src="docs/02_calendar.png" width="220"/> | <img src="docs/03_budget.png" width="220"/> |
+| 오늘·이번 달 지출, 예산 대비 현황 | 날짜별 내역 + 월간 패턴 | 월별 예산·지출률·초과 추적 |
 
-| 예산 | 검색 | 거래 추가 |
+| 예산 추가 | 거래 추가 | 검색 |
 |:---:|:---:|:---:|
-| <img src="docs/04_budget.png" width="220"/> | <img src="docs/05_search.png" width="220"/> | <img src="docs/06_add.png" width="220"/> |
-| 월별 예산 설정·초과 추적 | 기간·카테고리·결제수단 다중 필터 | 수입/지출/저축 입력, 반복·할부 |
+| <img src="docs/04_budget_add.png" width="220"/> | <img src="docs/05_add.png" width="220"/> | <img src="docs/06_search.png" width="220"/> |
+| 카테고리별 예산 슬라이더·상세 태그 | 수입/지출/저축 입력, 반복·할부 | 기간·카테고리·결제수단 다중 필터 |
+
+| 카테고리 관리 | 반복 설정 | 백업·복구 (Google Drive) |
+|:---:|:---:|:---:|
+| <img src="docs/07_category.png" width="220"/> | <img src="docs/08_recurring.png" width="220"/> | <img src="docs/09_backup.png" width="220"/> |
+| 카테고리·상세 태그 편집·정렬 | 고정 반복 거래 관리 | Google 로그인 + Drive 백업/복구 |
 
 > Android · iOS 동일 코드베이스 (Kotlin Multiplatform + Compose Multiplatform)
 
