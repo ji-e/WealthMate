@@ -4,6 +4,20 @@
 
 WealthMate는 일상의 거래 내역을 기록·분류하고, 예산을 세워 지출을 관리하며, 데이터를 Google Drive로 백업·동기화하는 **개인 가계부 앱**입니다. Android와 iOS를 Compose Multiplatform으로 함께 지원합니다.
 
+## 📱 스크린샷
+
+| 홈 (대시보드) | 카테고리별 통계 | 캘린더 |
+|:---:|:---:|:---:|
+| <img src="docs/01_home.png" width="220"/> | <img src="docs/02_stats.png" width="220"/> | <img src="docs/03_calendar.png" width="220"/> |
+| 오늘·이번 달 지출, 예산 대비 현황 | 카테고리·결제수단별 지출 분석 | 날짜별 내역 + 월간 패턴 |
+
+| 예산 | 검색 | 거래 추가 |
+|:---:|:---:|:---:|
+| <img src="docs/04_budget.png" width="220"/> | <img src="docs/05_search.png" width="220"/> | <img src="docs/06_add.png" width="220"/> |
+| 월별 예산 설정·초과 추적 | 기간·카테고리·결제수단 다중 필터 | 수입/지출/저축 입력, 반복·할부 |
+
+> Android · iOS 동일 코드베이스 (Kotlin Multiplatform + Compose Multiplatform)
+
 ## 소개
 
 - **거래 기록** — 수입·지출·저축 내역을 카테고리·결제수단·날짜로 기록하고 편집합니다.
