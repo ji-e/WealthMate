@@ -49,7 +49,6 @@ WealthMate는 일상의 거래 내역을 기록·분류하고, 예산을 세워 
 - **Voyager** 1.1.0-beta03 — 네비게이션 (ScreenModel)
 - **Koin** 4.1.1 — 의존성 주입
 - **Room** 2.8.4 (+ androidx.sqlite) — 로컬 SQLite 데이터베이스
-- **Ktor Client** 3.4.0 — Google Drive API 연동
 - **KmpAuth** — Google OAuth 인증
 - **Multiplatform Settings** — 키-값 저장(토큰 등)
 - **kotlinx** — Coroutines / Serialization / DateTime / Collections-Immutable
